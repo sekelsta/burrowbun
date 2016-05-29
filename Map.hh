@@ -1,6 +1,9 @@
 #include <iostream>
-#include <fstream>
+#include <fstream> // To write and read files
 #include <cassert>
+#include <cstdlib> // For randomness
+#include <ctime> // To seed the random number generator
+#include "Tile.hh"
 #include "MapHelpers.hh"
 
 using namespace std;
@@ -16,8 +19,8 @@ class Map {
     // The height and width of the map, in number of tiles
     int height, width;
 
-    // Return a pointer to the tile* at row, col
-    Tile **findPointer(int row, int col) const;
+    // Return a pointer to the tile* at x, y
+    Tile **findPointer(int x, int y) const;
 
     // Copy fields, to make assignment and copy-construction eaasier
     void copyFields(const Map &m);
@@ -31,8 +34,8 @@ class Map {
     // Generate an Earth-type world
     void generateEarth();
 
-    // Make a mountain at row, col
-    void mountain(int row, int col);
+    // Make a mountain at x, y
+    void mountain(int x, int y);
 
 public:
     //  1-argument constructor
@@ -59,12 +62,12 @@ public:
     // Return the width of the map, in number of tiles
     int getWidth() const;
 
-    // Return the value of the tile at row, col
+    // Return the value of the tile at x, y
     // 0, 0 is the bottom right
-    Tile *getTile(int row, int col) const;
+    Tile *getTile(int x, int y) const;
 
-    // Set the tile at row, col equal to val
-    void setTile(int row, int col, Tile *val);
+    // Set the tile at x, y equal to val
+    void setTile(int x, int y, Tile *val);
 
     // Write the map to a file
     void save(string filename) const;

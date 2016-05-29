@@ -36,95 +36,11 @@ enum class Direction {
     EAST
 };
 
-// A class for keeping track of which tiles there are
-enum class TileType {
-    MAGMA = 200,
-    EMPTY = 255,
-    DIRT = 10,
-    STONE = 100,
-    PLATFORM = 150
-};
-
 // A class for passing a biome argument
 enum class WorldType {
     TEST,
     EARTH,
     MOON
-};
-
-/* A class to make tiles based on their type, and storre their infos. */
-class Tile {
-public:
-    // The name of this type of tile
-    TileType type;
-
-    // The height and width of the tile when displayed in game, in pixels
-    int height, width;
-
-    // The name of the image file
-    std::string sprite;
-
-    // Variables for how it interacts with the players
-    bool isSolid;    // Whether players can go through it
-    bool isPlatform; // Whether players collide with the underside
-
-    // Variables to use in map generation and upkeep
-    // In these ones, -1 means infinity
-    float mass;        // How heavy one tile of it is
-    float erodeResist;  // How hard it is to erode
-    float maxTorque;   // How much it can take before it falls over
-    float maxPressure; // How much pressure before it metamorphoses
-    // TODO: implement heat-based metamorphism
-    TileType pressureMetamorph; // What it becomes
-
-    // Constructor, based on the tile type
-    Tile(TileType tileType) {
-        type = tileType;
-        // Set Height and width. It's probably best if this is the same
-        // for all types of tiles. Maybe it should be a field of Map.
-        height = 20;
-        width = 20;
-        // These varables will usually be these values
-        isSolid = true;
-        isPlatform = false;
-        erodeResist = -1;
-        maxTorque = 0;
-        maxPressure = -1;
-        // Set things to the right values
-        switch(tileType) {
-            case TileType::EMPTY : 
-                sprite = "empty.png";
-                isSolid = false;
-                mass = 0;
-                break;
-            case TileType::PLATFORM :
-                sprite = "platform.png";
-                mass = 0;
-                isPlatform = true;
-                break;
-            case TileType::DIRT :
-                sprite = "dirt.png";
-                mass = 5;
-                erodeResist = 10;
-                maxTorque = 1;
-                maxPressure = 500;
-                pressureMetamorph = TileType::STONE;
-                break;
-            case TileType::STONE :
-                sprite = "stone.png";
-                mass = 10;
-                erodeResist = 100;
-                maxTorque = 50;
-                maxPressure = 10000;
-                pressureMetamorph = TileType::MAGMA;
-                break;
-            case TileType::MAGMA :
-                sprite = "magma.png";
-                mass = 15;
-                maxTorque = 10;
-                break;
-        }
-    }
 };
 
 /* A class for storing numbers that go between squares on a grid. It 
