@@ -1,3 +1,4 @@
+#include <vector>
 #include <iostream>
 #include <fstream> // To write and read files
 #include <cassert>
@@ -15,6 +16,10 @@ class Map {
     // The array to hold the map info
     // This is a 2d array squished into 1d
     Tile **tiles;
+
+    // A list of the pointers in the map
+    // Basically these are the ones that contain manually allocated memeory
+    vector<Tile *> pointers;
 
     // The height and width of the map, in number of tiles
     int height, width;

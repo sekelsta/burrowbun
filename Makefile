@@ -2,7 +2,7 @@ CXXFLAGS = -std=c++14 -Wall
 
 all : main
 
-main : main.cc Map.cc Map.hh Tile.cc Tile.hh MapHelpers.hh
+main : main.o Map.o Tile.o
 	$(CXX) $(CXXFLAGS) $^ -o $@ $(LDFLAGS)
 
 clean :

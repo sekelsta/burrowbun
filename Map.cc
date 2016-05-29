@@ -25,12 +25,19 @@ Map::Map(const Map &m) {
 
 // Destructor
 Map::~Map() {
+    // Delete the map
     delete[] tiles;
+    // Delete each tile object
+    while (pointers.empty() == false) {
+        delete pointers.back();
+        pointers.pop_back();
+    }
 }
 
 // Helper function for copy-constructor and assignment operator
 void Map::copyFields(const Map &m) {
     // If I ever add more fields, I'll need to change this
+    // TODO: need to copy the *tile things too
     height = m.getHeight();
     width = m.getWidth();
     for (int i = 0; i < width; i++) {
@@ -113,35 +120,38 @@ void Map::generateTest() {
     // array of TileType, and is less bulky than construcing a new member
     // of the class for each one.
     // Later types of tiles might need to be unique objects
-    // Except this doesn't work because the variables go out of scope
-    Tile empty = Tile(TileType::EMPTY);
-    Tile stone = Tile(TileType::STONE);
-    Tile platform = Tile(TileType::PLATFORM);
+    // Also adds the addresses of the tile to the vector pointers
+    Tile *empty = new Tile(TileType::EMPTY);
+    pointers.push_back(empty);
+    Tile *stone = new Tile(TileType::STONE);
+    pointers.push_back(stone);
+    Tile *platform = new Tile(TileType::PLATFORM);
+    pointers.push_back(platform);
     // Set height and width, and use them to make a tile array
     height = 100;
     width = 200;
     tiles = new Tile*[height * width];
     // Set all tiles to empty, then make some that aren't
-    setAll(&empty);
+    setAll(empty);
 
     // Make the bottom solid
     for (int i = 0; i < width; i++) {
         for (int j = 0; j < 20; j++) {
-            setTile(i, j, &stone);
+            setTile(i, j, stone);
         }
     }
 
     // Add a couple lines and some platforms
     for (int i = 20; i < 80; i++) {
-        setTile(i, 40, &stone);
-        setTile(i, 50, &platform);
-        setTile(i, 60, &stone);
+        setTile(i, 40, stone);
+        setTile(i, 50, platform);
+        setTile(i, 60, stone);
     }
 
     // Add some diagonal lines
     for (int i = 20; i < 60; i++) {
-        setTile(100 + i, i + 10, &stone);
-        setTile(100 - i, i + 10, &stone);
+        setTile(100 + i, i + 10, stone);
+        setTile(100 - i, i + 10, stone);
     }
 }
 
@@ -149,12 +159,17 @@ void Map::generateTest() {
 void Map::generateEarth() {
     // Construct generic members of relevent classes, since we don't
     // actually need a new Tile object for every instance of that type
-    // Except this doesn't work because the variables go out of scope
-    Tile empty = Tile(TileType::EMPTY);
-    Tile stone = Tile(TileType::STONE);
-    Tile dirt = Tile(TileType::DIRT);
-    Tile magma = Tile(TileType::MAGMA);
-    Tile platform = Tile(TileType::PLATFORM);
+    // Add them to the pointers vector, so they can be deleted later
+    Tile *empty = new Tile(TileType::EMPTY);
+    pointers.push_back(empty);
+    Tile *stone = new Tile(TileType::STONE);
+    pointers.push_back(stone);
+    Tile *dirt = new Tile(TileType::DIRT);
+    pointers.push_back(dirt);
+    Tile *magma = new Tile(TileType::MAGMA);
+    pointers.push_back(magma);
+    Tile *platform = new Tile(TileType::PLATFORM);
+    pointers.push_back(platform);
 
     // TODO: make this actually do something interesting
     height = 10;
@@ -162,18 +177,18 @@ void Map::generateEarth() {
 
     // Create the array of tiles
     tiles = new Tile*[height * width];
-    setAll(&empty);
+    setAll(empty);
 
     // Make a horizon line for a continent
     int horizon = 4;
     int magmaLevel = 2;
     for (int x = 0; x < width; x++) {
         for (int y = 0; y < magmaLevel; y++) {
-            setTile(x, y, &magma);
+            setTile(x, y, magma);
             assert(getTile(x, y) -> type == TileType::MAGMA);
         }
         for (int y = magmaLevel; y < horizon; y++) {
-            setTile(x, y, &stone);
+            setTile(x, y, stone);
             assert(getTile(x, y) -> type == TileType::STONE);
         }
     }
