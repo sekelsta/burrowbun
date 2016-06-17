@@ -29,14 +29,14 @@ public:
     std::string sprite;
 
     // Variables for how it interacts with the players
-    bool isSolid;    // Whether players can go through it
     bool isPlatform; // Whether players collide with the underside
+    // Player speed is multiplied by passage of the tiles the player is in
+    double passage;
 
     // Variables to use in map generation and upkeep
     // In these ones, -1 means infinity
     float mass;        // How heavy one tile of it is
     float erodeResist;  // How hard it is to erode
-    float maxTorque;   // How much it can take before it falls over
     float maxPressure; // How much pressure before it metamorphoses
     // TODO: implement heat-based metamorphism
     TileType pressureMetamorph; // What it becomes

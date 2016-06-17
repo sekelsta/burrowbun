@@ -12,16 +12,15 @@ Tile::Tile(TileType tileType) {
     height = 20;
     width = 20;
     // These variables will usually be these values
-    isSolid = true;
+    passage = 0;
     isPlatform = false;
     erodeResist = -1;
-    maxTorque = 0;
     maxPressure = -1;
     // Set things to the right values
     switch(tileType) {
         case TileType::EMPTY : 
             sprite = "empty.png";
-            isSolid = false;
+            passage = 0;
             mass = 0;
             break;
         case TileType::PLATFORM :
@@ -33,7 +32,6 @@ Tile::Tile(TileType tileType) {
             sprite = "dirt.png";
             mass = 5;
             erodeResist = 10;
-            maxTorque = 1;
             maxPressure = 500;
             pressureMetamorph = TileType::STONE;
             break;
@@ -41,27 +39,23 @@ Tile::Tile(TileType tileType) {
             sprite = "stone.png";
             mass = 10;
             erodeResist = 100;
-            maxTorque = 50;
             maxPressure = 10000;
             pressureMetamorph = TileType::MAGMA;
             break;
         case TileType::MAGMA :
             sprite = "magma.png";
             mass = 15;
-            maxTorque = 10;
             break;
         case TileType::SANDSTONE :
             sprite = "sandstone.png";
             mass = 10;
             erodeResist = 100;
-            maxTorque = 50;
             // TODO: pressure metamorph is quartzite
             break;
         case TileType::MUDSTONE :
             sprite = "mudstone.png";
             mass = 10;
             erodeResist = 100;
-            maxTorque = 50;
             break;
     }
 }
