@@ -25,7 +25,7 @@ public:
     const TileType type;
 
     // The height and width of the tile when displayed in game, in pixels
-    const int height, width;
+    int height, width;
 
     // The name of the image file
     std::string sprite;
