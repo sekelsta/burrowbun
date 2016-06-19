@@ -16,14 +16,16 @@ enum class TileType {
     MUDSTONE
 };
 
-/* A class to make tiles based on their type, and storre their infos. */
+/* A class to make tiles based on their type, and store their infos. */
+// Maybe since maps are filled with pointers to the same tile, everything
+// should be constant
 class Tile {
 public:
     // The name of this type of tile
-    TileType type;
+    const TileType type;
 
     // The height and width of the tile when displayed in game, in pixels
-    int height, width;
+    const int height, width;
 
     // The name of the image file
     std::string sprite;
