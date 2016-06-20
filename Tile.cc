@@ -2,11 +2,9 @@
 
 using namespace std;
 
-
 // Constructor, based on the tile type
 // This is basically a long list of the attributes of each tile type
-Tile::Tile(TileType tileType) {
-    type = tileType;
+Tile::Tile(TileType tileType) : type(tileType) {
     // Set Height and width. It's probably best if this is the same
     // for all types of tiles. Maybe it should be a field of Map.
     height = 20;
