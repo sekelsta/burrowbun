@@ -25,7 +25,10 @@ public:
     const TileType type;
 
     // The height and width of the tile when displayed in game, in pixels
-    int height, width;
+    unsigned height, width;
+
+    // This tile's position in the map's vector of tile pointers
+    unsigned index;
 
     // The name of the image file
     std::string sprite;
@@ -37,13 +40,13 @@ public:
 
     // Variables to use in map generation and upkeep
     // In these ones, -1 means infinity
-    float mass;        // How heavy one tile of it is
-    float erodeResist;  // How hard it is to erode
-    float maxPressure; // How much pressure before it metamorphoses
+    double mass;        // How heavy one tile of it is
+    double erodeResist;  // How hard it is to erode
+    double maxPressure; // How much pressure before it metamorphoses
     // TODO: implement heat-based metamorphism
     TileType pressureMetamorph; // What it becomes
 
     // Constructor, based on the tile type
     // Also the only actual method Tiles have
-    Tile(TileType tileType);
+    Tile(TileType tileType, unsigned index);
 };

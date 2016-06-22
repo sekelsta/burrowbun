@@ -1,1 +1,1 @@
-This is a sandbox game similar to Terraria and Starbound. Currently it only generates a map.
+This is a sandbox game similar to Terraria and Starbound. Currently it only generates a map, saves it to a file, and opens an unrelated window.

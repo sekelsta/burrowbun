@@ -16,17 +16,17 @@ using namespace std;
 // locations are the same or not.
 class Location {
 public:
-    // The row and column of the location
-    int row;
-    int col;
+    // The x and y values of the location
+    int x;
+    int y;
 
     // Constructors for initializing locations
-    Location(int row, int col) : row(row), col(col) { }
-    Location() : row(0), col(0) { }
+    Location(int x, int y) : x(x), y(y) { }
+    Location() : x(0), y(0) { }
     
     // Returns true if this location is the same as the specified location
     bool operator==(const Location &loc) const {
-        return row == loc.row && col == loc.col;
+        return x == loc.x && y == loc.y;
     }
     
     // Returns true if this location is different from the specified location
@@ -176,6 +176,9 @@ public:
 
     // Set the tile at x, y equal to val
     void setTile(int x, int y, const Tile* const &val);
+
+    // Gets the map's list of the tile pointers it uses
+    vector<const Tile *> getPointers();
 
     // Write the map to a file
     void save(const string &filename) const;

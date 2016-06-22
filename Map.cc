@@ -18,7 +18,7 @@ const Tile **Map::findPointer(int x, int y) const {
 
 // Make a new Tile *, add it to the list of pointers, and return the pointer
 const Tile *Map::makeTile(TileType val) {
-    const Tile *tile = new Tile(val);
+    const Tile *tile = new Tile(val, pointers.size());
     pointers.push_back(tile);
     return tile;
 }
@@ -518,6 +518,11 @@ const Tile *Map::getTile(int x, int y) const {
 // Set the tile at x, y equal to val
 void Map::setTile(int x, int y, const Tile* const &val) {
     *findPointer(x, y) = val;
+}
+
+// Gets the map's list of the tile pointers it uses
+vector<const Tile *> Map::getPointers() {
+    return pointers;
 }
 
 // Write the map to a file
