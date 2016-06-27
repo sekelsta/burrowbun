@@ -15,11 +15,6 @@ Tile::Tile(TileType tileType, unsigned index)
     erodeResist = -1;
     maxPressure = -1;
 
-    // Set the default color key to cyan
-    red = 0;
-    green = 0xFF;
-    blue = 0xFF;
-
     // Set things to the right values
     switch(tileType) {
         case TileType::EMPTY : 

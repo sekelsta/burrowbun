@@ -31,11 +31,6 @@ public:
     // The name of the image file
     std::string sprite;
 
-    // A color for keying. This color will become transparent
-    Uint8 red;
-    Uint8 green;
-    Uint8 blue;
-
     // The texture made from that image file
     SDL_Texture *texture;
 

@@ -45,8 +45,8 @@ class WindowHandler {
     // A list of all textures that have been loaded
     vector<SDL_Texture *> textures;
 
-    // A 3D vector of SLD rects for rendering the map
-    vector<vector<vector<SDL_Rect>>> tileRects;
+    // A 2D vector of SLD rects for rendering the map
+    vector<vector<SDL_Rect>> tileRects;
 
     // Private methods
 
@@ -67,8 +67,8 @@ public:
     // Load the images
     bool loadMedia(vector<Tile *> &pointers);
 
-    // Load a texture, color keying rgb to transparent
-    SDL_Texture *loadTexture(const string &name, Uint8 r, Uint8 g, Uint8 b);
+    // Load a texture
+    SDL_Texture *loadTexture(const string &name);
 
     // Load a texture for each tile
     bool loadTiles(vector<Tile *> &pointers);

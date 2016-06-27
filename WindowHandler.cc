@@ -11,10 +11,14 @@ SDL_Rect WindowHandler::findCamera(int x, int y) {
     camera.h = SCREEN_HEIGHT;
 
     // Adjust the camera if necessary, so that it's entirely on the screen
-    camera.x = max(0, camera.x);
-    camera.y = max(0, camera.y);
     camera.x = min(camera.x, worldWidth - SCREEN_WIDTH);
     camera.y = min(camera.y, worldHeight - SCREEN_HEIGHT);
+    camera.x = max(0, camera.x);
+    camera.y = max(0, camera.y);
+
+    // If, God forbid, the map is smaller than the camera, shrink the camera
+    camera.w = min(camera.w, worldWidth - TILE_HEIGHT);
+    camera.h = min(camera.h, worldHeight - TILE_WIDTH);
 
     return camera;
 }
@@ -40,15 +44,11 @@ WindowHandler::WindowHandler(int screenWidth, int screenHeight,
     screenSurface = NULL;
     renderer = NULL;
 
-    // Set the 3D vector of rects for the tiles
-    // Access goes [x][y][i], where i = 0 for the rectangle to draw from
-    // and i = 1 for the rectangle to draw to
+    // Set the 2D vector of rects for the tiles
+    // Access goes [x][y]
     tileRects.resize((SCREEN_WIDTH / TILE_WIDTH) + 1);
     for (unsigned i = 0; i < tileRects.size(); i++) {
         tileRects[i].resize((SCREEN_HEIGHT / TILE_HEIGHT) + 1);
-        for (unsigned j = 0; j < tileRects[i].size(); j++) {
-            tileRects[i][j].resize(2);
-        }
     }
 }
 
@@ -118,8 +118,7 @@ bool WindowHandler::loadMedia(vector<Tile *> &pointers) {
 }
 
 // Load an image onto a surface and convert it to match the screen
-SDL_Texture *WindowHandler::loadTexture(const string &name, 
-                                        Uint8 r, Uint8 g, Uint8 b) {
+SDL_Texture *WindowHandler::loadTexture(const string &name) {
     // Declare variables and load a surface
     SDL_Surface *surface = IMG_Load(name.c_str());
     SDL_Texture *texture = NULL;
@@ -129,10 +128,6 @@ SDL_Texture *WindowHandler::loadTexture(const string &name,
     }
     // Make a texture
     else {
-        // Color key
-        SDL_SetColorKey(surface, SDL_TRUE, 
-                            SDL_MapRGB(surface -> format, r, g, b));
-
         // Convert the surface to a texture
         texture = SDL_CreateTextureFromSurface(renderer, surface);
         if (texture == NULL) {
@@ -155,10 +150,7 @@ bool WindowHandler::loadTiles(vector<Tile *> &pointers) {
     bool success = true;
     for (unsigned i = 0; i < pointers.size(); i++) {
         string name = TILE_PATH + pointers[i] -> sprite;
-        Uint8 r = pointers[i] -> red;
-        Uint8 b = pointers[i] -> blue;
-        Uint8 g = pointers[i] -> green;
-        loadTexture(name, r, g, b);
+        loadTexture(name);
         assert(textures.size() != 0);
         if (textures.back() == NULL) {
             success = false;
@@ -183,73 +175,43 @@ void WindowHandler::renderMap(const Map &m, unsigned x, unsigned y) {
     // Find the camera
     SDL_Rect camera = findCamera(x, y);
 
-    // Rectangles to draw from or to
-    SDL_Rect *rectFrom, *rectTo;
+    // Rectangle to draw to
+    SDL_Rect *rectTo;
 
     // Iterate through every tile at least partially within the camera
     for (int i = 0; i < (camera.w / TILE_WIDTH) + 1; i++) {
+        int xRectTo = i * TILE_WIDTH - (camera.x % TILE_WIDTH);
         for (int j = 0; j < (camera.h / TILE_HEIGHT) + 1; j++) {
-            // Set the rectangles to the correct ones in the vector3D
-            rectFrom = &tileRects[i][j][0];
-            rectTo = &tileRects[i][j][1];
+            // Set the rectangle to the correct one in the vector2D
+            rectTo = &tileRects[i][j];
 
-            // TODO: It might be better to move this outside this for loop
-            // Also it should be possible to replace most of this with a 
-            // linear transform
-            // Figure out whether they're partially or fully one the screen
-            // in the x direction
-            if (i == 0) {
-                // Only draw the right part of the tile
-                rectFrom -> x = camera.x % TILE_WIDTH;
-                rectTo -> x = 0;
-                rectFrom -> w = rectTo -> w = TILE_WIDTH - rectFrom -> x;
-            }
-            else if (i == camera.w / TILE_WIDTH) {
-                // Only draw the left half
-                rectFrom -> x = 0;
-                // The x coordinate of the right edge of the camera
-                int right = camera.x + camera.w;
-                rectTo -> x = camera.w - (right % TILE_WIDTH);
-                rectFrom -> w = rectTo -> w = right % TILE_WIDTH;
-            }
-            else {
-                // Draw the entire tile
-                rectFrom -> x = 0;
-                rectFrom -> w = TILE_WIDTH;
-                rectTo -> x = (TILE_WIDTH - (camera.x % TILE_WIDTH));
-                rectTo -> x += (i - 1) * TILE_WIDTH;
-                rectTo -> w = TILE_WIDTH;
-            }
+            rectTo -> w = TILE_WIDTH;
+            rectTo -> x = xRectTo;
 
-            // Figure out whether the tile is partially off the screen
-            // in the y direction, remembering that screen y == 0 at the top
-            // but world y == 0 at the bottom
-            // j == 0 at the top of the screen
+            // Remember that screen y == 0 at the top but world y == 0 at 
+            // the bottom. Here j == 0 at the top of the screen.
             // We're not using convertRect because that doesn't align them
-            if (j == 0) {
-                int height = (camera.y + SCREEN_HEIGHT) % TILE_HEIGHT;
-                rectFrom -> y = TILE_HEIGHT - height;
-                rectTo -> y = 0;
-                rectFrom -> h = rectTo -> h = height;
-            }
-            else if (j == camera.h / TILE_HEIGHT) {
-                rectFrom -> y = 0;
-                int height = TILE_HEIGHT - (camera.y % TILE_HEIGHT);
-                rectTo -> y = SCREEN_HEIGHT - height;
-                rectFrom -> h = rectTo -> h = height;
-            }
-            else {
-                rectFrom -> y = 0;
-                rectFrom -> h = TILE_HEIGHT;
-                rectTo -> h = TILE_HEIGHT;
-                rectTo -> y = (SCREEN_HEIGHT + camera.y) % TILE_HEIGHT;
-                rectTo -> y += (j - 1) * TILE_HEIGHT;
-            }
+            // wit hthe tile grid.
+            rectTo -> h = TILE_HEIGHT;
+            rectTo -> y = (camera.h + camera.y) % TILE_HEIGHT;
+            rectTo -> y += (j - 1) * TILE_HEIGHT;
 
             // Render the tile
-            Tile *tile = m.getTile(camera.x / TILE_WIDTH + i,
-                                (camera.h + camera.y) / TILE_HEIGHT - j);
-            SDL_RenderCopy(renderer, tile -> texture, rectFrom, rectTo);
+            int xTile = (camera.x / TILE_WIDTH) + i;
+            int yTile = (camera.y + camera.h) / TILE_HEIGHT - j;
+            // But only if it's a tile that exists on the map
+            if (0 <= xTile && xTile < worldWidth / TILE_WIDTH 
+                && 0 <= yTile && yTile < worldHeight / TILE_HEIGHT) { 
+                Tile *tile = m.getTile(xTile, yTile);
+                SDL_RenderCopy(renderer, tile -> texture, NULL, rectTo);
+            }
+            else {
+                cerr << "Tried to render the tile at " << xTile;
+                cerr << ", " << yTile << endl;
+                cerr << "camera.x is " << camera.x << ", camera.y is ";
+                cerr << camera.y << ", camera.w is " << camera.w;
+                cerr << ", camera.h is " << camera.h << endl;
+            }
         }
     }
 }
