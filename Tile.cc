@@ -6,15 +6,20 @@ using namespace std;
 // This is basically a long list of the attributes of each tile type
 Tile::Tile(TileType tileType, unsigned index) 
         : type(tileType), index(index) {
-    // Set Height and width. It's probably best if this is the same
-    // for all types of tiles. Maybe it should be a field of Map.
-    height = 20;
-    width = 20;
+    // Make the pointer point to nothing
+    texture = NULL;
+
     // These variables will usually be these values
     passage = 0;
     isPlatform = false;
     erodeResist = -1;
     maxPressure = -1;
+
+    // Set the default color key to cyan
+    red = 0;
+    green = 0xFF;
+    blue = 0xFF;
+
     // Set things to the right values
     switch(tileType) {
         case TileType::EMPTY : 

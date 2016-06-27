@@ -1,0 +1,16 @@
+ - Added a changelog.
+ - Made the map once again use tiles instead of const tiles
+ - Added an SDL_Texture field to the Tile class, now that they aren't const
+   so the texture wouldn't have to be passed for construction
+ - Moved Tile's height and width fields to the WindowHandler class
+ - Added red, blue, and green fields to the tile class for color keying, which
+   turned out to be unnecessary because SDL understands translucent images
+ - Added a function to render the map, which currently makes unnecessary
+   rectangles because I didn't realize I don't need to handle cases where the
+   tile is partially off the screen separately
+ - Added a 3D vector of rectangles, which can actually just be a 2D vector
+ - Added a prototype of a function for unloading tiles to switch maps
+
+Known Bugs:
+ - When TILE_WIDTH and TILE_HEIGHT aren't 20, a horizontal and vertical line
+   of not rendering any tiles show up

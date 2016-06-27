@@ -1,5 +1,6 @@
 #include <string>
 #include <cassert>
+#include <SDL2/SDL.h>
 
 using namespace std;
 
@@ -24,14 +25,19 @@ public:
     // The name of this type of tile
     const TileType type;
 
-    // The height and width of the tile when displayed in game, in pixels
-    unsigned height, width;
-
     // This tile's position in the map's vector of tile pointers
     unsigned index;
 
     // The name of the image file
     std::string sprite;
+
+    // A color for keying. This color will become transparent
+    Uint8 red;
+    Uint8 green;
+    Uint8 blue;
+
+    // The texture made from that image file
+    SDL_Texture *texture;
 
     // Variables for how it interacts with the players
     bool isPlatform; // Whether players collide with the underside

@@ -8,7 +8,7 @@ using namespace std;
 
 // Returns a pointer to the tile* at x, y
 // Maybe I should just make tiles a 2d array
-const Tile **Map::findPointer(int x, int y) const {
+Tile **Map::findPointer(int x, int y) const {
     assert (0 <= x);
     assert (x < width);
     assert (0 <= y);
@@ -17,8 +17,8 @@ const Tile **Map::findPointer(int x, int y) const {
 }
 
 // Make a new Tile *, add it to the list of pointers, and return the pointer
-const Tile *Map::makeTile(TileType val) {
-    const Tile *tile = new Tile(val, pointers.size());
+Tile *Map::makeTile(TileType val) {
+    Tile *tile = new Tile(val, pointers.size());
     pointers.push_back(tile);
     return tile;
 }
@@ -35,13 +35,13 @@ void Map::generateTest() {
     // Later types of tiles might need to be unique objects
     // Also adds the addresses of the tile to the vector pointers
     // TODO: bugfix so it actually makes the shape it should
-    const Tile *empty = makeTile(TileType::EMPTY);
-    const Tile *stone = makeTile(TileType::STONE);
-    const Tile *platform = makeTile(TileType::PLATFORM);
+    Tile *empty = makeTile(TileType::EMPTY);
+    Tile *stone = makeTile(TileType::STONE);
+    Tile *platform = makeTile(TileType::PLATFORM);
     // Set height and width, and use them to make a tile array
     height = 500;
     width = 500;
-    tiles = new const Tile*[height * width];
+    tiles = new Tile*[height * width];
     // Set all tiles to empty, then make some that aren't
     setAll(empty);
 
@@ -72,20 +72,20 @@ void Map::generateEarth() {
     // Construct generic members of relevent classes, since we don't
     // actually need a new Tile object for every instance of that type
     // Add them to the pointers vector, so they can be deleted later
-    const Tile *empty = makeTile(TileType::EMPTY);
-    const Tile *stone = makeTile(TileType::STONE);
-    const Tile *dirt = makeTile(TileType::DIRT);
-    const Tile *magma = makeTile(TileType::MAGMA);
-    //const Tile *platform = makeTile(TileType::PLATFORM);
-    const Tile *sandstone = makeTile(TileType::SANDSTONE);
-    const Tile *mudstone = makeTile(TileType::MUDSTONE);
+    Tile *empty = makeTile(TileType::EMPTY);
+    Tile *stone = makeTile(TileType::STONE);
+    Tile *dirt = makeTile(TileType::DIRT);
+    Tile *magma = makeTile(TileType::MAGMA);
+    //Tile *platform = makeTile(TileType::PLATFORM);
+    Tile *sandstone = makeTile(TileType::SANDSTONE);
+    Tile *mudstone = makeTile(TileType::MUDSTONE);
 
     // TODO: make this actually do something interesting
     height = 500;
     width = 1024;
 
     // Create the array of tiles
-    tiles = new const Tile*[height * width];
+    tiles = new Tile*[height * width];
     setAll(empty);
 
     // Make a horizon line for a continent
@@ -104,7 +104,7 @@ void Map::generateEarth() {
 
     // Make a canyon
     int canyonPlace = 750;
-    vector<const Tile *> fill;
+    vector<Tile *> fill;
     fill.push_back(sandstone);
     fill.push_back(mudstone);
     canyon(canyonPlace, horizon, 60, -50, fill, -0.7, 2);
@@ -115,7 +115,7 @@ void Map::generateEarth() {
     }
 
     // Add a layer of dirt
-    vector<const Tile *> justdirt;
+    vector<Tile *> justdirt;
     justdirt.push_back(dirt);
     // Constructs a vector of length width with every value set to 5
     vector<double> heights (width, 5.0);
@@ -126,7 +126,7 @@ void Map::generateEarth() {
 
 
 // Set all tiles to val
-void Map::setAll(const Tile* &val) {
+void Map::setAll(Tile* const &val) {
     for (int i = 0; i < width; i++) {
         for (int j = 0; j < height; j++) {
             setTile(i, j, val);
@@ -180,14 +180,14 @@ vector<double> Map::merge(int start1, int stop1,
 }
 
 // Set everything from y1 to y2 to tile
-void Map::setTo(int x, int y1, int y2, const Tile* &tile) {
-    vector<const Tile *> fill;
+void Map::setTo(int x, int y1, int y2, Tile* const &tile) {
+    vector<Tile *> fill;
     fill.push_back(tile);
     setTo(x, y1, y2, fill);
 }
 
 // Set everything from y1 to y2 to something picked randomly from fill, at x
-void Map::setTo(int x, int y1, int y2, const vector<const Tile *> &fill) {
+void Map::setTo(int x, int y1, int y2, const vector<Tile *> &fill) {
     int miny = min(y1, y2);
     int maxy = max(y1, y2);
     assert(0 <= miny);
@@ -207,7 +207,7 @@ void Map::setTo(int x, int y1, int y2, const vector<const Tile *> &fill) {
 // From x = start to x = stop, add heights[x - start] of a randomly 
 // selected Tile* from fill, above the line given by findChange(x, top)
 void Map::addHeights(int start, int stop, const vector<double> &heights,
-                const vector<const Tile *> &fill, int top) {
+                const vector<Tile *> &fill, int top) {
     assert(0 <= start);
     assert(start <= stop);
     assert(stop <= width);
@@ -232,15 +232,15 @@ void Map::addHeights(int start, int stop, const vector<double> &heights,
 
 // Move the horizon line from findChange(x, top) to heights[x - start]
 void Map::setHeights(int start, int stop, const vector<double> &heights, 
-                    const vector<const Tile *> &above, 
-                    const vector<const Tile *> &below, int top) {
+                    const vector<Tile *> &above, 
+                    const vector<Tile *> &below, int top) {
     assert(0 <= start);
     assert(start <= stop);
     assert(stop <= width);
     assert(0 < top);
     assert(top <= height);
 
-    vector<const Tile *> fill;
+    vector<Tile *> fill;
     for (int i = 0; i < stop - start; i++) {
         int x = i + start;
         int newy = (int)heights[i];
@@ -341,7 +341,7 @@ vector<double> Map::makeTriangle(int b, int h, double mean, double stddev) {
    expected from the height and width is divided by mean to get the
    actual slope, and stddev is devietion from an exact triangle. */
 void Map::canyon(int x, int y, int width, int height, 
-                    const vector<const Tile *> &fill, 
+                    const vector<Tile *> &fill, 
                     double mean, double stddev) {
     assert(fill.size() != 0);
     // direction should be + or - 1, depending on whether this is a canyon 
@@ -350,7 +350,7 @@ void Map::canyon(int x, int y, int width, int height,
     double slope = 2.0 * (double)height / (double)width;
     width = abs(width);
     double left, right, random;
-    const Tile *tile;
+    Tile *tile;
 
     // initiatialize a normal distribution
     normal_distribution<double> distribution(mean, stddev);
@@ -380,11 +380,11 @@ void Map::canyon(int x, int y, int width, int height,
 void Map::mountain(int x, int y, int h) {
 //TODO: add randomness, make it recursive
 // TODO make the limit reasonable and add a recursive else
-    vector<const Tile *> below, above;
+    vector<Tile *> below, above;
     // TODO: find a better source of tile pointers
-    const Tile *stone = makeTile(TileType::STONE);
-    const Tile *dirt = makeTile(TileType::DIRT);
-    const Tile *empty = makeTile(TileType::EMPTY);
+    Tile *stone = makeTile(TileType::STONE);
+    Tile *dirt = makeTile(TileType::DIRT);
+    Tile *empty = makeTile(TileType::EMPTY);
     above.push_back(empty);
     below.push_back(stone);
     below.push_back(dirt);
@@ -421,7 +421,7 @@ vector<double> Map::makeHills(int length, int maxAmp, double maxFreq) const {
             /*int n = (amp * sin(i * freq + phaseShift));
             heights[i] += n;
             // Code to view what sin functions are involved
-            const Tile *tile = makeTile(TileType::MAGMA);
+            Tile *tile = makeTile(TileType::MAGMA);
             setTile(i, n + 200, tile);
             */
         }
@@ -454,8 +454,8 @@ void Map::setHills(int start, int stop, int maxAmp, double maxFreq) {
     }
 
     // Now that we have the heights, actually set the hills to those heights
-    vector<const Tile *> above(1, makeTile(TileType::EMPTY));
-    vector<const Tile *> below(1, makeTile(TileType::STONE));
+    vector<Tile *> above(1, makeTile(TileType::EMPTY));
+    vector<Tile *> below(1, makeTile(TileType::STONE));
     setHeights(start, stop, heights, above, below, height);
 }
 
@@ -511,17 +511,22 @@ Location Map::getSpawn() const {
 
 // Returns the tile pointer at x, y
 // 0, 0 is the bottom right
-const Tile *Map::getTile(int x, int y) const {
+Tile *Map::getTile(int x, int y) const {
     return *findPointer(x, y);
 }
 
 // Set the tile at x, y equal to val
-void Map::setTile(int x, int y, const Tile* const &val) {
+void Map::setTile(int x, int y, Tile* const &val) {
     *findPointer(x, y) = val;
 }
 
 // Gets the map's list of the tile pointers it uses
-vector<const Tile *> Map::getPointers() {
+vector<Tile *> Map::getPointers() const {
+    return pointers;
+}
+
+// Gets a reference to the list of pointers the map uses
+vector<Tile *> &Map::getPointersRef() {
     return pointers;
 }
 

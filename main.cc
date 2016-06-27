@@ -6,14 +6,13 @@ int main(int argc, char **argv) {
     // Do the stuff it would be doing without the images
         Map m = Map(WorldType::EARTH);
         m.save("map.world");
-        Map t = Map(WorldType::TEST);
-        t.save("test.world");
     // Declare variables for rendering a window
     const int SCREEN_WIDTH = 800;
     const int SCREEN_HEIGHT = 600;
 
     // Construct a WindowHandler
-    WindowHandler window(SCREEN_WIDTH, SCREEN_HEIGHT);
+    WindowHandler window(SCREEN_WIDTH, SCREEN_HEIGHT, m.getWidth(), 
+                            m.getHeight());
 
     // Start SDL and open the window
     if (!window.init()) {
@@ -21,7 +20,7 @@ int main(int argc, char **argv) {
     }
 
     // Load any pictures
-    if (!window.loadMedia(m.getPointers())) {
+    if (!window.loadMedia(m.getPointersRef())) {
         exit(1);
     }
 
@@ -40,7 +39,7 @@ int main(int argc, char **argv) {
         }
 
         // Put pictures on the screen
-        window.update();
+        window.update(m);
     }
     window.close();
     return 0;

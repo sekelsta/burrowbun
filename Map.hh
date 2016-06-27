@@ -14,6 +14,7 @@ using namespace std;
 // A simple class for representing locations in a 2D array.  The class also
 // implements equality/inequality operators so that we can see if two
 // locations are the same or not.
+// Maybe this should be a struct instead.
 class Location {
 public:
     // The x and y values of the location
@@ -58,11 +59,11 @@ class Map {
 
     // The array to hold the map info
     // This is a 2d array squished into 1d
-    const Tile **tiles;
+    Tile **tiles;
 
     // A list of the pointers in the map
     // Basically these are the ones that contain manually allocated memeory
-    vector<const Tile *> pointers;
+    vector<Tile *> pointers;
 
     // The height and width of the map, in number of tiles
     int height, width;
@@ -78,11 +79,11 @@ class Map {
     // Really small helper functions that don't directly change tiles
 
     // Return a pointer to the tile* at x, y
-    const Tile **findPointer(int x, int y) const;
+    Tile **findPointer(int x, int y) const;
 
     /* Make a Tile object, add it to the list of pointers, and return 
        a pointer to it. */
-    const Tile *makeTile(TileType val);
+    Tile *makeTile(TileType val);
 
     // How to make the different types of worlds
 
@@ -95,7 +96,7 @@ class Map {
     // Parts of generating a world
 
     // Set all tiles to val
-    void setAll(const Tile* &val);
+    void setAll(Tile* const &val);
 
     // Start at top and go down until the type changes
     // Return the height of the first tile of a different type
@@ -108,20 +109,20 @@ class Map {
                     int stop2, const vector<double> &heights2) const;
 
     // Set everything from y1 to y2 to tile
-    void setTo(int x, int y1, int y2, const Tile* &tile);
+    void setTo(int x, int y1, int y2, Tile* const &tile);
 
     // Set everything from y1 to y2 to something picked randomly from fill
-    void setTo(int x, int y1, int y2, const vector<const Tile *> &fill);
+    void setTo(int x, int y1, int y2, const vector<Tile *> &fill);
 
     // From x = start to x = stop, add heights[x - start] of a randomly 
     // selected Tile* from fill, above the line given by findChange(x, top)
     void addHeights(int start, int stop, const vector<double> &heights, 
-                    const vector<const Tile *> &fill, int top);
+                    const vector<Tile *> &fill, int top);
 
     // Move the line from findChange(x, top) to heights[x - start]
     void setHeights(int start, int stop, const vector<double> &heights, 
-                    const vector<const Tile *> &above, 
-                    const vector<const Tile *> &below, int top);
+                    const vector<Tile *> &above, 
+                    const vector<Tile *> &below, int top);
 
     // Linear interpolator
     double lerp(double lo, double hi, double t) const;
@@ -142,7 +143,7 @@ class Map {
        expected from the height and width is divided by mean to get the
        actual slope, and stddev is devietion from an exact triangle. */
     void canyon(int x, int y, int width, int height, 
-                    const vector<const Tile *> &fill, 
+                    const vector<Tile *> &fill, 
                     double mean, double stddev);
 
     // Make a mountain at x, y
@@ -172,13 +173,17 @@ public:
 
     // Returns the tile pointer at x, y
     // 0, 0 is the bottom right
-    const Tile *getTile(int x, int y) const;
+    Tile *getTile(int x, int y) const;
 
     // Set the tile at x, y equal to val
-    void setTile(int x, int y, const Tile* const &val);
+    void setTile(int x, int y, Tile* const &val);
 
     // Gets the map's list of the tile pointers it uses
-    vector<const Tile *> getPointers();
+    vector<Tile *> getPointers() const;
+
+    // Gets a reference to the map's list of the tile pointers it uses
+    // This might only be for setting the tile textures
+    vector<Tile *> &getPointersRef();
 
     // Write the map to a file
     void save(const string &filename) const;
