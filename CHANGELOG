@@ -1,12 +1,9 @@
 Changes since last push:
- - moved TILEWIDTH and TILE_HEIGHT from WindowHandler to main
- - The window is now resizable.
- - moved #includes from .hh files to .cc files wherever possible
- - Added include guards
- - Added movement by arrow keys and wasd
+ - Fixed the bug where the rightmost and bottommost rows of tiles weren't
+   being rendered if screen height and width weren't multiples of tile height
+   and width. 
 
 Known bugs:
- - The rightmost and bottommost rows of tiles sometimes? aren't rendered
  - When generating the world, canyon layers don't go all the way across
 
 Known "features": 

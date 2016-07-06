@@ -61,9 +61,14 @@ void WindowHandler::resize(int width, int height) {
 
     // Set the 2D vector of rects for the tiles
     // Access goes [x][y]
-    tileRects.resize((screenWidth / TILE_WIDTH) + 1);
+    tileRects.resize(ceil((float)screenWidth / (float)TILE_WIDTH) + 1);
     for (unsigned i = 0; i < tileRects.size(); i++) {
-        tileRects[i].resize((screenHeight / TILE_HEIGHT) + 1);
+        tileRects[i].resize(ceil((float)screenHeight / (float)TILE_HEIGHT) + 1);
+        // Set the tileRects to have the correct width and height
+        for (unsigned j = 0; j < tileRects[i].size(); j++) {
+            tileRects[i][j].w = TILE_WIDTH;
+            tileRects[i][j].h = TILE_HEIGHT;
+        }
     }
 }
 
@@ -119,7 +124,7 @@ bool WindowHandler::init() {
             }
         }
     }
-    // Assume the winodw is not minmized
+    // Assume the window is not minmized
     isMinimized = false;
 
     return success;
@@ -197,20 +202,22 @@ void WindowHandler::renderMap(const Map &m, unsigned x, unsigned y) {
     SDL_Rect *rectTo;
 
     // Iterate through every tile at least partially within the camera
-    for (int i = 0; i < (camera.w / TILE_WIDTH) + 1; i++) {
+    // This will be one too high or one too wide only if camera.w or
+    // camera.h is a multiple of TILE_WIDTH or TILE_HEIGHT
+    int width = ceil((float)camera.w / (float)TILE_WIDTH) + 1;
+    int height = ceil((float)camera.h / (float)TILE_HEIGHT) + 1;
+    for (int i = 0; i < width; i++) {
         int xRectTo = i * TILE_WIDTH - (camera.x % TILE_WIDTH);
-        for (int j = 0; j < (camera.h / TILE_HEIGHT) + 1; j++) {
+        for (int j = 0; j < height; j++) {
             // Set the rectangle to the correct one in the vector2D
             rectTo = &tileRects[i][j];
 
-            rectTo -> w = TILE_WIDTH;
             rectTo -> x = xRectTo;
 
             // Remember that screen y == 0 at the top but world y == 0 at 
             // the bottom. Here j == 0 at the top of the screen.
             // We're not using convertRect because that doesn't align them
-            // wit hthe tile grid.
-            rectTo -> h = TILE_HEIGHT;
+            // with the tile grid.
             rectTo -> y = (camera.h + camera.y) % TILE_HEIGHT;
             rectTo -> y += (j - 1) * TILE_HEIGHT;
 
@@ -248,7 +255,7 @@ void WindowHandler::update(const Map &map, const vector<Movable *> &movables) {
     if (!isMinimized) {
 
         // Put stuff on it
-        // movables[0] should be the player
+        // movables[0] should be the 
         renderMap(map, movables[0] -> x, movables[0] -> y);
 
         // Update the screen
