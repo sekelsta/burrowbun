@@ -1,12 +1,9 @@
+#ifndef MAP_HH
+#define MAP_HH
+
 #include <vector>
 #include <string>
-#include <iostream>
-#include <fstream> // To write and read files
-#include <cassert>
-#include <cstdlib> // For randomness
-#include <ctime> // To seed the random number generator
 #include <random> // For the fancy randomness like a normal distribution
-#include <math.h> // because pi
 #include "Tile.hh"
 
 using namespace std;
@@ -128,11 +125,11 @@ class Map {
     double lerp(double lo, double hi, double t) const;
 
     // Generate Perlin noise of length times * wavelength
-    vector<double>noise(double range, int times, int wavelength) const;
+    vector<double> noise(double range, int times, int wavelength) const;
 
     // Make an array containing the information for an irregular triangle with
     // width b and height h
-    vector<double>makeTriangle(int b, int h, double mean, double stddev);
+    vector<double> makeTriangle(int b, int h, double mean, double stddev);
 
     /* Make a canyon, and fill it with alternating layers of fill
        This can also be used to make triangles with alternating layers of fill
@@ -150,7 +147,7 @@ class Map {
     void mountain(int x, int y, int height);
 
     // Make an array containing the information for sinusoidal hills
-    vector<double>makeHills(int length, int maxAmp, double maxFreq) const;
+    vector<double> makeHills(int length, int maxAmp, double maxFreq) const;
 
     // Actually put said sinusoidal hills on the map, adjusting for height
     void setHills(int start, int stop, int maxAmp, double maxFreq);
@@ -188,3 +185,5 @@ public:
     // Write the map to a file
     void save(const string &filename) const;
 };
+
+#endif

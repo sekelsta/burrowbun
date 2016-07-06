@@ -1,3 +1,6 @@
+#include <cassert>
+#include <iostream>
+#include <SDL2/SDL_image.h>
 #include "WindowHandler.hh"
 
 using namespace std;
@@ -5,14 +8,14 @@ using namespace std;
 // Return a rectangle in world coordinates with x and y at the center
 SDL_Rect WindowHandler::findCamera(int x, int y) {
     SDL_Rect camera;
-    camera.x = x - SCREEN_WIDTH / 2;
-    camera.y = y - SCREEN_HEIGHT / 2;
-    camera.w = SCREEN_WIDTH;
-    camera.h = SCREEN_HEIGHT;
+    camera.x = x - screenWidth / 2;
+    camera.y = y - screenHeight / 2;
+    camera.w = screenWidth;
+    camera.h = screenHeight;
 
     // Adjust the camera if necessary, so that it's entirely on the screen
-    camera.x = min(camera.x, worldWidth - SCREEN_WIDTH);
-    camera.y = min(camera.y, worldHeight - SCREEN_HEIGHT);
+    camera.x = min(camera.x, worldWidth - screenWidth);
+    camera.y = min(camera.y, worldHeight - screenHeight);
     camera.x = max(0, camera.x);
     camera.y = max(0, camera.y);
 
@@ -27,7 +30,7 @@ SDL_Rect WindowHandler::findCamera(int x, int y) {
 SDL_Rect WindowHandler::convertRect(SDL_Rect rect, int x, int y) {
     SDL_Rect camera = findCamera(x, y);
     int xScreen = rect.x - camera.x;
-    int yScreen = camera.y + SCREEN_HEIGHT - rect.y;
+    int yScreen = camera.y + screenHeight - rect.y;
     SDL_Rect screenRect = { xScreen, yScreen, rect.w, rect.h };
 
     return screenRect;
@@ -35,9 +38,9 @@ SDL_Rect WindowHandler::convertRect(SDL_Rect rect, int x, int y) {
 
 // Constructor
 WindowHandler::WindowHandler(int screenWidth, int screenHeight, 
-                                int mapWidth, int mapHeight) 
-    : SCREEN_WIDTH(screenWidth), SCREEN_HEIGHT(screenHeight), 
-        TILE_WIDTH(20), TILE_HEIGHT(20), TILE_PATH("content/"), 
+                    int mapWidth, int mapHeight, int tileWidth, int tileHeight) 
+    : screenWidth(screenWidth), screenHeight(screenHeight), 
+        TILE_WIDTH(tileWidth), TILE_HEIGHT(tileHeight), TILE_PATH("content/"), 
         worldWidth(TILE_WIDTH * mapWidth),
         worldHeight(TILE_HEIGHT * mapHeight) {
     window = NULL;
@@ -45,10 +48,22 @@ WindowHandler::WindowHandler(int screenWidth, int screenHeight,
     renderer = NULL;
 
     // Set the 2D vector of rects for the tiles
+    resize(screenWidth, screenHeight);
+}
+
+void WindowHandler::setMinimized(bool minimized) {
+    isMinimized = minimized;
+}
+
+void WindowHandler::resize(int width, int height) {
+    screenWidth = width;
+    screenHeight = height;
+
+    // Set the 2D vector of rects for the tiles
     // Access goes [x][y]
-    tileRects.resize((SCREEN_WIDTH / TILE_WIDTH) + 1);
+    tileRects.resize((screenWidth / TILE_WIDTH) + 1);
     for (unsigned i = 0; i < tileRects.size(); i++) {
-        tileRects[i].resize((SCREEN_HEIGHT / TILE_HEIGHT) + 1);
+        tileRects[i].resize((screenHeight / TILE_HEIGHT) + 1);
     }
 }
 
@@ -65,8 +80,8 @@ bool WindowHandler::init() {
     else {
         // Create window
         window = SDL_CreateWindow("Hello whirreled!", SDL_WINDOWPOS_UNDEFINED,
-                    SDL_WINDOWPOS_UNDEFINED, SCREEN_WIDTH, SCREEN_HEIGHT,
-                    SDL_WINDOW_SHOWN);
+                    SDL_WINDOWPOS_UNDEFINED, screenWidth, screenHeight,
+                    SDL_WINDOW_SHOWN | SDL_WINDOW_RESIZABLE);
         if (window == NULL) {
             cerr << "Window could not be created. SDL_Error: ";
             cerr << SDL_GetError() << endl;
@@ -104,6 +119,9 @@ bool WindowHandler::init() {
             }
         }
     }
+    // Assume the winodw is not minmized
+    isMinimized = false;
+
     return success;
 }
 
@@ -217,25 +235,25 @@ void WindowHandler::renderMap(const Map &m, unsigned x, unsigned y) {
 }
 
 // Update the screen
-void WindowHandler::update(const Map &m) {
+void WindowHandler::update(const Map &map, const vector<Movable *> &movables) {
     // Clear the screen
     SDL_RenderClear(renderer);
 
     // Put a black rectangle in the background
-    SDL_Rect fillRect = { 0, 0, SCREEN_WIDTH, SCREEN_HEIGHT };
+    SDL_Rect fillRect = { 0, 0, screenWidth, screenHeight };
     SDL_SetRenderDrawColor(renderer, 0x00, 0x00, 0x00, 0xFF);
     SDL_RenderFillRect(renderer, &fillRect);
 
-    // Put stuff on it
-    renderMap(m, m.getSpawn().x * TILE_WIDTH, m.getSpawn().y * TILE_HEIGHT);
-    /*
-    SDL_Rect stretch = { 0, 0, 20, 20 };
-    SDL_RenderCopy(renderer, textures.back(), NULL, NULL);
-    SDL_RenderCopy(renderer, textures.back(), NULL, &stretch);
-    */
+    // Only draw stuff if it isn't minimized
+    if (!isMinimized) {
 
-    // Update the screen
-    SDL_RenderPresent(renderer);
+        // Put stuff on it
+        // movables[0] should be the player
+        renderMap(map, movables[0] -> x, movables[0] -> y);
+
+        // Update the screen
+        SDL_RenderPresent(renderer);
+    }
 }
 
 // Close the window, clean up, and exit SDL

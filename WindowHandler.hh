@@ -1,25 +1,26 @@
+#ifndef WINDOWHANDLER_HH
+#define WINDOWHANDLER_HH
+
 /* Note: There are three coordinate systems in use. Tile coordinates measure
 in tiles, and have y = 0 at the bottom of the map. World coordinates measure
 in pixels, and also have y = 0 at the bottom of the map. Screen coordinates
 also measure in pixels, but have y = 0 at the top of the screen. Rendering is
 the only thing screen coordinates are used for. */
 
-#include <assert.h>
-#include <iostream>
 #include <vector>
 #include <string>
-#include <vector>
 #include <SDL2/SDL.h>
-#include <SDL2/SDL_image.h>
+#include "Tile.hh"
 #include "Map.hh"
+#include "Movable.hh"
 
 using namespace std;
 
 // A class to open a window and display things to it
 class WindowHandler {
     // Fields
-    const int SCREEN_WIDTH;
-    const int SCREEN_HEIGHT;
+    int screenWidth;
+    int screenHeight;
 
     // Height and width of tiles
     const int TILE_WIDTH;
@@ -32,6 +33,9 @@ class WindowHandler {
     // Not const because it should eventually be possible to switch maps
     int worldWidth;
     int worldHeight;
+
+    // Whether the window is minimized
+    bool isMinimized;
 
     // The window to render to
     SDL_Window *window;
@@ -59,7 +63,11 @@ class WindowHandler {
 public:
     // Constructor
     WindowHandler(int screenWidth, int screenHeight, int mapWidth, 
-                    int mapHeight);
+                    int mapHeight, int tileWidth, int tileHeight);
+
+    // Access functions
+    void setMinimized(bool minimized);
+    void resize(int width, int height);
 
     // Start up SDL and open the window
     bool init();
@@ -79,7 +87,7 @@ public:
     void renderMap(const Map &m, unsigned x, unsigned y);
 
     // Update the screen
-    void update(const Map &m);
+    void update(const Map &m, const vector<Movable *> &movables);
 
     // Unload media to switch maps, currently done by close()
     void unloadMedia(vector<Tile *> &pointers);
@@ -88,3 +96,4 @@ public:
     void close();
 };
 
+#endif

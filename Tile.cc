@@ -1,3 +1,4 @@
+#include <cassert>
 #include "Tile.hh"
 
 using namespace std;

@@ -1,3 +1,9 @@
+#include <iostream>
+#include <fstream> // To read and write files
+#include <cassert>
+#include <ctime> // To seed the random number generator
+#include <cstdlib> // For randomness
+#include <math.h> // Because pi
 #include "Map.hh"
 
 using namespace std;

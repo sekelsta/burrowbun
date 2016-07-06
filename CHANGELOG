@@ -1,11 +1,17 @@
 Changes since last push:
- - Removed color keying, since transparency in the image is just better
- - Removed the unnecessary rectangles to draw from, since SDL can handle 
-   things that are partially off the screen just fine. This also seems to have 
-   fixed the bug.
- - findCamera now returns a camera smaller than worldsize, even if worldsize
-   is smaller than screensize. This means TILE_WIDTH and TILE_HEIGHT can be 
-   set to 1 to view most of the map, though it's pretty slow
+ - moved TILEWIDTH and TILE_HEIGHT from WindowHandler to main
+ - The window is now resizable.
+ - moved #includes from .hh files to .cc files wherever possible
+ - Added include guards
+ - Added movement by arrow keys and wasd
 
 Known bugs:
+ - The rightmost and bottommost rows of tiles sometimes? aren't rendered
  - When generating the world, canyon layers don't go all the way across
+
+Known "features": 
+ - Both pressing and releasing a key accelerates the player in the same
+   direction
+ - If the player has multiple keys for a movement, holding two of them down
+   will accelerate the player twice as fast
+

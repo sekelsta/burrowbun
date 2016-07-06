@@ -1,18 +1,30 @@
+#include <iostream>
+#include <SDL2/SDL.h>
+#include "Tile.hh"
+#include "Map.hh"
 #include "WindowHandler.hh"
+#include "EventHandler.hh"
+#include "Movable.hh"
+#include "Player.hh"
+#include "Collider.hh"
 
 using namespace std;
 
 int main(int argc, char **argv) {
     // Do the stuff it would be doing without the images
-        Map m = Map(WorldType::EARTH);
-        m.save("map.world");
+        Map map = Map(WorldType::EARTH);
+        map.save("map.world");
+
     // Declare variables for rendering a window
-    const int SCREEN_WIDTH = 800;
-    const int SCREEN_HEIGHT = 600;
+    int screenWidth = 800;
+    int screenHeight = 600;
+
+    const int TILE_WIDTH = 12;
+    const int TILE_HEIGHT = 12;
 
     // Construct a WindowHandler
-    WindowHandler window(SCREEN_WIDTH, SCREEN_HEIGHT, m.getWidth(), 
-                            m.getHeight());
+    WindowHandler window(screenWidth, screenHeight, map.getWidth(), 
+                            map.getHeight(), TILE_WIDTH, TILE_HEIGHT);
 
     // Start SDL and open the window
     if (!window.init()) {
@@ -20,27 +32,71 @@ int main(int argc, char **argv) {
     }
 
     // Load any pictures
-    if (!window.loadMedia(m.getPointersRef())) {
+    if (!window.loadMedia(map.getPointersRef())) {
         exit(1);
     }
 
-    // Event handler
-    SDL_Event e;
+    // Event and event handler
+    SDL_Event event;
+    EventHandler eventHandler;
+
+    // Player
+    Player player;
+
+    // A vector to hold all the things that need to collide
+    vector<Movable *> movables;
+    movables.push_back(&player);
+
+    // Set the player's position to the spawnpoint
+    // TODO: make this prettier
+    player.x = map.getSpawn().x * TILE_WIDTH;
+    player.y = map.getSpawn().y * TILE_HEIGHT;
+
+    // Collision handler
+    Collider collider(TILE_WIDTH, TILE_HEIGHT);
+
+    // Variable to tell whether the window is in focus
+    bool isFocused = true;
 
     // Loop infinitely until exiting
     bool quit = false;
     while (!quit) {
         // Handle events on the queue
-        while(SDL_PollEvent(&e) != 0) {
+        while(SDL_PollEvent(&event) != 0) {
             // Check whether to quit
-            if (e.type == SDL_QUIT) {
-                quit = true;
+            switch(event.type) {
+                case SDL_QUIT: 
+                    quit = true;
+                    break;
+                // Pass the event and relevent information to EventHandler
+                case SDL_WINDOWEVENT:
+                    eventHandler.windowEvent(event, isFocused, window);
+                    break;
+                case SDL_KEYDOWN:
+                case SDL_KEYUP:
+                    eventHandler.keyEvent(event, player);
+                    break;
+                case SDL_MOUSEMOTION:
+                case SDL_MOUSEWHEEL:
+                case SDL_MOUSEBUTTONDOWN:
+                case SDL_MOUSEBUTTONUP:
+                    eventHandler.mouseEvent(event);
+                    break;
+                default:
+                    // TODO
+                    // cerr << "Received unsupported event." << endl;
+                    break;
             }
         }
 
+        // Move things around
+        collider.update(map, movables);
+
         // Put pictures on the screen
-        window.update(m);
+        window.update(map, movables);
     }
     window.close();
     return 0;
 }
+
+

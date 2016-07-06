@@ -1,5 +1,7 @@
+#ifndef TILE_HH
+#define TILE_HH
+
 #include <string>
-#include <cassert>
 #include <SDL2/SDL.h>
 
 using namespace std;
@@ -51,3 +53,5 @@ public:
     // Also the only actual method Tiles have
     Tile(TileType tileType, unsigned index);
 };
+
+#endif
