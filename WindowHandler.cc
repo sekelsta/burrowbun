@@ -14,9 +14,8 @@ SDL_Rect WindowHandler::findCamera(int x, int y) {
     camera.h = screenHeight;
 
     // Adjust the camera if necessary, so that it's entirely on the screen
-    camera.x = min(camera.x, worldWidth - screenWidth);
-    camera.y = min(camera.y, worldHeight - screenHeight);
-    camera.x = max(0, camera.x);
+    camera.x %= worldWidth;
+    camera.y = min(camera.y, worldHeight - screenHeight - TILE_HEIGHT);
     camera.y = max(0, camera.y);
 
     // If, God forbid, the map is smaller than the camera, shrink the camera
@@ -202,10 +201,11 @@ void WindowHandler::renderMap(const Map &m, unsigned x, unsigned y) {
     SDL_Rect *rectTo;
 
     // Iterate through every tile at least partially within the camera
-    // This will be one too high or one too wide only if camera.w or
-    // camera.h is a multiple of TILE_WIDTH or TILE_HEIGHT
     int width = ceil((float)camera.w / (float)TILE_WIDTH) + 1;
     int height = ceil((float)camera.h / (float)TILE_HEIGHT) + 1;
+    int mapWidth = worldWidth / TILE_WIDTH;
+    int xMapStart = ((camera.x / TILE_WIDTH) + mapWidth) % mapWidth;
+    int yMapStart = (camera.y + camera.h) / TILE_HEIGHT;
     for (int i = 0; i < width; i++) {
         int xRectTo = i * TILE_WIDTH - (camera.x % TILE_WIDTH);
         for (int j = 0; j < height; j++) {
@@ -218,24 +218,24 @@ void WindowHandler::renderMap(const Map &m, unsigned x, unsigned y) {
             // the bottom. Here j == 0 at the top of the screen.
             // We're not using convertRect because that doesn't align them
             // with the tile grid.
-            rectTo -> y = (camera.h + camera.y) % TILE_HEIGHT;
-            rectTo -> y += (j - 1) * TILE_HEIGHT;
+            rectTo -> y = ((camera.h + camera.y) % TILE_HEIGHT) - TILE_HEIGHT;
+            rectTo -> y %= TILE_HEIGHT;
+            rectTo -> y += j * TILE_HEIGHT;
 
             // Render the tile
-            int xTile = (camera.x / TILE_WIDTH) + i;
-            int yTile = (camera.y + camera.h) / TILE_HEIGHT - j;
+            int xTile = (xMapStart + i) % mapWidth;
+            int yTile = yMapStart - j;
             // But only if it's a tile that exists on the map
-            if (0 <= xTile && xTile < worldWidth / TILE_WIDTH 
-                && 0 <= yTile && yTile < worldHeight / TILE_HEIGHT) { 
+            if (0 <= xTile && xTile < mapWidth && 0 <= yTile 
+                && yTile < worldHeight / TILE_HEIGHT) { 
                 Tile *tile = m.getTile(xTile, yTile);
                 SDL_RenderCopy(renderer, tile -> texture, NULL, rectTo);
             }
             else {
                 cerr << "Tried to render the tile at " << xTile;
                 cerr << ", " << yTile << endl;
-                cerr << "camera.x is " << camera.x << ", camera.y is ";
-                cerr << camera.y << ", camera.w is " << camera.w;
-                cerr << ", camera.h is " << camera.h << endl;
+                cerr << "xMapStart is " << xMapStart << ", mapWidth is ";
+                cerr << mapWidth << endl;
             }
         }
     }

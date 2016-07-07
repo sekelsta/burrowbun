@@ -26,9 +26,11 @@ void Collider::update(const Map &map, vector<Movable *> &movables) {
     for (unsigned i = 0; i < movables.size(); i++) {
         movables[i] -> x += movables[i] -> getXVelocity();
         movables[i] -> y += movables[i] -> getYVelocity();
-        movables[i] -> x = max(0, movables[i] -> x);
+        // Wrap in the x direction
+        movables[i] -> x += worldWidth;
+        movables[i] -> x %= worldWidth;
+        // Collide in the y direction
         movables[i] -> y = max(0, movables[i] -> y);
-        movables[i] -> x = min(movables[i] -> x, worldWidth);
         movables[i] -> y = min(movables[i] -> y, worldHeight);
     }
 }

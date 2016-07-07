@@ -30,7 +30,7 @@ Collider.o : Collider.cc Collider.hh
 	$(CC) $(CXXFLAGS) $(LINKER_FLAGS) $^ -c $(LDFLAGS)
 
 clean :
-	rm -f main *.o *.gch *~ *.world
+	rm -f *.o *.gch *~ *.world
 
 .PHONY : all clean
 

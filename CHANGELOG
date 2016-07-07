@@ -1,7 +1,5 @@
 Changes since last push:
- - Fixed the bug where the rightmost and bottommost rows of tiles weren't
-   being rendered if screen height and width weren't multiples of tile height
-   and width. 
+ - Now the world wraps in the x direction
 
 Known bugs:
  - When generating the world, canyon layers don't go all the way across

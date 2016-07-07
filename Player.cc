@@ -6,8 +6,8 @@ using namespace std;
 // Constructor
 Player::Player() {
     // Set the max velocity to not 0
-    xMaxSpeed = 5;
-    yMaxSpeed = 5;
+    xMaxSpeed = 50;
+    yMaxSpeed = 50;
 
     leftKeys.push_back(SDLK_LEFT);
     leftKeys.push_back(SDLK_a);
