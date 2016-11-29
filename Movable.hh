@@ -5,8 +5,9 @@
 
 using namespace std;
 
-/* A base class for anything that can move and collide on the map, 
-   not including tiles. */
+/*  A base class for anything that can move and collide on the map, 
+    not including tiles. Monsters, NPCs, the player, and dropped items should
+    all be subclasses. */
 class Movable {
 protected:
     // Fields

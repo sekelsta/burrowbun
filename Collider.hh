@@ -10,7 +10,7 @@
 using namespace std;
 
 /* A class to handle collisions. It takes a map and a vector of movables
-   and claculates where they are at the next update. */
+   and calculates where they are at the next update. */
 class Collider {
     // Fields
     const int TILE_WIDTH;

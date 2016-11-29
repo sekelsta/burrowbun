@@ -9,10 +9,10 @@ main : main.o Map.o Tile.o WindowHandler.o EventHandler.o Movable.o \
 	$(CC) $(CXXFLAGS) $(LINKER_FLAGS) $^ -o $@ $(LDFLAGS)
 
 Map.o : Map.cc Map.hh
-	$(CC) $(CXXFLAGS) $(LINKER_FLAGS) $^ -c $(LDFLAGS)
+	$(CC) $(CXXFLAGS) $^ -c $(LDFLAGS)
 
 Tile.o : Tile.cc Tile.hh
-	$(CC) $(CXXFLAGS) $(LINKER_FLAGS) $^ -c $(LDFLAGS)
+	$(CC) $(CXXFLAGS) $^ -c $(LDFLAGS)
 
 WindowHandler.o : WindowHandler.cc WindowHandler.hh
 	$(CC) $(CXXFLAGS) $(LINKER_FLAGS) $^ -c $(LDFLAGS)
@@ -27,7 +27,7 @@ Player.o : Player.cc Player.hh
 	$(CC) $(CXXFLAGS) $(LINKER_FLAGS) $^ -c $(LDFLAGS)
 
 Collider.o : Collider.cc Collider.hh
-	$(CC) $(CXXFLAGS) $(LINKER_FLAGS) $^ -c $(LDFLAGS)
+	$(CC) $(CXXFLAGS) $^ -c $(LDFLAGS)
 
 clean :
 	rm -f *.o *.gch *~ *.world

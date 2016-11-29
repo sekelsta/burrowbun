@@ -2,7 +2,9 @@
 #define TILE_HH
 
 #include <string>
-#include <SDL2/SDL.h>
+
+// Forward declare
+struct SDL_Texture;
 
 using namespace std;
 
