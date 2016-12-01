@@ -1,5 +1,5 @@
 Changes since last push:
- - I learned about forward declaring! Now there's a bunch of things that don't need to be linked to SLD when compiling!
+ - Location is now a struct, as it always should have been.
 
 Known bugs:
  - When generating the world, canyon layers don't go all the way across

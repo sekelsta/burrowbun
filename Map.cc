@@ -485,7 +485,8 @@ Map::Map(WorldType worldType) {
         cerr << "Maybe I'll implement that later." << endl;
     }
     int x = width / 2;
-    spawn = Location(x, max(0, findChange(x, height)));
+    spawn.x = x;
+    spawn.y = max(0, findChange(x, height));
 }
 
 // Destructor

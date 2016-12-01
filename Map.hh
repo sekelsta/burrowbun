@@ -8,32 +8,14 @@
 
 using namespace std;
 
-// A simple class for representing locations in a 2D array.  The class also
-// implements equality/inequality operators so that we can see if two
-// locations are the same or not.
-// Maybe this should be a struct instead.
-class Location {
-public:
+// A struct for holding an x and a y coordinate.
+struct Location {
     // The x and y values of the location
     int x;
     int y;
-
-    // Constructors for initializing locations
-    Location(int x, int y) : x(x), y(y) { }
-    Location() : x(0), y(0) { }
-    
-    // Returns true if this location is the same as the specified location
-    bool operator==(const Location &loc) const {
-        return x == loc.x && y == loc.y;
-    }
-    
-    // Returns true if this location is different from the specified location
-    bool operator!=(const Location &loc) const {
-        return !(*this == loc);
-    }
 };
 
-// A class to talk about directions. Down and West are smaller numbers
+// A class to talk about directions. Down and West are smaller numbers.
 enum class Direction {
     DOWN,
     UP,
