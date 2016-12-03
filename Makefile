@@ -1,5 +1,7 @@
 CC = g++
-CXXFLAGS = -std=c++14 -Wall
+# For debugging use -Og -g
+# For going fast use -O2 or -O3
+CXXFLAGS = -std=c++14 -Wall -Og -g
 LINKER_FLAGS = -lSDL2 -lSDL2_image
 
 all : main

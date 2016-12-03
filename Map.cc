@@ -325,11 +325,15 @@ vector<double> Map::makeTriangle(int b, int h, double mean, double stddev) {
             random = distribution(generator);
             colHeight += random * slope;
             slope = ((double)(h - colHeight)) / ((double)i);
-            heights[((i * k) + b)] = colHeight;
+            // This number starts at 0 and keeps increasing by 1
+            int index = (i * k) + b - ((k + 1) / 2);
+            assert(index < 2 * b);
+            assert(index >= 0);
             // Just in case values get wierd
             if (abs(colHeight) > 2 * abs(h)) {
                 cerr << "colHeight " << colHeight << " set to " << h << endl;
                 colHeight = h;
+            heights[index] = colHeight;
             }
         }
     }
@@ -484,9 +488,11 @@ Map::Map(WorldType worldType) {
     else {
         cerr << "Maybe I'll implement that later." << endl;
     }
-    int x = width / 2;
-    spawn.x = x;
-    spawn.y = max(0, findChange(x, height));
+    spawn.x = width / 2;
+    // I should be careful to make sure there are never cloud cities or 
+    // floating islands or whatever directly above the spawn point, so the
+    // player doesn't die of fall damage every time they respawn.
+    spawn.y = max(0, findChange(spawn.x, height));
 }
 
 // Destructor

@@ -1,8 +1,13 @@
 Changes since last push:
- - Location is now a struct, as it always should have been.
+ - Made a struct to hold map information, TODO: make a class that has easy access to a 2d array of this struct, and make Map use that instead
+ - make now incudes debugging information by default
+
+Fixed bugs:
+ - When generating the world, canyon layers don't go all the way across 
+    (the program was writing to the wrong memory)
 
 Known bugs:
- - When generating the world, canyon layers don't go all the way across
+ - There's a few memory-management related bugs valgrind finds.
 
 Known "features": 
  - Both pressing and releasing a key accelerates the player in the same
