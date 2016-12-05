@@ -1,10 +1,7 @@
 Changes since last push:
- - Made a struct to hold map information, TODO: make a class that has easy access to a 2d array of this struct, and make Map use that instead
- - make now incudes debugging information by default
+ - Fixed bug where values of Movables weren't being initialized.
 
-Fixed bugs:
- - When generating the world, canyon layers don't go all the way across 
-    (the program was writing to the wrong memory)
+TODO: make a class that has easy access to a 2d array of this SpaceInfo, and make Map use that instead
 
 Known bugs:
  - There's a few memory-management related bugs valgrind finds.

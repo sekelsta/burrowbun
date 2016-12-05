@@ -24,6 +24,9 @@ public:
     double xAccel;
     double yAccel;
 
+    // Constructor
+    Movable();
+
     // Access functions
     double getXVelocity();
     double getYVelocity();

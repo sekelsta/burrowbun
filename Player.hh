@@ -18,6 +18,8 @@ public:
     Player();
 
     // Access methods
+    // TODO: It would probably be better if I friended EventHandler or some 
+    // function of it.
     vector<SDL_Keycode> getLeftKeys();
     vector<SDL_Keycode> getRightKeys();
     vector<SDL_Keycode> getUpKeys();

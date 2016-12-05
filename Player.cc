@@ -5,10 +5,6 @@ using namespace std;
 
 // Constructor
 Player::Player() {
-    // Initialize velocity to 0
-    xVelocity = 0;
-    yVelocity = 0;
-
     // Set the max velocity to not 0
     xMaxSpeed = 50;
     yMaxSpeed = 50;
