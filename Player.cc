@@ -9,29 +9,22 @@ Player::Player() {
     xMaxSpeed = 50;
     yMaxSpeed = 50;
 
-    leftKeys.push_back(SDLK_LEFT);
-    leftKeys.push_back(SDLK_a);
-    rightKeys.push_back(SDLK_RIGHT);
-    rightKeys.push_back(SDLK_d);
-    upKeys.push_back(SDLK_UP);
-    upKeys.push_back(SDLK_w);
-    downKeys.push_back(SDLK_DOWN);
-    downKeys.push_back(SDLK_s);
+    // There might be a less repetitive way to do this.
+    keySettings.leftKeys.push_back(SDLK_LEFT);
+    keySettings.leftKeys.push_back(SDLK_a);
+    keySettings.rightKeys.push_back(SDLK_RIGHT);
+    keySettings.rightKeys.push_back(SDLK_d);
+    keySettings.upKeys.push_back(SDLK_UP);
+    keySettings.upKeys.push_back(SDLK_w);
+    keySettings.downKeys.push_back(SDLK_DOWN);
+    keySettings.downKeys.push_back(SDLK_s);
 }
 
-// Access functions - this is so ugly!
-vector<SDL_Keycode> Player::getLeftKeys() {
-    return leftKeys;
+// Access functions
+KeySettings Player::getKeySettings() {
+    return keySettings;
 }
 
-vector<SDL_Keycode> Player::getRightKeys() {
-    return rightKeys;
-}
-
-vector<SDL_Keycode> Player::getUpKeys() {
-    return upKeys;
-}
-
-vector<SDL_Keycode> Player::getDownKeys() {
-    return downKeys;
+void Player::setKeySettings(KeySettings &newSettings) {
+    keySettings = newSettings;
 }

@@ -52,16 +52,18 @@ void EventHandler::mouseEvent(const SDL_Event &event) {
 // Do whatever should be done when key presses or releases happen
 void EventHandler::keyEvent(const SDL_Event &event, Player &player) {
     SDL_Keycode key = event.key.keysym.sym;
-    if (isIn(key, player.getLeftKeys())) {
+    // Maybe keySettings should belong to this class
+    KeySettings keySettings = player.getKeySettings();
+    if (isIn(key, keySettings.leftKeys)) {
         player.xAccel -= 1;
     }
-    else if (isIn(key, player.getRightKeys())) {
+    else if (isIn(key, keySettings.rightKeys)) {
         player.xAccel += 1;
     }
-    if (isIn(key, player.getUpKeys())) {
+    if (isIn(key, keySettings.upKeys)) {
         player.yAccel += 1;
     }
-    else if (isIn(key, player.getDownKeys())) {
+    else if (isIn(key, keySettings.downKeys)) {
         player.yAccel -= 1;
     }
 }

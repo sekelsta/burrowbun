@@ -1,10 +1,7 @@
 Changes since last push:
- - Fixed bug where values of Movables weren't being initialized.
+ - The player now stores which keys do what in a struct instead of a bunch of vectors. I'm not sure that it's better than the eventHandler just storing the info, though.
 
 TODO: make a class that has easy access to a 2d array of this SpaceInfo, and make Map use that instead
-
-Known bugs:
- - There's a few memory-management related bugs valgrind finds.
 
 Known "features": 
  - Both pressing and releasing a key accelerates the player in the same
