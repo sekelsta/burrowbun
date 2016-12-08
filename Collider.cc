@@ -24,8 +24,8 @@ void Collider::update(const Map &map, vector<Movable *> &movables) {
 
     // Move movables and stop at the edge of the map
     for (unsigned i = 0; i < movables.size(); i++) {
-        movables[i] -> x += movables[i] -> getXVelocity();
-        movables[i] -> y += movables[i] -> getYVelocity();
+        movables[i] -> x += movables[i] -> getVelocity().x;
+        movables[i] -> y += movables[i] -> getVelocity().y;
         // Wrap in the x direction
         movables[i] -> x += worldWidth;
         movables[i] -> x %= worldWidth;

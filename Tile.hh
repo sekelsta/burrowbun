@@ -18,7 +18,8 @@ enum class TileType {
     STONE,
     PLATFORM,
     SANDSTONE,
-    MUDSTONE
+    MUDSTONE,
+    NONE = 255
 };
 
 /* A class to make tiles based on their type, and store their infos. */

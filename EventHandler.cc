@@ -4,7 +4,8 @@
 
 using namespace std;
 
-bool EventHandler::isIn(SDL_Keycode key, vector<SDL_Keycode> keys) {
+// Tell whether a scancode is in a vector
+bool EventHandler::isIn(SDL_Scancode key, vector<SDL_Scancode> keys) {
     for (unsigned i = 0; i < keys.size(); i++) {
         if (keys[i] == key) {
             return true;
@@ -13,6 +14,48 @@ bool EventHandler::isIn(SDL_Keycode key, vector<SDL_Keycode> keys) {
 
     // None of the keys in the vector match the key
     return false;
+}
+
+// Tell whether a vector has a key that's being held down
+bool EventHandler::isHeld(const Uint8 *state, vector<SDL_Scancode> keys) {
+    for (unsigned int i = 0; i < keys.size(); i++) {
+        if (state[keys[i]]) {
+            return true;
+        }
+    }
+
+    return false;
+}
+
+
+// Public methods
+
+// Constructor
+EventHandler::EventHandler() {
+    // Assume the player starts off not moving
+    left = false;
+    right = false;
+    up = false;
+    down = false;
+
+    // There might be a less repetitive way to do this.
+    keySettings.leftKeys.push_back(SDL_SCANCODE_LEFT);
+    keySettings.leftKeys.push_back(SDL_SCANCODE_A);
+    keySettings.rightKeys.push_back(SDL_SCANCODE_RIGHT);
+    keySettings.rightKeys.push_back(SDL_SCANCODE_D);
+    keySettings.upKeys.push_back(SDL_SCANCODE_UP);
+    keySettings.upKeys.push_back(SDL_SCANCODE_W);
+    keySettings.downKeys.push_back(SDL_SCANCODE_DOWN);
+    keySettings.downKeys.push_back(SDL_SCANCODE_S);
+}
+
+// Access functions
+KeySettings EventHandler::getKeySettings() {
+    return keySettings;
+}
+
+void EventHandler::setKeySettings(KeySettings &newSettings) {
+    keySettings = newSettings;
 }
 
 // Handle window events
@@ -50,20 +93,57 @@ void EventHandler::mouseEvent(const SDL_Event &event) {
 }
 
 // Do whatever should be done when key presses or releases happen
-void EventHandler::keyEvent(const SDL_Event &event, Player &player) {
-    SDL_Keycode key = event.key.keysym.sym;
-    // Maybe keySettings should belong to this class
-    KeySettings keySettings = player.getKeySettings();
-    if (isIn(key, keySettings.leftKeys)) {
-        player.xAccel -= 1;
+void EventHandler::keyEvent(const SDL_Event &event) {
+    SDL_Scancode key = event.key.keysym.scancode;
+
+    // TODO: Here we should handle keys which don't need to be held down to
+    // work. Currently that's none of them.
+}
+
+// Do stuff that depends on keys being held down.
+void EventHandler::updateKeys(const Uint8 *state) {
+    // Initialize
+    left = false;
+    right = false;
+    up = false;
+    down = false;
+
+    // Try to tell whether keys that matter are up or down
+    if (isHeld(state, keySettings.leftKeys)) {
+        left = true;
     }
-    else if (isIn(key, keySettings.rightKeys)) {
-        player.xAccel += 1;
+    if (isHeld(state, keySettings.rightKeys)) {
+        right = true;
     }
-    if (isIn(key, keySettings.upKeys)) {
-        player.yAccel += 1;
+    if (isHeld(state, keySettings.upKeys)) {
+        up = true;
     }
-    else if (isIn(key, keySettings.downKeys)) {
-        player.yAccel -= 1;
+    if (isHeld(state, keySettings.downKeys)) {
+        down = true;
     }
+}
+
+// Change the player's acceleration
+void EventHandler::updatePlayer(Player &player) {
+    Point newAccel;
+    newAccel.x = 0;
+    newAccel.y = 0;
+
+    // TODO: It would probably be better to replace left, ect, with newAccel
+    if (right) {
+        newAccel.x += player.getDAccel().x;
+    }
+    if (left) {
+        newAccel.x -= player.getDAccel().x;
+    }
+    // TODO: handle these separately, so the player can't fly
+    if (up) {
+        newAccel.y += player.getDAccel().y;
+    }
+    if (down) {
+        newAccel.y -= player.getDAccel().y;
+    }
+
+    // Change the player's acceleration
+    player.setAccel(newAccel);
 }

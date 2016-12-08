@@ -1,7 +1,7 @@
 #include <iostream>
-#include <SDL2/SDL.h>
 #include "Tile.hh"
 #include "Map.hh"
+#include "World.hh"
 #include "WindowHandler.hh"
 #include "EventHandler.hh"
 #include "Movable.hh"
@@ -12,8 +12,10 @@ using namespace std;
 
 int main(int argc, char **argv) {
     // Do the stuff it would be doing without the images
-        Map map = Map(WorldType::EARTH);
-        map.save("map.world");
+    World world = World(WorldType::EARTH);
+    world.save("world.world");
+    Map map = Map("world.world");
+    map.save("map.bmp");
 
     // Declare variables for rendering a window
     int screenWidth = 800;
@@ -46,7 +48,6 @@ int main(int argc, char **argv) {
     // A vector to hold all the things that need to collide
     vector<Movable *> movables;
     movables.push_back(&player);
-
     // Set the player's position to the spawnpoint
     // TODO: make this prettier
     player.x = map.getSpawn().x * TILE_WIDTH;
@@ -74,7 +75,7 @@ int main(int argc, char **argv) {
                     break;
                 case SDL_KEYDOWN:
                 case SDL_KEYUP:
-                    eventHandler.keyEvent(event, player);
+                    eventHandler.keyEvent(event);
                     break;
                 case SDL_MOUSEMOTION:
                 case SDL_MOUSEWHEEL:
@@ -89,7 +90,13 @@ int main(int argc, char **argv) {
             }
         }
 
+        // Now that all the events have been handled, look at which keys are
+        // currently being held down and handle those too
+        const Uint8 *state = SDL_GetKeyboardState(NULL);
+        eventHandler.updateKeys(state);
+
         // Move things around
+        eventHandler.updatePlayer(player);
         collider.update(map, movables);
 
         // Put pictures on the screen

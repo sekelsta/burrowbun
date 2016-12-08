@@ -6,34 +6,38 @@ using namespace std;
 
 // Constructor
 Movable::Movable() {
-    xVelocity = 0;
-    yVelocity = 0;
-    xAccel = 0;
-    yAccel = 0;
+    velocity.x = 0;
+    velocity.y = 0;
+    accel.x = 0;
+    accel.y = 0;
 
     // These should be changed by the child class's init.
-    xMaxSpeed = 0;
-    yMaxSpeed = 0;
+    drag.x = 0;
+    drag.y = 0;
+    dAccel.x = 0;
+    dAccel.y = 0;
 }
 
-double Movable::getXVelocity() {
-    return xVelocity;
+Point Movable::getVelocity() {
+    return velocity;
 }
 
-double Movable::getYVelocity() {
-    return yVelocity;
+void Movable::setAccel(Point newAccel) {
+    accel = newAccel;
+}
+
+Point Movable::getDAccel() {
+    return dAccel;
 }
 
 // This adds acceleration to speed, and limits speed at maxSpeed.
 void Movable::accelerate() {
     // Update velocity
-    xVelocity += xAccel;
-    yVelocity += yAccel;
+    velocity.x += accel.x;
+    velocity.y += accel.y;
 
-    // Make sure velocity is less than max velocity
-    xVelocity = min(xVelocity, xMaxSpeed);
-    yVelocity = min(yVelocity, yMaxSpeed);
-    xVelocity = max(xVelocity, -1 * xMaxSpeed);
-    yVelocity = max(yVelocity, -1 * yMaxSpeed);
+    // Add drag effects
+    velocity.x *= drag.x;
+    velocity.y *= drag.y;
 }
 

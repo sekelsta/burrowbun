@@ -5,26 +5,12 @@ using namespace std;
 
 // Constructor
 Player::Player() {
-    // Set the max velocity to not 0
-    xMaxSpeed = 50;
-    yMaxSpeed = 50;
+    // Set the drag to not 0
+    drag.x = 0.8;
+    drag.y = 0.8;
 
-    // There might be a less repetitive way to do this.
-    keySettings.leftKeys.push_back(SDLK_LEFT);
-    keySettings.leftKeys.push_back(SDLK_a);
-    keySettings.rightKeys.push_back(SDLK_RIGHT);
-    keySettings.rightKeys.push_back(SDLK_d);
-    keySettings.upKeys.push_back(SDLK_UP);
-    keySettings.upKeys.push_back(SDLK_w);
-    keySettings.downKeys.push_back(SDLK_DOWN);
-    keySettings.downKeys.push_back(SDLK_s);
+    // Set the amount to accelerate by
+    dAccel.x = 3;
+    dAccel.y = 3;
 }
 
-// Access functions
-KeySettings Player::getKeySettings() {
-    return keySettings;
-}
-
-void Player::setKeySettings(KeySettings &newSettings) {
-    keySettings = newSettings;
-}

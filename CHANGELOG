@@ -1,7 +1,13 @@
 Changes since last push:
- - The player now stores which keys do what in a struct instead of a bunch of vectors. I'm not sure that it's better than the eventHandler just storing the info, though.
+ - Changed movement so it's actually reasonable. Also made movables use a struct with a double for x and y instead of having a copy of each variable for x and for y.
 
-TODO: make a class that has easy access to a 2d array of this SpaceInfo, and make Map use that instead
+TODO: Make Map use SpaceInfo instead of Tile*
+
+Known bugs:
+ - Moving up and down looks wierd.
+
+Fixed bugs:
+ - Making a mountain does it wrong. 
 
 Known "features": 
  - Both pressing and releasing a key accelerates the player in the same

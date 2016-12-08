@@ -2,6 +2,7 @@
 #define MOVABLE_HH
 
 #include <string>
+#include "Point.hh"
 
 using namespace std;
 
@@ -14,22 +15,20 @@ protected:
     string sprite;
 
     // Movement-related fields
-    double xMaxSpeed, yMaxSpeed, xVelocity, yVelocity;
+    // Drag is a number between 0 and 1 which the velocity is multiplied by
+    Point drag, velocity, accel, dAccel;
 
 public:
     // Location
     int x, y;
 
-    // Acceleration
-    double xAccel;
-    double yAccel;
-
     // Constructor
     Movable();
 
     // Access functions
-    double getXVelocity();
-    double getYVelocity();
+    Point getVelocity();
+    void setAccel(Point newAccel);
+    Point getDAccel();
 
     // Updates velocity
     void accelerate();

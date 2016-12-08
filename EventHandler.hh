@@ -7,8 +7,18 @@
 
 using namespace std;
 
+/* A struct to hold information about which keys do what. This is so that
+   later the player can change these settings. */
+struct KeySettings {
+    // Which keys are for movement
+    vector<SDL_Scancode> leftKeys, rightKeys, upKeys, downKeys;
+};
+
 /* A class to handle events such as keyboard input or mouse movement. */
 class EventHandler {
+    // Which keys do what
+    KeySettings keySettings;
+
     // Whether the player is trying to move in some direction
     bool left, right, up, down;
 
@@ -17,10 +27,20 @@ class EventHandler {
 
     // Helper functions
 
-    // Tell whether a keycode is in a vector
-    bool isIn(SDL_Keycode key, vector<SDL_Keycode> keys);
+    // Tell whether a scancode is in a vector
+    bool isIn(SDL_Scancode key, vector<SDL_Scancode> keys);
+
+    // Tell whether a vector has a key that's being held down
+    bool isHeld(const Uint8 *state, vector<SDL_Scancode> keys);
 
 public:
+    // Constructor
+    EventHandler();
+
+    // Access methods
+    KeySettings getKeySettings();
+    void setKeySettings(KeySettings &newSettings); // non-ideal name
+
     // Handle events
     void windowEvent(const SDL_Event &event, bool &isFocused,
                             WindowHandler &window);
@@ -29,7 +49,13 @@ public:
     void mouseEvent(const SDL_Event &event);
 
     // Do whatever should be done when a key is pressed or released
-    void keyEvent(const SDL_Event &event, Player &player);
+    void keyEvent(const SDL_Event &event);
+
+    // Do stuff for keys being held down
+    void updateKeys(const Uint8 *state);
+
+    // Tell the Player what its trying to do
+    void updatePlayer(Player &player);
 };
 
 #endif
