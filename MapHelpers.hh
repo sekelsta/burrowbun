@@ -24,6 +24,7 @@ enum class Direction {
 world-generation to use. */
 enum class WorldType {
     TEST,
+    SMOLTEST,
     EARTH,
     MOON
 };

@@ -2,6 +2,7 @@
 #include <SDL2/SDL.h>
 #include "Tile.hh"
 #include "Map.hh"
+#include "World.hh"
 #include "WindowHandler.hh"
 #include "EventHandler.hh"
 #include "Movable.hh"
@@ -12,8 +13,10 @@ using namespace std;
 
 int main(int argc, char **argv) {
     // Do the stuff it would be doing without the images
-        Map map = Map(WorldType::EARTH);
-        map.save("map.world");
+    World world = World(WorldType::EARTH);
+    world.save("world.world");
+    Map map = Map("world.world");
+    map.save("map.bmp");
 
     // Declare variables for rendering a window
     int screenWidth = 800;

@@ -6,7 +6,7 @@ LINKER_FLAGS = -lSDL2 -lSDL2_image
 
 all : main
 
-main : main.o Map.o Tile.o WindowHandler.o EventHandler.o Movable.o \
+main : main.o Map.o World.o Tile.o WindowHandler.o EventHandler.o Movable.o \
         Player.o Collider.o
 	$(CC) $(CXXFLAGS) $(LINKER_FLAGS) $^ -o $@ $(LDFLAGS)
 
@@ -29,6 +29,9 @@ Player.o : Player.cc Player.hh
 	$(CC) $(CXXFLAGS) $(LINKER_FLAGS) $^ -c $(LDFLAGS)
 
 Collider.o : Collider.cc Collider.hh
+	$(CC) $(CXXFLAGS) $^ -c $(LDFLAGS)
+
+World.o : World.cc World.hh
 	$(CC) $(CXXFLAGS) $^ -c $(LDFLAGS)
 
 clean :

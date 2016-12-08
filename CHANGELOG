@@ -1,7 +1,13 @@
 Changes since last push:
- - The player now stores which keys do what in a struct instead of a bunch of vectors. I'm not sure that it's better than the eventHandler just storing the info, though.
+ - Map has been split into World and Map. World generates a world and saves it
+to a file, and Map reads a world file and stores the info in memory so it can
+be displayed.
+ - Added a TileType NONE, mainly for debugging purposes
 
-TODO: make a class that has easy access to a 2d array of this SpaceInfo, and make Map use that instead
+TODO: Make Map use SpaceInfo instead of Tile*
+
+Known bugs:
+ - Making a mountain does it wrong.
 
 Known "features": 
  - Both pressing and releasing a key accelerates the player in the same
