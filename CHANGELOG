@@ -1,17 +1,11 @@
 Changes since last push:
- - Changed movement so it's actually reasonable. Also made movables use a struct with a double for x and y instead of having a copy of each variable for x and for y.
+ - Very small velocities are now rounded to 0.
+ - Added a Point struct.
 
 TODO: Make Map use SpaceInfo instead of Tile*
 
-Known bugs:
- - Moving up and down looks wierd.
-
 Fixed bugs:
- - Making a mountain does it wrong. 
-
-Fixed "features": 
- - Both pressing and releasing a key accelerates the player in the same
-   direction
- - If the player has multiple keys for a movement, holding two of them down
-   will accelerate the player twice as fast
+ - Moving up and down looks wierd.
+ - Movement up and right isn't quite right.
+ - When the map wrapped it was being rendered wrong.
 

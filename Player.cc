@@ -6,11 +6,11 @@ using namespace std;
 // Constructor
 Player::Player() {
     // Set the drag to not 0
-    drag.x = 0.8;
-    drag.y = 0.8;
+    drag.x = 0.3;
+    drag.y = 0.3;
 
     // Set the amount to accelerate by
-    dAccel.x = 3;
-    dAccel.y = 3;
+    dAccel.x = 10;
+    dAccel.y = 10;
 }
 

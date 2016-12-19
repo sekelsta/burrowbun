@@ -14,6 +14,8 @@ SDL_Rect WindowHandler::findCamera(int x, int y) {
     camera.h = screenHeight;
 
     // Adjust the camera if necessary, so that it's entirely on the screen
+    // Because modulo can return a negative
+    camera.x += worldWidth;
     camera.x %= worldWidth;
     camera.y = min(camera.y, worldHeight - screenHeight - TILE_HEIGHT);
     camera.y = max(0, camera.y);
@@ -196,6 +198,8 @@ void WindowHandler::renderMap(const Map &m, unsigned x, unsigned y) {
 
     // Find the camera
     SDL_Rect camera = findCamera(x, y);
+    assert(camera.x >= 0);
+    assert(camera.y >= 0);
 
     // Rectangle to draw to
     SDL_Rect *rectTo;
@@ -219,7 +223,6 @@ void WindowHandler::renderMap(const Map &m, unsigned x, unsigned y) {
             // We're not using convertRect because that doesn't align them
             // with the tile grid.
             rectTo -> y = ((camera.h + camera.y) % TILE_HEIGHT) - TILE_HEIGHT;
-            rectTo -> y %= TILE_HEIGHT;
             rectTo -> y += j * TILE_HEIGHT;
 
             // Render the tile

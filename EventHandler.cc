@@ -38,6 +38,8 @@ EventHandler::EventHandler() {
     up = false;
     down = false;
 
+    move = 0;
+
     // There might be a less repetitive way to do this.
     keySettings.leftKeys.push_back(SDL_SCANCODE_LEFT);
     keySettings.leftKeys.push_back(SDL_SCANCODE_A);
@@ -96,8 +98,21 @@ void EventHandler::mouseEvent(const SDL_Event &event) {
 void EventHandler::keyEvent(const SDL_Event &event) {
     SDL_Scancode key = event.key.keysym.scancode;
 
-    // TODO: Here we should handle keys which don't need to be held down to
-    // work. Currently that's none of them.
+    // Here we should handle keys which don't need to be held down to work.
+    if (event.type == SDL_KEYUP) {
+        // Pass
+    }
+    else if (key == SDL_SCANCODE_J) {
+        // Move one pixel down
+        move = -1;
+    }
+    else if (key == SDL_SCANCODE_K) {
+        // Move one pixel up
+        move = 1;
+    }
+    else {
+        move = 0;
+    }
 }
 
 // Do stuff that depends on keys being held down.
@@ -136,6 +151,7 @@ void EventHandler::updatePlayer(Player &player) {
     if (left) {
         newAccel.x -= player.getDAccel().x;
     }
+
     // TODO: handle these separately, so the player can't fly
     if (up) {
         newAccel.y += player.getDAccel().y;
@@ -146,4 +162,11 @@ void EventHandler::updatePlayer(Player &player) {
 
     // Change the player's acceleration
     player.setAccel(newAccel);
+
+    // Move the player by a pixel
+    player.y += move;
+    if (move != 0) {
+        cout << player.y << "\n";
+    }
+    move = 0;
 }

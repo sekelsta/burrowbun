@@ -1,4 +1,5 @@
 #include <cassert>
+#include <cmath> // For rounding
 #include "Movable.hh"
 #include <iostream>
 
@@ -39,5 +40,24 @@ void Movable::accelerate() {
     // Add drag effects
     velocity.x *= drag.x;
     velocity.y *= drag.y;
+
+    // Don't bother going ridiculously slowly
+    if (-1 < velocity.x && velocity.x < 1) {
+        velocity.x = 0;
+    }
+    if (-1 < velocity.y && velocity.y < 1) {
+        velocity.y = 0;
+    }
+    
+    // Since location is an int, make velocity an int by rounding away from 0
+    if (velocity.x < 0) {
+        velocity.x = floor(velocity.x);
+    }
+    velocity.x = ceil(velocity.x);
+
+    if (velocity.y < 0) {
+        velocity.y = floor(velocity.y);
+    }
+    velocity.y = ceil(velocity.y);
 }
 

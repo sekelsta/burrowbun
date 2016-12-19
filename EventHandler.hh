@@ -22,6 +22,10 @@ class EventHandler {
     // Whether the player is trying to move in some direction
     bool left, right, up, down;
 
+    // To move by one pixel at a time, in the vertical direction 
+    // This currently only exists for debugging
+    int move;
+
     // Whether certain windows have been opened
     bool inventory, quests;
 
