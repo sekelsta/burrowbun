@@ -21,8 +21,8 @@ int main(int argc, char **argv) {
     int screenWidth = 800;
     int screenHeight = 600;
 
-    const int TILE_WIDTH = 20;
-    const int TILE_HEIGHT = 20;
+    const int TILE_WIDTH = 12;
+    const int TILE_HEIGHT = 12;
 
     // Construct a WindowHandler
     WindowHandler window(screenWidth, screenHeight, map.getWidth(), 
