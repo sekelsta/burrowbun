@@ -9,7 +9,7 @@ Known bugs:
 Fixed bugs:
  - Making a mountain does it wrong. 
 
-Known "features": 
+Fixed "features": 
  - Both pressing and releasing a key accelerates the player in the same
    direction
  - If the player has multiple keys for a movement, holding two of them down
