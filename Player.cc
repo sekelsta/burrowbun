@@ -10,7 +10,7 @@ Player::Player() {
     drag.y = 0.3;
 
     // Set the amount to accelerate by
-    dAccel.x = 10;
-    dAccel.y = 10;
+    dAccel.x = 16;
+    dAccel.y = 16;
 }
 

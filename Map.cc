@@ -12,9 +12,8 @@ using namespace std;
 
 // Really small helper functions that don't directly change tiles
 
-// Returns a pointer to the tile* at x, y
-// Maybe I should just make tiles a 2d array
-Tile **Map::findPointer(int x, int y) const {
+// Returns a pointer to the SpaceInfo at x, y
+SpaceInfo *Map::findPointer(int x, int y) const {
     assert (0 <= x);
     assert (x < width);
     assert (0 <= y);
@@ -40,8 +39,8 @@ Tile *Map::makeTile(TileType val) {
     return newTile(val);
 }
 
-
-// Set all tiles to val
+/*
+/ / Set all tiles to val
 void Map::setAll(Tile* const &val) {
     for (int i = 0; i < width; i++) {
         for (int j = 0; j < height; j++) {
@@ -49,7 +48,7 @@ void Map::setAll(Tile* const &val) {
         }
     }
 }
-
+*/
 // Public methods
 
 // Constructor, based on a world file that exists
@@ -73,7 +72,7 @@ Map::Map(string filename) {
     infile >> width >> height;
 
     // Create an array of tiles
-    tiles = new Tile*[width * height];
+    tiles = new SpaceInfo[width * height];
 
     // Read the spawn point
     infile >> spawn.x >> spawn.y;
@@ -89,11 +88,14 @@ Map::Map(string filename) {
         matchingTile = makeTile(current);
         for (int i = 0; i < count; i++) {
             assert(index < width * height);
-            tiles[index] = matchingTile;
+            tiles[index].foreground = matchingTile;
+            tiles[index].foregroundHealth = matchingTile -> maxHealth;
+            tiles[index].background = NULL;
+            tiles[index].backgroundHealth = 1;
             index++;
         }
     }
-    assert(getTile(0, 0) -> type == tiles[0] -> type);
+    assert(getForeground(0, 0) -> type == tiles[0].foreground -> type);
 }
 
 // Destructor
@@ -123,15 +125,28 @@ Location Map::getSpawn() const {
     return spawn;
 }
 
-// Returns the tile pointer at x, y
+// Returns the foreground tile at x, y
 // 0, 0 is the bottom right
-Tile *Map::getTile(int x, int y) const {
-    return *findPointer(x, y);
+Tile *Map::getForeground(int x, int y) const {
+    return findPointer(x, y) -> foreground;
 }
 
-// Set the tile at x, y equal to val
-void Map::setTile(int x, int y, Tile* const &val) {
-    *findPointer(x, y) = val;
+// Returns the background tile at x, y
+// 0, 0 is the bottom right
+Tile *Map::getBackground(int x, int y) const {
+    return findPointer(x, y) -> background;
+}
+
+// Set the foreground tile at x, y equal to val
+void Map::setForeground(int x, int y, Tile* const &val) {
+    findPointer(x, y) -> foreground = val;
+    findPointer(x, y) -> foregroundHealth = val -> maxHealth;
+}
+
+// Set the background tile at x, y equal to val
+void Map::setBackground(int x, int y, Tile* const &val) {
+    findPointer(x, y) -> background = val;
+    findPointer(x, y) -> backgroundHealth = val -> maxHealth;
 }
 
 // Gets the map's list of the tile pointers it uses
@@ -155,7 +170,7 @@ void Map::save(const string &filename) const {
     // Write tile values
     for (int j = height - 1; j >= 0; j--) {
         for (int i = 0; i < width; i++) {
-            outfile << (int)(getTile(i, j) -> type) << " ";
+            outfile << (int)(getForeground(i, j) -> type) << " ";
         }
         outfile << "\n";
     }

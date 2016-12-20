@@ -16,7 +16,7 @@ class Map {
 
     // The array to hold the map info
     // This is a 2d array squished into 1d
-    Tile **tiles;
+    SpaceInfo *tiles;
 
     // A list of the pointers in the map
     // Basically these are the ones that contain manually allocated memeory
@@ -36,7 +36,7 @@ class Map {
     // Really small helper functions that don't directly change tiles
 
     // Return a pointer to the tile* at x, y
-    Tile **findPointer(int x, int y) const;
+    SpaceInfo *findPointer(int x, int y) const;
 
     /* Make a Tile object, add it to the list of pointers, and return 
        a pointer to it. */
@@ -47,12 +47,12 @@ class Map {
     Tile *makeTile(TileType val);
 
     // Set all tiles to val
-    void setAll(Tile* const &val);
+    //void setAll(Tile* const &val);
 
     // Start at top and go down until the type changes
     // Return the height of the first tile of a different type
     // Return -1 if there is no change
-    int findChange(int x, int top) const;
+    //int findChange(int x, int top) const;
     public:
 
     // Contructs a map by loading a file
@@ -70,12 +70,19 @@ class Map {
     // Return the default spawn point
     Location getSpawn() const;
 
-    // Returns the tile pointer at x, y
+    // Returns the foreground tile pointer at x, y
     // 0, 0 is the bottom right
-    Tile *getTile(int x, int y) const;
+    Tile *getForeground(int x, int y) const;
 
-    // Set the tile at x, y equal to val
-    void setTile(int x, int y, Tile* const &val);
+    // Returns the background tile pointer at x, y
+    // 0, 0 is the bottom right
+    Tile *getBackground(int x, int y) const;
+
+    // Set the foreground tile at x, y equal to val
+    void setForeground(int x, int y, Tile* const &val);
+
+    // Set the background tile at x, y equal to val
+    void setBackground(int x, int y, Tile* const &val);
 
     // Gets the map's list of the tile pointers it uses
     vector<Tile *> getPointers() const;

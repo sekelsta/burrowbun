@@ -44,6 +44,9 @@ public:
     // Player speed is multiplied by passage of the tiles the player is in
     double passage;
 
+    // Basically the number of hits with a pickax to break it
+    int maxHealth;
+
     // Variables to use in map generation and upkeep
     // In these ones, -1 means infinity
     double mass;        // How heavy one tile of it is

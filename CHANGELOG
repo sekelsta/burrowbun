@@ -1,5 +1,3 @@
 Changes since last push:
- - Mountains are now made by midpoint displacement
-
-TODO: Make Map use SpaceInfo instead of Tile*
+ -  Map now uses SpaceInfo instead of Tile*
 

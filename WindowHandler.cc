@@ -231,7 +231,7 @@ void WindowHandler::renderMap(const Map &m, unsigned x, unsigned y) {
             // But only if it's a tile that exists on the map
             if (0 <= xTile && xTile < mapWidth && 0 <= yTile 
                 && yTile < worldHeight / TILE_HEIGHT) { 
-                Tile *tile = m.getTile(xTile, yTile);
+                Tile *tile = m.getForeground(xTile, yTile);
                 SDL_RenderCopy(renderer, tile -> texture, NULL, rectTo);
             }
             else {
