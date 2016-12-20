@@ -5,13 +5,18 @@
 
 using namespace std;
 
-// Return a rectangle in world coordinates with x and y at the center
-SDL_Rect WindowHandler::findCamera(int x, int y) {
+// Return a rectangle in world coordinates for a player at x, y
+// w and h are the width and height of the player sprite
+SDL_Rect WindowHandler::findCamera(int x, int y, int w, int h) {
     SDL_Rect camera;
     camera.x = x - screenWidth / 2;
     camera.y = y - screenHeight / 2;
     camera.w = screenWidth;
     camera.h = screenHeight;
+
+    // Make the camera center be the center of the player
+    camera.x += w / 2;
+    camera.y += h / 2;
 
     // Adjust the camera if necessary, so that it's entirely on the screen
     // Because modulo can return a negative
@@ -28,10 +33,9 @@ SDL_Rect WindowHandler::findCamera(int x, int y) {
 }
 
 // Convert a rectangle from world coordinates to screen coordinates
-SDL_Rect WindowHandler::convertRect(SDL_Rect rect, int x, int y) {
-    SDL_Rect camera = findCamera(x, y);
-    int xScreen = rect.x - camera.x;
-    int yScreen = camera.y + screenHeight - rect.y;
+SDL_Rect WindowHandler::convertRect(SDL_Rect rect, SDL_Rect camera) {
+    int xScreen = (rect.x - camera.x + worldWidth) % worldWidth;
+    int yScreen = camera.y + screenHeight - rect.y - rect.h;
     SDL_Rect screenRect = { xScreen, yScreen, rect.w, rect.h };
 
     return screenRect;
@@ -41,7 +45,7 @@ SDL_Rect WindowHandler::convertRect(SDL_Rect rect, int x, int y) {
 WindowHandler::WindowHandler(int screenWidth, int screenHeight, 
                     int mapWidth, int mapHeight, int tileWidth, int tileHeight) 
     : screenWidth(screenWidth), screenHeight(screenHeight), 
-        TILE_WIDTH(tileWidth), TILE_HEIGHT(tileHeight), TILE_PATH("content/"), 
+        TILE_WIDTH(tileWidth), TILE_HEIGHT(tileHeight), 
         worldWidth(TILE_WIDTH * mapWidth),
         worldHeight(TILE_HEIGHT * mapHeight) {
     window = NULL;
@@ -132,11 +136,15 @@ bool WindowHandler::init() {
 }
 
 // Load test.bmp to surface, return true if successful
-bool WindowHandler::loadMedia(vector<Tile *> &pointers) {
+bool WindowHandler::loadMedia(vector<Tile *> &pointers, 
+        vector<Movable *> &movables) {
     bool success = true;
 
     // Load the textures for tiles
-    loadTiles(pointers);
+    success = loadTiles(pointers);
+
+    // And for the movables
+    success = success && loadMovables(movables);
 
     return success;
 }
@@ -188,16 +196,31 @@ bool WindowHandler::loadTiles(vector<Tile *> &pointers) {
     return success;
 }
 
+// Load a texture for each movable
+bool WindowHandler::loadMovables(vector<Movable *> &movables) {
+    bool success = true;
+    for (unsigned int i = 0; i < movables.size(); i++) {
+        string name = MOVABLE_PATH + movables[i] -> getSprite();
+        loadTexture(name);
+        assert(textures.size() != 0);
+        if (textures.back() == NULL) {
+            success = false;
+        }
+
+        movables[i] -> texture = textures.back();
+    }
+
+    return success;
+}
+
 // Render everything the map holds information about
 // x and y are the center of view of the camera, in pixels, 
 // where y = 0 at the bottom
 // If either value puts the camera past the end of the map, it will be fixed
-void WindowHandler::renderMap(const Map &m, unsigned x, unsigned y) {
+void WindowHandler::renderMap(const Map &m, const SDL_Rect &camera) {
     // Make sure the renerer draw color is set to white
     SDL_SetRenderDrawColor(renderer, 0xFF, 0xFF, 0xFF, 0xFF);
 
-    // Find the camera
-    SDL_Rect camera = findCamera(x, y);
     assert(camera.x >= 0);
     assert(camera.y >= 0);
 
@@ -244,6 +267,41 @@ void WindowHandler::renderMap(const Map &m, unsigned x, unsigned y) {
     }
 }
 
+// Render any movables (the player, monsters NPCs, dropped items)
+void WindowHandler::renderMovables(const vector<Movable *> &movables) {
+    // Make sure the renerer draw color is set to white
+    SDL_SetRenderDrawColor(renderer, 0xFF, 0xFF, 0xFF, 0xFF);
+
+    // Find where the player and camera are
+    int x = movables[0] -> x;
+    int y = movables[0] -> y;
+    int w = movables[0] -> getSpriteWidth();
+    int h = movables[0] -> getSpriteHeight();
+    SDL_Rect camera = findCamera(x, y, w, h);
+    SDL_Rect rectTo;
+
+    // Render things
+    for (unsigned int i = 0; i < movables.size(); i++) {
+        rectTo.x = movables[i] -> x;
+        rectTo.y = movables[i] -> y;
+        rectTo.w = movables[i] -> getSpriteWidth();
+        rectTo.h = movables[i] -> getSpriteHeight();
+
+        // Convert the rectangle to screen coordinates
+        rectTo = convertRect(rectTo, camera);
+
+        assert(i != 0 || rectTo.x >= 0);
+        assert(i != 0 || rectTo.y >= 0);
+        assert(i != 0 || rectTo.x < camera.w);
+        assert(i != 0 || rectTo.y < camera.h);
+
+        // Draw!
+        // TODO: check whether it's actually anywhere near the screen
+        SDL_RenderCopy(renderer, movables[i] -> texture, NULL, &rectTo);
+    }
+
+}
+
 // Update the screen
 void WindowHandler::update(const Map &map, const vector<Movable *> &movables) {
     // Clear the screen
@@ -258,8 +316,16 @@ void WindowHandler::update(const Map &map, const vector<Movable *> &movables) {
     if (!isMinimized) {
 
         // Put stuff on it
-        // movables[0] should be the 
-        renderMap(map, movables[0] -> x, movables[0] -> y);
+        // movables[0] should be the player
+        int x = movables[0] -> x;
+        int y = movables[0] -> y;
+        int w = movables[0] -> getSpriteWidth();
+        int h = movables[0] -> getSpriteHeight();
+        SDL_Rect camera = findCamera(x, y, w, h);
+        renderMap(map, camera);
+
+        // Draw any movables
+        renderMovables(movables);
 
         // Update the screen
         SDL_RenderPresent(renderer);

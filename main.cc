@@ -33,11 +33,6 @@ int main(int argc, char **argv) {
         exit(1);
     }
 
-    // Load any pictures
-    if (!window.loadMedia(map.getPointersRef())) {
-        exit(1);
-    }
-
     // Event and event handler
     SDL_Event event;
     EventHandler eventHandler;
@@ -49,9 +44,13 @@ int main(int argc, char **argv) {
     vector<Movable *> movables;
     movables.push_back(&player);
     // Set the player's position to the spawnpoint
-    // TODO: make this prettier
     player.x = map.getSpawn().x * TILE_WIDTH;
     player.y = map.getSpawn().y * TILE_HEIGHT;
+
+    // Load any pictures
+    if (!window.loadMedia(map.getPointersRef(), movables)) {
+        exit(1);
+    }
 
     // Collision handler
     Collider collider(TILE_WIDTH, TILE_HEIGHT);

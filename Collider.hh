@@ -16,6 +16,10 @@ class Collider {
     const int TILE_WIDTH;
     const int TILE_HEIGHT;
 
+    // Whether the player collides with tiles
+    // Disable to get a map veiwer
+    bool enableCollisions;
+
 public:
     // Constructor
     Collider(int tileWidth, int tileHeight);

@@ -14,6 +14,10 @@ the only thing screen coordinates are used for. */
 #include "Map.hh"
 #include "Movable.hh"
 
+// The path to image files
+#define TILE_PATH "content/"
+#define MOVABLE_PATH "content/"
+
 using namespace std;
 
 // A class to open a window and display things to it
@@ -25,9 +29,6 @@ class WindowHandler {
     // Height and width of tiles
     const int TILE_WIDTH;
     const int TILE_HEIGHT;
-
-    // The path to image files
-    const string TILE_PATH;
 
     // Height and width of the world, in pixels
     // Not const because it should eventually be possible to switch maps
@@ -54,11 +55,12 @@ class WindowHandler {
 
     // Private methods
 
-    // Return a rectangle in world coordinates, with x and y at the center
-    SDL_Rect findCamera(int x, int y);
+    // Return a rectangle in world coordinates, for a player at x, y
+    // w and h are the width and height of the player sprite.
+    SDL_Rect findCamera(int x, int y, int w, int h);
 
     // Convert a rectangle from world coordinates to screen coordinates
-    SDL_Rect convertRect(SDL_Rect rect, int x, int y);
+    SDL_Rect convertRect(SDL_Rect rect, SDL_Rect camera);
 
 public:
     // Constructor
@@ -73,7 +75,7 @@ public:
     bool init();
 
     // Load the images
-    bool loadMedia(vector<Tile *> &pointers);
+    bool loadMedia(vector<Tile *> &pointers, vector<Movable *> &movables);
 
     // Load a texture
     SDL_Texture *loadTexture(const string &name);
@@ -81,10 +83,16 @@ public:
     // Load a texture for each tile
     bool loadTiles(vector<Tile *> &pointers);
 
+    // Load a texture for each movable
+    bool loadMovables(vector<Movable *> &movables);
+
     // Render everything the map holds information about
     // x and y are the coordinates of the center of the camera, in pixels,
     // where y = 0 is at the bottom
-    void renderMap(const Map &m, unsigned x, unsigned y);
+    void renderMap(const Map &m, const SDL_Rect &camera);
+
+    // Render movables (the player, monsters, NPCs, dropped items)
+    void renderMovables(const vector<Movable *> &movables);
 
     // Update the screen
     void update(const Map &m, const vector<Movable *> &movables);

@@ -12,5 +12,12 @@ Player::Player() {
     // Set the amount to accelerate by
     dAccel.x = 16;
     dAccel.y = 16;
+
+    // Set the sprite name
+    // Todo: have a race
+    sprite = "humanHaha.png";
+    spriteWidth = 24;
+    spriteHeight = 48;
+   
 }
 

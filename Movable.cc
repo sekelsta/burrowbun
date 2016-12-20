@@ -11,12 +11,14 @@ Movable::Movable() {
     velocity.y = 0;
     accel.x = 0;
     accel.y = 0;
+    texture = NULL;
 
     // These should be changed by the child class's init.
     drag.x = 0;
     drag.y = 0;
     dAccel.x = 0;
     dAccel.y = 0;
+    sprite = "";
 }
 
 Point Movable::getVelocity() {
@@ -29,6 +31,18 @@ void Movable::setAccel(Point newAccel) {
 
 Point Movable::getDAccel() {
     return dAccel;
+}
+
+string Movable::getSprite() {
+    return sprite;
+}
+
+int Movable::getSpriteWidth() {
+    return spriteWidth;
+}
+
+int Movable::getSpriteHeight() {
+    return spriteHeight;
 }
 
 // This adds acceleration to speed, and limits speed at maxSpeed.

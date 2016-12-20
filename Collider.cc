@@ -6,7 +6,8 @@ using namespace std;
 // Constructor
 Collider::Collider(int tileWidth, int tileHeight) : TILE_WIDTH(tileWidth),
     TILE_HEIGHT(tileHeight) {
-    // No other fields to initialize?
+    // Disable collisions to get a map veiwer
+    enableCollisions = true;
 }
 
 // A function to maove and collide the movables
