@@ -1,11 +1,5 @@
 Changes since last push:
- - Very small velocities are now rounded to 0.
- - Added a Point struct.
+ - Mountains are now made by midpoint displacement
 
 TODO: Make Map use SpaceInfo instead of Tile*
-
-Fixed bugs:
- - Moving up and down looks wierd.
- - Movement up and right isn't quite right.
- - When the map wrapped it was being rendered wrong.
 

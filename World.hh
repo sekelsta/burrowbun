@@ -93,6 +93,16 @@ class World {
     // Generate Perlin noise of length times * wavelength
     vector<double> noise(double range, int times, int wavelength) const;
 
+    // Generate a heightmap recursively by midpoint displacement
+    // length is best as (a power of 2) + 1, start, end, and mid are the 
+    // heights at those places. variance is the coefficient of the random 
+    // number added. exp is the  number that the variance is multiplied by 
+    // every  iteration. For best results,
+    // use a  number between 0 and 1. An exp closer to 0 will make smoother 
+    // terrain, one closer to 1 will make more jagged terrain.
+    vector<double> midpointDisplacement(int length, double start, double end,
+        double mid, double exp, double variance);
+
     // Make an array containing the information for an irregular triangle with
     // width b and height h
     vector<double> makeTriangle(int b, int h, double mean, double stddev);

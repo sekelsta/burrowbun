@@ -3,7 +3,7 @@
 #include <cassert>
 #include <ctime> // To seed the random number generator
 #include <cstdlib> // For randomness
-#include <math.h> // Because pi
+#include <cmath> // Because pi and exponentiation
 #include "World.hh"
 
 using namespace std;
@@ -280,7 +280,7 @@ void World::setHeights(int start, int stop, const vector<double> &heights,
             fill = below;
         }
         setTo(x, newy, oldy, fill, array);
-        assert (findChange(x, top, array) == newy - 1);
+        // assert (findChange(x, top, array) == newy - 1);
     }
 }
 
@@ -314,6 +314,72 @@ vector<double> World::noise(double range, int times, int wavelength) const {
         values[i] = lerp(values[lo], values[hi], t);
     }
     return values;
+}
+
+// Generate a heightmap recursively by midpoint displacement
+// length is best as (a power of 2) + 1, start, end, and mid are the 
+// heights at those places. variance is the coefficient of the random 
+// number added. exp is the  number that the variance is multiplied by 
+// every  iteration. For best results,
+// use a  number between 0 and 1. An exp closer to 0 will make smoother 
+// terrain, one closer to 1 will make more jagged terrain.
+vector<double> World::midpointDisplacement(int length, double start, double end,
+    double mid, double exp, double variance) {
+    // Initialize the heightmap
+    vector<double> heights;
+    heights.resize(length);
+
+    // If exp is greater than 1, warn the user
+    if (exp < -1 || exp > 1) {
+        cerr << "Warning: calling midpointDisplacement with large exp.\n";
+    }
+
+    // Set the start, end, and midpoint
+    assert(length > 2);
+    heights[0] = start;
+    heights[length - 1] = end;
+    heights[length / 2] = mid;
+
+    // Solve the base case
+    if (length == 3) {
+        return heights;
+    }
+
+    // Recurse! (This isn't very efficient.)
+
+    // Have randomness between -1 and 1
+    uniform_real_distribution<double> distribution(-1.0, 1.0);
+
+    // Find the rest of the first half
+    int newLength = length / 2 + 1;
+    double newMid = (start + mid) / 2 + variance * distribution(generator);
+    if(newLength > 2) {
+        vector<double> first = midpointDisplacement(newLength, start, mid, 
+            newMid, exp, variance * exp);
+        assert(heights.size() > first.size());
+        assert(heights[0] == first[0]);
+        assert(first[first.size() - 1] == mid);
+        for (unsigned int i = 0; i < first.size(); i++) {
+            heights[i] = first[i];
+        }
+    }
+
+    // Find the rest of the second half
+    newLength = (length + 1) / 2; // Different because rounding
+    if (newLength > 2) {
+        newMid = (end + mid) / 2 + variance * distribution(generator);
+        vector<double> second = midpointDisplacement(newLength, mid, end, 
+            newMid, exp, variance * exp);
+        assert(heights.size() > second.size());
+        assert(heights[length / 2] == second[0]);
+        assert(heights[length - 1] == second[second.size() - 1]);
+        for (unsigned int i = 0; i < second.size(); i++) {
+            heights[length / 2 + i] = second[i];
+        }
+    }
+
+    return heights;
+
 }
 
 // Make an irregular triangle
@@ -402,15 +468,13 @@ void World::mountain(int x, int y, int h) {
     vector<TileType> below, above;
     above.push_back(EMPTY);
     below.push_back(STONE);
-    below.push_back(DIRT);
     vector<double> heights;
-    int w = 2 * h / 3;
+    int w = 4 * h / 3;
     if (h < 200) {
-        heights = makeTriangle(2 * w, h, 1, 1);
+        heights = midpointDisplacement(2 * w, (double)y, (double)y, 
+            (double)(h + y), 0.3, (double)h);
     }
-    for (int i = 0; i < 2 * w; i++) {
-        heights[i] += y;
-    }
+
     setHeights(x - w, x + w, heights, above, below, height, foreground);
 }
 
@@ -452,6 +516,7 @@ void World::setHills(int start, int stop, int maxAmp, double maxFreq) {
     int stopy = findChange(stop, height, foreground);
     stopy = max(0, stopy);
     double avgHeight = (starty + stopy) / 2.0;
+
     vector<double> heights = makeHills(stop - start, maxAmp, maxFreq);
 
    // Correct so it's at the right height
