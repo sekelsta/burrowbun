@@ -566,7 +566,7 @@ World::World(WorldType worldType) {
     // I should be careful to make sure there are never cloud cities or 
     // floating islands or whatever directly above the spawn point, so the
     // player doesn't die of fall damage every time they respawn.
-    spawn.y = max(0, findChange(spawn.x, height, foreground));
+    spawn.y = max(0, findChange(spawn.x, height, foreground)) + 4;
 }
 
 // Destructor

@@ -11,7 +11,7 @@ Tile::Tile(TileType tileType, unsigned index)
     texture = NULL;
 
     // These variables will usually be these values
-    passage = 1;
+    isSolid = true;
     isPlatform = false;
     maxHealth = 1;
     erodeResist = -1;
@@ -22,6 +22,7 @@ Tile::Tile(TileType tileType, unsigned index)
         case TileType::NONE :
             break;
         case TileType::EMPTY : 
+            isSolid = false;
             sprite = "empty.png";
             mass = 0;
             break;

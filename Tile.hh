@@ -41,8 +41,7 @@ public:
 
     // Variables for how it interacts with the players
     bool isPlatform; // Whether players collide with the underside
-    // Player speed is multiplied by passage of the tiles the player is in
-    double passage;
+    bool isSolid;
 
     // Basically the number of hits with a pickax to break it
     int maxHealth;

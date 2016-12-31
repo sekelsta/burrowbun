@@ -1,3 +1,5 @@
 Changes since last push:
- - Now the player's sprite is displayed 
- - The center of view is now the center of the player, not the corner
+ - very buggy collision detection added
+
+Known bugs:
+ - It doesn't work.
