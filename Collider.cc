@@ -10,14 +10,9 @@ Collider::Collider(int tileWidth, int tileHeight) : TILE_WIDTH(tileWidth),
     enableCollisions = true;
 }
 
-inline bool Collider::isColliding(const Rect &rectA, const Rect &rectB) {
-    return (rectA.x + rectA.w > rectB.x && rectA.x < rectB.x + rectB.w
-        && rectA.y + rectA.h > rectB.y && rectA.y < rectB.y + rectB.h);
-}
-
 // Given that a collision happens left or right, update info accordingly.
 inline void Collider::findXCollision(CollisionInfo &info, int dx, 
-        const Rect &stays) {
+        int w, const Rect &stays) {
     // Collision is left or right
     if (dx < 0) {
         info.type = CollisionType::LEFT;
@@ -25,14 +20,14 @@ inline void Collider::findXCollision(CollisionInfo &info, int dx,
     }
     else {
         info.type = CollisionType::RIGHT;
-        info.x = stays.x;
+        info.x = stays.x - w;
     }
 
 }
 
 // Given that a collision is up or down, update info accordingly
 inline void Collider::findYCollision(CollisionInfo &info, int dy, 
-        const Rect &stays) {
+        int h, const Rect &stays) {
     // Collision is up or down
     if (dy < 0) {
         info.type = CollisionType::DOWN;
@@ -40,7 +35,7 @@ inline void Collider::findYCollision(CollisionInfo &info, int dy,
     }
     else {
         info.type = CollisionType::UP;
-        info.y = stays.y;
+        info.y = stays.y - h;
     }
 }
 
@@ -49,12 +44,11 @@ inline void Collider::findYCollision(CollisionInfo &info, int dy,
 CollisionInfo Collider::findCollision(const Rect &to, const Rect &stays, 
         int dx, int dy) {
     CollisionInfo info;
-    info.tile = NULL;
     info.x = 0;
     info.y = 0;
 
     // Check for collisions
-    if (isColliding(stays, to)) {
+    if (stays.intersects(to)) {
         // There's a collision.
         // If exactly one of the sides didn't use to be in the collision area
         // and now it is, we know the direction. (Actually, it can be two
@@ -72,7 +66,7 @@ CollisionInfo Collider::findCollision(const Rect &to, const Rect &stays,
                 || to.y + to.h - dy <= stays.y);
             // Since there definately is a collision, it has to be up or down
             assert(dy != 0);
-            findYCollision(info, dy, stays);
+            findYCollision(info, dy, to.h, stays);
             return info;
         }
         // If the top or bottom started off in the collision area
@@ -82,7 +76,7 @@ CollisionInfo Collider::findCollision(const Rect &to, const Rect &stays,
                 && to.y + to.h - dy > stays.y)) {
             // Likewise, we know it must be left or right
             assert(dx != 0);
-            findXCollision(info, dx, stays);
+            findXCollision(info, dx, to.w, stays);
             return info;
         }
         // Now we know none of the edges started off in the collision area,
@@ -98,15 +92,15 @@ CollisionInfo Collider::findCollision(const Rect &to, const Rect &stays,
         ty *= abs(dx);
         if (tx < ty) {
             // Collision is left or right
-            findXCollision(info, dx, stays);
+            findXCollision(info, dx, to.w, stays);
         }
         else if (ty < tx) {
             // Collision is up or down
-            findYCollision(info, dy, stays);
+            findYCollision(info, dy, to.h, stays);
         }
         // tx == ty and it's exactly hitting the corner
         else {
-            findXCollision(info, dx, stays);
+            findXCollision(info, dx, to.w, stays);
             cout << "Corner collision.\n";
             if (info.type == CollisionType::LEFT) {
                 info.type = CollisionType::LEFT_CORNER;
@@ -134,6 +128,10 @@ void Collider::update(const Map &map, vector<Movable *> &movables) {
     int worldWidth = map.getWidth() * TILE_WIDTH;
     int worldHeight = map.getHeight() * TILE_HEIGHT;
 
+    // from is the rectangle of the player the update before, to is the 
+    // rectangle the player would move to if it didn't collide with anything,
+    // and stays is the tile currently being checked for collisions with the
+    // player.
     Rect from;
     Rect to;
     Rect stays;
@@ -160,19 +158,23 @@ void Collider::update(const Map &map, vector<Movable *> &movables) {
         int startY = from.y / TILE_HEIGHT; 
         // Collide with the tiles it starts on
         for (int k = startX; k < startX + width; k++) {
+            int l = (k + map.getWidth()) % map.getWidth();
+            stays.x = l * TILE_WIDTH;
             for (int j = startY; j < startY + height; j++) {
-                //double passage = map.getForeground(k, j) -> passage;
-                stays.x = k * TILE_WIDTH;
                 stays.y = j * TILE_HEIGHT;
-                if (isColliding(stays, from)) {
+                if (stays.intersects(from) && enableCollisions) {
                     // If I add sand that falls and does damage, I should 
                     // deal that damage here.
-                    //xVelocity *= passage;
-                    //yVelocity *= passage;
+                    if (map.getForeground(l, j) -> isSolid) {
+                        xVelocity = 0;
+                        yVelocity = 0;
+                    }
                 }
             }
         }
 
+        // For debugging, TODO: remove
+        vector<CollisionInfo> collisions;
         // Calculating this here instead of with the other things, 
         // in case velocity changes after start collisions
         while (xVelocity != 0 || yVelocity != 0) {
@@ -193,63 +195,65 @@ void Collider::update(const Map &map, vector<Movable *> &movables) {
             double yCoefficient = 1;
             // Only these tiles can possibly be colliding
             for (int k = to.x / TILE_WIDTH;
-                    k < (to.x + to.w) / TILE_WIDTH + 2; k++) {
+                    k < (to.x + to.w) / TILE_WIDTH + 1; k++) {
                 int l = (k + map.getWidth()) % map.getWidth();
+                stays.x = l * TILE_WIDTH;
                 for (int j = to.y / TILE_HEIGHT;
-                        j < (to.y + to.h) / TILE_WIDTH + 2; j++) {
+                        j < (to.y + to.h) / TILE_HEIGHT + 1; j++) {
                     Tile *tile = map.getForeground(l, j);
                     if (!(tile -> isSolid || tile -> isPlatform)) {
                         continue;
                     }
-                    stays.x = l * TILE_WIDTH;
                     stays.y = j * TILE_HEIGHT;
-                    if (isColliding(stays, from)) {
-                        cout << "Tile at " << l << ", " << j;
-                        cout << " is already colliding with the player.\n";
-                        //newX = from.x;
-                        //xCoefficient = 0;
+                    if (stays.intersects(from)) {
                         continue;
                     }
                     CollisionInfo info = findCollision(to, stays, dx, dy);
-                    if (info.type == CollisionType::UP) {
-                        newY = info.y - to.h;
-                        yCoefficient *= (int)(!(tile -> isSolid));
-                        cout << "Up collision at ";
-                        cout << l << ", " << j << ".\n";
-                    }
-                    else if (info.type == CollisionType::DOWN) {
-                        newY = info.y;
-                        yCoefficient *= (int)(!(tile -> isSolid));
-                        yCoefficient *= (int)(!(tile -> isPlatform));
-                        cout << "Down collision at ";
-                        cout << l << ", " << j << ".\n";
-                    }
-                    else if (info.type == CollisionType::LEFT) {
-                        newX = info.x;
-                        xCoefficient *= (int)(!(tile -> isSolid));
-                        cout << "Left collision at ";
-                        cout << l << ", " << j << ".\n";
-                    }
-                    else if (info.type == CollisionType::RIGHT) {
-                        newX = info.x - to.w;
-                        xCoefficient *= (int)(!(tile -> isSolid));
-                        cout << "Right collision at ";
-                        cout << l << ", " << j << ".\n";
-                    }
-                    else if (info.type != CollisionType::NONE) {
-                        cerr << "Collider: unhandled corner case.\n";
-                    }
-                    else {
-                        cout << "No collision with tile at " << l << ", ";
-                        cout << j << ".\n";
+                    switch(info.type) {
+                        case CollisionType::DOWN :
+                            yCoefficient *= (int)(!(tile -> isPlatform));
+                            cout << "Down collision at ";
+                            cout << l << ", " << j << ".\n";
+                        case CollisionType::UP :
+                            newY = info.y;
+                            yCoefficient *= (int)(!(tile -> isSolid));
+                            // For debugging. TODO: remove
+                            collisions.push_back(info);
+                            break;
+                        case CollisionType::LEFT :
+                            cout << "Left collision at ";
+                            cout << l << ", " << j << ".\n";
+                        case CollisionType::RIGHT :
+                            newX = info.x;
+                            xCoefficient *= (int)(!(tile -> isSolid));
+                            // For debugging. TODO: remove
+                            collisions.push_back(info);
+                            break;
+                        case CollisionType::LEFT_CORNER :
+                        case CollisionType::RIGHT_CORNER :
+                            cerr << "Collider: unhandled corner case.\n";
+                            // For debugging. TODO: remove
+                            collisions.push_back(info);
+                            break;
+                        case CollisionType::NONE :
+                            cout << "No collision with tile at " << l << ", ";
+                            cout << j << ".\n";
+                            break;
                     }
                 }
             }
             // Back in the while, move loop
-            dx *= xCoefficient;
-            dy *= yCoefficient;
-            xVelocity *= xCoefficient;
-            yVelocity *= yCoefficient;
+            // In case the collisions doesn't stop us
+            dx = to.x - newX;
+            dy = to.y - newY;
+
+            // Only collide if collisions are enabled
+            if (enableCollisions) {
+                dx *= xCoefficient;
+                dy *= yCoefficient;
+                xVelocity *= xCoefficient;
+                yVelocity *= yCoefficient;
+            }
             // This will only work if there aren't half-tiles
             from.x = newX + dx;
             from.y = newY + dy;
@@ -264,7 +268,6 @@ void Collider::update(const Map &map, vector<Movable *> &movables) {
         // Collide in the y direction
         movables[i] -> y = max(0, movables[i] -> y);
         movables[i] -> y = min(movables[i] -> y, worldHeight);
-
     }
 }
 

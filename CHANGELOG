@@ -1,5 +1,4 @@
 Changes since last push:
- - very buggy collision detection added
-
-Known bugs:
- - It doesn't work.
+ - Reorganized code, so hopefully it can be slightly more readable
+ - Replacing isColliding with interects as a method of the Rect struct seems to have fixed the bug? It's still possible to enter a block, but I think that's
+only because I haven't implemented corner collisions yet.

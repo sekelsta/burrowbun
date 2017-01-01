@@ -12,7 +12,6 @@ using namespace std;
 /* To be able to describe collisions better. */
 enum class CollisionType {
     NONE,
-    START,
     UP,
     DOWN,
     LEFT,
@@ -36,6 +35,12 @@ struct Rect {
     int y;
     int w;
     int h;
+
+    // Function to tell whether another rectangle intersects this one.
+    inline bool intersects(const Rect &that) const {
+        return (x + w > that.x && x < that.x + that.w
+            && y + h > that.y && y < that.y + that.h);
+    }
 };
 
 /* A class to handle collisions. It takes a map and a vector of movables
@@ -49,14 +54,13 @@ class Collider {
     // Disable to get a map veiwer
     bool enableCollisions;
 
-    // Whether two rectangles overlap
-    bool isColliding(const Rect &rectA, const Rect &rectB);
-
     // Given that a collision happens left or right, update info accordingly.
-    void findXCollision(CollisionInfo &info, int dx, const Rect &stays);
+    // dx is the step size and w is the width of the player.
+    void findXCollision(CollisionInfo &info, int dx, int w, const Rect &stays);
 
     // Given that a collision is up or down, update info accordingly
-    void findYCollision(CollisionInfo &info, int dy, const Rect &stays);
+    // dy is the step size and h is the height of the player.
+    void findYCollision(CollisionInfo &info, int dy, int h, const Rect &stays);
 
     // Returns info on the collision between a moving thing and a stationary 
     // thing. Collisions that occur even if the moving thing stays still will
