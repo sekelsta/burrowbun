@@ -1,6 +1,2 @@
 Changes since last push:
- - Added going up a single block to the collision detection
- - Fixed Makefile dependencies
-
-Known bugs:
- - It actually goes up a block sometimes when it shouldn't, which means that it can step up two block tall things
+ - fixed bug: It was going up two blocks sometimes because it was compariring with the wrong value when deciding whether to step up.

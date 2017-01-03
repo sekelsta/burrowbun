@@ -135,7 +135,7 @@ void Collider::collide(const Map &map, Movable &movable) {
     stays.w = TILE_WIDTH;
     stays.h = TILE_HEIGHT;
 
-    // If these need to be true, they can be made true
+    // In case these were true before
     movable.isCollidingX = false;
     movable.isCollidingDown = false;
  
@@ -285,8 +285,10 @@ void Collider::update(const Map &map, vector<Movable *> &movables) {
             hypothetical.spriteHeight = movables[i] -> spriteHeight;
             // See if it can go up one tile or less without colliding
             int oldY = hypothetical.y;
-            // The amount to move by to go up one tile or less
+            // The amount to move by to go up one tile or less, assuming 
+            // gravity is in the usual direction
             int dy = TILE_HEIGHT - (oldY % TILE_HEIGHT);
+            assert(dy <= TILE_HEIGHT);
             assert(dy > 0);
             Point newVelocity;
             newVelocity.x = 0;
@@ -295,18 +297,21 @@ void Collider::update(const Map &map, vector<Movable *> &movables) {
             collide(map, hypothetical);
             // If there wasn't a collision
             if (hypothetical.y == oldY + dy) {
-                assert(hypothetical.x = movables[i] -> x);
+                assert(hypothetical.x == movables[i] -> x);
                 assert(movables[i] -> y == oldY);
                 // check that it would end up standing on the tile, and not 
                 // randomly jump up and fall back down
+                // dx is how much more it could have gone in the x direction, 
+                // if it didn't collide with the tile it's stepping up
                 int dx = oldX + movables[i] -> getVelocity().x;
                 dx -= hypothetical.x;
+                assert(hypothetical.x + dx == oldX + movables[i] -> getVelocity().x);
                 Point newVelocity;
                 newVelocity.x = dx;
                 newVelocity.y = 0;
                 hypothetical.setVelocity(newVelocity);
                 collide(map, hypothetical);
-                if (hypothetical.x != oldX) {
+                if (hypothetical.x != movables[i] -> x) {
                     // Ok, so we do want to jump up and continue
                     movables[i] -> x = hypothetical.x;
                     movables[i] -> y = hypothetical.y;
