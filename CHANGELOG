@@ -1,4 +1,6 @@
 Changes since last push:
- - Reorganized code, so hopefully it can be slightly more readable
- - Replacing isColliding with interects as a method of the Rect struct seems to have fixed the bug? It's still possible to enter a block, but I think that's
-only because I haven't implemented corner collisions yet.
+ - Added going up a single block to the collision detection
+ - Fixed Makefile dependencies
+
+Known bugs:
+ - It actually goes up a block sometimes when it shouldn't, which means that it can step up two block tall things

@@ -101,7 +101,6 @@ CollisionInfo Collider::findCollision(const Rect &to, const Rect &stays,
         // tx == ty and it's exactly hitting the corner
         else {
             findXCollision(info, dx, to.w, stays);
-            cout << "Corner collision.\n";
             if (info.type == CollisionType::LEFT) {
                 info.type = CollisionType::LEFT_CORNER;
             }
@@ -117,13 +116,10 @@ CollisionInfo Collider::findCollision(const Rect &to, const Rect &stays,
     return info;
 }
 
-// A function to move and collide the movables
-void Collider::update(const Map &map, vector<Movable *> &movables) {
-    // Update the velocity of everything
-    for (unsigned i = 0; i < movables.size(); i++) {
-        movables[i] -> accelerate();
-    }
-
+//  A function that moves a movable to where it should end up on a map. This 
+// assumes that no collisions with anything other than the map will affect the
+// end location.
+void Collider::collide(const Map &map, Movable &movable) {
     // Calculate the world width and height
     int worldWidth = map.getWidth() * TILE_WIDTH;
     int worldHeight = map.getHeight() * TILE_HEIGHT;
@@ -139,135 +135,184 @@ void Collider::update(const Map &map, vector<Movable *> &movables) {
     stays.w = TILE_WIDTH;
     stays.h = TILE_HEIGHT;
 
-    // Move movables and stop at the edge of the map
-    for (unsigned i = 0; i < movables.size(); i++) {
-        from.x = movables[i] -> x;
-        from.y = movables[i] -> y;
-        from.w = movables[i] -> getSpriteWidth();
-        to.w = movables[i] -> getSpriteWidth();
-        from.h = movables[i] -> getSpriteHeight();
-        to.h = movables[i] -> getSpriteHeight();
+    // If these need to be true, they can be made true
+    movable.isCollidingX = false;
+    movable.isCollidingDown = false;
+ 
 
-        // Collide with tiles
-        // Get basic information
-        int width = movables[i] -> getSpriteWidth() / TILE_WIDTH + 2;
-        int height = movables[i] -> getSpriteHeight() / TILE_HEIGHT + 2;
-        int xVelocity = movables[i] -> getVelocity().x;
-        int yVelocity = movables[i] -> getVelocity().y;
-        int startX = from.x / TILE_WIDTH;
-        int startY = from.y / TILE_HEIGHT; 
-        // Collide with the tiles it starts on
-        for (int k = startX; k < startX + width; k++) {
+    // Move, collide, and stop at the edge of the map
+    from.x = movable.x;
+    from.y = movable.y;
+    from.w = movable.spriteWidth;
+    to.w = movable.spriteWidth;
+    from.h = movable.spriteHeight;
+    to.h = movable.spriteHeight;
+
+    // Collide with tiles
+    // Get basic information
+    int width = movable.spriteWidth / TILE_WIDTH + 2;
+    int height = movable.spriteHeight / TILE_HEIGHT + 2;
+    int xVelocity = movable.getVelocity().x;
+    int yVelocity = movable.getVelocity().y;
+    int startX = from.x / TILE_WIDTH;
+    int startY = from.y / TILE_HEIGHT; 
+    // Collide with the tiles it starts on
+    for (int k = startX; k < startX + width; k++) {
+        int l = (k + map.getWidth()) % map.getWidth();
+        stays.x = l * TILE_WIDTH;
+        for (int j = startY; j < startY + height; j++) {
+            stays.y = j * TILE_HEIGHT;
+            if (stays.intersects(from) && enableCollisions) {
+                // If I add sand that falls and does damage, I should 
+                // deal that damage here.
+                if (map.getForeground(l, j) -> isSolid) {
+                    xVelocity = 0;
+                    yVelocity = 0;
+                }
+            }
+        }
+    }
+    // Calculating this here instead of with the other things, 
+    // in case velocity changes after start collisions
+    while (xVelocity != 0 || yVelocity != 0) {
+        // The n is in case moludo results in 0 inconviniently
+        int n = max(min(1, xVelocity), -1);
+        int dx = (xVelocity - n) % (TILE_WIDTH / 2) + n;
+        n = max(min(1, yVelocity), -1);
+        int dy = (yVelocity - n) % (TILE_HEIGHT / 2) + n;
+        to.x = from.x + dx;
+        to.y = from.y + dy;
+        int newX = to.x;
+        int newY = to.y;
+        // A separate variable so that corner collisions can only happen if
+        // no other collisions happen.
+        int cornerX = to.x;
+        assert(abs(xVelocity - dx) <= abs(xVelocity));
+        assert(abs(yVelocity - dy) <= abs(yVelocity));
+        xVelocity -= dx;
+        yVelocity -= dy;
+        double xCoefficient = 1;
+        double yCoefficient = 1;
+        // Only these tiles can possibly be colliding
+        for (int k = to.x / TILE_WIDTH;
+                k < (to.x + to.w) / TILE_WIDTH + 1; k++) {
             int l = (k + map.getWidth()) % map.getWidth();
             stays.x = l * TILE_WIDTH;
-            for (int j = startY; j < startY + height; j++) {
+            for (int j = to.y / TILE_HEIGHT;
+                    j < (to.y + to.h) / TILE_HEIGHT + 1; j++) {
+                Tile *tile = map.getForeground(l, j);
+                if (!(tile -> isSolid || tile -> isPlatform)) {
+                    continue;
+                }
                 stays.y = j * TILE_HEIGHT;
-                if (stays.intersects(from) && enableCollisions) {
-                    // If I add sand that falls and does damage, I should 
-                    // deal that damage here.
-                    if (map.getForeground(l, j) -> isSolid) {
-                        xVelocity = 0;
-                        yVelocity = 0;
-                    }
+                if (stays.intersects(from)) {
+                    continue;
+                }
+                CollisionInfo info = findCollision(to, stays, dx, dy);
+                switch(info.type) {
+                    case CollisionType::DOWN :
+                        movable.isCollidingDown = true;
+                        yCoefficient *= (int)(!(tile -> isPlatform));
+                    case CollisionType::UP :
+                        newY = info.y;
+                        yCoefficient *= (int)(!(tile -> isSolid));
+                        break;
+                    case CollisionType::LEFT :
+                    case CollisionType::RIGHT :
+                        newX = info.x;
+                        if (tile -> isSolid) {
+                            xCoefficient = 0;
+                            movable.isCollidingX = true;
+                        }
+                        break;
+                    case CollisionType::LEFT_CORNER :
+                    case CollisionType::RIGHT_CORNER :
+                        if (tile -> isSolid) {
+                            cornerX = info.x;
+                        }
+                        break;
+                    case CollisionType::NONE :
+                        break;
                 }
             }
         }
+        // Back in the while, move loop
+        // In case the collisions doesn't stop us
+        dx = to.x - newX;
+        dy = to.y - newY;
 
-        // For debugging, TODO: remove
-        vector<CollisionInfo> collisions;
-        // Calculating this here instead of with the other things, 
-        // in case velocity changes after start collisions
-        while (xVelocity != 0 || yVelocity != 0) {
-            // The n is in case moludo results in 0 inconviniently
-            int n = max(min(1, xVelocity), -1);
-            int dx = (xVelocity - n) % (TILE_WIDTH / 2) + n;
-            n = max(min(1, yVelocity), -1);
-            int dy = (yVelocity - n) % (TILE_HEIGHT / 2) + n;
-            to.x = from.x + dx;
-            to.y = from.y + dy;
-            int newX = to.x;
-            int newY = to.y;
-            assert(abs(xVelocity - dx) <= abs(xVelocity));
-            assert(abs(yVelocity - dy) <= abs(yVelocity));
-            xVelocity -= dx;
-            yVelocity -= dy;
-            double xCoefficient = 1;
-            double yCoefficient = 1;
-            // Only these tiles can possibly be colliding
-            for (int k = to.x / TILE_WIDTH;
-                    k < (to.x + to.w) / TILE_WIDTH + 1; k++) {
-                int l = (k + map.getWidth()) % map.getWidth();
-                stays.x = l * TILE_WIDTH;
-                for (int j = to.y / TILE_HEIGHT;
-                        j < (to.y + to.h) / TILE_HEIGHT + 1; j++) {
-                    Tile *tile = map.getForeground(l, j);
-                    if (!(tile -> isSolid || tile -> isPlatform)) {
-                        continue;
-                    }
-                    stays.y = j * TILE_HEIGHT;
-                    if (stays.intersects(from)) {
-                        continue;
-                    }
-                    CollisionInfo info = findCollision(to, stays, dx, dy);
-                    switch(info.type) {
-                        case CollisionType::DOWN :
-                            yCoefficient *= (int)(!(tile -> isPlatform));
-                            cout << "Down collision at ";
-                            cout << l << ", " << j << ".\n";
-                        case CollisionType::UP :
-                            newY = info.y;
-                            yCoefficient *= (int)(!(tile -> isSolid));
-                            // For debugging. TODO: remove
-                            collisions.push_back(info);
-                            break;
-                        case CollisionType::LEFT :
-                            cout << "Left collision at ";
-                            cout << l << ", " << j << ".\n";
-                        case CollisionType::RIGHT :
-                            newX = info.x;
-                            xCoefficient *= (int)(!(tile -> isSolid));
-                            // For debugging. TODO: remove
-                            collisions.push_back(info);
-                            break;
-                        case CollisionType::LEFT_CORNER :
-                        case CollisionType::RIGHT_CORNER :
-                            cerr << "Collider: unhandled corner case.\n";
-                            // For debugging. TODO: remove
-                            collisions.push_back(info);
-                            break;
-                        case CollisionType::NONE :
-                            cout << "No collision with tile at " << l << ", ";
-                            cout << j << ".\n";
-                            break;
-                    }
+        // Only collide if collisions are enabled
+        if (enableCollisions) {
+            dx *= xCoefficient;
+            dy *= yCoefficient;
+            xVelocity *= xCoefficient;
+            yVelocity *= yCoefficient;
+        }
+        // This will only work if there aren't half-tiles
+        from.x = newX + dx;
+        from.y = newY + dy;
+        // Handle corner collisions if necessary
+        if (from.x == to.x && from.y == to.y) {
+            from.x = cornerX;
+        }
+    }
+    movable.x = from.x;
+    movable.y = from.y;
+    // Collide with the edge of the map
+    // Wrap in the x direction
+    movable.x += worldWidth;
+    movable.x %= worldWidth;
+    // Collide in the y direction
+    movable.y = max(0, movable.y);
+    movable.y = min(movable.y, worldHeight);
+}
+
+
+// A function to move and collide the movables
+void Collider::update(const Map &map, vector<Movable *> &movables) {
+    // Update the velocity of everything
+    for (unsigned i = 0; i < movables.size(); i++) {
+        movables[i] -> accelerate();
+        int oldX = movables[i] -> x;
+        collide(map, *movables[i]);
+        // Do the thing where colliding with a wall one block high doesn't
+        // stop you
+        if (movables[i] -> isCollidingX) {
+            Movable hypothetical;
+            hypothetical.x = movables[i] -> x;
+            hypothetical.y = movables[i] -> y;
+            hypothetical.spriteWidth = movables[i] -> spriteWidth;
+            hypothetical.spriteHeight = movables[i] -> spriteHeight;
+            // See if it can go up one tile or less without colliding
+            int oldY = hypothetical.y;
+            // The amount to move by to go up one tile or less
+            int dy = TILE_HEIGHT - (oldY % TILE_HEIGHT);
+            assert(dy > 0);
+            Point newVelocity;
+            newVelocity.x = 0;
+            newVelocity.y = dy;
+            hypothetical.setVelocity(newVelocity);
+            collide(map, hypothetical);
+            // If there wasn't a collision
+            if (hypothetical.y == oldY + dy) {
+                assert(hypothetical.x = movables[i] -> x);
+                assert(movables[i] -> y == oldY);
+                // check that it would end up standing on the tile, and not 
+                // randomly jump up and fall back down
+                int dx = oldX + movables[i] -> getVelocity().x;
+                dx -= hypothetical.x;
+                Point newVelocity;
+                newVelocity.x = dx;
+                newVelocity.y = 0;
+                hypothetical.setVelocity(newVelocity);
+                collide(map, hypothetical);
+                if (hypothetical.x != oldX) {
+                    // Ok, so we do want to jump up and continue
+                    movables[i] -> x = hypothetical.x;
+                    movables[i] -> y = hypothetical.y;
                 }
             }
-            // Back in the while, move loop
-            // In case the collisions doesn't stop us
-            dx = to.x - newX;
-            dy = to.y - newY;
-
-            // Only collide if collisions are enabled
-            if (enableCollisions) {
-                dx *= xCoefficient;
-                dy *= yCoefficient;
-                xVelocity *= xCoefficient;
-                yVelocity *= yCoefficient;
-            }
-            // This will only work if there aren't half-tiles
-            from.x = newX + dx;
-            from.y = newY + dy;
         }
-        movables[i] -> x = from.x;
-        movables[i] -> y = from.y;
-
-        // Collide with the edge of the map
-        // Wrap in the x direction
-        movables[i] -> x += worldWidth;
-        movables[i] -> x %= worldWidth;
-        // Collide in the y direction
-        movables[i] -> y = max(0, movables[i] -> y);
-        movables[i] -> y = min(movables[i] -> y, worldHeight);
     }
 }
 

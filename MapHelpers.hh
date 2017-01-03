@@ -1,6 +1,8 @@
 #ifndef MAPHELPERS_HH
 #define MAPHELPERS_HH
 
+#include "Tile.hh"
+
 // TODO: Actually create a Liquid class, not necessarily in this file. For now
 // any Liquid* will just be set to NULL.
 class Liquid;

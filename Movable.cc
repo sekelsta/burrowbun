@@ -12,6 +12,8 @@ Movable::Movable() {
     accel.x = 0;
     accel.y = 0;
     texture = NULL;
+    isCollidingDown = false;
+    isCollidingX = false;
 
     // These should be changed by the child class's init.
     drag.x = 0;
@@ -19,30 +21,28 @@ Movable::Movable() {
     dAccel.x = 0;
     dAccel.y = 0;
     sprite = "";
+    spriteWidth = 0;
+    spriteHeight = 0;
 }
 
-Point Movable::getVelocity() {
+Point Movable::getVelocity() const {
     return velocity;
+}
+
+void Movable::setVelocity(Point newVelocity) {
+    velocity = newVelocity;
 }
 
 void Movable::setAccel(Point newAccel) {
     accel = newAccel;
 }
 
-Point Movable::getDAccel() {
+Point Movable::getDAccel() const {
     return dAccel;
 }
 
-string Movable::getSprite() {
+string Movable::getSprite() const {
     return sprite;
-}
-
-int Movable::getSpriteWidth() {
-    return spriteWidth;
-}
-
-int Movable::getSpriteHeight() {
-    return spriteHeight;
 }
 
 // This adds acceleration to speed, and limits speed at maxSpeed.

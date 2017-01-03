@@ -68,6 +68,9 @@ class Collider {
     CollisionInfo findCollision(const Rect &to, const Rect &stays, 
         int dx, int dy);
 
+    // Takes a movable and a map, and moves it to where it should end up
+    void collide(const Map &map, Movable &movable);
+
 public:
     // Constructor
     Collider(int tileWidth, int tileHeight);

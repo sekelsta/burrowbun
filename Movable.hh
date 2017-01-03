@@ -17,31 +17,39 @@ protected:
     // Fields
     string sprite;
 
-    // How big is the sprite?
-    int spriteWidth;
-    int spriteHeight;
-
     // Movement-related fields
     // Drag is a number between 0 and 1 which the velocity is multiplied by
     Point drag, velocity, accel, dAccel;
 
 public:
+    // Information about recent collisions
+    // We need to know whether there was a collision down so that we can
+    // avoid jumping midair, and we need isCollidingX to not be stopped by
+    // one block high walls.
+    bool isCollidingX;
+    bool isCollidingDown;
+
     // Location
     int x, y;
 
     // Sprite, as a texture
     SDL_Texture *texture;
 
+    // How big is the sprite?
+    int spriteWidth;
+    int spriteHeight;
+
     // Constructor
     Movable();
 
     // Access functions
-    Point getVelocity();
+    Point getVelocity() const;
+    void setVelocity(Point newVelocity); // Very few things should use this.
     void setAccel(Point newAccel);
-    Point getDAccel();
-    string getSprite();
-    int getSpriteWidth();
-    int getSpriteHeight();
+    Point getDAccel() const;
+    string getSprite() const;
+    int getSpriteWidth() const;
+    int getSpriteHeight() const;
 
     // Updates velocity
     void accelerate();
