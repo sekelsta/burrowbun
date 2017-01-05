@@ -11,7 +11,10 @@ Player::Player() {
 
     // Set the amount to accelerate by
     dAccel.x = 16;
-    dAccel.y = 16;
+    dAccel.y = 30;
+
+    // Set the number of updates a jump can last
+    maxJumpTime = 16;
 
     // Set the sprite name
     // Todo: have a race

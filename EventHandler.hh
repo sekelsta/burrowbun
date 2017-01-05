@@ -11,7 +11,7 @@ using namespace std;
    later the player can change these settings. */
 struct KeySettings {
     // Which keys are for movement
-    vector<SDL_Scancode> leftKeys, rightKeys, upKeys, downKeys;
+    vector<SDL_Scancode> leftKeys, rightKeys, upKeys, downKeys, jumpKeys;
 };
 
 /* A class to handle events such as keyboard input or mouse movement. */
@@ -20,7 +20,7 @@ class EventHandler {
     KeySettings keySettings;
 
     // Whether the player is trying to move in some direction
-    bool left, right, up, down;
+    bool left, right, up, down, jump;
 
     // To move by one pixel at a time, in the vertical direction 
     // This currently only exists for debugging

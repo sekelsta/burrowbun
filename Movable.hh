@@ -28,6 +28,10 @@ public:
     // one block high walls.
     bool isCollidingX;
     bool isCollidingDown;
+    int timeOffGround; // How many updates since it was on the ground
+    // How many updates before holding down the jump key stops working. This
+    // determines maximum jump height. Here -1 means infinity.
+    int maxJumpTime; 
 
     // Location
     int x, y;

@@ -264,7 +264,7 @@ void Collider::collide(const Map &map, Movable &movable) {
     movable.x %= worldWidth;
     // Collide in the y direction
     movable.y = max(0, movable.y);
-    movable.y = min(movable.y, worldHeight);
+    movable.y = min(movable.y, worldHeight - movable.spriteHeight);
 }
 
 
@@ -273,6 +273,12 @@ void Collider::update(const Map &map, vector<Movable *> &movables) {
     // Update the velocity of everything
     for (unsigned i = 0; i < movables.size(); i++) {
         movables[i] -> accelerate();
+        // This should be changed
+        double gravity = -5;
+        Point v = movables[i] -> getVelocity();
+        v.y += gravity;
+        movables[i] -> setVelocity(v);
+
         int oldX = movables[i] -> x;
         collide(map, *movables[i]);
         // Do the thing where colliding with a wall one block high doesn't

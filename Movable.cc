@@ -14,6 +14,7 @@ Movable::Movable() {
     texture = NULL;
     isCollidingDown = false;
     isCollidingX = false;
+    timeOffGround = 0;
 
     // These should be changed by the child class's init.
     drag.x = 0;
@@ -45,8 +46,18 @@ string Movable::getSprite() const {
     return sprite;
 }
 
-// This adds acceleration to speed, and limits speed at maxSpeed.
+// This adds acceleration to speed, and limits speed at maxSpeed. This also
+// updates the value of timeOffGround.
 void Movable::accelerate() {
+    // If on the ground, timeOffGround should be 0, otherwise it should be
+    // one more than it was before
+    if (isCollidingDown) {
+        timeOffGround = 0;
+    }
+    else {
+        timeOffGround++;
+    }
+
     // Update velocity
     velocity.x += accel.x;
     velocity.y += accel.y;

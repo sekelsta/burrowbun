@@ -35,7 +35,7 @@ SDL_Rect WindowHandler::findCamera(int x, int y, int w, int h) {
 // Convert a rectangle from world coordinates to screen coordinates
 SDL_Rect WindowHandler::convertRect(SDL_Rect rect, SDL_Rect camera) {
     int xScreen = (rect.x - camera.x + worldWidth) % worldWidth;
-    int yScreen = camera.y + screenHeight - rect.y - rect.h;
+    int yScreen = camera.y + camera.h - rect.y - rect.h;
     SDL_Rect screenRect = { xScreen, yScreen, rect.w, rect.h };
 
     return screenRect;

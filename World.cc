@@ -58,8 +58,8 @@ void World::generateTest() {
 
 // Generate a tiny world good for testing world generation
 void World::generateSmolTest() {
-    width = 10;
-    height = 2;
+    width = 50;
+    height = 20;
 
     spawn.x = width / 2;
     spawn.y = height / 2;

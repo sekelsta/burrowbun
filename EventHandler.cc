@@ -37,6 +37,7 @@ EventHandler::EventHandler() {
     right = false;
     up = false;
     down = false;
+    jump = false;
 
     move = 0;
 
@@ -49,6 +50,8 @@ EventHandler::EventHandler() {
     keySettings.upKeys.push_back(SDL_SCANCODE_W);
     keySettings.downKeys.push_back(SDL_SCANCODE_DOWN);
     keySettings.downKeys.push_back(SDL_SCANCODE_S);
+    keySettings.jumpKeys.push_back(SDL_SCANCODE_SPACE);
+    keySettings.jumpKeys.push_back(SDL_SCANCODE_KP_SPACE);
 }
 
 // Access functions
@@ -122,6 +125,7 @@ void EventHandler::updateKeys(const Uint8 *state) {
     right = false;
     up = false;
     down = false;
+    jump = false;
 
     // Try to tell whether keys that matter are up or down
     if (isHeld(state, keySettings.leftKeys)) {
@@ -135,6 +139,9 @@ void EventHandler::updateKeys(const Uint8 *state) {
     }
     if (isHeld(state, keySettings.downKeys)) {
         down = true;
+    }
+    if (isHeld(state, keySettings.jumpKeys)) {
+        jump = true;
     }
 }
 
@@ -150,6 +157,10 @@ void EventHandler::updatePlayer(Player &player) {
     }
     if (left) {
         newAccel.x -= player.getDAccel().x;
+    }
+    if (jump && (player.timeOffGround <= player.maxJumpTime
+            || player.maxJumpTime == -1)) {
+        newAccel.y += player.getDAccel().y;
     }
 
     // TODO: handle these separately, so the player can't fly
