@@ -35,6 +35,8 @@ public:
 
     // The name of the image file
     std::string sprite;
+    // The number of variations of the tile that sprites exist of
+    int maxSpriteCol;
 
     // The texture made from that image file
     SDL_Texture *texture;

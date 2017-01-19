@@ -35,7 +35,7 @@ class Map {
 
     // Really small helper functions that don't directly change tiles
 
-    // Return a pointer to the tile* at x, y
+    // Return a pointer to the SpaceInfo* at x, y
     SpaceInfo *findPointer(int x, int y) const;
 
     /* Make a Tile object, add it to the list of pointers, and return 
@@ -69,6 +69,9 @@ class Map {
 
     // Return the default spawn point
     Location getSpawn() const;
+
+    // Return which part of the spritesheet should be used
+    Location getSpritePlace(int x, int y) const;
 
     // Returns the foreground tile pointer at x, y
     // 0, 0 is the bottom right

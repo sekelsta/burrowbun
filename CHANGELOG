@@ -1,18 +1,22 @@
 Changes since last push:
- - added jumping and gravity
+ - Empty tiles no longer have a sprite
+ - Temporarily, all non-empty tiles are dirt or stone
+ - Tile sprites now look different based on whether they're next to air, 
+and have several variations
 
 Known "features":
  - Holding down space means that it will attempt to jump whenever possible, 
 rather than doing the "one press of space corresponds to one jump" that can feel more natural (in Terraria, the difference between equipping or not equipping a frog leg).
  - It is possible to step up a tile while jumping, to go up extra fast.
  - The strenth of gravity is independent of the world.
+ - Attempting to go sideways into a wall will prevent you from falling down the side, because gravity mean you collide with the top of the tile next to your feet, even though you can't physically stand on it. This can be fixed by handling collisions that only depend on one part of the velocity vector before handling ones that depend on both.
+ - Things that move multiple lines per second won't collide as if they were moving in a straight line. The best way to solve this may be to not allow anything to move that fast, possibly via multiple updates between renderings.
 
 Known bugs:
  - Collision with the top of the map doesn't work right. This will probably be ignored after creating a clear solid unminable tile to go on the map borders.
 
 Soon to come (though likely not very soon):
  - Tile sprites that don't look ugly
- - A (hopefully final) tile size of 16x16
  - Better values for movement fields
  - Trees!
  - Better map generation

@@ -47,6 +47,11 @@ struct SpaceInfo {
     // Healths of the foreground and background
     int foregroundHealth;
     int backgroundHealth;
+
+    // Which rectangle of the spritesheet to draw
+    // spriteRow should be based on which surrounding tiles are empty,
+    // spriteCol should be random
+    Location spritePlace;
 };
 
 #endif

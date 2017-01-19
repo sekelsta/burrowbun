@@ -182,15 +182,17 @@ bool WindowHandler::loadTiles(vector<Tile *> &pointers) {
     bool success = true;
     for (unsigned i = 0; i < pointers.size(); i++) {
         string name = TILE_PATH + pointers[i] -> sprite;
-        loadTexture(name);
-        assert(textures.size() != 0);
-        if (textures.back() == NULL) {
-            success = false;
-        }
+        if (name != TILE_PATH) {
+            loadTexture(name);
+            assert(textures.size() != 0);
+            if (textures.back() == NULL) {
+                success = false;
+            }
 
-        // Set the tile's texture to the loaded texture
-        assert(pointers[i] -> texture == NULL);
-        pointers[i] -> texture = textures.back();
+            // Set the tile's texture to the loaded texture
+            assert(pointers[i] -> texture == NULL);
+            pointers[i] -> texture = textures.back();
+        }
     }
 
     return success;
@@ -226,6 +228,10 @@ void WindowHandler::renderMap(const Map &m, const SDL_Rect &camera) {
 
     // Rectangle to draw to
     SDL_Rect *rectTo;
+    // Rectangle to draw from, to pick part of a spritesheet
+    SDL_Rect rectFrom;
+    rectFrom.w = TILE_WIDTH;
+    rectFrom.h = TILE_HEIGHT;
 
     // Iterate through every tile at least partially within the camera
     int width = ceil((float)camera.w / (float)TILE_WIDTH) + 1;
@@ -252,16 +258,12 @@ void WindowHandler::renderMap(const Map &m, const SDL_Rect &camera) {
             int xTile = (xMapStart + i) % mapWidth;
             int yTile = yMapStart - j;
             // But only if it's a tile that exists on the map
-            if (0 <= xTile && xTile < mapWidth && 0 <= yTile 
-                && yTile < worldHeight / TILE_HEIGHT) { 
-                Tile *tile = m.getForeground(xTile, yTile);
-                SDL_RenderCopy(renderer, tile -> texture, NULL, rectTo);
-            }
-            else {
-                cerr << "Tried to render the tile at " << xTile;
-                cerr << ", " << yTile << endl;
-                cerr << "xMapStart is " << xMapStart << ", mapWidth is ";
-                cerr << mapWidth << endl;
+            assert (0 <= xTile && xTile < mapWidth && 0 <= yTile 
+                && yTile < worldHeight / TILE_HEIGHT);
+            Tile *tile = m.getForeground(xTile, yTile);
+            if (tile -> texture != NULL) {
+                rectFrom.x = m.getSpritePlace(xTile, yTile).x * TILE_WIDTH;
+                rectFrom.y = m.getSpritePlace(xTile, yTile).y * TILE_HEIGHT;                    SDL_RenderCopy(renderer, tile -> texture, &rectFrom, rectTo);
             }
         }
     }
@@ -309,7 +311,7 @@ void WindowHandler::update(const Map &map, const vector<Movable *> &movables) {
 
     // Put a black rectangle in the background
     SDL_Rect fillRect = { 0, 0, screenWidth, screenHeight };
-    SDL_SetRenderDrawColor(renderer, 0x00, 0x00, 0x00, 0xFF);
+    SDL_SetRenderDrawColor(renderer, 0x00, 0xFF, 0xFF, 0xFF);
     SDL_RenderFillRect(renderer, &fillRect);
 
     // Only draw stuff if it isn't minimized

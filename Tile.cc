@@ -11,6 +11,7 @@ Tile::Tile(TileType tileType, unsigned index)
     texture = NULL;
 
     // These variables will usually be these values
+    maxSpriteCol = 4;
     isSolid = true;
     isPlatform = false;
     maxHealth = 1;
@@ -23,7 +24,7 @@ Tile::Tile(TileType tileType, unsigned index)
             break;
         case TileType::EMPTY : 
             isSolid = false;
-            sprite = "empty.png";
+            sprite = "";
             mass = 0;
             break;
         case TileType::PLATFORM :
@@ -49,19 +50,19 @@ Tile::Tile(TileType tileType, unsigned index)
             pressureMetamorph = TileType::MAGMA;
             break;
         case TileType::MAGMA :
-            sprite = "magma.png";
+            sprite = "stone.png";
             mass = 15;
             maxHealth = 3;
             break;
         case TileType::SANDSTONE :
-            sprite = "sandstone.png";
+            sprite = "dirt.png";
             mass = 10;
             maxHealth = 8;
             erodeResist = 100;
             // TODO: pressure metamorph is quartzite
             break;
         case TileType::MUDSTONE :
-            sprite = "mudstone.png";
+            sprite = "stone.png";
             mass = 10;
             maxHealth = 8;
             erodeResist = 100;

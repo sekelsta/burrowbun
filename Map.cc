@@ -92,10 +92,43 @@ Map::Map(string filename) {
             tiles[index].foregroundHealth = matchingTile -> maxHealth;
             tiles[index].background = NULL;
             tiles[index].backgroundHealth = 1;
+            tiles[index].spritePlace.x = rand() % matchingTile -> maxSpriteCol;
+            tiles[index].spritePlace.y = 0;
             index++;
         }
     }
     assert(getForeground(0, 0) -> type == tiles[0].foreground -> type);
+
+    // Find the tiles that need a special border sprite
+    for (int i = 0; i < width; i++) {
+        for (int j = 0; j < height; j++) {
+            if (getForeground(i, j) -> type != TileType::EMPTY) {
+                // The value at getSpritePlace.y should be between 0 and 15.
+                // In fact, it should be the binary number that you get if
+                // you start at the top and go counterclockwise, treating
+                // a non-air tile to that side as 0 and an air tile to that 
+                // side as 1.
+                int col = 0;
+                if (j != height - 1 
+                    && getForeground(i, j + 1) -> type == TileType::EMPTY) {
+                        col += 1;
+                }
+                if (i != width - 1
+                    && getForeground(i + 1, j) -> type == TileType::EMPTY) {
+                        col += 2;
+                }
+                if (j != 0
+                    && getForeground(i, j - 1) -> type == TileType::EMPTY) {
+                        col += 4;
+                }
+                if (i != 0
+                    && getForeground(i - 1, j) -> type == TileType::EMPTY) {
+                        col += 8;
+                }
+                findPointer(i, j) -> spritePlace.y = col;
+            }
+        }
+    }
 }
 
 // Destructor
@@ -123,6 +156,11 @@ int Map::getWidth() const {
 // Return the default spawn point
 Location Map::getSpawn() const {
     return spawn;
+}
+
+// Return the part of the spritesheet that should be used
+Location Map::getSpritePlace(int x, int y) const {
+    return findPointer(x, y) -> spritePlace;
 }
 
 // Returns the foreground tile at x, y
