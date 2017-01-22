@@ -9,16 +9,6 @@
 
 using namespace std;
 
-// Declare some constants
-// TODO: fix, this is non-ideal
-const TileType DIRT = TileType::DIRT;
-const TileType STONE = TileType::STONE;
-const TileType EMPTY = TileType::EMPTY;
-const TileType PLATFORM = TileType::PLATFORM;
-const TileType MAGMA = TileType::MAGMA;
-const TileType SANDSTONE = TileType::SANDSTONE;
-const TileType MUDSTONE = TileType::MUDSTONE;
-
 // A class for generating a map for a sandbox game
 class World {
     // Fields:

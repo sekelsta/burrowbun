@@ -12,13 +12,15 @@ using namespace std;
 
 // A class for keeping track of which tiles there are
 enum class TileType {
-    MAGMA,
+    PERIDOTITE,
     EMPTY,
+    IMPASSABLE,
     DIRT,
-    STONE,
+    MUDSTONE,
     PLATFORM,
     SANDSTONE,
-    MUDSTONE,
+    RED_SANDSTONE,
+    DIAMOND,
     NONE = 255
 };
 
@@ -43,6 +45,8 @@ public:
 
     // Variables for how it interacts with the players
     bool isPlatform; // Whether players collide with the underside
+    bool isTiledLikePlatform; // Platforms look at the tiles next to them and
+                              // diagonal when deciding which sprite to use
     bool isSolid;
 
     // Basically the number of hits with a pickax to break it
@@ -50,11 +54,7 @@ public:
 
     // Variables to use in map generation and upkeep
     // In these ones, -1 means infinity
-    double mass;        // How heavy one tile of it is
     double erodeResist;  // How hard it is to erode
-    double maxPressure; // How much pressure before it metamorphoses
-    // TODO: implement heat-based metamorphism
-    TileType pressureMetamorph; // What it becomes
 
     // Constructor, based on the tile type
     // Also the only actual method Tiles have

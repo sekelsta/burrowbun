@@ -311,7 +311,7 @@ void WindowHandler::update(const Map &map, const vector<Movable *> &movables) {
 
     // Put a black rectangle in the background
     SDL_Rect fillRect = { 0, 0, screenWidth, screenHeight };
-    SDL_SetRenderDrawColor(renderer, 0x00, 0xFF, 0xFF, 0xFF);
+    SDL_SetRenderDrawColor(renderer, 0x00, 0x99, 0xFF, 0xFF);
     SDL_RenderFillRect(renderer, &fillRect);
 
     // Only draw stuff if it isn't minimized

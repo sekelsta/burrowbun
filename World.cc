@@ -33,26 +33,26 @@ void World::generateTest() {
     foreground = new TileType[height * width];
     background = new TileType[height * width];
     // Set all tiles to EMPTY, then make some that aren't
-    setAll(EMPTY, foreground);
+    setAll(TileType::EMPTY, foreground);
 
     // Make the bottom solid
     for (int i = 0; i < width; i++) {
         for (int j = 0; j < 20; j++) {
-            setTile(i, j, STONE, foreground);
+            setTile(i, j, TileType::MUDSTONE, foreground);
         }
     }
 
     // Add a couple lines and some platforms
     for (int i = 20; i < 80; i++) {
-        setTile(i, 40, STONE, foreground);
-        setTile(i, 50, PLATFORM, foreground);
-        setTile(i, 60, STONE, foreground);
+        setTile(i, 40, TileType::MUDSTONE, foreground);
+        setTile(i, 50, TileType::PLATFORM, foreground);
+        setTile(i, 60, TileType::MUDSTONE, foreground);
     }
 
     // Add some diagonal lines
     for (int i = 20; i < 60; i++) {
-        setTile(100 + i, i + 10, STONE, foreground);
-        setTile(100 - i, i + 10, STONE, foreground);
+        setTile(100 + i, i + 10, TileType::MUDSTONE, foreground);
+        setTile(100 - i, i + 10, TileType::MUDSTONE, foreground);
     }
 }
 
@@ -67,28 +67,13 @@ void World::generateSmolTest() {
     // Create the array of tiles
     foreground = new TileType[width * height];
     background = new TileType[width * height];
-    setAll(EMPTY, foreground);
+    setAll(TileType::EMPTY, foreground);
 
-    /*
-    for (int x = 0; x < width; x++) {
-        setTo(x, 2, 3, SANDSTONE, foreground);
-        setTo(x, 0, 2, DIRT, foreground);
-    }
-   
-    // Make what should be a nice straight column
-    setTo(1, 0, height - 1, MAGMA, foreground);
-    
-    for (int x = 0; x < width; x++) {
-        if (x % 2 == 0) {
-            setTile(x, height - 1, MAGMA, foreground);
-        }
-    }
-*/
     // Set a few reference points 
-    setTile(0, 0, MUDSTONE, foreground);
-    setTile(0, height - 1, SANDSTONE, foreground);
-    setTile(width - 1, 0, STONE, foreground);
-    setTile(1, height - 1, DIRT, foreground);
+    setTile(0, 0, TileType::RED_SANDSTONE, foreground);
+    setTile(0, height - 1, TileType::SANDSTONE, foreground);
+    setTile(width - 1, 0, TileType::MUDSTONE, foreground);
+    setTile(1, height - 1, TileType::DIRT, foreground);
     
 }
 
@@ -101,14 +86,14 @@ void World::generateEarth() {
     // Create the array of tiles
     foreground = new TileType[height * width];
     background = new TileType[height * width];
-    setAll(EMPTY, foreground);
+    setAll(TileType::EMPTY, foreground);
 
     // Make a horizon line for a continent
     int horizon = 200;
     int magmaLevel = 100;
     for (int x = 0; x < width; x++) {
-        setTo(x, 0, magmaLevel, MAGMA, foreground);
-        setTo(x, magmaLevel, horizon, STONE, foreground);
+        setTo(x, 0, magmaLevel, TileType::PERIDOTITE, foreground);
+        setTo(x, magmaLevel, horizon, TileType::MUDSTONE, foreground);
     }
 
     setHills(400, 700, 15, 0.1);
@@ -120,8 +105,8 @@ void World::generateEarth() {
     // Make a canyon
     int canyonPlace = 750;
     vector<TileType> fill;
-    fill.push_back(SANDSTONE);
-    fill.push_back(MUDSTONE);
+    fill.push_back(TileType::SANDSTONE);
+    fill.push_back(TileType::RED_SANDSTONE);
     canyon(canyonPlace, horizon, 60, -50, fill, -0.7, 2);
 
     // Make some pillars (desert-style)
@@ -131,7 +116,7 @@ void World::generateEarth() {
 
     // Add a layer of dirt
     vector<TileType> justdirt;
-    justdirt.push_back(DIRT);
+    justdirt.push_back(TileType::DIRT);
     // Constructs a vector of length width with every value set to 5
     vector<double> heights (width, 5.0);
     vector<double> perlin = noise(20, width / 16, 16);
@@ -466,8 +451,8 @@ void World::mountain(int x, int y, int h) {
 //TODO: add randomness, make it recursive
 // TODO make the limit reasonable and add a recursive else
     vector<TileType> below, above;
-    above.push_back(EMPTY);
-    below.push_back(STONE);
+    above.push_back(TileType::EMPTY);
+    below.push_back(TileType::MUDSTONE);
     vector<double> heights;
     int w = 4 * h / 3;
     if (h < 200) {
@@ -500,7 +485,7 @@ vector<double> World::makeHills(int length, int maxAmp, double maxFreq) const {
             /*int n = (amp * sin(i * freq + phaseShift));
             heights[i] += n;
             // Code to view what sin functions are involved
-            setTile(i, n + 200, MAGMA, foreground);
+            setTile(i, n + 200, TileType::PERIDOTITE, foreground);
             */
         }
     }
@@ -534,7 +519,7 @@ void World::setHills(int start, int stop, int maxAmp, double maxFreq) {
 
     // Now that we have the heights, actually set the hills to those heights
     vector<TileType> above(1, TileType::EMPTY);
-    vector<TileType> below(1, TileType::STONE);
+    vector<TileType> below(1, TileType::MUDSTONE);
     setHeights(start, stop, heights, above, below, height, foreground);
 }
 

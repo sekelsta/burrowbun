@@ -14,9 +14,9 @@ Tile::Tile(TileType tileType, unsigned index)
     maxSpriteCol = 4;
     isSolid = true;
     isPlatform = false;
+    isTiledLikePlatform = false;
     maxHealth = 1;
     erodeResist = -1;
-    maxPressure = -1;
 
     // Set things to the right values
     switch(tileType) {
@@ -25,48 +25,42 @@ Tile::Tile(TileType tileType, unsigned index)
         case TileType::EMPTY : 
             isSolid = false;
             sprite = "";
-            mass = 0;
             break;
+        case TileType::IMPASSABLE :
+            isSolid = true;
+            sprite = "";
         case TileType::PLATFORM :
             sprite = "platform.png";
-            mass = 0;
             maxHealth = 2;
             isPlatform = true;
+            isTiledLikePlatform = true;
             break;
         case TileType::DIRT :
             sprite = "dirt.png";
-            mass = 5;
             maxHealth = 5;
             erodeResist = 10;
-            maxPressure = 500;
-            pressureMetamorph = TileType::STONE;
             break;
-        case TileType::STONE :
-            sprite = "stone.png";
-            mass = 10;
+        case TileType::MUDSTONE :
+            sprite = "mudstone.png";
             maxHealth = 10;
             erodeResist = 100;
-            maxPressure = 10000;
-            pressureMetamorph = TileType::MAGMA;
             break;
-        case TileType::MAGMA :
-            sprite = "stone.png";
-            mass = 15;
+        case TileType::PERIDOTITE :
+            sprite = "peridotite.png";
             maxHealth = 3;
             break;
         case TileType::SANDSTONE :
-            sprite = "dirt.png";
-            mass = 10;
-            maxHealth = 8;
-            erodeResist = 100;
-            // TODO: pressure metamorph is quartzite
-            break;
-        case TileType::MUDSTONE :
-            sprite = "stone.png";
-            mass = 10;
+            sprite = "sandstone.png";
             maxHealth = 8;
             erodeResist = 100;
             break;
+        case TileType::RED_SANDSTONE :
+            sprite = "red_sandstone.png";
+            maxHealth = 8;
+            erodeResist = 100;
+            break;
+        case TileType::DIAMOND :
+            sprite = "diamond.png";
     }
 }
 
