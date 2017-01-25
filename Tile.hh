@@ -12,16 +12,15 @@ using namespace std;
 
 // A class for keeping track of which tiles there are
 enum class TileType {
-    PERIDOTITE,
     EMPTY,
     IMPASSABLE,
     DIRT,
     MUDSTONE,
-    PLATFORM,
     SANDSTONE,
     RED_SANDSTONE,
+    PERIDOTITE,
     DIAMOND,
-    NONE = 255
+    PLATFORM,
 };
 
 /* A class to make tiles based on their type, and store their infos. */

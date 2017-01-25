@@ -4,6 +4,7 @@
 #include <ctime> // To seed the random number generator
 #include <cstdlib> // For randomness
 #include <cmath> // Because pi and exponentiation
+#include <algorithm> // For max and min
 #include "World.hh"
 
 using namespace std;
@@ -122,6 +123,12 @@ void World::generateEarth() {
     vector<double> perlin = noise(20, width / 16, 16);
     heights = merge(0, width, heights, 0, width, perlin);
     addHeights(0, width, heights, justdirt, height, foreground);
+
+    // Put a tunnel
+    Location start;
+    start.x = width / 2;
+    start.y = findChange(start.x, height - 1, foreground);
+    tunnel(start);
 }
 
 
@@ -269,12 +276,80 @@ void World::setHeights(int start, int stop, const vector<double> &heights,
     }
 }
 
+/* Set all tiles in a circle with radius r from Location center to val. */
+void World::setCircle(float r, const Location &center, TileType val, 
+        TileType *array) {
+    for (int i = center.x - r; i < center.x + r + 1; i++) {
+        int x = i % width;
+        for (int y = max(0, (int)(center.y - r));
+                y < min(height - 1, (int)(center.y + r + 1)); y++) {
+            if (pow(x - center.x, 2) + pow(y - center.y, 2) <= r * r) {
+                setTile(x, y, val, array);
+            }
+        }
+    } 
+}
+
+/* Put a circle at each location in centers, with the corresponding radius from
+   r. r and centers should be the same length. */
+void World::setPath(const vector<float> &r, const vector<Location> &centers,
+        TileType val, TileType *array) {
+    assert(r.size() >= centers.size());
+    for (unsigned int i = 0; i < centers.size(); i++) {
+        setCircle(r[i], centers[i], val, array);
+    }
+}
+
+// Put a gently sloping tunnel with a given start point
+void World::tunnel(Location start) {
+    // Set some constants
+    int length = 200;
+    float minR = 3;
+    float maxR = 7;
+    vector<float> r;
+    vector<Location> centers;
+    int direction = 1;
+    if (rand() % 2 == 0) {
+        direction *= -1;
+    }
+
+    // Choose the path
+    r.push_back((minR + maxR) / 2);
+    centers.push_back(start);
+
+    for (int i = 0; i < length; i++) {
+        // Have a chance of switching direction
+        if (rand() % 50 == 0) {
+            direction *= -1;
+        }
+        Location next;
+        next = centers.back();
+        // Go in a direction
+        if (rand() % 3 == 0) {
+            next.y -= 1;
+        }
+        else {
+            next.x += direction;
+        }
+        centers.push_back(next);
+
+        // Change the radius
+        float radius = r.back();
+        radius += rand() % 3 - 2;
+        radius = min(radius, maxR);
+        radius = max(radius, minR);
+        r.push_back(radius);
+    }
+
+    setPath(r, centers, TileType::EMPTY, foreground);
+}
+
 // Linear interpolator
 double World::lerp(double lo, double hi, double t) const {
     return lo * (1 - t) + hi * t;
 }
 
-// Generate Perlin noise between 0 and range
+// Generate 1D Perlin noise between 0 and range
 // The length of the array is times * wavelength
 vector<double> World::noise(double range, int times, int wavelength) const {
     assert(times >= 0);

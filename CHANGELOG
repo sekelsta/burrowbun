@@ -1,8 +1,5 @@
 Changes since last push:
- - mudstone replaced by red sandstone
- - stone is now called mudstone
- - magma replaced by peridotite
- - new and improved tile sprites
+ - Maps can now generate tunnels, albeit somewhat badly
 
 Known "features":
  - Holding down space means that it will attempt to jump whenever possible, 

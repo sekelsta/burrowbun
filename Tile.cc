@@ -20,8 +20,6 @@ Tile::Tile(TileType tileType, unsigned index)
 
     // Set things to the right values
     switch(tileType) {
-        case TileType::NONE :
-            break;
         case TileType::EMPTY : 
             isSolid = false;
             sprite = "";

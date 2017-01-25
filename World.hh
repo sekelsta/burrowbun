@@ -77,6 +77,19 @@ class World {
         const vector<TileType> &above, const vector<TileType> &below, int top,
         TileType *array);
 
+    // Set all tiles in a circle with radius r centered on location center, 
+    // to TileType val on the array array (eg foreground, background)
+    void setCircle(float r, const Location &center, TileType val, 
+        TileType *array);
+
+    // Put a circle at each location in centers, with the corresponding radius
+    // from r. r and centers should be the same length.
+    void setPath(const vector<float> &r, const vector<Location> &centers,
+        TileType val, TileType *array);
+
+    // Put a gently sloping tunnel with a given start point.
+    void tunnel(Location start);
+
     // Linear interpolator
     double lerp(double lo, double hi, double t) const;
 
