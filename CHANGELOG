@@ -1,5 +1,5 @@
 Changes since last push:
- - Maps can now generate tunnels, albeit somewhat badly
+ - Collision detection now overlaps the player with the tile a little
 
 Known "features":
  - Holding down space means that it will attempt to jump whenever possible, 

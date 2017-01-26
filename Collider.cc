@@ -8,6 +8,8 @@ Collider::Collider(int tileWidth, int tileHeight) : TILE_WIDTH(tileWidth),
     TILE_HEIGHT(tileHeight) {
     // Or disable collisions to get a map viewer
     enableCollisions = true;
+    xOffset = 1;
+    yOffset = 1;
 }
 
 // Given that a collision happens left or right, update info accordingly.
@@ -132,8 +134,8 @@ void Collider::collide(const Map &map, Movable &movable) {
     Rect to;
     Rect stays;
 
-    stays.w = TILE_WIDTH;
-    stays.h = TILE_HEIGHT;
+    stays.w = TILE_WIDTH - 2 * xOffset;
+    stays.h = TILE_HEIGHT - 2 * yOffset;
 
     // In case these were true before
     movable.isCollidingX = false;
@@ -159,9 +161,9 @@ void Collider::collide(const Map &map, Movable &movable) {
     // Collide with the tiles it starts on
     for (int k = startX; k < startX + width; k++) {
         int l = (k + map.getWidth()) % map.getWidth();
-        stays.x = l * TILE_WIDTH;
+        stays.x = l * TILE_WIDTH + xOffset;
         for (int j = startY; j < startY + height; j++) {
-            stays.y = j * TILE_HEIGHT;
+            stays.y = j * TILE_HEIGHT + yOffset;
             if (stays.intersects(from) && enableCollisions) {
                 // If I add sand that falls and does damage, I should 
                 // deal that damage here.
@@ -197,14 +199,14 @@ void Collider::collide(const Map &map, Movable &movable) {
         for (int k = to.x / TILE_WIDTH;
                 k < (to.x + to.w) / TILE_WIDTH + 1; k++) {
             int l = (k + map.getWidth()) % map.getWidth();
-            stays.x = l * TILE_WIDTH;
+            stays.x = l * TILE_WIDTH + xOffset;
             for (int j = to.y / TILE_HEIGHT;
                     j < (to.y + to.h) / TILE_HEIGHT + 1; j++) {
                 Tile *tile = map.getForeground(l, j);
                 if (!(tile -> isSolid || tile -> isPlatform)) {
                     continue;
                 }
-                stays.y = j * TILE_HEIGHT;
+                stays.y = j * TILE_HEIGHT + yOffset;
                 if (stays.intersects(from)) {
                     continue;
                 }
@@ -293,7 +295,7 @@ void Collider::update(const Map &map, vector<Movable *> &movables) {
             int oldY = hypothetical.y;
             // The amount to move by to go up one tile or less, assuming 
             // gravity is in the usual direction
-            int dy = TILE_HEIGHT - (oldY % TILE_HEIGHT);
+            int dy = TILE_HEIGHT - ((oldY + yOffset) % TILE_HEIGHT);
             assert(dy <= TILE_HEIGHT);
             assert(dy > 0);
             Point newVelocity;

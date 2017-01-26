@@ -18,9 +18,9 @@ Player::Player() {
 
     // Set the sprite name
     // Todo: have a race
-    sprite = "humanHaha.png";
-    spriteWidth = 24;
-    spriteHeight = 48;
+    sprite = "bunny.png";
+    spriteWidth = 38;
+    spriteHeight = 32;
    
 }
 

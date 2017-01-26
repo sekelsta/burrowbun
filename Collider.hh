@@ -54,6 +54,10 @@ class Collider {
     // Disable to get a map veiwer
     bool enableCollisions;
 
+    // Pretend all tiles are smaller by this amount
+    int xOffset;
+    int yOffset;
+
     // Given that a collision happens left or right, update info accordingly.
     // dx is the step size and w is the width of the player.
     void findXCollision(CollisionInfo &info, int dx, int w, const Rect &stays);
