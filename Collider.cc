@@ -137,6 +137,12 @@ void Collider::collide(const Map &map, Movable &movable) {
     stays.w = TILE_WIDTH - 2 * xOffset;
     stays.h = TILE_HEIGHT - 2 * yOffset;
 
+    // Tell all the Rects the world width, so they can wrap when checking for
+    // collisions
+    stays.worldWidth = worldWidth;
+    from.worldWidth = worldWidth;
+    to.worldWidth = worldWidth;
+
     // In case these were true before
     movable.isCollidingX = false;
     movable.isCollidingDown = false;
@@ -174,8 +180,8 @@ void Collider::collide(const Map &map, Movable &movable) {
             }
         }
     }
-    // Calculating this here instead of with the other things, 
-    // in case velocity changes after start collisions
+
+    // Collide with tiles it doesn't start on
     while (xVelocity != 0 || yVelocity != 0) {
         // The n is in case moludo results in 0 inconviniently
         int n = max(min(1, xVelocity), -1);
@@ -211,30 +217,17 @@ void Collider::collide(const Map &map, Movable &movable) {
                     continue;
                 }
                 CollisionInfo info = findCollision(to, stays, dx, dy);
-                switch(info.type) {
-                    case CollisionType::DOWN :
-                        movable.isCollidingDown = true;
-                        yCoefficient *= (int)(!(tile -> isPlatform));
-                    case CollisionType::UP :
-                        newY = info.y;
-                        yCoefficient *= (int)(!(tile -> isSolid));
-                        break;
-                    case CollisionType::LEFT :
-                    case CollisionType::RIGHT :
-                        newX = info.x;
-                        if (tile -> isSolid) {
-                            xCoefficient = 0;
-                            movable.isCollidingX = true;
-                        }
-                        break;
-                    case CollisionType::LEFT_CORNER :
-                    case CollisionType::RIGHT_CORNER :
-                        if (tile -> isSolid) {
-                            cornerX = info.x;
-                        }
-                        break;
-                    case CollisionType::NONE :
-                        break;
+                info.resolve(movable, tile);
+                xCoefficient *= info.xCoefficient;
+                yCoefficient *= info.yCoefficient;
+                if (info.newX != -1) {
+                    newX = info.newX;
+                }
+                if (info.newY != -1) {
+                    newY = info.newY;
+                }
+                if (info.cornerX != -1) {
+                    cornerX = info.cornerX;
                 }
             }
         }

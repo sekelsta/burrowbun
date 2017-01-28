@@ -1,6 +1,7 @@
 #ifndef COLLIDER_HH
 #define COLLIDER_HH
 
+#include <iostream>
 #include <cassert>
 #include <vector>
 #include "Tile.hh"
@@ -27,10 +28,54 @@ struct CollisionInfo {
     int x;
     int y;
     CollisionType type;
+    // For resolving the collision
+    int xCoefficient;
+    int yCoefficient;
+    int newX;
+    int newY;
+    int cornerX;
+
+    // Resolve a collision
+    // Technically it says the pointer to the Tile is const, but the Tile 
+    // should be const as well. It just shouldn't be a pointer to a const tile.
+    void resolve(Movable &movable, const Tile *tile) {
+        newX = -1;
+        newY = -1;
+        cornerX = -1;
+        switch(type) {
+            case CollisionType::DOWN :
+                movable.isCollidingDown = true;
+                yCoefficient *= (int)(!(tile -> isPlatform));
+            case CollisionType::UP :
+                newY = y;
+                yCoefficient *= (int)(!(tile -> isSolid));
+                break;
+            case CollisionType::LEFT :
+            case CollisionType::RIGHT :
+                newX = x;
+                if (tile -> isSolid) {
+                    xCoefficient = 0;
+                    movable.isCollidingX = true;
+                }
+                break;
+            case CollisionType::LEFT_CORNER :
+            case CollisionType::RIGHT_CORNER :
+                if (tile -> isSolid) {
+                    cornerX = x;
+                }
+                break;
+            case CollisionType::NONE :
+                break;
+            }
+        }
+    
 };
 
-/* I want a rectangle, but I don't want to include SDL. */
-struct Rect {
+/* Rectangle, capable of seeing if another intersects it taking into account
+    the world wrapping around the x direction. */
+class Rect {
+public:
+    int worldWidth;
     int x;
     int y;
     int w;
@@ -38,8 +83,18 @@ struct Rect {
 
     // Function to tell whether another rectangle intersects this one.
     inline bool intersects(const Rect &that) const {
-        return (x + w > that.x && x < that.x + that.w
-            && y + h > that.y && y < that.y + that.h);
+        bool intersectsX = x + w > that.x && x < that.x + that.w;
+        /* If either rectangle wraps but not both, we should also see if they
+           intersect when  one is moved to the other side of the line. */
+        if ((x + w < worldWidth) != (that.x + that.w < worldWidth)) {
+            intersectsX = intersectsX || (x + w + worldWidth > that.x 
+                && x + worldWidth < that.x + that.w) 
+                || (x + w > that.x + worldWidth
+                && x < that.x + that.w + worldWidth);
+        }
+        
+
+        return (intersectsX && y + h > that.y && y < that.y + that.h);
     }
 };
 
