@@ -1,7 +1,6 @@
 Changes since last push:
- - Fixed the bug where collisions where the world wrapped weren't detected.
-The Rect.intersects function didn't take wrapping into account.
- - Tried to make collision detection a little more organized.
+ - Added darkness. Currently the sky is the only source of light, the sky is
+always white light, and every tile has the same darkness for all of it.
 
 Known "features":
  - Holding down space means that it will attempt to jump whenever possible, 
@@ -22,4 +21,4 @@ Soon to come (though likely not very soon):
  - Fixed collision detection
  - A more deliberate framerate
  - Better values for movement fields
- - Light and darkness
+ - Darkness that looks less rectangular

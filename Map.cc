@@ -39,16 +39,82 @@ Tile *Map::makeTile(TileType val) {
     return newTile(val);
 }
 
-/*
-/ / Set all tiles to val
-void Map::setAll(Tile* const &val) {
-    for (int i = 0; i < width; i++) {
-        for (int j = 0; j < height; j++) {
-            setTile(i, j, val);
+/* Pick the sprite for a tile based on the ones next to it. */
+void Map::chooseSprite(int x, int y) {
+    // The value at getSpritePlace.y should be between 0 and 15.
+    // In fact, it should be the binary number that you get if
+    // you start at the top and go counterclockwise, treating
+    // a non-air tile to that side as 0 and an air tile to that 
+    // side as 1.
+    int col = 0;
+    if (y != height - 1 
+        && getForeground(x, y + 1) -> type == TileType::EMPTY) {
+            col += 1;
+    }
+    if (x != width - 1
+        && getForeground(x + 1, y) -> type == TileType::EMPTY) {
+            col += 2;
+    }
+    if (y != 0
+        && getForeground(x, y - 1) -> type == TileType::EMPTY) {
+            col += 4;
+    }
+    if (x != 0
+        && getForeground(x - 1, y) -> type == TileType::EMPTY) {
+            col += 8;
+    }
+    findPointer(x, y) -> spritePlace.y = col;
+    int row = rand() % getForeground(x, y) -> maxSpriteCol;
+    findPointer(x, y) -> spritePlace.x = row;
+}
+
+/* Return true if neither the foreground nor background is opaque. */
+inline bool Map::isSky(int x, int y) {
+    return (getForeground(x, y) -> opacity == 0
+        && getBackground(x, y) -> opacity == 0);
+}
+
+/* Compute the taxicab distance between i, j and x, y. */
+int Map::distance(int i, int j, int x, int y) {
+    return (abs(i - x) + abs(j - y));
+}
+
+/* Compute the taxicab distance to the nearest sky tile that is a source of
+   light (doesn't have an opaque foreground or background). If the distance is 
+   more than maxDist, return maxDist. */
+int Map::skyDistance(int x, int y, int maxDist) {
+    if (isSky(x, y)) {
+        return 0;
+    }
+    int smallest = maxDist;
+    for (int i = max(0, x + 1 - maxDist); i < maxDist + x && i < width; 
+            i++) {
+        for (int j = max(0, y + 1 - maxDist);
+                j < maxDist + y && j < height; j++) {
+            if (isSky(i, j)) {
+                smallest = min(smallest, distance(i, j, x, y));
+            }
         }
     }
+    return smallest;
 }
-*/
+
+/* Calculate how well-lit the tile is. */
+void Map::setLight(int x, int y) {
+    // TODO: actually make this depend on the light source
+    SpaceInfo *place = findPointer(x, y);
+    place -> lightBlock.intensity = 0;
+    place -> lightBlock.r = 0;
+    place -> lightBlock.g = 0;
+    place -> lightBlock.b = 0;
+    place -> lightSky.r = 255;
+    place -> lightSky.g = 255;
+    place -> lightSky.b = 255;
+    int dist = skyDistance(x, y, 8);
+    place -> lightSky.setIntensity(1.0 - 0.125 * dist);
+    place -> light.sum(place -> lightSky, place -> lightBlock);
+}
+
 // Public methods
 
 // Constructor, based on a world file that exists
@@ -82,15 +148,17 @@ Map::Map(string filename) {
     int count, tile;
     TileType current;
     Tile *matchingTile = NULL;
+    Tile *matchingBackground = NULL;
     while (index < height * width) {
         infile >> count >> tile;
         current = (TileType)tile;
         matchingTile = makeTile(current);
+        matchingBackground = makeTile(TileType::EMPTY);
         for (int i = 0; i < count; i++) {
             assert(index < width * height);
             tiles[index].foreground = matchingTile;
             tiles[index].foregroundHealth = matchingTile -> maxHealth;
-            tiles[index].background = NULL;
+            tiles[index].background = matchingBackground;
             tiles[index].backgroundHealth = 1;
             tiles[index].spritePlace.x = rand() % matchingTile -> maxSpriteCol;
             tiles[index].spritePlace.y = 0;
@@ -99,34 +167,14 @@ Map::Map(string filename) {
     }
     assert(getForeground(0, 0) -> type == tiles[0].foreground -> type);
 
-    // Find the tiles that need a special border sprite
+    /* Iterate over the map finding the tiles that need a special border 
+       sprite and figuring out how well-lit each tile is. */
     for (int i = 0; i < width; i++) {
         for (int j = 0; j < height; j++) {
             if (getForeground(i, j) -> type != TileType::EMPTY) {
-                // The value at getSpritePlace.y should be between 0 and 15.
-                // In fact, it should be the binary number that you get if
-                // you start at the top and go counterclockwise, treating
-                // a non-air tile to that side as 0 and an air tile to that 
-                // side as 1.
-                int col = 0;
-                if (j != height - 1 
-                    && getForeground(i, j + 1) -> type == TileType::EMPTY) {
-                        col += 1;
-                }
-                if (i != width - 1
-                    && getForeground(i + 1, j) -> type == TileType::EMPTY) {
-                        col += 2;
-                }
-                if (j != 0
-                    && getForeground(i, j - 1) -> type == TileType::EMPTY) {
-                        col += 4;
-                }
-                if (i != 0
-                    && getForeground(i - 1, j) -> type == TileType::EMPTY) {
-                        col += 8;
-                }
-                findPointer(i, j) -> spritePlace.y = col;
+                chooseSprite(i, j);
             }
+            setLight(i, j);
         }
     }
 }
@@ -161,6 +209,10 @@ Location Map::getSpawn() const {
 // Return the part of the spritesheet that should be used
 Location Map::getSpritePlace(int x, int y) const {
     return findPointer(x, y) -> spritePlace;
+}
+
+Light Map::getLight(int x, int y) const {
+    return findPointer(x, y) -> light;
 }
 
 // Returns the foreground tile at x, y

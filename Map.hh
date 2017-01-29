@@ -46,13 +46,23 @@ class Map {
     // multiple exist, return the first one.
     Tile *makeTile(TileType val);
 
-    // Set all tiles to val
-    //void setAll(Tile* const &val);
+    /* Pick the sprite to use for a tile based on the ones next to it. */
+    void chooseSprite(int x, int y);
 
-    // Start at top and go down until the type changes
-    // Return the height of the first tile of a different type
-    // Return -1 if there is no change
-    //int findChange(int x, int top) const;
+    /* Return true if neither the foreground nor background are opaque. */
+    bool isSky(int x, int y);
+
+    /* Compute the taxicab distance between i, j and x, y. */
+    int distance(int i, int j, int x, int y);
+
+    /* Compute the taxicab distance to the nearest sky block that is a source 
+       of light (doesn't have and opaque foreground or background). If more 
+       than maxDist, return maxDist. */
+    int skyDistance(int x, int y, int maxDist);
+
+    /* Set the light of a tile. */
+    void setLight(int x, int y);
+
     public:
 
     // Contructs a map by loading a file
@@ -72,6 +82,9 @@ class Map {
 
     // Return which part of the spritesheet should be used
     Location getSpritePlace(int x, int y) const;
+
+    // Return the light at a square. 
+    Light getLight(int x, int y) const;
 
     // Returns the foreground tile pointer at x, y
     // 0, 0 is the bottom right

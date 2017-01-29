@@ -10,6 +10,7 @@ the only thing screen coordinates are used for. */
 #include <vector>
 #include <string>
 #include <SDL2/SDL.h>
+#include "Light.hh"
 #include "Tile.hh"
 #include "Map.hh"
 #include "Movable.hh"

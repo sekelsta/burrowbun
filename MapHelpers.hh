@@ -2,6 +2,7 @@
 #define MAPHELPERS_HH
 
 #include "Tile.hh"
+#include "Light.hh"
 
 // TODO: Actually create a Liquid class, not necessarily in this file. For now
 // any Liquid* will just be set to NULL.
@@ -22,13 +23,45 @@ enum class Direction {
     EAST
 };
 
-/* A class for passing a biome argument, to pick which pattern of 
+/* A class for passing a global-biome argument, to pick which pattern of 
 world-generation to use. */
 enum class WorldType {
     TEST,
     SMOLTEST,
     EARTH,
     MOON
+};
+
+/* A class to talk about nonglobal (only part of the world) biomes.*/
+enum class BiomeType {
+    ARCTIC_TUNDRA,
+    ALPINE_TUNDRA,
+    TAIGA,
+    ALPINE_FOREST,
+    GRASSLAND,
+    WOODLAND, // Temperate forest
+    DEEP_WOODS,
+    JUNGLE, // Either tropical rainforest or monsoon forest?
+    SAVANNAH,
+    DESERT,
+    SWAMP,
+    BOG,
+    SKY,
+    UNDERGROUND,
+    // Might not be implemented for a good long while:
+    COASTAL,
+    REEF,
+    PELAGIC,
+    BENTHIC
+};
+
+/* Whether that part of the world is particularily magical and what type of
+   magic. Also whether things that die there become undead. */
+enum class Surroundings {
+    GOOD,
+    NONE,
+    EVIL,
+    REANIMATING
 };
 
 /* A struct that holds information about a specific tile location on the map.
@@ -47,6 +80,13 @@ struct SpaceInfo {
     // Healths of the foreground and background
     int foregroundHealth;
     int backgroundHealth;
+
+    // How well-lit this tile is, and from where
+    Light lightSky;
+    Light lightBlock;
+    Light light;
+
+    
 
     // Which rectangle of the spritesheet to draw
     // spriteRow should be based on which surrounding tiles are empty,

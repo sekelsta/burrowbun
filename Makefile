@@ -10,13 +10,14 @@ main : main.o Map.o World.o Tile.o WindowHandler.o EventHandler.o Movable.o \
         Player.o Collider.o
 	$(CC) $(CXXFLAGS) $(LINKER_FLAGS) $^ -o $@ $(LDFLAGS)
 
-Map.o : Map.cc Map.hh Tile.hh MapHelpers.hh
+Map.o : Map.cc Map.hh Tile.hh MapHelpers.hh Light.hh
 	$(CC) $(CXXFLAGS) $^ -c $(LDFLAGS)
 
 Tile.o : Tile.cc Tile.hh
 	$(CC) $(CXXFLAGS) $^ -c $(LDFLAGS)
 
-WindowHandler.o : WindowHandler.cc WindowHandler.hh Tile.hh Map.hh Movable.hh
+WindowHandler.o : WindowHandler.cc WindowHandler.hh Tile.hh Map.hh Movable.hh \
+        Light.hh
 	$(CC) $(CXXFLAGS) $(LINKER_FLAGS) $^ -c $(LDFLAGS)
 
 EventHandler.o : EventHandler.cc EventHandler.hh WindowHandler.hh Player.hh

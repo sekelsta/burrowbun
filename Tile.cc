@@ -17,18 +17,23 @@ Tile::Tile(TileType tileType, unsigned index)
     isTiledLikePlatform = false;
     maxHealth = 1;
     erodeResist = -1;
+    opacity = 64;
 
     // Set things to the right values
     switch(tileType) {
         case TileType::EMPTY : 
             isSolid = false;
             sprite = "";
+            opacity = 0;
             break;
         case TileType::IMPASSABLE :
             isSolid = true;
             sprite = "";
+            opacity = 0;
+            break;
         case TileType::PLATFORM :
             sprite = "platform.png";
+            opacity = 0;
             maxHealth = 2;
             isPlatform = true;
             isTiledLikePlatform = true;

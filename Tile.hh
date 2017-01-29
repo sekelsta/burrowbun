@@ -48,6 +48,9 @@ public:
                               // diagonal when deciding which sprite to use
     bool isSolid;
 
+    /* For lighting. Tiles with 0 opacity are completely permeable to light.*/
+    int opacity;
+
     // Basically the number of hits with a pickax to break it
     int maxHealth;
 

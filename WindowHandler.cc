@@ -262,6 +262,10 @@ void WindowHandler::renderMap(const Map &m, const SDL_Rect &camera) {
                 && yTile < worldHeight / TILE_HEIGHT);
             Tile *tile = m.getForeground(xTile, yTile);
             if (tile -> texture != NULL) {
+                // Modulate the color due to lighting
+                Light light = m.getLight(xTile, yTile);
+                SDL_SetTextureColorMod(tile -> texture, light.r, 
+                    light.g, light.b);
                 rectFrom.x = m.getSpritePlace(xTile, yTile).x * TILE_WIDTH;
                 rectFrom.y = m.getSpritePlace(xTile, yTile).y * TILE_HEIGHT;                    SDL_RenderCopy(renderer, tile -> texture, &rectFrom, rectTo);
             }
