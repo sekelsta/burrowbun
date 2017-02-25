@@ -4,6 +4,7 @@
 #include <ctime> // To seed the random number generator
 #include <cstdlib> // For randomness
 #include <math.h> // Because pi
+#include <tgmath.h> // for exponentiation
 #include "Map.hh"
 
 using namespace std;
@@ -74,19 +75,19 @@ inline bool Map::isSky(int x, int y) {
         && getBackground(x, y) -> opacity == 0);
 }
 
-/* Compute the taxicab distance between i, j and x, y. */
+/* Return the square of the distance between i, j and x, y. */
 int Map::distance(int i, int j, int x, int y) {
-    return (abs(i - x) + abs(j - y));
+    return (((i - x) * (i - x)) + ((j - y) * (j - y)));
 }
 
-/* Compute the taxicab distance to the nearest sky tile that is a source of
-   light (doesn't have an opaque foreground or background). If the distance is 
-   more than maxDist, return maxDist. */
+/* Compute the square of the distance to the nearest sky tile that is a source 
+   of light (doesn't have an opaque foreground or background). If the distance 
+   is more than maxDist, return maxDist. */
 int Map::skyDistance(int x, int y, int maxDist) {
     if (isSky(x, y)) {
         return 0;
     }
-    int smallest = maxDist;
+    int smallest = distance(0, 0, 0, maxDist);
     for (int i = max(0, x + 1 - maxDist); i < maxDist + x && i < width; 
             i++) {
         for (int j = max(0, y + 1 - maxDist);
@@ -110,8 +111,9 @@ void Map::setLight(int x, int y) {
     place -> lightSky.r = 255;
     place -> lightSky.g = 255;
     place -> lightSky.b = 255;
-    int dist = skyDistance(x, y, 8);
-    place -> lightSky.setIntensity(1.0 - 0.125 * dist);
+    int dist = skyDistance(x, y, 25);
+    // TODO: make light intensity fall off exponentiallyish
+    place -> lightSky.setIntensity(max(0.0, exp((1 - dist) / 8.0)));
     place -> light.sum(place -> lightSky, place -> lightBlock);
 }
 

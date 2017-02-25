@@ -25,8 +25,9 @@ int main(int argc, char **argv) {
     const int TILE_HEIGHT = 16;
 
     // Construct a WindowHandler
+    bool enableDarkness = true;
     WindowHandler window(screenWidth, screenHeight, map.getWidth(), 
-                            map.getHeight(), TILE_WIDTH, TILE_HEIGHT);
+                    map.getHeight(), TILE_WIDTH, TILE_HEIGHT, enableDarkness);
 
     // Start SDL and open the window
     if (!window.init()) {

@@ -43,11 +43,11 @@ SDL_Rect WindowHandler::convertRect(SDL_Rect rect, SDL_Rect camera) {
 
 // Constructor
 WindowHandler::WindowHandler(int screenWidth, int screenHeight, 
-                    int mapWidth, int mapHeight, int tileWidth, int tileHeight) 
+        int mapWidth, int mapHeight, int tileWidth, int tileHeight, bool dark) 
     : screenWidth(screenWidth), screenHeight(screenHeight), 
         TILE_WIDTH(tileWidth), TILE_HEIGHT(tileHeight), 
         worldWidth(TILE_WIDTH * mapWidth),
-        worldHeight(TILE_HEIGHT * mapHeight) {
+        worldHeight(TILE_HEIGHT * mapHeight), enableDarkness(dark) {
     window = NULL;
     screenSurface = NULL;
     renderer = NULL;
@@ -264,8 +264,11 @@ void WindowHandler::renderMap(const Map &m, const SDL_Rect &camera) {
             if (tile -> texture != NULL) {
                 // Modulate the color due to lighting
                 Light light = m.getLight(xTile, yTile);
-                SDL_SetTextureColorMod(tile -> texture, light.r, 
-                    light.g, light.b);
+                // Only add darkness if darkness is enabled
+                if(enableDarkness) {
+                    SDL_SetTextureColorMod(tile -> texture, light.r, 
+                        light.g, light.b);
+                }
                 rectFrom.x = m.getSpritePlace(xTile, yTile).x * TILE_WIDTH;
                 rectFrom.y = m.getSpritePlace(xTile, yTile).y * TILE_HEIGHT;                    SDL_RenderCopy(renderer, tile -> texture, &rectFrom, rectTo);
             }

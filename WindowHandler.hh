@@ -36,6 +36,9 @@ class WindowHandler {
     int worldWidth;
     int worldHeight;
 
+    // Whether to use the tile's light when rendering
+    bool enableDarkness;
+
     // Whether the window is minimized
     bool isMinimized;
 
@@ -66,7 +69,7 @@ class WindowHandler {
 public:
     // Constructor
     WindowHandler(int screenWidth, int screenHeight, int mapWidth, 
-                    int mapHeight, int tileWidth, int tileHeight);
+        int mapHeight, int tileWidth, int tileHeight, bool dark);
 
     // Access functions
     void setMinimized(bool minimized);
