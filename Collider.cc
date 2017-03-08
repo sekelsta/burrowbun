@@ -48,6 +48,8 @@ CollisionInfo Collider::findCollision(const Rect &to, const Rect &stays,
     CollisionInfo info;
     info.x = 0;
     info.y = 0;
+    info.xCoefficient = 1;
+    info.yCoefficient = 1;
 
     // Check for collisions
     if (stays.intersects(to)) {
@@ -243,6 +245,7 @@ void Collider::collide(const Map &map, Movable &movable) {
             xVelocity *= xCoefficient;
             yVelocity *= yCoefficient;
         }
+
         // This will only work if there aren't half-tiles
         from.x = newX + dx;
         from.y = newY + dy;

@@ -1,6 +1,5 @@
 Changes since last push:
- - Added darkness. Currently the sky is the only source of light, the sky is
-always white light, and every tile has the same darkness for all of it.
+ - Fixed a bug where a value was uninitialized.
 
 Known "features":
  - Holding down space means that it will attempt to jump whenever possible, 
@@ -9,10 +8,11 @@ rather than doing the "one press of space corresponds to one jump" that can feel
  - The strenth of gravity is independent of the world.
  - Attempting to go sideways into a wall will prevent you from falling down the side, because gravity means you collide with the top of the tile next to your feet, even though you can't physically stand on it. This can be fixed by handling collisions that only depend on one part of the velocity vector before handling ones that depend on both.
  - Things that move multiple tiles per second won't collide as if they were moving in a straight line. The best way to solve this may be to not allow anything to move that fast, possibly via multiple updates between renderings.
- - The spawn point sometimes puts the player on top of dirt.
+ - The spawn point sometimes puts the player on top of dirt. Spawning should be changed so it destroys any tiles in the way.
 
 Known bugs:
  - Collision with the top of the map doesn't work right. This will probably be ignored after creating a clear solid unminable tile to go on the map borders.
+ - Sometimes the player doesn't collide with a tile when they should. It always seems to happen somewhere around the very corner.
 
 Soon to come (though likely not very soon):
  - More types of tiles

@@ -52,7 +52,7 @@ class Map {
     /* Return true if neither the foreground nor background are opaque. */
     bool isSky(int x, int y);
 
-    /* Compute the taxicab distance between i, j and x, y. */
+    /* Return the square of the distance between i, j and x, y. */
     int distance(int i, int j, int x, int y);
 
     /* Compute the taxicab distance to the nearest sky block that is a source 
