@@ -1,5 +1,6 @@
 Changes since last push:
  - Fixed a bug where a value was uninitialized.
+ - Made the Light struct smaller.
 
 Known "features":
  - Holding down space means that it will attempt to jump whenever possible, 
@@ -21,4 +22,6 @@ Soon to come (though likely not very soon):
  - Fixed collision detection
  - A more deliberate framerate
  - Better values for movement fields
- - Darkness that looks less rectangular
+ - Darkness that looks less rectangular - removing this from the list. This may never happen, or it may happen at some arbritrarily future time. (Requires using OpenGL or something similar.)
+ - Some proper way of storing information about a sprite animation?
+ - Instead of storing the health of every single tile on the map, I should just have a list of the ones that have been damaged.

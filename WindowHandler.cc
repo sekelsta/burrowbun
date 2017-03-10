@@ -263,7 +263,9 @@ void WindowHandler::renderMap(const Map &m, const SDL_Rect &camera) {
             Tile *tile = m.getForeground(xTile, yTile);
             if (tile -> texture != NULL) {
                 // Modulate the color due to lighting
-                Light light = m.getLight(xTile, yTile);
+                Light light;
+                light.sum(m.getSkyLight(xTile, yTile), 
+                    m.getBlockLight(xTile, yTile));
                 // Only add darkness if darkness is enabled
                 if(enableDarkness) {
                     SDL_SetTextureColorMod(tile -> texture, light.r, 

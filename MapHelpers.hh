@@ -4,7 +4,6 @@
 #include "Tile.hh"
 #include "Light.hh"
 
-// TODO: Actually create a Liquid class, not necessarily in this file. For now
 // any Liquid* will just be set to NULL.
 class Liquid;
 
@@ -84,9 +83,6 @@ struct SpaceInfo {
     // How well-lit this tile is, and from where
     Light lightSky;
     Light lightBlock;
-    Light light;
-
-    
 
     // Which rectangle of the spritesheet to draw
     // spriteRow should be based on which surrounding tiles are empty,
