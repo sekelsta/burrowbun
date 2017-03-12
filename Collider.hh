@@ -28,6 +28,8 @@ struct CollisionInfo {
     int x;
     int y;
     CollisionType type;
+    // Whether other collisions can prevent this one
+    bool isInevitable;
     // For resolving the collision
     int xCoefficient;
     int yCoefficient;
@@ -38,14 +40,14 @@ struct CollisionInfo {
     // Resolve a collision
     // Technically it says the pointer to the Tile is const, but the Tile 
     // should be const as well. It just shouldn't be a pointer to a const tile.
-    void resolve(Movable &movable, const Tile *tile) {
+    void resolve(const Tile *tile) {
         newX = -1;
         newY = -1;
         cornerX = -1;
         switch(type) {
             case CollisionType::DOWN :
-                movable.isCollidingDown = true;
                 yCoefficient *= (int)(!(tile -> isPlatform));
+                // Purposely no break
             case CollisionType::UP :
                 newY = y;
                 yCoefficient *= (int)(!(tile -> isSolid));
@@ -55,7 +57,6 @@ struct CollisionInfo {
                 newX = x;
                 if (tile -> isSolid) {
                     xCoefficient = 0;
-                    movable.isCollidingX = true;
                 }
                 break;
             case CollisionType::LEFT_CORNER :
@@ -115,17 +116,25 @@ class Collider {
 
     // Given that a collision happens left or right, update info accordingly.
     // dx is the step size and w is the width of the player.
-    void findXCollision(CollisionInfo &info, int dx, int w, const Rect &stays);
+    void findXCollision(CollisionInfo &info, int dx, int w, const Rect &stays)
+        const;
 
     // Given that a collision is up or down, update info accordingly
     // dy is the step size and h is the height of the player.
-    void findYCollision(CollisionInfo &info, int dy, int h, const Rect &stays);
+    void findYCollision(CollisionInfo &info, int dy, int h, const Rect &stays)
+        const;
 
     // Returns info on the collision between a moving thing and a stationary 
     // thing. Collisions that occur even if the moving thing stays still will
     // be ignored. 
     CollisionInfo findCollision(const Rect &to, const Rect &stays, 
-        int dx, int dy);
+        int dx, int dy) const;
+
+    /* Goes through the tiles near the movable, finds all collisions, and adds
+    them to the vactor collisions. If any of the collisions are inevitable, it 
+    returns true. Otherwise, it returns false. */
+    bool listCollisions(vector<CollisionInfo> &collisions, const Map &map, 
+        const Rect &to, const Rect &from) const;
 
     // Takes a movable and a map, and moves it to where it should end up
     void collide(const Map &map, Movable &movable);

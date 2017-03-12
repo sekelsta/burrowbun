@@ -135,7 +135,7 @@ bool WindowHandler::init() {
     return success;
 }
 
-// Load test.bmp to surface, return true if successful
+// Load all the pictures, return true if successful
 bool WindowHandler::loadMedia(vector<Tile *> &pointers, 
         vector<Movable *> &movables) {
     bool success = true;
@@ -163,7 +163,7 @@ SDL_Texture *WindowHandler::loadTexture(const string &name) {
         // Convert the surface to a texture
         texture = SDL_CreateTextureFromSurface(renderer, surface);
         if (texture == NULL) {
-            cerr << "Failed to crate texture from " <<  name << endl;
+            cerr << "Failed to create texture from " <<  name << endl;
             cerr << "SDL Error: " << SDL_GetError() << endl;
         }
 

@@ -20,7 +20,9 @@ struct Light {
         b = max(one.b, two.b);
     }
 
-    /* Sets a new intensity and multiplies each value of rgb by it. */
+    /* Sets a new intensity and multiplies each value of rgb by it. Should only
+    be used just after r, g, and b have been set to their max for the given
+    light color. */
     void setIntensity(double intensity) {
         r *= intensity;
         g *= intensity;

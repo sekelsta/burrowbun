@@ -14,7 +14,7 @@ Collider::Collider(int tileWidth, int tileHeight) : TILE_WIDTH(tileWidth),
 
 // Given that a collision happens left or right, update info accordingly.
 inline void Collider::findXCollision(CollisionInfo &info, int dx, 
-        int w, const Rect &stays) {
+        int w, const Rect &stays) const {
     // Collision is left or right
     if (dx < 0) {
         info.type = CollisionType::LEFT;
@@ -29,7 +29,7 @@ inline void Collider::findXCollision(CollisionInfo &info, int dx,
 
 // Given that a collision is up or down, update info accordingly
 inline void Collider::findYCollision(CollisionInfo &info, int dy, 
-        int h, const Rect &stays) {
+        int h, const Rect &stays) const {
     // Collision is up or down
     if (dy < 0) {
         info.type = CollisionType::DOWN;
@@ -44,12 +44,13 @@ inline void Collider::findYCollision(CollisionInfo &info, int dy,
 // Return information about a collision between a moving thing and a non-moving
 // thing. 
 CollisionInfo Collider::findCollision(const Rect &to, const Rect &stays, 
-        int dx, int dy) {
+        int dx, int dy) const {
     CollisionInfo info;
     info.x = 0;
     info.y = 0;
     info.xCoefficient = 1;
     info.yCoefficient = 1;
+    info.isInevitable = false;
 
     // Check for collisions
     if (stays.intersects(to)) {
@@ -71,6 +72,8 @@ CollisionInfo Collider::findCollision(const Rect &to, const Rect &stays,
             // Since there definately is a collision, it has to be up or down
             assert(dy != 0);
             findYCollision(info, dy, to.h, stays);
+            // Whether a collision happens doesn't depend on x velocity
+            info.isInevitable = true; 
             return info;
         }
         // If the top or bottom started off in the collision area
@@ -81,11 +84,14 @@ CollisionInfo Collider::findCollision(const Rect &to, const Rect &stays,
             // Likewise, we know it must be left or right
             assert(dx != 0);
             findXCollision(info, dx, to.w, stays);
+            // And whether it happens doesn't dedpend on y velocity
+            info.isInevitable = true;
             return info;
         }
         // Now we know none of the edges started off in the collision area,
         // so since we know there is a collision, there must be at least two
         // edges in the collision area.
+        // Also for any of these cases isInevitable should stay false.
         int tx = min(abs(to.x - dx - stays.x - stays.w), 
             abs(to.x - dx - to.w - stays.x));
         int ty = min(abs(to.y - dy - stays.y - stays.h),
@@ -118,6 +124,57 @@ CollisionInfo Collider::findCollision(const Rect &to, const Rect &stays,
     }
 
     return info;
+}
+
+/* Goes through the tiles near the player and adds all collisions found to 
+the vector collisions. If any are inevitable, it returns true. Otherwise, it
+returns false. */
+bool Collider::listCollisions(vector<CollisionInfo> &collisions, const Map &map,
+    const Rect &to, const Rect &from) const {
+    // The rectangle of the current tile to check
+    Rect stays;
+    stays.w = TILE_WIDTH - 2 * xOffset;
+    stays.h = TILE_HEIGHT - 2 * yOffset;
+    int worldWidth = map.getWidth() * TILE_WIDTH;
+    stays.worldWidth = worldWidth;
+
+    // Calculate the distance we move.
+    int dx = to.x - from.x;
+    int dy = to.y - from.y;
+
+    bool anyInevitable = false;
+
+    // Only these tiles can possibly be colliding
+    for (int k = to.x / TILE_WIDTH;
+            k < (to.x + to.w) / TILE_WIDTH + 1; k++) {
+        int l = (k + map.getWidth()) % map.getWidth();
+        stays.x = l * TILE_WIDTH + xOffset;
+        for (int j = to.y / TILE_HEIGHT;
+                j < (to.y + to.h) / TILE_HEIGHT + 1; j++) {
+            Tile *tile = map.getForeground(l, j);
+            if (!(tile -> isSolid || tile -> isPlatform)) {
+                continue;
+            }
+            stays.y = j * TILE_HEIGHT + yOffset;
+            // Cases where they start off colliding should be dealt with
+            // elsewhere.
+            if (stays.intersects(from)) {
+                continue;
+            }
+            CollisionInfo info = findCollision(to, stays, dx, dy);
+            // Include information about what tile was collided
+            info.resolve(tile);
+            // Add this collision to the list to deal with later
+            // Also check whether any collision is inevitable
+            if (info.type != CollisionType::NONE) {
+                if (info.isInevitable) {
+                    anyInevitable = true;
+                }
+                collisions.push_back(info);
+            }
+        }
+    }
+    return anyInevitable; 
 }
 
 //  A function that moves a movable to where it should end up on a map. This 
@@ -203,27 +260,31 @@ void Collider::collide(const Map &map, Movable &movable) {
         yVelocity -= dy;
         double xCoefficient = 1;
         double yCoefficient = 1;
-        // Only these tiles can possibly be colliding
-        for (int k = to.x / TILE_WIDTH;
-                k < (to.x + to.w) / TILE_WIDTH + 1; k++) {
-            int l = (k + map.getWidth()) % map.getWidth();
-            stays.x = l * TILE_WIDTH + xOffset;
-            for (int j = to.y / TILE_HEIGHT;
-                    j < (to.y + to.h) / TILE_HEIGHT + 1; j++) {
-                Tile *tile = map.getForeground(l, j);
-                if (!(tile -> isSolid || tile -> isPlatform)) {
+        // Check whether there are and inevitable collisions we should 
+        // handle first (they do need to be first, otherwise the player can
+        // climb walls).
+        bool anyInevitable = false;
+        // Make a list of all collisions between the movable and any tiles 
+        vector<CollisionInfo> collisions;
+        anyInevitable = listCollisions(collisions, map, to, from);
+
+        // Only collide if collisions are enabled
+        while (enableCollisions && (collisions.size() != 0)) {
+           // And actually handle the collisions
+            for (unsigned int i = 0; i < collisions.size(); i++) {
+                CollisionInfo info = collisions[i];
+                // Skip this one if necessary
+                if (anyInevitable && (!info.isInevitable)) {
                     continue;
                 }
-                stays.y = j * TILE_HEIGHT + yOffset;
-                if (stays.intersects(from)) {
-                    continue;
-                }
-                CollisionInfo info = findCollision(to, stays, dx, dy);
-                info.resolve(movable, tile);
                 xCoefficient *= info.xCoefficient;
                 yCoefficient *= info.yCoefficient;
                 if (info.newX != -1) {
                     newX = info.newX;
+                    movable.isCollidingX = true;
+                }
+                if (info.type == CollisionType::DOWN) {
+                    movable.isCollidingDown = true;
                 }
                 if (info.newY != -1) {
                     newY = info.newY;
@@ -232,27 +293,38 @@ void Collider::collide(const Map &map, Movable &movable) {
                     cornerX = info.cornerX;
                 }
             }
-        }
-        // Back in the while, move loop
-        // In case the collisions doesn't stop us
-        dx = to.x - newX;
-        dy = to.y - newY;
 
-        // Only collide if collisions are enabled
-        if (enableCollisions) {
+            // Move the rest of the way
+            dx = to.x - newX;
+            dy = to.y - newY;
             dx *= xCoefficient;
             dy *= yCoefficient;
             xVelocity *= xCoefficient;
             yVelocity *= yCoefficient;
+
+            // And repeat until we're done
+            from.x = newX;
+            from.y = newY;
+            to.x = from.x + dx;
+            to.y = from.y + dy;
+
+            // Exit this loop if there weren't any inevitable collisions, 
+            // therefore we handled all of them.
+            if (!anyInevitable) {
+                // But first handle corner collisions, if necessary
+                if (from.x == to.x && from.y == to.y) {
+                    from.x = cornerX;
+                }
+                break;
+            }
+            // Otherwise, check again for collisions.
+            collisions.clear();
+            anyInevitable = listCollisions(collisions, map, to, from);
         }
 
-        // This will only work if there aren't half-tiles
-        from.x = newX + dx;
-        from.y = newY + dy;
-        // Handle corner collisions if necessary
-        if (from.x == to.x && from.y == to.y) {
-            from.x = cornerX;
-        }
+        // Set to where we're actaully moving to.
+        from.x = to.x;
+        from.y = to.y;
     }
     movable.x = from.x;
     movable.y = from.y;
