@@ -1,30 +1,32 @@
 Changes since last push:
- - Fixed a bug where a value was uninitialized.
- - Made the Light struct smaller.
- - Fixed the "feature" that let the player climb walls
- - Fixed some typos in a comment and error message in WIndoHandler.cc
+ - Fixed the bug where the player would sometimes not collide properly with a 
+tile and would end up inside it.
+ - Fixed the bug where reaching the top of the world would crash the program.
 
 Known "features":
  - Holding down space means that it will attempt to jump whenever possible, 
 rather than doing the "one press of space corresponds to one jump" that can feel more natural (in Terraria, the difference between equipping or not equipping a frog leg).
  - It is possible to step up a tile while jumping, to go up extra fast.
  - The strenth of gravity is independent of the world.
- - Attempting to go sideways into a wall will prevent you from falling down the side, because gravity means you collide with the top of the tile next to your feet, even though you can't physically stand on it. This can be fixed by handling collisions that only depend on one part of the velocity vector before handling ones that depend on both. - This is now fixed.
  - Things that move multiple tiles per second won't collide as if they were moving in a straight line. The best way to solve this may be to not allow anything to move that fast, possibly via multiple updates between renderings.
  - The spawn point sometimes puts the player on top of dirt. Spawning should be changed so it destroys any tiles in the way.
 
 Known bugs:
- - Collision with the top of the map doesn't work right. This will probably be ignored after creating a clear solid unminable tile to go on the map borders.
+ - Collision with the top of the map doesn't work right. This will probably be ignored after creating a clear solid unminable tile to go on the map borders. - Nope! Fixed! (just needed to move the movable down one more tileheight)
  - Sometimes the player doesn't collide with a tile when they should. It always seems to happen somewhere around the very corner, and often results in the
-bunny stuck in a two tile wide spot.
+bunny stuck in a two tile wide spot. - Fixed! It was failing to react
+to corner collisions, and once that ws fixed, it was reacting to them by 
+stopping all movement in the x direction, which is only sometimes what it 
+should do. Both problems have been fixed.
 
 Soon to come (though likely not very soon):
  - More types of tiles
  - Trees!
  - Better map generation
- - Fixed collision detection
+ - Fixed collision detection - just one bug left now!
  - A more deliberate framerate
  - Better values for movement fields
- - Darkness that looks less rectangular - removing this from the list. This may never happen, or it may happen at some arbritrarily future time. (Requires using OpenGL or something similar.)
  - Some proper way of storing information about a sprite animation?
  - Instead of storing the health of every single tile on the map, I should just have a list of the ones that have been damaged.
+ - hud
+ - inventory

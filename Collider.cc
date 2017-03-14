@@ -179,7 +179,11 @@ bool Collider::listCollisions(vector<CollisionInfo> &collisions, const Map &map,
 
 //  A function that moves a movable to where it should end up on a map. This 
 // assumes that no collisions with anything other than the map will affect the
-// end location.
+// end location. It also assumes collisions between the very corner of the 
+// movable and the very corner of a tile should be collisions in the x 
+// direction. This is not always the case, so after calling this function once
+// it's best to call it again with the results assuming the y position is 
+// correct but the x may have farther to move.
 void Collider::collide(const Map &map, Movable &movable) {
     // Calculate the world width and height
     int worldWidth = map.getWidth() * TILE_WIDTH;
@@ -249,8 +253,8 @@ void Collider::collide(const Map &map, Movable &movable) {
         int dy = (yVelocity - n) % (TILE_HEIGHT / 2) + n;
         to.x = from.x + dx;
         to.y = from.y + dy;
-        int newX = to.x;
-        int newY = to.y;
+        int newX = from.x;
+        int newY = from.y;
         // A separate variable so that corner collisions can only happen if
         // no other collisions happen.
         int cornerX = to.x;
@@ -294,6 +298,17 @@ void Collider::collide(const Map &map, Movable &movable) {
                 }
             }
 
+            // If there weren't any inevitable collisions, handle corner 
+            // collisions and restart
+            // Only check for corner collisions when there were no others
+            bool usedCorner = false;
+            if (!anyInevitable && xCoefficient != 0 && yCoefficient != 0) {
+                movable.isCollidingX = true;
+                newX = cornerX;
+                xCoefficient = 0;
+                usedCorner = true;
+            }
+ 
             // Move the rest of the way
             dx = to.x - newX;
             dy = to.y - newY;
@@ -308,14 +323,11 @@ void Collider::collide(const Map &map, Movable &movable) {
             to.x = from.x + dx;
             to.y = from.y + dy;
 
-            // Exit this loop if there weren't any inevitable collisions, 
-            // therefore we handled all of them.
-            if (!anyInevitable) {
-                // But first handle corner collisions, if necessary
-                if (from.x == to.x && from.y == to.y) {
-                    from.x = cornerX;
-                }
+           if (!anyInevitable && !usedCorner) {
+                // This actually happens surprisingly rarely
                 break;
+            }
+            else {
             }
             // Otherwise, check again for collisions.
             collisions.clear();
@@ -334,7 +346,8 @@ void Collider::collide(const Map &map, Movable &movable) {
     movable.x %= worldWidth;
     // Collide in the y direction
     movable.y = max(0, movable.y);
-    movable.y = min(movable.y, worldHeight - movable.spriteHeight);
+    int worldTop = worldHeight - movable.spriteHeight - TILE_HEIGHT;
+    movable.y = min(movable.y, worldTop);
 }
 
 
@@ -349,8 +362,25 @@ void Collider::update(const Map &map, vector<Movable *> &movables) {
         v.y += gravity;
         movables[i] -> setVelocity(v);
 
-        int oldX = movables[i] -> x;
+        // toX is the x value the movable expects to end up having.
+        int toX = movables[i] -> x + movables[i] -> getVelocity().x;
         collide(map, *movables[i]);
+        // Because collide() may stop things in the x direction before it 
+        // should, we should try again.
+        // Actually since after corner collisions it will just step up and 
+        // contunue, this won't be a noticable bug most of the time, but might
+        // as well fix it anyway.
+        if (movables[i] -> isCollidingX) {
+            // Have it move only the rest of the way in the x direction, now.
+            Point newVelocity;
+            newVelocity.x = toX - movables[i] -> x;
+            newVelocity.y = 0;
+            Point oldVelocity = movables[i] -> getVelocity();
+            movables[i] -> setVelocity(newVelocity);
+            collide(map, *movables[i]);
+            movables[i] -> setVelocity(oldVelocity);
+        }
+
         // Do the thing where colliding with a wall one block high doesn't
         // stop you
         if (movables[i] -> isCollidingX) {
@@ -379,9 +409,7 @@ void Collider::update(const Map &map, vector<Movable *> &movables) {
                 // randomly jump up and fall back down
                 // dx is how much more it could have gone in the x direction, 
                 // if it didn't collide with the tile it's stepping up
-                int dx = oldX + movables[i] -> getVelocity().x;
-                dx -= hypothetical.x;
-                assert(hypothetical.x + dx == oldX + movables[i] -> getVelocity().x);
+                int dx = toX - hypothetical.x;
                 Point newVelocity;
                 newVelocity.x = dx;
                 newVelocity.y = 0;
