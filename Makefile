@@ -17,19 +17,20 @@ Tile.o : Tile.cc Tile.hh
 	$(CC) $(CXXFLAGS) $^ -c $(LDFLAGS)
 
 WindowHandler.o : WindowHandler.cc WindowHandler.hh Tile.hh Map.hh Movable.hh \
-        Light.hh
+        Light.hh MapHelpers.hh
 	$(CC) $(CXXFLAGS) $(LINKER_FLAGS) $^ -c $(LDFLAGS)
 
-EventHandler.o : EventHandler.cc EventHandler.hh WindowHandler.hh Player.hh
+EventHandler.o : EventHandler.cc EventHandler.hh WindowHandler.hh Player.hh \
+        Movable.hh Point.hh
 	$(CC) $(CXXFLAGS) $(LINKER_FLAGS) $^ -c $(LDFLAGS)
 
 Movable.o : Movable.cc Movable.hh Point.hh
 	$(CC) $(CXXFLAGS) $(LINKER_FLAGS) $^ -c $(LDFLAGS)
 
-Player.o : Player.cc Player.hh Movable.hh
+Player.o : Player.cc Player.hh Movable.hh Point.hh
 	$(CC) $(CXXFLAGS) $(LINKER_FLAGS) $^ -c $(LDFLAGS)
 
-Collider.o : Collider.cc Collider.hh Tile.hh Map.hh Movable.hh
+Collider.o : Collider.cc Collider.hh Tile.hh Map.hh Movable.hh Point.hh
 	$(CC) $(CXXFLAGS) $^ -c $(LDFLAGS)
 
 World.o : World.cc World.hh Tile.hh MapHelpers.hh

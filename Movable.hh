@@ -28,6 +28,7 @@ public:
     // one block high walls.
     bool isCollidingX;
     bool isCollidingDown;
+    bool isSteppingUp; // As in, stepping up one block
     int timeOffGround; // How many updates since it was on the ground
     // How many updates before holding down the jump key stops working. This
     // determines maximum jump height. Here -1 means infinity.
@@ -35,6 +36,9 @@ public:
 
     // Location
     int x, y;
+
+    // How strong is gravity (may vary by location)
+    double gravity;
 
     // Sprite, as a texture
     SDL_Texture *texture;

@@ -1,1 +1,3 @@
-This is a sandbox game similar to Terraria and Starbound. Currently it only generates a map, saves it to a file, and opens a window to view it.
+This may someday be a sandbox game. Currently it generates a world in which the player can run around.
+
+To compile, it requires SDL2. The Makefile also expects gcc to be installed, but could be edited to use a different compiler. This program is written for and tested on Debian Linux (Jessie), but might work if compiled on other operating stystems. (Windows definitely requires edits to the source code, if only to change the including of SDL2/SDL.h to including SDL2.)

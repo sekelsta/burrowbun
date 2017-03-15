@@ -14,11 +14,15 @@ Movable::Movable() {
     texture = NULL;
     isCollidingDown = false;
     isCollidingX = false;
+    isSteppingUp = false;
     timeOffGround = 0;
+
+    gravity = 0;
 
     // These should be changed by the child class's init.
     drag.x = 0;
     drag.y = 0;
+    // The amount to accelerate by when trying to move
     dAccel.x = 0;
     dAccel.y = 0;
     sprite = "";
@@ -61,6 +65,9 @@ void Movable::accelerate() {
     // Update velocity
     velocity.x += accel.x;
     velocity.y += accel.y;
+    if (!isSteppingUp) {
+        velocity.y += gravity;
+    }
 
     // Add drag effects
     velocity.x *= drag.x;

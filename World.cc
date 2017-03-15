@@ -303,7 +303,7 @@ void World::setPath(const vector<float> &r, const vector<Location> &centers,
 // Put a gently sloping tunnel with a given start point
 void World::tunnel(Location start) {
     // Set some constants
-    int length = 200;
+    int length = 300;
     float minR = 3;
     float maxR = 7;
     vector<float> r;

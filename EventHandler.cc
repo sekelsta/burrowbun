@@ -39,6 +39,9 @@ EventHandler::EventHandler() {
     down = false;
     jump = false;
 
+    isJumping = false;
+    hasJumped = false;
+
     move = 0;
 
     // There might be a less repetitive way to do this.
@@ -143,6 +146,10 @@ void EventHandler::updateKeys(const Uint8 *state) {
     if (isHeld(state, keySettings.jumpKeys)) {
         jump = true;
     }
+    else {
+        isJumping = false;
+        hasJumped = false;
+    }
 }
 
 // Change the player's acceleration
@@ -159,8 +166,14 @@ void EventHandler::updatePlayer(Player &player) {
         newAccel.x -= player.getDAccel().x;
     }
     if (jump && (player.timeOffGround <= player.maxJumpTime
-            || player.maxJumpTime == -1)) {
+            || player.maxJumpTime == -1)
+            && (isJumping == hasJumped)) {
         newAccel.y += player.getDAccel().y;
+        isJumping = true;
+        hasJumped = true;
+    }
+    else {
+        isJumping = false;
     }
 
     // TODO: handle these separately, so the player can't fly

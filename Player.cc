@@ -10,8 +10,8 @@ Player::Player() {
     drag.y = 0.3;
 
     // Set the amount to accelerate by
-    dAccel.x = 16;
-    dAccel.y = 30;
+    dAccel.x = 10;
+    dAccel.y = 24;
 
     // Set the number of updates a jump can last
     maxJumpTime = 16;

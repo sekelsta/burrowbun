@@ -21,6 +21,9 @@ class EventHandler {
 
     // Whether the player is trying to move in some direction
     bool left, right, up, down, jump;
+    // Veriables to keep track of the one jump per key press rule
+    bool isJumping;
+    bool hasJumped; // as in, since the last time the key was pressed
 
     // To move by one pixel at a time, in the vertical direction 
     // This currently only exists for debugging

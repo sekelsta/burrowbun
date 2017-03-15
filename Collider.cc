@@ -206,11 +206,6 @@ void Collider::collide(const Map &map, Movable &movable) {
     from.worldWidth = worldWidth;
     to.worldWidth = worldWidth;
 
-    // In case these were true before
-    movable.isCollidingX = false;
-    movable.isCollidingDown = false;
- 
-
     // Move, collide, and stop at the edge of the map
     from.x = movable.x;
     from.y = movable.y;
@@ -355,12 +350,13 @@ void Collider::collide(const Map &map, Movable &movable) {
 void Collider::update(const Map &map, vector<Movable *> &movables) {
     // Update the velocity of everything
     for (unsigned i = 0; i < movables.size(); i++) {
+        // TODO: replace this with gravity as a function of height
+        double gravity = -12;
+        movables[i] -> gravity = gravity;
         movables[i] -> accelerate();
-        // This should be changed
-        double gravity = -5;
-        Point v = movables[i] -> getVelocity();
-        v.y += gravity;
-        movables[i] -> setVelocity(v);
+        movables[i] -> isSteppingUp = false;
+        movables[i] -> isCollidingX = false;
+        movables[i] -> isCollidingDown = false;
 
         // toX is the x value the movable expects to end up having.
         int toX = movables[i] -> x + movables[i] -> getVelocity().x;
@@ -417,8 +413,21 @@ void Collider::update(const Map &map, vector<Movable *> &movables) {
                 collide(map, hypothetical);
                 if (hypothetical.x != movables[i] -> x) {
                     // Ok, so we do want to jump up and continue
-                    movables[i] -> x = hypothetical.x;
-                    movables[i] -> y = hypothetical.y;
+                    // doing that instantaneously would look like:
+                    // movables[i] -> x = hypothetical.x;
+                    // movables[i] -> y = hypothetical.y;
+                    // but we actually only want to go up by one x velocity
+                    // (not one y velocity because the whole point of this is 
+                    // that you go up without jumping).
+                    if (dy < movables[i] -> getVelocity().x) {
+                        movables[i] -> x = hypothetical.x;
+                        movables[i] -> y = hypothetical.y;
+                    }
+                    else {
+                        movables[i] -> y += abs(movables[i] -> getVelocity().x);
+                        movables[i] -> isSteppingUp = true;
+                    }
+                    
                 }
             }
         }
