@@ -14,6 +14,7 @@ the only thing screen coordinates are used for. */
 #include "Tile.hh"
 #include "Map.hh"
 #include "Movable.hh"
+#include "Hotbar.hh"
 
 // The path to image files
 #define TILE_PATH "content/"
@@ -66,6 +67,15 @@ class WindowHandler {
     // Convert a rectangle from world coordinates to screen coordinates
     SDL_Rect convertRect(SDL_Rect rect, SDL_Rect camera);
 
+    // Create a texture and render all the textures to it, using the spacing 
+    // variables from hotbar. The texture to is expected to have the correct 
+    // width and height, and the vector is expected to have length 12.
+    SDL_Texture *renderHotbarPart(const Hotbar &hotbar, 
+        vector<SDL_Texture*> textures) const;
+
+    // Render everything UI
+    void renderUI(const Hotbar &hotbar) const;
+
 public:
     // Constructor
     WindowHandler(int screenWidth, int screenHeight, int mapWidth, 
@@ -79,7 +89,8 @@ public:
     bool init();
 
     // Load the images
-    bool loadMedia(vector<Tile *> &pointers, vector<Movable *> &movables);
+    bool loadMedia(vector<Tile *> &pointers, vector<Movable *> &movables, 
+        Hotbar &hotbar);
 
     // Load a texture
     SDL_Texture *loadTexture(const string &name);
@@ -90,6 +101,9 @@ public:
     // Load a texture for each movable
     bool loadMovables(vector<Movable *> &movables);
 
+    // Load textures for the hotbar
+    bool loadHotbar(Hotbar &hotbar);
+
     // Render everything the map holds information about
     // x and y are the coordinates of the center of the camera, in pixels,
     // where y = 0 is at the bottom
@@ -99,7 +113,8 @@ public:
     void renderMovables(const vector<Movable *> &movables);
 
     // Update the screen
-    void update(const Map &m, const vector<Movable *> &movables);
+    void update(const Map &m, const vector<Movable *> &movables, 
+        const Hotbar &hotbar);
 
     // Unload media to switch maps, currently done by close()
     void unloadMedia(vector<Tile *> &pointers);

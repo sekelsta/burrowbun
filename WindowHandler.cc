@@ -41,6 +41,68 @@ SDL_Rect WindowHandler::convertRect(SDL_Rect rect, SDL_Rect camera) {
     return screenRect;
 }
 
+// Render each texture from textures onto to, using the spacing variables
+// from hotbar. The texture to is expected to have the correct width and
+// height, and the vector is expected to have length 12. 
+SDL_Texture *WindowHandler::renderHotbarPart(const Hotbar &hotbar,
+        vector<SDL_Texture*> textures) const {
+    assert(textures.size() == 12);
+    // Create texture to draw to
+    Uint32 pixelFormat;
+    int width;
+    int height;
+    // Get the width and height of the textures to render
+    // This function assumes they are all the same
+    SDL_QueryTexture(textures.back(), &pixelFormat, NULL, &width, &height);
+    int totalWidth = 12 * width + 12 * hotbar.smallGap + 2 * hotbar.largeGap;
+    SDL_Texture *to = SDL_CreateTexture(renderer, pixelFormat, 
+        SDL_TEXTUREACCESS_TARGET, totalWidth, height);
+
+    // Set render settings
+    SDL_SetRenderTarget(renderer, to);
+    SDL_SetTextureBlendMode(to, SDL_BLENDMODE_BLEND);
+    // Set draw color to transparent so the texture has a transparent 
+    // background
+    SDL_SetRenderDrawColor(renderer, 0, 0, 0 ,0);
+    SDL_RenderClear(renderer);
+
+    // Set the draw color to white so it draws whatever it's drawing normally
+    SDL_SetRenderDrawColor(renderer, 0xFF, 0xFF, 0xFF, 0xFF);
+
+    // Actually render
+    SDL_Rect rectTo;
+    rectTo.w = width;
+    rectTo.h = height;
+    rectTo.x = 0;
+    rectTo.y = 0;
+    // For each section of four
+    for (int i = 0; i < 3; i++) {
+        for (int j = 0; j < 4; j++) {
+            int index = 4 * i + j;
+            SDL_RenderCopy(renderer, textures[index], NULL, &rectTo);
+            rectTo.x += width + hotbar.smallGap;
+        }
+        rectTo.x += hotbar.largeGap;
+    }
+
+    return to;
+}
+
+void WindowHandler::renderUI(const Hotbar &hotbar) const {
+    // Make sure the renderer isn't rendering to a texture
+    SDL_SetRenderTarget(renderer, NULL);
+
+    // Create a rect to render to
+    SDL_Rect rectTo;
+    rectTo.w = hotbar.frames.width;
+    rectTo.h = hotbar.frames.height;
+
+    // Render, picking random magic numbers right now because meh
+    rectTo.x = 20;
+    rectTo.y = 10;
+    SDL_RenderCopy(renderer, hotbar.frames.texture, NULL, &rectTo);
+}
+
 // Constructor
 WindowHandler::WindowHandler(int screenWidth, int screenHeight, 
         int mapWidth, int mapHeight, int tileWidth, int tileHeight, bool dark) 
@@ -137,7 +199,7 @@ bool WindowHandler::init() {
 
 // Load all the pictures, return true if successful
 bool WindowHandler::loadMedia(vector<Tile *> &pointers, 
-        vector<Movable *> &movables) {
+        vector<Movable *> &movables, Hotbar &hotbar) {
     bool success = true;
 
     // Load the textures for tiles
@@ -145,6 +207,9 @@ bool WindowHandler::loadMedia(vector<Tile *> &pointers,
 
     // And for the movables
     success = success && loadMovables(movables);
+
+    // And load the hotbar
+    success = success && loadHotbar(hotbar);
 
     return success;
 }
@@ -181,7 +246,7 @@ SDL_Texture *WindowHandler::loadTexture(const string &name) {
 bool WindowHandler::loadTiles(vector<Tile *> &pointers) {
     bool success = true;
     for (unsigned i = 0; i < pointers.size(); i++) {
-        string name = TILE_PATH + pointers[i] -> sprite;
+        string name = TILE_PATH + pointers[i] -> sprite.name;
         if (name != TILE_PATH) {
             loadTexture(name);
             assert(textures.size() != 0);
@@ -190,8 +255,8 @@ bool WindowHandler::loadTiles(vector<Tile *> &pointers) {
             }
 
             // Set the tile's texture to the loaded texture
-            assert(pointers[i] -> texture == NULL);
-            pointers[i] -> texture = textures.back();
+            assert(pointers[i] -> sprite.texture == NULL);
+            pointers[i] -> sprite.texture = textures.back();
         }
     }
 
@@ -211,6 +276,77 @@ bool WindowHandler::loadMovables(vector<Movable *> &movables) {
 
         movables[i] -> texture = textures.back();
     }
+
+    return success;
+}
+
+// Load textures for the hotbar
+bool WindowHandler::loadHotbar(Hotbar &hotbar) {
+    bool success = true;
+
+    string name = TILE_PATH + hotbar.frame.name;
+    loadTexture(name);
+    assert(textures.size() != 0);
+    if (textures.back() == NULL) {
+        success = false;
+    }
+
+    hotbar.frame.texture = textures.back();
+
+    // Make a texture and render the hotbar to it.
+    // Use the same pixel format as the frame did.
+    Uint32 pixelFormat;
+    SDL_QueryTexture(textures.back(), &pixelFormat, NULL, NULL, NULL);
+    // Make the texture to render the frames of the hotbar to
+    // Hardcoding 12 because I don't expect to change my mind (12 is the
+    // number of F keys).
+    int width = 12 * hotbar.frame.width + 12 * hotbar.smallGap;
+    width += 2 * hotbar.largeGap + hotbar.offsetRight;
+    int height = hotbar.frame.height + hotbar.offsetDown;
+    hotbar.frames.width = width;
+    hotbar.frames.height = height;
+    // Create a texture to render the entire hotbar to
+    SDL_Texture *all = SDL_CreateTexture(renderer, pixelFormat,
+        SDL_TEXTUREACCESS_TARGET, width, height);
+
+    // Fill a vector with frame images to render
+    vector<SDL_Texture*> frames;
+    for (int i = 0; i < 12; i++) {
+        frames.push_back(hotbar.frame.texture);
+    }
+    SDL_Texture *front = renderHotbarPart(hotbar, frames);
+    SDL_Texture *back = renderHotbarPart(hotbar, frames);
+
+    SDL_SetRenderTarget(renderer, all);
+    // Tell SDL to do trnsparency when it renders
+    SDL_SetTextureBlendMode(all, SDL_BLENDMODE_BLEND);
+    // Set draw color to transparent so the texture has a transparent 
+    // background
+    SDL_SetRenderDrawColor(renderer, 0, 0, 0 ,0);
+    SDL_RenderClear(renderer);
+
+    // Actually render the frames onto the texture
+    SDL_SetRenderDrawColor(renderer, 0xFF, 0xFF, 0xFF, 0xFF);
+    // TODO: make the back layer slightly transparent
+    SDL_Rect rectTo;
+    rectTo.x = hotbar.offsetRight;
+    rectTo.y = hotbar.offsetDown;
+    rectTo.w = width - hotbar.offsetRight;
+    rectTo.h = height - hotbar.offsetDown;
+    // Render the back layer
+    SDL_RenderCopy(renderer, back, NULL, &rectTo);
+    // Render the front layer
+    rectTo.x = 0;
+    rectTo.y = 0;
+    SDL_RenderCopy(renderer, front, NULL, &rectTo);
+
+    // Set the frames thing in the hotbar to the texture we just made
+    hotbar.frames.texture = all;
+
+    // Not leak memory
+    textures.push_back(all);
+    SDL_DestroyTexture(front);
+    SDL_DestroyTexture(back);
 
     return success;
 }
@@ -260,19 +396,20 @@ void WindowHandler::renderMap(const Map &m, const SDL_Rect &camera) {
             // But only if it's a tile that exists on the map
             assert (0 <= xTile && xTile < mapWidth && 0 <= yTile 
                 && yTile < worldHeight / TILE_HEIGHT);
-            Tile *tile = m.getForeground(xTile, yTile);
-            if (tile -> texture != NULL) {
+            SDL_Texture *texture 
+                = m.getForeground(xTile, yTile) -> sprite.texture;
+            if (texture != NULL) {
                 // Modulate the color due to lighting
                 Light light;
                 light.sum(m.getSkyLight(xTile, yTile), 
                     m.getBlockLight(xTile, yTile));
                 // Only add darkness if darkness is enabled
                 if(enableDarkness) {
-                    SDL_SetTextureColorMod(tile -> texture, light.r, 
-                        light.g, light.b);
+                    SDL_SetTextureColorMod(texture, light.r, light.g, light.b);
                 }
                 rectFrom.x = m.getSpritePlace(xTile, yTile).x * TILE_WIDTH;
-                rectFrom.y = m.getSpritePlace(xTile, yTile).y * TILE_HEIGHT;                    SDL_RenderCopy(renderer, tile -> texture, &rectFrom, rectTo);
+                rectFrom.y = m.getSpritePlace(xTile, yTile).y * TILE_HEIGHT;
+                SDL_RenderCopy(renderer, texture, &rectFrom, rectTo);
             }
         }
     }
@@ -314,7 +451,10 @@ void WindowHandler::renderMovables(const vector<Movable *> &movables) {
 }
 
 // Update the screen
-void WindowHandler::update(const Map &map, const vector<Movable *> &movables) {
+void WindowHandler::update(const Map &map, const vector<Movable *> &movables,
+        const Hotbar &hotbar) {
+    // Make sure the renderer isn't rendering to a texture
+    SDL_SetRenderTarget(renderer, NULL);
     // Clear the screen
     SDL_RenderClear(renderer);
 
@@ -337,6 +477,9 @@ void WindowHandler::update(const Map &map, const vector<Movable *> &movables) {
 
         // Draw any movables
         renderMovables(movables);
+
+        // Draw the UI
+        renderUI(hotbar);
 
         // Update the screen
         SDL_RenderPresent(renderer);

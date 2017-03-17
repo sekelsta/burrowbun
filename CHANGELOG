@@ -1,28 +1,25 @@
 Changes since last push:
- - Edited README to actually maybe be useful.
- - Stepping up a tile now takes more tha none frame.
- - One press of space now corresponds to one jump.
- - Movement and gravity was adjusted.
+ - Now it renders the places where things held by the hotbar would go, though 
+there still aren't things to put in the hotbar.
+ - Added a framerate cap for when it tries to go too fast and frame skipping 
+for when it triest to go too slow.
+ - Added a sprite struct, for storing information about a sprite, though I 
+haven't yet made everything use it that should be.
+ - Adjusted player movement speed.
 
 Known "features":
- - Holding down space means that it will attempt to jump whenever possible, 
-rather than doing the "one press of space corresponds to one jump" that can feel more natural (in Terraria, the difference between equipping or not equipping a frog leg). - fixed
- - It is possible to step up a tile while jumping, to go up extra fast - fixed
  - The strenth of gravity is independent of the world.
  - Things that move multiple tiles per second won't collide as if they were moving in a straight line. The best way to solve this may be to not allow anything to move that fast, possibly via multiple updates between renderings.
  - The spawn point sometimes puts the player on top of dirt. Spawning should be changed so it destroys any tiles in the way.
 
 Known bugs:
-None!
+ - Apparently the player can fit in gaps that they can't escape.
 
 Soon to come (though likely not very soon):
  - More types of tiles
  - Trees!
  - Better map generation
- - Fixed collision detection - mission accomplished, until I add platforms
- - A more deliberate framerate
- - Better values for movement fields - done for now
- - Some proper way of storing information about a sprite animation?
  - Instead of storing the health of every single tile on the map, I should just have a list of the ones that have been damaged.
  - hud
  - inventory
+ - actual support for platforms

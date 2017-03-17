@@ -1,10 +1,7 @@
 #ifndef TILE_HH
 #define TILE_HH
 
-#include <string>
-
-// Forward declare
-struct SDL_Texture;
+#include "Sprite.hh"
 
 using namespace std;
 
@@ -34,13 +31,11 @@ public:
     // This tile's position in the map's vector of tile pointers
     unsigned index;
 
-    // The name of the image file
-    std::string sprite;
-    // The number of variations of the tile that sprites exist of
-    int maxSpriteCol;
-
-    // The texture made from that image file
-    SDL_Texture *texture;
+    // Information about the sprite
+    // Tile spritesheets use rows for the different versions that depend on
+    // whether each side is next to air, and the cols are the different 
+    // variations.
+    Sprite sprite;
 
     // Variables for how it interacts with the players
     bool isPlatform; // Whether players collide with the underside

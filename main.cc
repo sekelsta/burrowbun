@@ -7,8 +7,13 @@
 #include "Movable.hh"
 #include "Player.hh"
 #include "Collider.hh"
+#include "Hotbar.hh"
 
 using namespace std;
+
+// for capping frame rate
+const int SCREEN_FPS = 60;
+const int TICKS_PER_FRAME = 1000 / SCREEN_FPS;
 
 int main(int argc, char **argv) {
     // Do the stuff it would be doing without the images
@@ -40,6 +45,8 @@ int main(int argc, char **argv) {
 
     // Player
     Player player;
+    Hotbar hotbar;
+    assert(hotbar.smallGap == 4);
 
     // A vector to hold all the things that need to collide
     vector<Movable *> movables;
@@ -49,7 +56,7 @@ int main(int argc, char **argv) {
     player.y = map.getSpawn().y * TILE_HEIGHT;
 
     // Load any pictures
-    if (!window.loadMedia(map.getPointersRef(), movables)) {
+    if (!window.loadMedia(map.getPointersRef(), movables, hotbar)) {
         exit(1);
     }
 
@@ -59,9 +66,13 @@ int main(int argc, char **argv) {
     // Variable to tell whether the window is in focus
     bool isFocused = true;
 
+    // Frames since the start of the game
+    Uint32 gameTicks = 0;
+
     // Loop infinitely until exiting
     bool quit = false;
     while (!quit) {
+        Uint32 ticks = SDL_GetTicks();
         // Handle events on the queue
         while(SDL_PollEvent(&event) != 0) {
             // Check whether to quit
@@ -100,7 +111,20 @@ int main(int argc, char **argv) {
         collider.update(map, movables);
 
         // Put pictures on the screen
-        window.update(map, movables);
+        // But only if rendering isn't really slow
+        Uint32 frameTicks = SDL_GetTicks() - ticks;
+        if (frameTicks < 2 * TICKS_PER_FRAME) { 
+            window.update(map, movables, hotbar);
+        }
+
+        // Count the number of times we've gone through this loop
+        gameTicks++;
+
+        // Wait for enough time to pass before doing the next frame
+        frameTicks = SDL_GetTicks() - ticks;
+        if (frameTicks < TICKS_PER_FRAME) {
+            SDL_Delay(TICKS_PER_FRAME - frameTicks);
+        }
     }
     window.close();
     return 0;

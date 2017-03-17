@@ -65,7 +65,7 @@ void Map::chooseSprite(int x, int y) {
             col += 8;
     }
     findPointer(x, y) -> spritePlace.y = col;
-    int row = rand() % getForeground(x, y) -> maxSpriteCol;
+    int row = rand() % getForeground(x, y) -> sprite.cols;
     findPointer(x, y) -> spritePlace.x = row;
 }
 
@@ -159,7 +159,7 @@ Map::Map(string filename) {
             tiles[index].foregroundHealth = matchingTile -> maxHealth;
             tiles[index].background = matchingBackground;
             tiles[index].backgroundHealth = 1;
-            tiles[index].spritePlace.x = rand() % matchingTile -> maxSpriteCol;
+            tiles[index].spritePlace.x = rand() % matchingTile -> sprite.cols;
             tiles[index].spritePlace.y = 0;
             index++;
         }

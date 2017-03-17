@@ -8,10 +8,10 @@ using namespace std;
 Tile::Tile(TileType tileType, unsigned index) 
         : type(tileType), index(index) {
     // Make the pointer point to nothing
-    texture = NULL;
+    sprite.texture = NULL;
 
     // These variables will usually be these values
-    maxSpriteCol = 4;
+    sprite.cols = 4;
     isSolid = true;
     isPlatform = false;
     isTiledLikePlatform = false;
@@ -23,47 +23,47 @@ Tile::Tile(TileType tileType, unsigned index)
     switch(tileType) {
         case TileType::EMPTY : 
             isSolid = false;
-            sprite = "";
+            sprite.name = "";
             opacity = 0;
             break;
         case TileType::IMPASSABLE :
             isSolid = true;
-            sprite = "";
+            sprite.name = "";
             opacity = 0;
             break;
         case TileType::PLATFORM :
-            sprite = "platform.png";
+            sprite.name = "platform.png";
             opacity = 0;
             maxHealth = 2;
             isPlatform = true;
             isTiledLikePlatform = true;
             break;
         case TileType::DIRT :
-            sprite = "dirt.png";
+            sprite.name = "dirt.png";
             maxHealth = 5;
             erodeResist = 10;
             break;
         case TileType::MUDSTONE :
-            sprite = "mudstone.png";
+            sprite.name = "mudstone.png";
             maxHealth = 10;
             erodeResist = 100;
             break;
         case TileType::PERIDOTITE :
-            sprite = "peridotite.png";
+            sprite.name = "peridotite.png";
             maxHealth = 3;
             break;
         case TileType::SANDSTONE :
-            sprite = "sandstone.png";
+            sprite.name = "sandstone.png";
             maxHealth = 8;
             erodeResist = 100;
             break;
         case TileType::RED_SANDSTONE :
-            sprite = "red_sandstone.png";
+            sprite.name = "red_sandstone.png";
             maxHealth = 8;
             erodeResist = 100;
             break;
         case TileType::DIAMOND :
-            sprite = "diamond.png";
+            sprite.name = "diamond.png";
     }
 }
 
