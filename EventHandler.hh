@@ -16,6 +16,9 @@ struct KeySettings {
 
     // Key to toggle the hotbar
     vector<SDL_Scancode> toggleHotbarKeys;
+
+    // 24 keys to select a hotbar slot
+    vector<SDL_Scancode> hotbarKeys;
 };
 
 /* A class to handle events such as keyboard input or mouse movement. */

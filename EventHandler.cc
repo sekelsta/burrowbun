@@ -57,6 +57,31 @@ EventHandler::EventHandler() {
     keySettings.jumpKeys.push_back(SDL_SCANCODE_KP_SPACE);
     // For the hotbar
     keySettings.toggleHotbarKeys.push_back(SDL_SCANCODE_X);
+    // And each of 24 keys to select a hotbar slot
+    keySettings.hotbarKeys.push_back(SDL_SCANCODE_1);
+    keySettings.hotbarKeys.push_back(SDL_SCANCODE_2);
+    keySettings.hotbarKeys.push_back(SDL_SCANCODE_3);
+    keySettings.hotbarKeys.push_back(SDL_SCANCODE_4);
+    keySettings.hotbarKeys.push_back(SDL_SCANCODE_5);
+    keySettings.hotbarKeys.push_back(SDL_SCANCODE_6);
+    keySettings.hotbarKeys.push_back(SDL_SCANCODE_7);
+    keySettings.hotbarKeys.push_back(SDL_SCANCODE_8);
+    keySettings.hotbarKeys.push_back(SDL_SCANCODE_9);
+    keySettings.hotbarKeys.push_back(SDL_SCANCODE_0);
+    keySettings.hotbarKeys.push_back(SDL_SCANCODE_MINUS);
+    keySettings.hotbarKeys.push_back(SDL_SCANCODE_EQUALS);
+    keySettings.hotbarKeys.push_back(SDL_SCANCODE_F1);
+    keySettings.hotbarKeys.push_back(SDL_SCANCODE_F2);
+    keySettings.hotbarKeys.push_back(SDL_SCANCODE_F3);
+    keySettings.hotbarKeys.push_back(SDL_SCANCODE_F4);
+    keySettings.hotbarKeys.push_back(SDL_SCANCODE_F5);
+    keySettings.hotbarKeys.push_back(SDL_SCANCODE_F6);
+    keySettings.hotbarKeys.push_back(SDL_SCANCODE_F7);
+    keySettings.hotbarKeys.push_back(SDL_SCANCODE_F8);
+    keySettings.hotbarKeys.push_back(SDL_SCANCODE_F9);
+    keySettings.hotbarKeys.push_back(SDL_SCANCODE_F10);
+    keySettings.hotbarKeys.push_back(SDL_SCANCODE_F11);
+    keySettings.hotbarKeys.push_back(SDL_SCANCODE_F12);
 }
 
 // Access functions
@@ -112,6 +137,17 @@ void EventHandler::keyEvent(const SDL_Event &event, Player &player) {
     }
     else if (isIn(key, keySettings.toggleHotbarKeys)) {
         player.hotbar.toggle();
+    }
+    else if (isIn(key, keySettings.hotbarKeys)) {
+        // Select the appropriate slot in the hotbar
+        // This vector actually has the order matter, so you can't map more
+        // than one key to each hotbar slot
+        for (unsigned int i = 0; i < keySettings.hotbarKeys.size(); i++) {
+            if (key == keySettings.hotbarKeys[i]) {
+                player.hotbar.selected = i;
+                player.hotbar.isSpriteUpdated = false;
+            }
+        }
     }
     // For testing only, TODO: remove
     else if (key == SDL_SCANCODE_J) {
