@@ -45,8 +45,7 @@ int main(int argc, char **argv) {
 
     // Player
     Player player;
-    Hotbar hotbar;
-    assert(hotbar.smallGap == 4);
+    assert(player.hotbar.smallGap == 4);
 
     // A vector to hold all the things that need to collide
     vector<Movable *> movables;
@@ -56,7 +55,7 @@ int main(int argc, char **argv) {
     player.y = map.getSpawn().y * TILE_HEIGHT;
 
     // Load any pictures
-    if (!window.loadMedia(map.getPointersRef(), movables, hotbar)) {
+    if (!window.loadMedia(map.getPointersRef(), movables, player.hotbar)) {
         exit(1);
     }
 
@@ -86,13 +85,13 @@ int main(int argc, char **argv) {
                     break;
                 case SDL_KEYDOWN:
                 case SDL_KEYUP:
-                    eventHandler.keyEvent(event);
+                    eventHandler.keyEvent(event, player);
                     break;
                 case SDL_MOUSEMOTION:
                 case SDL_MOUSEWHEEL:
                 case SDL_MOUSEBUTTONDOWN:
                 case SDL_MOUSEBUTTONUP:
-                    eventHandler.mouseEvent(event);
+                    eventHandler.mouseEvent(event, player);
                     break;
                 default:
                     // TODO
@@ -114,7 +113,7 @@ int main(int argc, char **argv) {
         // But only if rendering isn't really slow
         Uint32 frameTicks = SDL_GetTicks() - ticks;
         if (frameTicks < 2 * TICKS_PER_FRAME) { 
-            window.update(map, movables, hotbar);
+            window.update(map, movables, player.hotbar);
         }
 
         // Count the number of times we've gone through this loop

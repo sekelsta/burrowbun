@@ -4,6 +4,7 @@
 #include <SDL2/SDL.h>
 #include "WindowHandler.hh"
 #include "Player.hh"
+#include "Hotbar.hh"
 
 using namespace std;
 
@@ -12,6 +13,9 @@ using namespace std;
 struct KeySettings {
     // Which keys are for movement
     vector<SDL_Scancode> leftKeys, rightKeys, upKeys, downKeys, jumpKeys;
+
+    // Key to toggle the hotbar
+    vector<SDL_Scancode> toggleHotbarKeys;
 };
 
 /* A class to handle events such as keyboard input or mouse movement. */
@@ -53,10 +57,10 @@ public:
                             WindowHandler &window);
 
     // Do whatever should be done when a mouse event happens
-    void mouseEvent(const SDL_Event &event);
+    void mouseEvent(const SDL_Event &event, Player &player);
 
     // Do whatever should be done when a key is pressed or released
-    void keyEvent(const SDL_Event &event);
+    void keyEvent(const SDL_Event &event, Player &player);
 
     // Do stuff for keys being held down
     void updateKeys(const Uint8 *state);

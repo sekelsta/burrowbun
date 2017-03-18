@@ -11,17 +11,31 @@ Hotbar::Hotbar(void) {
     largeGap = 16;
     offsetRight = 8;
     offsetDown = 8;
-
+    // Where to draw the hotbar
+    x = 20;
+    y = 10;
 
     frame.name = "frame.png";
+    frameSelected.name = "frame_selected.png";
     // How big are the squares in the hotbar
     frame.width = 32;
     frame.height = 32;
 
-    frames.name = "";
-    frames.width = 12 * frame.width + 9 * smallGap + 2 * largeGap + offsetRight;
-    frames.height = frame.height + offsetDown;
+    sprite.name = "";
+    sprite.width = 12 * frame.width + 12 * smallGap + 2 * largeGap 
+        + offsetRight;
+    sprite.height = frame.height + offsetDown;
 
     frame.texture = NULL;
-    frames.texture = NULL;
+    sprite.texture = NULL;
+
+    isSpriteUpdated = false;
+    isSwitched = false;
+    selected = 0;
+}
+
+// Toggle which row is on top
+void Hotbar::toggle() {
+    isSwitched = !isSwitched;
+    isSpriteUpdated = false;
 }

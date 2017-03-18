@@ -1,11 +1,7 @@
 Changes since last push:
- - Now it renders the places where things held by the hotbar would go, though 
-there still aren't things to put in the hotbar.
- - Added a framerate cap for when it tries to go too fast and frame skipping 
-for when it triest to go too slow.
- - Added a sprite struct, for storing information about a sprite, though I 
-haven't yet made everything use it that should be.
- - Adjusted player movement speed.
+ - Hotbar now has a slot selected, and will switch between the back and front 
+bars when x is pressed.
+ - The player class now owns a hotbar
 
 Known "features":
  - The strenth of gravity is independent of the world.

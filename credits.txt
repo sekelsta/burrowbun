@@ -32,7 +32,7 @@ The peridotite used a small piece from http://opengameart.org/content/opp-jungle
     Noaqh
     Darchangel 
 
-The frame for in the hotbar: J. W. Bjerk (eleazzaar) -- www.jwbjerk.com/art -- find this and other open art at: http://opengameart.org
+The frame for the hotbar (both selected and unselected): a resized version of the one created by J. W. Bjerk (eleazzaar) -- www.jwbjerk.com/art -- find this and other open art at: http://opengameart.org
 
 
 

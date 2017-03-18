@@ -13,18 +13,38 @@ responding to keyboard input. */
 class Hotbar {
 
 public:
+    // For drawing a frame around every hotbar item
     Sprite frame;
+    Sprite frameSelected;
     // How to space the slots
     int smallGap;
     int largeGap;
     // Where to put the inactive slots
     int offsetDown;
     int offsetRight;
+    // Where to draw the hotbar
+    int x;
+    int y;
+
     // The sprite that holds a bunch of frames rendered onto a texture
-    Sprite frames;
+    Sprite sprite;
+    // Whether anyhting about the hotbar has changed since the sprite was last
+    // rendered.
+    bool isSpriteUpdated;
+
+    // Which frame is selected
+    int selected;
+
+    // Whether the back hotbar was brought to the front
+    bool isSwitched;
 
     // Constructor
     Hotbar();
+
+    // Destructor, copy constructor: TODO
+
+    // Switch the two rows
+    void toggle();
 };
 
 #endif

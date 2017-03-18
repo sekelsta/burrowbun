@@ -19,6 +19,7 @@ the only thing screen coordinates are used for. */
 // The path to image files
 #define TILE_PATH "content/"
 #define MOVABLE_PATH "content/"
+#define UI_PATH "content/"
 
 using namespace std;
 
@@ -73,8 +74,12 @@ class WindowHandler {
     SDL_Texture *renderHotbarPart(const Hotbar &hotbar, 
         vector<SDL_Texture*> textures) const;
 
+    // Draw the entire hotbar sprite to a texture. This only needs to be called
+    // when the hotbar is first made, or when anything about it changes.
+    void updateHotbarSprite(Hotbar &hotbar);
+
     // Render everything UI
-    void renderUI(const Hotbar &hotbar) const;
+    void renderUI(Hotbar &hotbar);
 
 public:
     // Constructor
@@ -89,11 +94,11 @@ public:
     bool init();
 
     // Load the images
-    bool loadMedia(vector<Tile *> &pointers, vector<Movable *> &movables, 
+    bool loadMedia(vector<Tile *> &pointers, vector<Movable *> &movables,
         Hotbar &hotbar);
 
-    // Load a texture
-    SDL_Texture *loadTexture(const string &name);
+    // Load a texture, return true on success
+    bool loadTexture(const string &name);
 
     // Load a texture for each tile
     bool loadTiles(vector<Tile *> &pointers);
@@ -114,7 +119,7 @@ public:
 
     // Update the screen
     void update(const Map &m, const vector<Movable *> &movables, 
-        const Hotbar &hotbar);
+        Hotbar &hotbar);
 
     // Unload media to switch maps, currently done by close()
     void unloadMedia(vector<Tile *> &pointers);

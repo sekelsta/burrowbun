@@ -55,6 +55,8 @@ EventHandler::EventHandler() {
     keySettings.downKeys.push_back(SDL_SCANCODE_S);
     keySettings.jumpKeys.push_back(SDL_SCANCODE_SPACE);
     keySettings.jumpKeys.push_back(SDL_SCANCODE_KP_SPACE);
+    // For the hotbar
+    keySettings.toggleHotbarKeys.push_back(SDL_SCANCODE_X);
 }
 
 // Access functions
@@ -96,18 +98,22 @@ void EventHandler::windowEvent(const SDL_Event &event, bool &isFocused,
 }
 
 // Do whatever should be done when a mouse event happens
-void EventHandler::mouseEvent(const SDL_Event &event) {
+void EventHandler::mouseEvent(const SDL_Event &event, Player &player) {
     // TODO
 }
 
 // Do whatever should be done when key presses or releases happen
-void EventHandler::keyEvent(const SDL_Event &event) {
+void EventHandler::keyEvent(const SDL_Event &event, Player &player) {
     SDL_Scancode key = event.key.keysym.scancode;
 
     // Here we should handle keys which don't need to be held down to work.
     if (event.type == SDL_KEYUP) {
         // Pass
     }
+    else if (isIn(key, keySettings.toggleHotbarKeys)) {
+        player.hotbar.toggle();
+    }
+    // For testing only, TODO: remove
     else if (key == SDL_SCANCODE_J) {
         // Move one pixel down
         move = -1;

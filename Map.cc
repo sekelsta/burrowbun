@@ -156,9 +156,7 @@ Map::Map(string filename) {
         for (int i = 0; i < count; i++) {
             assert(index < width * height);
             tiles[index].foreground = matchingTile;
-            tiles[index].foregroundHealth = matchingTile -> maxHealth;
             tiles[index].background = matchingBackground;
-            tiles[index].backgroundHealth = 1;
             tiles[index].spritePlace.x = rand() % matchingTile -> sprite.cols;
             tiles[index].spritePlace.y = 0;
             index++;
@@ -235,13 +233,11 @@ Tile *Map::getBackground(int x, int y) const {
 // Set the foreground tile at x, y equal to val
 void Map::setForeground(int x, int y, Tile* const &val) {
     findPointer(x, y) -> foreground = val;
-    findPointer(x, y) -> foregroundHealth = val -> maxHealth;
 }
 
 // Set the background tile at x, y equal to val
 void Map::setBackground(int x, int y, Tile* const &val) {
     findPointer(x, y) -> background = val;
-    findPointer(x, y) -> backgroundHealth = val -> maxHealth;
 }
 
 // Gets the map's list of the tile pointers it uses
