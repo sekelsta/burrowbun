@@ -23,7 +23,7 @@ SDL_Rect WindowHandler::findCamera(int x, int y, int w, int h) {
     camera.x += worldWidth;
     camera.x %= worldWidth;
     camera.y = min(camera.y, worldHeight - screenHeight - TILE_HEIGHT);
-    camera.y = max(0, camera.y);
+    camera.y = max(TILE_HEIGHT, camera.y);
 
     // If, God forbid, the map is smaller than the camera, shrink the camera
     camera.w = min(camera.w, worldWidth - TILE_HEIGHT);
@@ -75,14 +75,11 @@ SDL_Texture *WindowHandler::renderHotbarPart(const Hotbar &hotbar,
     rectTo.h = height;
     rectTo.x = 0;
     rectTo.y = 0;
-    // For each section of four
-    for (int i = 0; i < 3; i++) {
-        for (int j = 0; j < 4; j++) {
-            int index = 4 * i + j;
-            SDL_RenderCopy(renderer, textures[index], NULL, &rectTo);
-            rectTo.x += width + hotbar.smallGap;
-        }
-        rectTo.x += hotbar.largeGap;
+    // For each slot
+    for (int i = 0; i < 12; i++) {
+        rectTo.x = hotbar.clickBoxes[i].x - hotbar.xStart;
+        rectTo.y = hotbar.clickBoxes[i].y - hotbar.yStart;
+        SDL_RenderCopy(renderer, textures[i], NULL, &rectTo);
     }
 
     return to;
@@ -182,8 +179,8 @@ void WindowHandler::renderUI(Hotbar &hotbar) {
     rectTo.h = hotbar.sprite.height;
 
     // Render
-    rectTo.x = hotbar.x;
-    rectTo.y = hotbar.y;
+    rectTo.x = hotbar.xStart;
+    rectTo.y = hotbar.yStart;
     SDL_RenderCopy(renderer, hotbar.sprite.texture, NULL, &rectTo);
 }
 
@@ -425,8 +422,10 @@ void WindowHandler::renderMap(const Map &m, const SDL_Rect &camera) {
             int xTile = (xMapStart + i) % mapWidth;
             int yTile = yMapStart - j;
             // But only if it's a tile that exists on the map
-            assert (0 <= xTile && xTile < mapWidth && 0 <= yTile 
-                && yTile < worldHeight / TILE_HEIGHT);
+            assert (0 <= xTile);
+            assert (xTile < mapWidth);
+            assert (0 <= yTile); 
+            assert (yTile < worldHeight / TILE_HEIGHT);
             SDL_Texture *texture 
                 = m.getForeground(xTile, yTile) -> sprite.texture;
             if (texture != NULL) {

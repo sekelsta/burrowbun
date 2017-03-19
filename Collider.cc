@@ -340,7 +340,7 @@ void Collider::collide(const Map &map, Movable &movable) {
     movable.x += worldWidth;
     movable.x %= worldWidth;
     // Collide in the y direction
-    movable.y = max(0, movable.y);
+    movable.y = max(TILE_HEIGHT, movable.y);
     int worldTop = worldHeight - movable.spriteHeight - TILE_HEIGHT;
     movable.y = min(movable.y, worldTop);
 }

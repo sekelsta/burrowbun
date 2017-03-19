@@ -1,5 +1,7 @@
 Changes since last push:
- - The hotbar now also responds to keyboard input.
+ - Fixed a bug where going near the bottom of the map would cause an assertion 
+error, by making the collider and the windowhandler pretend the map ends one
+tile sooner than it does. 
 
 Known "features":
  - The strenth of gravity is independent of the world.
