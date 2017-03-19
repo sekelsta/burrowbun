@@ -144,8 +144,7 @@ void EventHandler::keyEvent(const SDL_Event &event, Player &player) {
         // than one key to each hotbar slot
         for (unsigned int i = 0; i < keySettings.hotbarKeys.size(); i++) {
             if (key == keySettings.hotbarKeys[i]) {
-                player.hotbar.selected = i;
-                player.hotbar.isSpriteUpdated = false;
+                player.hotbar.select(i);
             }
         }
     }

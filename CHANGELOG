@@ -1,7 +1,5 @@
 Changes since last push:
- - Hotbar now has a slot selected, and will switch between the back and front 
-bars when x is pressed.
- - The player class now owns a hotbar
+ - The hotbar now also responds to keyboard input.
 
 Known "features":
  - The strenth of gravity is independent of the world.

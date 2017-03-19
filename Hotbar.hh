@@ -41,10 +41,11 @@ public:
     // Constructor
     Hotbar();
 
-    // Destructor, copy constructor: TODO
-
     // Switch the two rows
     void toggle();
+
+    // Select a slot
+    void select(int slot);
 };
 
 #endif

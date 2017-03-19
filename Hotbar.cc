@@ -39,3 +39,8 @@ void Hotbar::toggle() {
     isSwitched = !isSwitched;
     isSpriteUpdated = false;
 }
+
+void Hotbar::select(int slot) {
+    selected = slot;
+    isSpriteUpdated = false;
+}
