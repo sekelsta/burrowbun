@@ -1,7 +1,11 @@
 #ifndef HOTBAR_HH
 #define HOTBAR_HH
 
+#include <vector>
 #include "Sprite.hh"
+#include "UIHelpers.hh"
+
+using namespace std;
 
 /* The hotbar consists of 24 slots that action shortcuts can be stored. These
 action shortcuts can be items, skills, or maybe other things I haven't added 
@@ -23,8 +27,8 @@ public:
     int offsetDown;
     int offsetRight;
     // Where to draw the hotbar
-    int x;
-    int y;
+    int xStart;
+    int yStart;
 
     // The sprite that holds a bunch of frames rendered onto a texture
     Sprite sprite;
@@ -38,6 +42,9 @@ public:
     // Whether the back hotbar was brought to the front
     bool isSwitched;
 
+    // For telling whether any of the buttons were clicked
+    vector<MouseBox> clickBoxes;
+
     // Constructor
     Hotbar();
 
@@ -46,6 +53,9 @@ public:
 
     // Select a slot
     void select(int slot);
+
+    // Use mouse input
+    void update();
 };
 
 #endif

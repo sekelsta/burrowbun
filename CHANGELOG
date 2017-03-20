@@ -1,7 +1,8 @@
 Changes since last push:
- - Fixed a bug where going near the bottom of the map would cause an assertion 
-error, by making the collider and the windowhandler pretend the map ends one
-tile sooner than it does. 
+ - Now clicking on a hotbar slot selects it.
+ - I decided I don't want to write my own Perlin noise, so I linked to libnoise,
+but I haven't done anything with it yet.
+ - Switched the locations of the front and back rows of the hotbar
 
 Known "features":
  - The strenth of gravity is independent of the world.

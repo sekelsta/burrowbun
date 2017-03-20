@@ -5,6 +5,7 @@
 #include "WindowHandler.hh"
 #include "Player.hh"
 #include "Hotbar.hh"
+#include "UIHelpers.hh"
 
 using namespace std;
 
@@ -46,6 +47,11 @@ class EventHandler {
 
     // Tell whether a vector has a key that's being held down
     bool isHeld(const Uint8 *state, vector<SDL_Scancode> keys);
+
+    // Change the bool values of a MouseBox vector so they know whether they 
+    // were clicked
+    void updateMouseBoxes(vector<MouseBox> &mouseBoxes, 
+        const SDL_Event &event);
 
 public:
     // Constructor

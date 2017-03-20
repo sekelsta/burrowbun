@@ -77,8 +77,10 @@ SDL_Texture *WindowHandler::renderHotbarPart(const Hotbar &hotbar,
     rectTo.y = 0;
     // For each slot
     for (int i = 0; i < 12; i++) {
-        rectTo.x = hotbar.clickBoxes[i].x - hotbar.xStart;
-        rectTo.y = hotbar.clickBoxes[i].y - hotbar.yStart;
+        // We know the clickboxes have the correct spacing, but the first one 
+        // probably isn't at 0, 0. So we just correct for that.
+        rectTo.x = hotbar.clickBoxes[i].x - hotbar.clickBoxes[0].x;
+        rectTo.y = hotbar.clickBoxes[i].y - hotbar.clickBoxes[0].y;
         SDL_RenderCopy(renderer, textures[i], NULL, &rectTo);
     }
 
@@ -139,15 +141,15 @@ void WindowHandler::updateHotbarSprite(Hotbar &hotbar) {
     SDL_SetRenderDrawColor(renderer, 0xFF, 0xFF, 0xFF, 0xFF);
     // TODO: make the back layer slightly transparent
     SDL_Rect rectTo;
-    rectTo.x = hotbar.offsetRight;
-    rectTo.y = hotbar.offsetDown;
+    rectTo.x = 0;
+    rectTo.y = 0;
     rectTo.w = width - hotbar.offsetRight;
     rectTo.h = height - hotbar.offsetDown;
     // Render the back layer
     SDL_RenderCopy(renderer, back, NULL, &rectTo);
     // Render the front layer
-    rectTo.x = 0;
-    rectTo.y = 0;
+    rectTo.x = hotbar.offsetRight;
+    rectTo.y = hotbar.offsetDown;
     SDL_RenderCopy(renderer, front, NULL, &rectTo);
 
     // Set the sprite thing in the hotbar to the texture we just made

@@ -27,6 +27,41 @@ bool EventHandler::isHeld(const Uint8 *state, vector<SDL_Scancode> keys) {
     return false;
 }
 
+// Change the bool values of a MouseBox vector so they know whether they were
+// clicked
+void EventHandler::updateMouseBoxes(vector<MouseBox> &mouseBoxes,
+        const SDL_Event &event) {
+    assert(event.type == SDL_MOUSEMOTION || event.type == SDL_MOUSEBUTTONUP
+        || event.type == SDL_MOUSEBUTTONDOWN);
+    // Mouse coordinates, relative to the window
+    int x;
+    int y;
+    if (event.type == SDL_MOUSEMOTION) {
+        x = event.motion.x;
+        y = event.motion.y;
+    }
+    // Else it's a mouse button down or up event
+    else {
+        x = event.button.x;
+        y = event.button.y;
+    }
+
+    for (unsigned int i = 0; i < mouseBoxes.size(); i++) {
+        // Note that MouseBox.contains(x, y) also sets mouseBox.containsMouse
+        // to the appropriate value
+        // This if statement sets containsMouse and checks whether it was a
+        // button press or just the mouse moving
+        if (mouseBoxes[i].contains(x, y) && event.type != SDL_MOUSEMOTION) {
+            // If it was a button press in the box, fill in the
+            // appropriate fields
+            mouseBoxes[i].wasClicked = true;
+            mouseBoxes[i].event = event.button;
+        }
+        // And the mouseBox is responsible for making wasClicked false again,
+        // so we don't want to do that here
+    }
+
+}
 
 // Public methods
 
@@ -124,7 +159,10 @@ void EventHandler::windowEvent(const SDL_Event &event, bool &isFocused,
 
 // Do whatever should be done when a mouse event happens
 void EventHandler::mouseEvent(const SDL_Event &event, Player &player) {
-    // TODO
+    // Tell the hotbar whether it was clicked
+    if (event.type != SDL_MOUSEWHEEL) {
+        updateMouseBoxes(player.hotbar.clickBoxes, event);
+    }
 }
 
 // Do whatever should be done when key presses or releases happen
@@ -195,6 +233,10 @@ void EventHandler::updateKeys(const Uint8 *state) {
 
 // Change the player's acceleration
 void EventHandler::updatePlayer(Player &player) {
+    // Update the player's hotbar
+    player.hotbar.update();
+
+    // and update the player's accelleration
     Point newAccel;
     newAccel.x = 0;
     newAccel.y = 0;
