@@ -1,8 +1,5 @@
 Changes since last push:
- - Now clicking on a hotbar slot selects it.
- - I decided I don't want to write my own Perlin noise, so I linked to libnoise,
-but I haven't done anything with it yet.
- - Switched the locations of the front and back rows of the hotbar
+ - Added health, hunger (or maybe it'll be stamina), and mana bars
 
 Known "features":
  - The strenth of gravity is independent of the world.

@@ -15,6 +15,8 @@ the only thing screen coordinates are used for. */
 #include "Map.hh"
 #include "Movable.hh"
 #include "Hotbar.hh"
+#include "Player.hh"
+#include "UIHelpers.hh"
 
 // The path to image files
 #define TILE_PATH "content/"
@@ -59,6 +61,9 @@ class WindowHandler {
     // A 2D vector of SLD rects for rendering the map
     vector<vector<SDL_Rect>> tileRects;
 
+    // Store the texture to draw over the player's stat bars
+    Sprite statBarOverlay;
+
     // Private methods
 
     // Return a rectangle in world coordinates, for a player at x, y
@@ -67,6 +72,12 @@ class WindowHandler {
 
     // Convert a rectangle from world coordinates to screen coordinates
     SDL_Rect convertRect(SDL_Rect rect, SDL_Rect camera);
+
+    // Set render draw color to light color
+    void setRenderColorToLight(const Light &color);
+
+    // Render a StatBar
+    void renderStatBar(StatBar &bar);
 
     // Create a texture and render all the textures to it, using the spacing 
     // variables from hotbar. The texture to is expected to have the correct 
@@ -79,7 +90,7 @@ class WindowHandler {
     void updateHotbarSprite(Hotbar &hotbar);
 
     // Render everything UI
-    void renderUI(Hotbar &hotbar);
+    void renderUI(Player &player);
 
 public:
     // Constructor
@@ -119,7 +130,7 @@ public:
 
     // Update the screen
     void update(const Map &m, const vector<Movable *> &movables, 
-        Hotbar &hotbar);
+        Player &player);
 
     // Unload media to switch maps, currently done by close()
     void unloadMedia(vector<Tile *> &pointers);

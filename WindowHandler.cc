@@ -41,6 +41,46 @@ SDL_Rect WindowHandler::convertRect(SDL_Rect rect, SDL_Rect camera) {
     return screenRect;
 }
 
+// Set the renderer draw color to a Light color
+void WindowHandler::setRenderColorToLight(const Light &color) {
+    SDL_SetRenderDrawColor(renderer, color.r, color.g, color.b, 0xFF);
+}
+
+// Render a StatBar
+void WindowHandler::renderStatBar(StatBar &bar) {
+    SDL_Rect rect;
+    rect.y = bar.y;
+    rect.h = bar.h;
+
+    // Draw the part that's full
+    rect.x = bar.x;
+    rect.w = bar.full;
+    setRenderColorToLight(bar.fullColor);
+    SDL_RenderFillRect(renderer, &rect);
+
+    // Draw the part that can regenerate ("part")
+    rect.x += bar.full;
+    rect.w = bar.part - bar.full;
+    assert(rect.w >= 0);
+    setRenderColorToLight(bar.partColor);
+    SDL_RenderFillRect(renderer, &rect);
+
+    // Draw the empty part of the bar
+    rect.x += rect.w;
+    rect.w = bar.totalWidth - bar.part;
+    setRenderColorToLight(bar.emptyColor);
+    SDL_RenderFillRect(renderer, &rect);
+
+    // And draw the overlay on top
+    // The magic numbers come from the width of the stat bar border
+    int borderWidth = 1;
+    rect.x = bar.x - borderWidth;
+    rect.w = bar.totalWidth + 2 * borderWidth;
+    rect.y -= borderWidth;
+    rect.h += 2 * borderWidth;
+    SDL_RenderCopy(renderer, statBarOverlay.texture, NULL, &rect); 
+}
+
 // Render each texture from textures onto to, using the spacing variables
 // from hotbar. The texture to is expected to have the correct width and
 // height, and the vector is expected to have length 12. 
@@ -166,7 +206,8 @@ void WindowHandler::updateHotbarSprite(Hotbar &hotbar) {
 }
 
 // Currently this just renders the hotbar
-void WindowHandler::renderUI(Hotbar &hotbar) {
+void WindowHandler::renderUI(Player &player) {
+    Hotbar hotbar = player.hotbar;
     // Re-render the hotbar sprite if necessary
     if (!hotbar.isSpriteUpdated) {
         updateHotbarSprite(hotbar);
@@ -184,6 +225,29 @@ void WindowHandler::renderUI(Hotbar &hotbar) {
     rectTo.x = hotbar.xStart;
     rectTo.y = hotbar.yStart;
     SDL_RenderCopy(renderer, hotbar.sprite.texture, NULL, &rectTo);
+
+    // Render the stat bars
+    // Reference distance from the bottom of the screen
+    int up = 90;
+    // Reference distance from the left side of the screen
+    int right = 30;
+
+    int refX = right;
+    int refY = screenHeight - up;
+
+    // The magic numbers here come from the positions required by the sprite I
+    // want to put the bars next to. The refX and refY are its coordinates.
+    // These numbers are set here in case the window size changed.
+    player.health.x = refX + 65;
+    player.health.y = refY + 17;
+    player.hunger.x = refX + 65;
+    player.hunger.y = refY + 29;
+    player.mana.x = refX + 65;
+    player.mana.y = refY + 41;
+    // And actually draw them
+    renderStatBar(player.health);
+    renderStatBar(player.hunger);
+    renderStatBar(player.mana);
 }
 
 // Constructor
@@ -199,6 +263,10 @@ WindowHandler::WindowHandler(int screenWidth, int screenHeight,
 
     // Set the 2D vector of rects for the tiles
     resize(screenWidth, screenHeight);
+
+    // Not sure if this belongs here, but set the name of file to get the
+    // texture for statBarOverlay from
+    statBarOverlay.name = "stat_bar_overlay.png";
 }
 
 void WindowHandler::setMinimized(bool minimized) {
@@ -285,8 +353,13 @@ bool WindowHandler::loadMedia(vector<Tile *> &pointers,
         vector<Movable *> &movables, Hotbar &hotbar) {
     bool success = true;
 
+    // Load the overlay for the player's stats
+    success = loadTexture(UI_PATH + statBarOverlay.name);
+    assert(textures.size() != 0);
+    statBarOverlay.texture = textures.back(); 
+
     // Load the textures for tiles
-    success = loadTiles(pointers);
+    success = success && loadTiles(pointers);
 
     // And for the movables
     success = success && loadMovables(movables);
@@ -484,7 +557,7 @@ void WindowHandler::renderMovables(const vector<Movable *> &movables) {
 
 // Update the screen
 void WindowHandler::update(const Map &map, const vector<Movable *> &movables, 
-        Hotbar &hotbar) {
+        Player &player) {
     // Make sure the renderer isn't rendering to a texture
     SDL_SetRenderTarget(renderer, NULL);
     // Clear the screen
@@ -511,7 +584,7 @@ void WindowHandler::update(const Map &map, const vector<Movable *> &movables,
         renderMovables(movables);
 
         // Draw the UI
-        renderUI(hotbar);
+        renderUI(player);
 
         // Update the screen
         SDL_RenderPresent(renderer);

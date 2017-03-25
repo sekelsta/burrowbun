@@ -5,6 +5,7 @@
 #include <SDL2/SDL.h>
 #include "Movable.hh"
 #include "Hotbar.hh"
+#include "UIHelpers.hh"
 
 using namespace std;
 
@@ -18,6 +19,11 @@ class Player : public Movable {
 
 public:
     Hotbar hotbar;
+
+    // To hold info on the player's stats
+    StatBar health;
+    StatBar hunger;
+    StatBar mana;
 
     // Constructor
     Player();

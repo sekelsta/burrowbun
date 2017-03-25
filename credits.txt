@@ -34,7 +34,8 @@ The peridotite used a small piece from http://opengameart.org/content/opp-jungle
 
 The frame for the hotbar (both selected and unselected): a resized version of the one created by J. W. Bjerk (eleazzaar) -- www.jwbjerk.com/art -- find this and other open art at: http://opengameart.org
 
-
+Overlay for health and whatnot bars:an edited version of tthe one by  user Monk
+(http://opengameart.org/content/health-magic-and-stamina-hud)
 
 
 All other art was drawn by me.

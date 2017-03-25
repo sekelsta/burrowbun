@@ -113,7 +113,7 @@ int main(int argc, char **argv) {
         // But only if rendering isn't really slow
         Uint32 frameTicks = SDL_GetTicks() - ticks;
         if (frameTicks < 2 * TICKS_PER_FRAME) { 
-            window.update(map, movables, player.hotbar);
+            window.update(map, movables, player);
         }
 
         // Count the number of times we've gone through this loop
