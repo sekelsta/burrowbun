@@ -142,6 +142,9 @@ Map::Map(string filename) {
     // Read the spawn point
     infile >> spawn.x >> spawn.y;
 
+    // Read the seed
+    infile >> seed;
+
     // Read the map
     int index = 0;
     int count, tile;

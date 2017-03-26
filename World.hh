@@ -26,6 +26,8 @@ class World {
 
     // Have a random number generator
     default_random_engine generator;
+    // The seed that was used to generate the world
+    int seed;
 
     // Private methods
 

@@ -5,6 +5,8 @@
 #include <cstdlib> // For randomness
 #include <cmath> // Because pi and exponentiation
 #include <algorithm> // For max and min
+#include <noise.h> // Finding this requires having libnoise installed and may
+// require looking in non-standard places.
 #include "World.hh"
 
 using namespace std;
@@ -88,6 +90,9 @@ void World::generateEarth() {
     foreground = new TileType[height * width];
     background = new TileType[height * width];
     setAll(TileType::EMPTY, foreground);
+
+    // Test to see if this compiles
+    noise::module::Perlin perlinNoise;
 
     // Make a horizon line for a continent
     int horizon = 200;
@@ -303,7 +308,7 @@ void World::setPath(const vector<float> &r, const vector<Location> &centers,
 // Put a gently sloping tunnel with a given start point
 void World::tunnel(Location start) {
     // Set some constants
-    int length = 300;
+    int length = 500;
     float minR = 3;
     float maxR = 7;
     vector<float> r;
@@ -604,8 +609,9 @@ void World::setHills(int start, int stop, int maxAmp, double maxFreq) {
 // Constructor, based on the world type given
 World::World(WorldType worldType) {
     // Seed the random number generators
-    srand(time(NULL));
-    generator.seed(time(NULL));
+    seed = time(NULL);
+    srand(seed);
+    generator.seed();
 
     // Run the appropriate function
     switch(worldType) {
@@ -670,6 +676,7 @@ void World::save(const string &filename) const {
     // Write an informative header
     outfile << "#Map\n" << width << " " << height << "\n";
     outfile << spawn.x << " " << spawn.y << "\n";
+    outfile << seed << "\n";
     // Write tile values
 
     // For keeping track of a lot of the same tile in a row

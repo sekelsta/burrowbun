@@ -1,5 +1,6 @@
 Changes since last push:
  - Added health, hunger (or maybe it'll be stamina), and mana bars
+ - Map now saves the seed used to generate it
 
 Known "features":
  - The strenth of gravity is independent of the world.
