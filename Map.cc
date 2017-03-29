@@ -210,7 +210,11 @@ Location Map::getSpritePlace(int x, int y) const {
 
 // Return lighting
 Light Map::getLight(int x, int y) const {
-    return findPointer(x, y) -> light;
+    Light light;
+    // Combine the value from blocks wit hthe value from the sky, taking into
+    // account that the color of light the sky makes
+    light.useSky(findPointer(x, y) -> light, getSkyColor(x, y));
+    return light;
 }
 
 // Returns the color the sun or moon is shining
