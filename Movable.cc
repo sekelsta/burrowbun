@@ -17,6 +17,9 @@ Movable::Movable() {
     isSteppingUp = false;
     timeOffGround = 0;
 
+    pixelsFallen = 0;
+    maxHeight = 0;
+
     gravity = 0;
 
     // These should be changed by the child class's init.

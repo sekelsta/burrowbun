@@ -79,8 +79,7 @@ struct SpaceInfo {
     Liquid *liquid;
 
     // How well-lit this tile is, and from where
-    Light lightSky;
-    Light lightBlock;
+    Light light;
 
     // Which rectangle of the spritesheet to draw
     // spriteRow should be based on which surrounding tiles are empty,

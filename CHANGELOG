@@ -1,6 +1,6 @@
 Changes since last push:
- - Added health, hunger (or maybe it'll be stamina), and mana bars
- - Map now saves the seed used to generate it
+ - Removed redundant information in storing the amount of light in a tile. Also
+made it easier to change the light with time of day.
 
 Known "features":
  - The strenth of gravity is independent of the world.
@@ -18,3 +18,9 @@ Soon to come (though likely not very soon):
  - hud
  - inventory
  - actual support for platforms
+TODO:
+ - make the hotbar frames into a spritesheet
+ - Replace SDL_Texture* with void* in things that don't need to know about SDL?
+ - Make the spaceInfo class just store a tiletype, not a Tile*, and use it as
+the index of the Tile*
+

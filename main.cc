@@ -5,6 +5,7 @@
 #include "WindowHandler.hh"
 #include "EventHandler.hh"
 #include "Movable.hh"
+#include "Entity.hh"
 #include "Player.hh"
 #include "Collider.hh"
 #include "Hotbar.hh"
@@ -108,6 +109,8 @@ int main(int argc, char **argv) {
         // Move things around
         eventHandler.updatePlayer(player);
         collider.update(map, movables);
+        // TODO: make all entities take fall damage
+        player.takeFallDamage();
 
         // Put pictures on the screen
         // But only if rendering isn't really slow

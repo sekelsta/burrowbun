@@ -3,7 +3,7 @@
 
 #include <vector>
 #include <SDL2/SDL.h>
-#include "Movable.hh"
+#include "Entity.hh"
 #include "Hotbar.hh"
 #include "UIHelpers.hh"
 
@@ -15,15 +15,10 @@ using namespace std;
     If it's unclear whether something belongs in the player class or as part of
     the eventhandler, the rule of thumb is to ask whether it belongs in the
     player's savefile or in the game's config file. */
-class Player : public Movable {
+class Player : public Entity {
 
 public:
     Hotbar hotbar;
-
-    // To hold info on the player's stats
-    StatBar health;
-    StatBar hunger;
-    StatBar mana;
 
     // Constructor
     Player();

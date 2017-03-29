@@ -86,9 +86,10 @@ class Map {
     Location getSpritePlace(int x, int y) const;
 
     // Return the light at a square. 
-    Light getSkyLight(int x, int y) const;
+    Light getLight(int x, int y) const;
 
-    Light getBlockLight(int x, int y) const;
+    // Return the color the sun / moon is shining
+    Light getSkyColor(int x, int y) const;
 
     // Returns the foreground tile pointer at x, y
     // 0, 0 is the bottom right

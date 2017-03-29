@@ -34,6 +34,12 @@ public:
     // determines maximum jump height. Here -1 means infinity.
     int maxJumpTime; 
 
+    // What number to use when calculating fall damage
+    int pixelsFallen;
+    // The highest point reached since the last jump, or since last touching 
+    // the ground
+    int maxHeight;
+
     // Location
     int x, y;
 

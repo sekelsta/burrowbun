@@ -52,7 +52,7 @@ struct StatBar {
     int totalWidth;
 
     // The actual stats
-    int max;
+    int maxStat;
     int fullStat;
     int partStat;
 
@@ -64,8 +64,8 @@ struct StatBar {
 private:
     // Translate from portion of max health to portion of bar filled
     int convert(int newValue) {
-        if (max != 0) {
-            float fraction = newValue / (float)max;
+        if (maxStat != 0) {
+            float fraction = newValue / (float)maxStat;
             return fraction * totalWidth;
         }
         else {
@@ -74,21 +74,35 @@ private:
     }
 
 public:
- 
+    // Set the amount of the stat
     void setFull(int newValue) {
+        // Can't set it below 0 or above the max
+        newValue = max(0, newValue);
+        newValue = min(maxStat, newValue);
         fullStat = newValue;
-        full = convert(newValue);
+        // And you can't recover a stat past the temporary cap
+        if (fullStat > partStat) {
+            fullStat = partStat;
+        }
+        full = convert(fullStat);
     }
 
+    // Set the temporary cap (which prevents the stat from regenerating 
+    // completely)
     void setPart(int newValue) {
-        partStat  = newValue;
+        newValue  = max(0, newValue);
+        newValue = min(maxStat, newValue);
+        partStat = newValue;
         part = convert(newValue);
+        if (fullStat > partStat) {
+            setFull(partStat);
+        }
     }
 
     // Set the stat to as high as it can go
     void fill() {
-        setPart(max);
-        setFull(max);
+        setPart(maxStat);
+        setFull(maxStat);
     }
 };
 

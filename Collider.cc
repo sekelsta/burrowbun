@@ -347,9 +347,20 @@ void Collider::collide(const Map &map, Movable &movable) {
 
 
 // A function to move and collide the movables
+// Note that this only ever resets distance fallen when it hits the ground.
 void Collider::update(const Map &map, vector<Movable *> &movables) {
     // Update the velocity of everything
     for (unsigned i = 0; i < movables.size(); i++) {
+        // If it fell, figure out how far
+        if (movables[i] -> isCollidingDown) {
+            int distanceFallen = movables[i] -> maxHeight - movables[i] -> y;
+            movables[i] -> pixelsFallen = distanceFallen;
+            movables[i] -> maxHeight = movables[i] -> y;
+        }
+        else {
+            movables[i] -> pixelsFallen = 0;
+        }
+
         // TODO: replace this with gravity as a function of height
         double gravity = -12;
         movables[i] -> gravity = gravity;
@@ -427,10 +438,14 @@ void Collider::update(const Map &map, vector<Movable *> &movables) {
                         movables[i] -> y += abs(movables[i] -> getVelocity().x);
                         movables[i] -> isSteppingUp = true;
                     }
-                    
                 }
             }
         }
+        // And done checking whether it needs to step up.
+        // Now we're in just the "for each movable" loop
+        // Update the distance fallen from
+        int newMaxHeight = max(movables[i] -> maxHeight, movables[i] -> y);
+        movables[i] -> maxHeight = newMaxHeight;
     }
 }
 

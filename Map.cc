@@ -104,14 +104,11 @@ int Map::skyDistance(int x, int y, int maxDist) {
 void Map::setLight(int x, int y) {
     // TODO: actually make this depend on the light source
     SpaceInfo *place = findPointer(x, y);
-    place -> lightBlock.r = 0;
-    place -> lightBlock.g = 0;
-    place -> lightBlock.b = 0;
+    place -> light.r = 0;
+    place -> light.g = 0;
+    place -> light.b = 0;
     int dist = skyDistance(x, y, 25);
-    place -> lightSky.r = 255;
-    place -> lightSky.g = 255;
-    place -> lightSky.b = 255;
-    place -> lightSky.setIntensity(max(0.0, exp((1 - dist) / 8.0)));
+    place -> light.skyIntensity = 255 * max(0.0, exp((1 - dist) / 8.0));
 }
 
 // Public methods
@@ -211,14 +208,19 @@ Location Map::getSpritePlace(int x, int y) const {
     return findPointer(x, y) -> spritePlace;
 }
 
-// Return lighting from torches and other blocks
-Light Map::getSkyLight(int x, int y) const {
-    return findPointer(x, y) -> lightSky;
+// Return lighting
+Light Map::getLight(int x, int y) const {
+    return findPointer(x, y) -> light;
 }
 
-// Return lighting from proximity to the sky
-Light Map::getBlockLight(int x, int y) const {
-    return findPointer(x, y) -> lightBlock;
+// Returns the color the sun or moon is shining
+Light Map::getSkyColor(int x, int y) const {
+    Light light;
+    light.r = 255;
+    light.g = 255;
+    light.b = 255;
+    light.skyIntensity = 255;
+    return light;
 }
 
 // Returns the foreground tile at x, y
