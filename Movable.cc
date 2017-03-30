@@ -13,9 +13,12 @@ Movable::Movable() {
     accel.y = 0;
     texture = NULL;
     isCollidingDown = false;
+    ticksCollidingDown = 0;
     isCollidingX = false;
     isSteppingUp = false;
     timeOffGround = 0;
+    collidePlatforms = true;
+    isDroppingDown = false;
 
     pixelsFallen = 0;
     maxHeight = 0;

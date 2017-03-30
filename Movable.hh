@@ -28,8 +28,11 @@ public:
     // one block high walls.
     bool isCollidingX;
     bool isCollidingDown;
+    int ticksCollidingDown; // Number of updates isCollidingDown has been true
     bool isSteppingUp; // As in, stepping up one block
     int timeOffGround; // How many updates since it was on the ground
+    bool collidePlatforms; // Whether or not to fall through platforms
+    bool isDroppingDown; // isCollidingDown && !collidePlatforms
     // How many updates before holding down the jump key stops working. This
     // determines maximum jump height. Here -1 means infinity.
     int maxJumpTime; 

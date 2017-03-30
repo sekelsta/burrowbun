@@ -136,9 +136,10 @@ class Collider {
 
     /* Goes through the tiles near the movable, finds all collisions, and adds
     them to the vactor collisions. If any of the collisions are inevitable, it 
-    returns true. Otherwise, it returns false. */
+    returns true. Otherwise, it returns false. If dropDown is true, it will 
+    not count collisions with platforms. */
     bool listCollisions(vector<CollisionInfo> &collisions, const Map &map, 
-        const Rect &to, const Rect &from) const;
+        const Rect &to, const Rect &from, bool dropDown) const;
 
     // Takes a movable and a map, and moves it to where it should end up
     void collide(const Map &map, Movable &movable);

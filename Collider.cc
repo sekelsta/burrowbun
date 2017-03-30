@@ -1,6 +1,9 @@
 #include <iostream>
 #include "Collider.hh"
 
+// Number of updates to stand on a platform before dropping through
+#define PLATFORM_FALL_DELAY 4
+
 using namespace std;
 
 // Constructor
@@ -128,9 +131,9 @@ CollisionInfo Collider::findCollision(const Rect &to, const Rect &stays,
 
 /* Goes through the tiles near the player and adds all collisions found to 
 the vector collisions. If any are inevitable, it returns true. Otherwise, it
-returns false. */
+returns false. If dropDown is true, it will ignore collisions with platforms. */
 bool Collider::listCollisions(vector<CollisionInfo> &collisions, const Map &map,
-    const Rect &to, const Rect &from) const {
+    const Rect &to, const Rect &from, bool dropDown) const {
     // The rectangle of the current tile to check
     Rect stays;
     stays.w = TILE_WIDTH - 2 * xOffset;
@@ -152,7 +155,12 @@ bool Collider::listCollisions(vector<CollisionInfo> &collisions, const Map &map,
         for (int j = to.y / TILE_HEIGHT;
                 j < (to.y + to.h) / TILE_HEIGHT + 1; j++) {
             Tile *tile = map.getForeground(l, j);
+            // Skip non-collidable tiles
             if (!(tile -> isSolid || tile -> isPlatform)) {
+                continue;
+            }
+            // Skip platforms if we should drop through them
+            if (tile -> isPlatform && dropDown) {
                 continue;
             }
             stays.y = j * TILE_HEIGHT + yOffset;
@@ -164,6 +172,7 @@ bool Collider::listCollisions(vector<CollisionInfo> &collisions, const Map &map,
             CollisionInfo info = findCollision(to, stays, dx, dy);
             // Include information about what tile was collided
             info.resolve(tile);
+
             // Add this collision to the list to deal with later
             // Also check whether any collision is inevitable
             if (info.type != CollisionType::NONE) {
@@ -240,6 +249,8 @@ void Collider::collide(const Map &map, Movable &movable) {
     }
 
     // Collide with tiles it doesn't start on
+    double xCoefficient = 1;
+    double yCoefficient = 1;
     while (xVelocity != 0 || yVelocity != 0) {
         // The n is in case moludo results in 0 inconviniently
         int n = max(min(1, xVelocity), -1);
@@ -257,15 +268,16 @@ void Collider::collide(const Map &map, Movable &movable) {
         assert(abs(yVelocity - dy) <= abs(yVelocity));
         xVelocity -= dx;
         yVelocity -= dy;
-        double xCoefficient = 1;
-        double yCoefficient = 1;
         // Check whether there are and inevitable collisions we should 
         // handle first (they do need to be first, otherwise the player can
         // climb walls).
         bool anyInevitable = false;
         // Make a list of all collisions between the movable and any tiles 
         vector<CollisionInfo> collisions;
-        anyInevitable = listCollisions(collisions, map, to, from);
+        // Whether we should drop down through platforms
+        bool dropDown = movable.isDroppingDown
+            && (movable.ticksCollidingDown >= PLATFORM_FALL_DELAY);
+        anyInevitable = listCollisions(collisions, map, to, from, dropDown);
 
         // Only collide if collisions are enabled
         while (enableCollisions && (collisions.size() != 0)) {
@@ -326,13 +338,19 @@ void Collider::collide(const Map &map, Movable &movable) {
             }
             // Otherwise, check again for collisions.
             collisions.clear();
-            anyInevitable = listCollisions(collisions, map, to, from);
+            anyInevitable = listCollisions(collisions, map, to, from, dropDown);
         }
 
         // Set to where we're actaully moving to.
         from.x = to.x;
         from.y = to.y;
     }
+    // If there were collisions, set the velocity to 0
+    Point velocity = movable.getVelocity();
+    velocity.x *= xCoefficient;
+    velocity.y *= yCoefficient;
+    movable.setVelocity(velocity);
+
     movable.x = from.x;
     movable.y = from.y;
     // Collide with the edge of the map
@@ -356,15 +374,20 @@ void Collider::update(const Map &map, vector<Movable *> &movables) {
             int distanceFallen = movables[i] -> maxHeight - movables[i] -> y;
             movables[i] -> pixelsFallen = distanceFallen;
             movables[i] -> maxHeight = movables[i] -> y;
+            // Also set ticksCollidingDown
+            movables[i] -> ticksCollidingDown++;
         }
         else {
             movables[i] -> pixelsFallen = 0;
+            movables[i] -> ticksCollidingDown = 0;
         }
 
         // TODO: replace this with gravity as a function of height
-        double gravity = -12;
+        double gravity = -1.5;
         movables[i] -> gravity = gravity;
         movables[i] -> accelerate();
+        movables[i] -> isDroppingDown = movables[i] -> isCollidingDown
+            && !(movables[i] -> collidePlatforms);
         movables[i] -> isSteppingUp = false;
         movables[i] -> isCollidingX = false;
         movables[i] -> isCollidingDown = false;

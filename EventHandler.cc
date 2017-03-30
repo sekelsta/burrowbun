@@ -264,7 +264,11 @@ void EventHandler::updatePlayer(Player &player) {
         newAccel.y += player.getDAccel().y;
     }
     if (down) {
-        newAccel.y -= player.getDAccel().y;
+        player.collidePlatforms = false;
+        // newAccel.y -= player.getDAccel().y;
+    }
+    else {
+        player.collidePlatforms = true;
     }
 
     // Change the player's acceleration

@@ -1,5 +1,6 @@
 #include <SDL2/SDL.h>
 #include "Player.hh"
+#include <iostream>
 
 using namespace std;
 
@@ -7,11 +8,11 @@ using namespace std;
 Player::Player() {
     // Set the drag to not 0
     drag.x = 0.3;
-    drag.y = 0.5;
+    drag.y = 11.0 / 12.0;
 
     // Set the amount to accelerate by
     dAccel.x = 10;
-    dAccel.y = 24;
+    dAccel.y = 3;
 
     // Set the number of updates a jump can last
     maxJumpTime = 8;

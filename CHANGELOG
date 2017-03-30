@@ -1,9 +1,8 @@
 Changes since last push:
  - Changed where the final value for the light at each block is calculated
- - Partially added support for platforms: you still can't go down through them,
-but colliding in all other directions works fine.
  - Made the hotbar frames into a spritesheet
  - Added a struct for referring to a rectangle of a spritesheet
+ - Added support for platforms
 
 Known "features":
  - The strenth of gravity is independent of the world.
@@ -20,9 +19,6 @@ Soon to come (though likely not very soon):
  - Instead of storing the health of every single tile on the map, I should just have a list of the ones that have been damaged.
  - hud
  - inventory
- - actual support for platforms
- - a better way of storing texture / sprite information
-TODO:
  - Make the spaceInfo class just store a tiletype, not a Tile*, and use it as
 the index of the Tile*
 
