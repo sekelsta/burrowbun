@@ -346,8 +346,8 @@ void Collider::collide(const Map &map, Movable &movable) {
         from.y = to.y;
     }
     // If there were collisions, set the velocity to 0
+    // But only in the x direction because otherwise it breaks stepping up
     Point velocity = movable.getVelocity();
-    velocity.x *= xCoefficient;
     velocity.y *= yCoefficient;
     movable.setVelocity(velocity);
 
