@@ -68,6 +68,10 @@ struct CollisionInfo {
             case CollisionType::NONE :
                 break;
             }
+            // Ignore collisions with platforms from most directions
+            if (tile -> isPlatform && type != CollisionType::DOWN) {
+                type = CollisionType::NONE;
+            }
         }
     
 };

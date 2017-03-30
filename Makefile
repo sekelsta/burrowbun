@@ -35,7 +35,7 @@ Movable.o : Movable.cc Movable.hh Point.hh
 
 Player.o : Player.cc Player.hh Movable.hh Point.hh Hotbar.hh UIHelpers.hh \
         Light.hh Entity.hh
-	$(CC) $(CXXFLAGS) $(LINKER_FLAGS) $^ -c $(LDFLAGS)
+	$(CC) $(CXXFLAGS) $^ -c $(LDFLAGS)
 
 Collider.o : Collider.cc Collider.hh Tile.hh Map.hh Movable.hh Point.hh \
         Sprite.hh

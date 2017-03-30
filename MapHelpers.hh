@@ -4,9 +4,6 @@
 #include "Tile.hh"
 #include "Light.hh"
 
-// any Liquid* will just be set to NULL.
-class Liquid;
-
 // A struct for holding an x and a y coordinate.
 struct Location {
     // The x and y values of the location
@@ -74,9 +71,6 @@ struct SpaceInfo {
     // indexed by tiletype to refer to.
     Tile *foreground;
     Tile *background;
-    
-    // The liquid.
-    Liquid *liquid;
 
     // How well-lit this tile is, and from where
     Light light;

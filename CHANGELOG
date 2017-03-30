@@ -1,6 +1,7 @@
 Changes since last push:
- - Removed redundant information in storing the amount of light in a tile. Also
-made it easier to change the light with time of day.
+ - Changed where the final value for the light at each block is calculated
+ - Partially added support for platforms: you still can't go down through them,
+but colliding in all other directions works fine.
 
 Known "features":
  - The strenth of gravity is independent of the world.
@@ -18,6 +19,7 @@ Soon to come (though likely not very soon):
  - hud
  - inventory
  - actual support for platforms
+ - a better way of storing texture / sprite information
 TODO:
  - make the hotbar frames into a spritesheet
  - Replace SDL_Texture* with void* in things that don't need to know about SDL?
