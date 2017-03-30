@@ -19,7 +19,6 @@ class Hotbar {
 public:
     // For drawing a frame around every hotbar item
     Sprite frame;
-    Sprite frameSelected;
     // How to space the slots
     int smallGap;
     int largeGap;

@@ -18,6 +18,10 @@ struct Sprite {
     // If this is a spritesheet, the number of rows and columns
     int rows;
     int cols;
+
+    // When referring to specific square, it's row and column (0 indexed)
+    int row;
+    int col;
 };
 
 #endif

@@ -17,6 +17,7 @@ the only thing screen coordinates are used for. */
 #include "Hotbar.hh"
 #include "Player.hh"
 #include "UIHelpers.hh"
+#include "Sprite.hh"
 
 // The path to image files
 #define TILE_PATH "content/"
@@ -24,6 +25,27 @@ the only thing screen coordinates are used for. */
 #define UI_PATH "content/"
 
 using namespace std;
+
+// A struct to hold an SDL_Texture pointer and an SDL_Rect
+struct SpriteRect {
+    // Fields
+    SDL_Texture *texture;
+    SDL_Rect rect;
+
+    // Constructor from sprite
+    SpriteRect(const Sprite &sprite) {
+        texture = sprite.texture;
+        rect.w = sprite.width;
+        rect.h = sprite.height;
+        rect.x = rect.w * sprite.col;
+        rect.y = rect.h * sprite.row;
+    }
+
+    // render itself
+    void render(SDL_Renderer *renderer, const SDL_Rect *rectTo) const {
+        SDL_RenderCopy(renderer, texture, &rect, rectTo);
+    }
+};
 
 // A class to open a window and display things to it
 class WindowHandler {
@@ -83,7 +105,7 @@ class WindowHandler {
     // variables from hotbar. The texture to is expected to have the correct 
     // width and height, and the vector is expected to have length 12.
     SDL_Texture *renderHotbarPart(const Hotbar &hotbar, 
-        vector<SDL_Texture*> textures) const;
+        vector<SpriteRect> textures) const;
 
     // Draw the entire hotbar sprite to a texture. This only needs to be called
     // when the hotbar is first made, or when anything about it changes.

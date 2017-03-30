@@ -2,6 +2,8 @@ Changes since last push:
  - Changed where the final value for the light at each block is calculated
  - Partially added support for platforms: you still can't go down through them,
 but colliding in all other directions works fine.
+ - Made the hotbar frames into a spritesheet
+ - Added a struct for referring to a rectangle of a spritesheet
 
 Known "features":
  - The strenth of gravity is independent of the world.
@@ -21,8 +23,6 @@ Soon to come (though likely not very soon):
  - actual support for platforms
  - a better way of storing texture / sprite information
 TODO:
- - make the hotbar frames into a spritesheet
- - Replace SDL_Texture* with void* in things that don't need to know about SDL?
  - Make the spaceInfo class just store a tiletype, not a Tile*, and use it as
 the index of the Tile*
 

@@ -85,15 +85,17 @@ void WindowHandler::renderStatBar(StatBar &bar) {
 // from hotbar. The texture to is expected to have the correct width and
 // height, and the vector is expected to have length 12. 
 SDL_Texture *WindowHandler::renderHotbarPart(const Hotbar &hotbar,
-        vector<SDL_Texture*> textures) const {
+        vector<SpriteRect> textures) const {
     assert(textures.size() == 12);
     // Create texture to draw to
-    Uint32 pixelFormat;
-    int width;
-    int height;
     // Get the width and height of the textures to render
     // This function assumes they are all the same
-    SDL_QueryTexture(textures.back(), &pixelFormat, NULL, &width, &height);
+    int width = hotbar.frame.width;
+    int height = hotbar.frame.height;
+    // Create a texture to find the pixel format of
+    Uint32 pixelFormat;
+    SDL_Texture *sampleTexture = textures.back().texture;
+    SDL_QueryTexture(sampleTexture, &pixelFormat, NULL, NULL, NULL);
     int totalWidth = 12 * width + 12 * hotbar.smallGap + 2 * hotbar.largeGap;
     SDL_Texture *to = SDL_CreateTexture(renderer, pixelFormat, 
         SDL_TEXTUREACCESS_TARGET, totalWidth, height);
@@ -111,17 +113,15 @@ SDL_Texture *WindowHandler::renderHotbarPart(const Hotbar &hotbar,
 
     // Actually render
     SDL_Rect rectTo;
-    rectTo.w = width;
-    rectTo.h = height;
-    rectTo.x = 0;
-    rectTo.y = 0;
+    rectTo.w = hotbar.frame.width;
+    rectTo.h = hotbar.frame.height;
     // For each slot
     for (int i = 0; i < 12; i++) {
         // We know the clickboxes have the correct spacing, but the first one 
         // probably isn't at 0, 0. So we just correct for that.
         rectTo.x = hotbar.clickBoxes[i].x - hotbar.clickBoxes[0].x;
         rectTo.y = hotbar.clickBoxes[i].y - hotbar.clickBoxes[0].y;
-        SDL_RenderCopy(renderer, textures[i], NULL, &rectTo);
+        textures[i].render(renderer, &rectTo);
     }
 
     return to;
@@ -147,17 +147,17 @@ void WindowHandler::updateHotbarSprite(Hotbar &hotbar) {
         SDL_TEXTUREACCESS_TARGET, width, height);
 
     // Fill a vector with frame images to render
-    vector<SDL_Texture*> frontSprites;
-    vector<SDL_Texture*> backSprites;
+    vector<SpriteRect> frontSprites;
+    vector<SpriteRect> backSprites;
     for (int i = 0; i < 12; i++) {
-        frontSprites.push_back(hotbar.frame.texture);
-        backSprites.push_back(hotbar.frame.texture);
+        frontSprites.push_back(SpriteRect(hotbar.frame));
+        backSprites.push_back(SpriteRect(hotbar.frame));
         // Use the other version if that key is selected
         if (hotbar.selected == i) {
-            frontSprites[i] = hotbar.frameSelected.texture;
+            frontSprites[i].rect.y += hotbar.frame.height;
         }
         else if (hotbar.selected == i + 12) {
-            backSprites[i] = hotbar.frameSelected.texture;
+            backSprites[i].rect.y += hotbar.frame.height;
         }
     }
     SDL_Texture *front = renderHotbarPart(hotbar, frontSprites);
@@ -442,11 +442,6 @@ bool WindowHandler::loadHotbar(Hotbar &hotbar) {
     string name = UI_PATH + hotbar.frame.name;
     success = loadTexture(name);
     hotbar.frame.texture = textures.back();
-
-    // Load the picture of a selected frame
-    name = UI_PATH + hotbar.frameSelected.name;
-    success = success && loadTexture(name);
-    hotbar.frameSelected.texture = textures.back();
 
     // Update the hotbar sprite
     updateHotbarSprite(hotbar);

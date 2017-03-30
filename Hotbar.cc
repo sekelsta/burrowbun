@@ -18,10 +18,13 @@ Hotbar::Hotbar(void) {
     yStart = 10;
 
     frame.name = "frame.png";
-    frameSelected.name = "frame_selected.png";
     // How big are the squares in the hotbar
     frame.width = 32;
     frame.height = 32;
+    frame.rows = 1;
+    frame.cols = 2;
+    frame.row = 0;
+    frame.col = 0;
 
     sprite.name = "";
     sprite.width = 12 * frame.width + 12 * smallGap + 2 * largeGap 
