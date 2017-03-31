@@ -46,7 +46,8 @@ void Entity::takeFallDamage() {
     // pixelsFallen will only be non-zero when we need to calculate fall damage
     if (pixelsFallen > maxFallDistance && maxFallDistance != -1) {
         int effectiveDistance = (pixelsFallen - maxFallDistance);
-        int damage = effectiveDistance * effectiveDistance/ 16 / 16;
+        int damage = effectiveDistance * effectiveDistance / 256 / 8;
+        damage += effectiveDistance / 8;
         takeDamage(damage, 0);
     }
 }

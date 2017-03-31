@@ -19,7 +19,7 @@ Player::Player() {
 
     // Set the maximum distance it can fall before taking damage (-1 for
     // infinity)
-    maxFallDistance = 200;
+    maxFallDistance = 300;
 
     // Set the sprite name
     // Todo: have a race

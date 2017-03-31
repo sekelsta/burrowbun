@@ -1,8 +1,7 @@
 Changes since last push:
- - Changed where the final value for the light at each block is calculated
- - Made the hotbar frames into a spritesheet
- - Added a struct for referring to a rectangle of a spritesheet
- - Added support for platforms
+ - Fixed stepping up. Resetting the velocity when colliding in the x direction
+broke it.
+ - Changed the formula for taking fall damage.
 
 Known "features":
  - The strenth of gravity is independent of the world.
