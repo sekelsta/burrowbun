@@ -15,6 +15,9 @@ struct KeySettings {
     // Which keys are for movement
     vector<SDL_Scancode> leftKeys, rightKeys, upKeys, downKeys, jumpKeys;
 
+    // Key to open the inventory and whatever opens along with it
+    vector<SDL_Scancode> inventoryKeys;
+
     // Key to toggle the hotbar
     vector<SDL_Scancode> toggleHotbarKeys;
 
@@ -35,10 +38,7 @@ class EventHandler {
 
     // To move by one pixel at a time, in the vertical direction 
     // This currently only exists for debugging
-    int move;
-
-    // Whether certain windows have been opened
-    bool inventory, quests;
+    int move; // TODO: remove
 
     // Helper functions
 
@@ -51,6 +51,10 @@ class EventHandler {
     // Change the bool values of a MouseBox vector so they know whether they 
     // were clicked
     void updateMouseBoxes(vector<MouseBox> &mouseBoxes, 
+        const SDL_Event &event);
+
+    // Update the mouseboxes of an inventory
+    void updateInventoryClickBoxes(Inventory &inventory, 
         const SDL_Event &event);
 
 public:

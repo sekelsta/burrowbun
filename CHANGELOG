@@ -1,7 +1,6 @@
 Changes since last push:
- - Fixed stepping up. Resetting the velocity when colliding in the x direction
-broke it.
- - Changed the formula for taking fall damage.
+ - Added an inventory. There aren't yet any items to put in it, but it does
+appear and disappear as it should when the key to access it is pressed.
 
 Known "features":
  - The strenth of gravity is independent of the world.
@@ -12,12 +11,12 @@ Known bugs:
  - Apparently the player can fit in gaps that they can't escape.
 
 Soon to come (though likely not very soon):
+ - Items
  - More types of tiles
  - Trees!
  - Better map generation
  - Instead of storing the health of every single tile on the map, I should just have a list of the ones that have been damaged.
  - hud
- - inventory
  - Make the spaceInfo class just store a tiletype, not a Tile*, and use it as
 the index of the Tile*
 

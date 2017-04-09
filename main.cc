@@ -16,6 +16,9 @@ using namespace std;
 const int SCREEN_FPS = 60;
 const int TICKS_PER_FRAME = 1000 / SCREEN_FPS;
 
+// Define the static class member
+Sprite Inventory::squareSprite;
+
 int main(int argc, char **argv) {
     // Do the stuff it would be doing without the images
     World world = World(WorldType::EARTH);

@@ -46,6 +46,24 @@ void WindowHandler::setRenderColorToLight(const Light &color) {
     SDL_SetRenderDrawColor(renderer, color.r, color.g, color.b, 0xFF);
 }
 
+// Render the texture to a 2d grid with width columns and height rows
+void WindowHandler::renderGrid(const SpriteRect &sprite, int width, int height) {
+    // Where to render to
+    SDL_Rect rectTo;
+    rectTo.x = 0;
+    rectTo.y = 0;
+    rectTo.w = sprite.rect.w;
+    rectTo.h = sprite.rect.h;
+    for (int i = 0; i < width; i++) {
+        for (int j = 0; j < height; j++) {
+            sprite.render(renderer, &rectTo);
+            rectTo.y += rectTo.h;
+        }
+        rectTo.x += rectTo.w;
+        rectTo.y = 0;
+    }
+}
+
 // Render a StatBar
 void WindowHandler::renderStatBar(StatBar &bar) {
     SDL_Rect rect;
@@ -205,6 +223,99 @@ void WindowHandler::updateHotbarSprite(Hotbar &hotbar) {
     hotbar.isSpriteUpdated = true;
 }
 
+// Render the inventory to the screen
+void WindowHandler::renderInventory(Inventory &inventory) {
+    if (!inventory.isSpriteUpdated) {
+        updateInventorySprite(inventory);
+    }
+    // Just in case, make sure the renderer is rendering to the screen
+    SDL_SetRenderTarget(renderer, NULL);
+
+    // The rectangle to draw to
+    SDL_Rect rectTo;
+    rectTo.w = inventory.sprite.width;
+    rectTo.h = inventory.sprite.height;
+    rectTo.x = inventory.x;
+    rectTo.y = inventory.y;
+
+    // And actually render
+    SDL_RenderCopy(renderer, inventory.sprite.texture, NULL, &rectTo);
+}
+
+
+/* Load the spritesheet used by all inventories. */
+bool WindowHandler::loadInventory() {
+    // Inventory::squareSprite is a static member
+    // Hard-code sprite info? not sure if this is the best way.
+    Inventory::squareSprite.texture = NULL;
+    Inventory::squareSprite.name = "inventory.png";
+    Inventory::squareSprite.width = 32;
+    Inventory::squareSprite.height = 32;
+    Inventory::squareSprite.rows = 1;
+    Inventory::squareSprite.cols = 2;
+
+    // And actually load it
+    bool success = loadTexture(UI_PATH + Inventory::squareSprite.name);
+    if (success) {
+        Inventory::squareSprite.texture = textures.back();
+    }
+    return success;
+}
+
+/* Draw the whole inventory onto a single sprite. */
+void WindowHandler::updateInventorySprite(Inventory &inventory) {
+    // Unload the current inventory sprite, if there is one
+    unloadTexture(inventory.sprite.texture);
+    inventory.sprite.texture = NULL;
+    // Create a texture to draw it on
+    Uint32 pixelFormat;
+    SDL_QueryTexture(Inventory::squareSprite.texture, &pixelFormat, 
+        NULL, NULL, NULL);
+    int width = Inventory::squareSprite.width * inventory.getWidth();
+    int height = Inventory::squareSprite.height * inventory.getHeight();
+    SDL_Texture *texture = SDL_CreateTexture(renderer, pixelFormat, 
+        SDL_TEXTUREACCESS_TARGET, width, height);
+    textures.push_back(texture);
+
+    // Store the size of the texture
+    inventory.sprite.width = width;
+    inventory.sprite.height = height;
+
+    // Tell the renderer to draw to the texture
+    SDL_SetRenderTarget(renderer, texture);
+    SDL_SetTextureBlendMode(texture, SDL_BLENDMODE_BLEND);
+
+    // Now loop through each square twice, once to draw the bacxkground and
+    // once to draw the frame.
+    // Draw the background
+    Light color = inventory.squareColor;
+    SDL_SetTextureColorMod(Inventory::squareSprite.texture, color.r, color.g, 
+        color.b);
+    // Set the rect in the correct part of the spritesheet
+    Inventory::squareSprite.row = 0;
+    Inventory::squareSprite.col = 0;
+    SpriteRect backgroundSquare = SpriteRect(Inventory::squareSprite);
+
+    // And actually render
+    renderGrid(backgroundSquare, inventory.getWidth(), inventory.getHeight());
+
+    // Now render the frames
+    // Set render draw color to white
+    SDL_SetTextureColorMod(Inventory::squareSprite.texture, 0xFF, 0xFF, 0xFF);
+    // Make a spriteRect for the frame
+    Inventory::squareSprite.row = 0;
+    Inventory::squareSprite.col = 1;
+    SpriteRect frame = SpriteRect(Inventory::squareSprite);
+
+    // Actually render
+    renderGrid(frame, inventory.getWidth(), inventory.getHeight());
+
+    // Done rendering stuff. Give the inventory it's new sprite.
+    inventory.sprite.texture = texture;
+    // And now the sprite is updated
+    inventory.isSpriteUpdated = true;
+}
+
 // Currently this just renders the hotbar
 void WindowHandler::renderUI(Player &player) {
     Hotbar hotbar = player.hotbar;
@@ -248,6 +359,21 @@ void WindowHandler::renderUI(Player &player) {
     renderStatBar(player.health);
     renderStatBar(player.hunger);
     renderStatBar(player.mana);
+
+    // Render the inventory, if necessary
+    if (player.isInventoryOpen) {
+        renderInventory(player.inventory);
+        renderInventory(player.trash);
+    }
+    // Otherwise make sure its sprite is cleaned up
+    else if (player.inventory.sprite.texture != NULL) {
+        unloadTexture(player.inventory.sprite.texture);
+        player.inventory.sprite.texture = NULL;
+        player.inventory.isSpriteUpdated = false;
+        unloadTexture(player.trash.sprite.texture);
+        player.trash.sprite.texture = NULL;
+        player.trash.isSpriteUpdated = false;
+    }
 }
 
 // Constructor
@@ -368,6 +494,9 @@ bool WindowHandler::loadMedia(vector<Tile *> &pointers,
     // movables[0] is the player and therefore has a hotbar
     success = success && loadHotbar(hotbar);
 
+    // Load inventory background sprite
+    success = success && loadInventory();
+
     return success;
 }
 
@@ -402,6 +531,26 @@ bool WindowHandler::loadTexture(const string &name) {
     }
 
 
+    return success;
+}
+
+// Unload a texture. After calling this, make sure to set all pointers to the
+// texture to NULL. Returns whether it succeeded at destroying the texture.
+bool WindowHandler::unloadTexture(SDL_Texture *texture) {
+    // Loop through textures until it is found
+    bool success = false;
+    for (unsigned int i = 0; i < textures.size(); i++) {
+        if (textures[i] == texture) {
+            // Free the texture if we havn't already and if it isn't null
+            if (!success && !texture) {
+                SDL_DestroyTexture(texture);
+                success = true;
+            }
+            // And now we definately have destroyed the texture, so set this
+            // pointer to null
+            textures[i] = NULL;
+        }
+    }
     return success;
 }
 

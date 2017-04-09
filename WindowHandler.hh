@@ -18,6 +18,7 @@ the only thing screen coordinates are used for. */
 #include "Player.hh"
 #include "UIHelpers.hh"
 #include "Sprite.hh"
+#include "Inventory.hh"
 
 // The path to image files
 #define TILE_PATH "content/"
@@ -84,7 +85,7 @@ class WindowHandler {
     vector<vector<SDL_Rect>> tileRects;
 
     // Store the texture to draw over the player's stat bars
-    Sprite statBarOverlay;
+    Sprite statBarOverlay; // TODO: make this a static member of StatBar
 
     // Private methods
 
@@ -98,6 +99,10 @@ class WindowHandler {
     // Set render draw color to light color
     void setRenderColorToLight(const Light &color);
 
+    // Render the texture from the SpriteRect to a 2d grid with width columns
+    // and height rows
+    void renderGrid(const SpriteRect &sprite, int width, int height);
+
     // Render a StatBar
     void renderStatBar(StatBar &bar);
 
@@ -110,6 +115,15 @@ class WindowHandler {
     // Draw the entire hotbar sprite to a texture. This only needs to be called
     // when the hotbar is first made, or when anything about it changes.
     void updateHotbarSprite(Hotbar &hotbar);
+
+    // Render the inventory to the screen
+    void renderInventory(Inventory &inventory);
+
+    // Load the images used by all inventories
+    bool loadInventory(); //TODO
+
+    /* Draw the whole inventory onto a single sprite. */
+    void updateInventorySprite(Inventory &inventory);
 
     // Render everything UI
     void renderUI(Player &player);
@@ -132,6 +146,10 @@ public:
 
     // Load a texture, return true on success
     bool loadTexture(const string &name);
+
+    // Unload a texture. After calling this function, make sure to set all
+    // pointers to the texture to NULL.
+    bool unloadTexture(SDL_Texture *texture);
 
     // Load a texture for each tile
     bool loadTiles(vector<Tile *> &pointers);

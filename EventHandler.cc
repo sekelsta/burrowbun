@@ -63,6 +63,15 @@ void EventHandler::updateMouseBoxes(vector<MouseBox> &mouseBoxes,
 
 }
 
+// Update the mouseboxes in an inventory
+void EventHandler::updateInventoryClickBoxes(Inventory &inventory, 
+        const SDL_Event &event) {
+    for (int i = 0; i < inventory.getHeight(); i++) {
+        updateMouseBoxes(inventory.clickBoxes[i], event);
+    }
+}
+
+
 // Public methods
 
 // Constructor
@@ -90,6 +99,9 @@ EventHandler::EventHandler() {
     keySettings.downKeys.push_back(SDL_SCANCODE_S);
     keySettings.jumpKeys.push_back(SDL_SCANCODE_SPACE);
     keySettings.jumpKeys.push_back(SDL_SCANCODE_KP_SPACE);
+    // Keys to open the inventory and whatever else opens along with it
+    keySettings.inventoryKeys.push_back(SDL_SCANCODE_I);
+    keySettings.inventoryKeys.push_back(SDL_SCANCODE_C);
     // For the hotbar
     keySettings.toggleHotbarKeys.push_back(SDL_SCANCODE_X);
     // And each of 24 keys to select a hotbar slot
@@ -159,9 +171,11 @@ void EventHandler::windowEvent(const SDL_Event &event, bool &isFocused,
 
 // Do whatever should be done when a mouse event happens
 void EventHandler::mouseEvent(const SDL_Event &event, Player &player) {
-    // Tell the hotbar whether it was clicked
+    // Tell the hotbar and inventories whether they were clicked
     if (event.type != SDL_MOUSEWHEEL) {
         updateMouseBoxes(player.hotbar.clickBoxes, event);
+        updateInventoryClickBoxes(player.inventory, event);
+        updateInventoryClickBoxes(player.trash, event);
     }
 }
 
@@ -172,6 +186,9 @@ void EventHandler::keyEvent(const SDL_Event &event, Player &player) {
     // Here we should handle keys which don't need to be held down to work.
     if (event.type == SDL_KEYUP) {
         // Pass
+    }
+    else if (isIn(key, keySettings.inventoryKeys)) {
+        player.toggleInventory();
     }
     else if (isIn(key, keySettings.toggleHotbarKeys)) {
         player.hotbar.toggle();

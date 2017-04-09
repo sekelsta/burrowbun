@@ -5,6 +5,7 @@
 #include <SDL2/SDL.h>
 #include "Entity.hh"
 #include "Hotbar.hh"
+#include "Inventory.hh"
 #include "UIHelpers.hh"
 
 using namespace std;
@@ -18,10 +19,17 @@ using namespace std;
 class Player : public Entity {
 
 public:
+    bool isInventoryOpen;
+    Inventory inventory;
+    Inventory trash;
+
     Hotbar hotbar;
 
     // Constructor
     Player();
+
+    // Switch the open / closed state of the inventory.
+    void toggleInventory();
 };
 
 #endif

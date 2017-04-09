@@ -74,6 +74,12 @@ private:
     }
 
 public:
+    // Constructor
+    StatBar() {
+        fullStat = 0;
+        partStat = 0;
+    }
+
     // Set the amount of the stat
     void setFull(int newValue) {
         // Can't set it below 0 or above the max
