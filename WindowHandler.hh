@@ -21,9 +21,10 @@ the only thing screen coordinates are used for. */
 #include "Inventory.hh"
 
 // The path to image files
-#define TILE_PATH "content/"
+#define TILE_PATH "content/Blocks/"
 #define MOVABLE_PATH "content/"
 #define UI_PATH "content/"
+#define ICON_PATH "content/Icons/"
 
 using namespace std;
 

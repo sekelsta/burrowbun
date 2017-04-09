@@ -252,6 +252,8 @@ void EventHandler::updateKeys(const Uint8 *state) {
 void EventHandler::updatePlayer(Player &player) {
     // Update the player's hotbar
     player.hotbar.update();
+    player.inventory.update();
+    player.trash.update();
 
     // and update the player's accelleration
     Point newAccel;
@@ -282,7 +284,6 @@ void EventHandler::updatePlayer(Player &player) {
     }
     if (down) {
         player.collidePlatforms = false;
-        // newAccel.y -= player.getDAccel().y;
     }
     else {
         player.collidePlatforms = true;

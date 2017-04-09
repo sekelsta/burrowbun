@@ -62,9 +62,25 @@ void Inventory::updateClickBoxes() {
             clickBoxes[row][col].h = Inventory::squareSprite.height;
             clickBoxes[row][col].x = newX;
             clickBoxes[row][col].y = newY;
+            // Also initialize the click info
+            clickBoxes[row][col].wasClicked = false;
+            clickBoxes[row][col].containsMouse = false;
+ 
             newX += Inventory::squareSprite.width;
         }
         newX = x;
         newY += Inventory::squareSprite.height;
+    }
+}
+
+// Use mouse input
+void Inventory::update() {
+    for (int row = 0; row < getHeight(); row++) {
+        for (int col = 0; col < getWidth(); col++) {
+            if (clickBoxes[row][col].wasClicked) {
+                // TODO: put item
+                clickBoxes[row][col].wasClicked = false;
+            }
+        }
     }
 }

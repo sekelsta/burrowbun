@@ -5,10 +5,9 @@
 #include "Sprite.hh"
 #include "UIHelpers.hh"
 #include "Light.hh"
+#include "Item.hh"
 
 using namespace std;
-
-class Item;
 
 /* An inventory is basically just a thing that holds items. */
 class Inventory {
@@ -46,6 +45,9 @@ public:
 
     // Call this after changing x or y, puts clickboxes in the right place
     void updateClickBoxes();
+
+    // Use mouse input
+    void update();
 };
 
 #endif
