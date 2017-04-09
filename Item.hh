@@ -5,7 +5,7 @@
 
 /* Class to enumerate the different types of items. */
 enum class ItemType {
-    NONE,
+    // NONE is just a pointer to NULL instead of an actual object
     MAPLE_LEAF,
     DIRT,
     TORCH,

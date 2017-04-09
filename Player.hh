@@ -7,6 +7,7 @@
 #include "Hotbar.hh"
 #include "Inventory.hh"
 #include "UIHelpers.hh"
+#include "Action.hh"
 
 using namespace std;
 
@@ -22,6 +23,9 @@ public:
     bool isInventoryOpen;
     Inventory inventory;
     Inventory trash;
+
+    // So the mouse can move around items and put them in the hotbar
+    Action *mouseSlot;
 
     Hotbar hotbar;
 

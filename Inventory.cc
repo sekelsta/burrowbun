@@ -10,8 +10,12 @@ Inventory::Inventory(int cols, int rows) {
     items.resize(rows);
     clickBoxes.resize(rows);
     for (int i = 0; i < rows; i++) {
-        items[i].resize(cols);
         clickBoxes[i].resize(cols);
+        items[i].resize(cols);
+        // Set every item* to NULL
+        for (int j = 0; j < cols; j++) {
+            items[i][j] = NULL;
+        }
     }
 
     // Set all texture pointers to null
