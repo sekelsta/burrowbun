@@ -4,6 +4,7 @@
 #include <vector>
 #include "Sprite.hh"
 #include "UIHelpers.hh"
+#include "Action.hh"
 
 using namespace std;
 
@@ -40,6 +41,9 @@ public:
 
     // Whether the back hotbar was brought to the front
     bool isSwitched;
+
+    // What actions are held in the hotbar slots
+    vector<Action *> actions;
 
     // For telling whether any of the buttons were clicked
     vector<MouseBox> clickBoxes;

@@ -56,6 +56,11 @@ Hotbar::Hotbar(void) {
         x += largeGap;
     }
 
+    // Set every action * to NULL
+    actions.resize(24);
+    for (unsigned int i = 0; i < actions.size(); i++) {
+        actions[i] = NULL;
+    }
 
 }
 

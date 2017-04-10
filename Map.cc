@@ -171,7 +171,12 @@ Map::Map(string filename) {
             if (getForeground(i, j) -> type != TileType::EMPTY) {
                 chooseSprite(i, j);
             }
-            setLight(i, j);
+            // TODO: revert changes
+            findPointer(i, j) -> light.r = 0;
+            findPointer(i, j) -> light.g = 0;
+            findPointer(i, j) -> light.b = 0;
+            findPointer(i, j) -> light.skyIntensity = 255;
+            //setLight(i, j);
         }
     }
 }
