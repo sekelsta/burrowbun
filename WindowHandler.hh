@@ -19,6 +19,7 @@ the only thing screen coordinates are used for. */
 #include "UIHelpers.hh"
 #include "Sprite.hh"
 #include "Inventory.hh"
+#include "Action.hh"
 
 // The path to image files
 #define TILE_PATH "content/Blocks/"
@@ -43,9 +44,20 @@ struct SpriteRect {
         rect.y = rect.h * sprite.row;
     }
 
+    // Constructor from no arguements
+    SpriteRect() {
+        texture = NULL;
+        rect.x = 0;
+        rect.y = 0;
+        rect.w = 0;
+        rect.h = 0;
+    }
+
     // render itself
     void render(SDL_Renderer *renderer, const SDL_Rect *rectTo) const {
-        SDL_RenderCopy(renderer, texture, &rect, rectTo);
+        if (texture != NULL) {
+            SDL_RenderCopy(renderer, texture, &rect, rectTo);
+        }
     }
 };
 
@@ -111,7 +123,7 @@ class WindowHandler {
     // variables from hotbar. The texture to is expected to have the correct 
     // width and height, and the vector is expected to have length 12.
     SDL_Texture *renderHotbarPart(const Hotbar &hotbar, 
-        vector<SpriteRect> textures) const;
+        vector<SpriteRect> textures, SDL_Texture *texture) const;
 
     // Draw the entire hotbar sprite to a texture. This only needs to be called
     // when the hotbar is first made, or when anything about it changes.
@@ -160,6 +172,9 @@ public:
 
     // Load textures for the hotbar
     bool loadHotbar(Hotbar &hotbar);
+
+    // Load an item or skill sprite
+    bool loadAction(Action &action);
 
     // Render everything the map holds information about
     // x and y are the coordinates of the center of the camera, in pixels,

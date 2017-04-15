@@ -1,6 +1,5 @@
 Changes since last push:
- - Added an inventory. There aren't yet any items to put in it, but it does
-appear and disappear as it should when the key to access it is pressed.
+ - Hotbar now renders the actions it has
 
 Known "features":
  - The strenth of gravity is independent of the world.
@@ -19,4 +18,5 @@ Soon to come (though likely not very soon):
  - hud
  - Make the spaceInfo class just store a tiletype, not a Tile*, and use it as
 the index of the Tile*
-
+ - Store data in a file instead of in the source code (eg the size of sprites
+and the properties of the different types of tiles)

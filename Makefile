@@ -47,7 +47,7 @@ Collider.o : Collider.cc Collider.hh Tile.hh Map.hh Movable.hh Point.hh \
 World.o : World.cc World.hh Tile.hh MapHelpers.hh Sprite.hh
 	$(CC) $(CXXFLAGS) $^ -c $(LDFLAGS) $(NOISE_FLAGS)
 
-Hotbar.o : Hotbar.cc Hotbar.hh Sprite.hh UIHelpers.hh
+Hotbar.o : Hotbar.cc Hotbar.hh Sprite.hh UIHelpers.hh Action.hh Item.hh
 	$(CC) $(CXXFLAGS) $^ -c $(LDFLAGS)
 
 Entity.o : Entity.cc Entity.hh Movable.hh

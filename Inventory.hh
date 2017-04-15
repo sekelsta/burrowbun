@@ -40,8 +40,8 @@ public:
     // Access functions
     int getWidth() const;
     int getHeight() const;
-    Item *getItem(int, int) const;
-    void setItem(Item *, int, int);
+    Item *getItem(int row, int col) const;
+    void setItem(Item *, int row, int col);
 
     // Call this after changing x or y, puts clickboxes in the right place
     void updateClickBoxes();

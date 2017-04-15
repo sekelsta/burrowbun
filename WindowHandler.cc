@@ -103,28 +103,29 @@ void WindowHandler::renderStatBar(StatBar &bar) {
 // from hotbar. The texture to is expected to have the correct width and
 // height, and the vector is expected to have length 12. 
 SDL_Texture *WindowHandler::renderHotbarPart(const Hotbar &hotbar,
-        vector<SpriteRect> textures) const {
+        vector<SpriteRect> textures, SDL_Texture *texture) const {
     assert(textures.size() == 12);
+    // Make a texture if necessary
+    if (texture == NULL) {
     // Create texture to draw to
     // Get the width and height of the textures to render
     // This function assumes they are all the same
     int width = hotbar.frame.width;
     int height = hotbar.frame.height;
-    // Create a texture to find the pixel format of
-    Uint32 pixelFormat;
-    SDL_Texture *sampleTexture = textures.back().texture;
-    SDL_QueryTexture(sampleTexture, &pixelFormat, NULL, NULL, NULL);
     int totalWidth = 12 * width + 12 * hotbar.smallGap + 2 * hotbar.largeGap;
-    SDL_Texture *to = SDL_CreateTexture(renderer, pixelFormat, 
+    Uint32 pixelFormat = SDL_PIXELFORMAT_ARGB8888;
+    texture = SDL_CreateTexture(renderer, pixelFormat, 
         SDL_TEXTUREACCESS_TARGET, totalWidth, height);
-
-    // Set render settings
-    SDL_SetRenderTarget(renderer, to);
-    SDL_SetTextureBlendMode(to, SDL_BLENDMODE_BLEND);
-    // Set draw color to transparent so the texture has a transparent 
-    // background
+    // Make the new texture have a transparent background
+    SDL_SetRenderTarget(renderer, texture);
+    SDL_SetTextureBlendMode(texture, SDL_BLENDMODE_BLEND);
     SDL_SetRenderDrawColor(renderer, 0, 0, 0 ,0);
     SDL_RenderClear(renderer);
+    }
+
+    // Set render settings
+    SDL_SetRenderTarget(renderer, texture);
+    SDL_SetTextureBlendMode(texture, SDL_BLENDMODE_BLEND);
 
     // Set the draw color to white so it draws whatever it's drawing normally
     SDL_SetRenderDrawColor(renderer, 0xFF, 0xFF, 0xFF, 0xFF);
@@ -142,16 +143,12 @@ SDL_Texture *WindowHandler::renderHotbarPart(const Hotbar &hotbar,
         textures[i].render(renderer, &rectTo);
     }
 
-    return to;
+    return texture;
 }
 
 // Draw the entire hotbar sprite to a texture. This only needs to be called 
 // when the hotbar is first made, or when anything about it changes.
 void WindowHandler::updateHotbarSprite(Hotbar &hotbar) {
-    // Make a texture and render the hotbar to it.
-    // Use the same pixel format as the frame did.
-    Uint32 pixelFormat;
-    SDL_QueryTexture(textures.back(), &pixelFormat, NULL, NULL, NULL);
     // Make the texture to render the sprite of the hotbar to
     // Hardcoding 12 because I don't expect to change my mind (12 is the
     // number of F keys).
@@ -160,26 +157,53 @@ void WindowHandler::updateHotbarSprite(Hotbar &hotbar) {
     int height = hotbar.frame.height + hotbar.offsetDown;
     hotbar.sprite.width = width;
     hotbar.sprite.height = height;
-    // Create a texture to render the entire hotbar to
+    Uint32 pixelFormat = SDL_PIXELFORMAT_ARGB8888;
+    // Actually create the texture
     SDL_Texture *all = SDL_CreateTexture(renderer, pixelFormat,
         SDL_TEXTUREACCESS_TARGET, width, height);
 
     // Fill a vector with frame images to render
+    // The frame to put around each sprite
+    vector<SpriteRect> frontFrames;
+    vector<SpriteRect> backFrames;
+    // The image of the item in the slot
     vector<SpriteRect> frontSprites;
     vector<SpriteRect> backSprites;
     for (int i = 0; i < 12; i++) {
-        frontSprites.push_back(SpriteRect(hotbar.frame));
-        backSprites.push_back(SpriteRect(hotbar.frame));
+        frontFrames.push_back(SpriteRect(hotbar.frame));
+        backFrames.push_back(SpriteRect(hotbar.frame));
         // Use the other version if that key is selected
         if (hotbar.selected == i) {
-            frontSprites[i].rect.y += hotbar.frame.height;
+            frontFrames[i].rect.y += hotbar.frame.height;
         }
         else if (hotbar.selected == i + 12) {
-            backSprites[i].rect.y += hotbar.frame.height;
+            backFrames[i].rect.y += hotbar.frame.height;
+        }
+
+        // Add the Action sprites to their lists of textures, if there is one 
+        // in that slot.
+        if (hotbar.actions[i] != NULL) {
+            // Add a sprite to the front row
+            // Load the sprite if it doesn't have one
+            loadAction(*hotbar.actions[i]);
+            frontSprites.push_back(SpriteRect(hotbar.actions[i] -> sprite));
+        }
+        else {
+            frontSprites.push_back(SpriteRect());
+        }
+        if (hotbar.actions[i + 12] != NULL) {
+            // Load the sprite if necessary
+            loadAction(*hotbar.actions[i]);
+            backSprites.push_back(SpriteRect(hotbar.actions[i + 12] -> sprite));
+        }
+        else {
+            backSprites.push_back(SpriteRect());
         }
     }
-    SDL_Texture *front = renderHotbarPart(hotbar, frontSprites);
-    SDL_Texture *back = renderHotbarPart(hotbar, backSprites);
+    SDL_Texture *front = renderHotbarPart(hotbar, frontSprites, NULL);
+    front = renderHotbarPart(hotbar, frontFrames, front);
+    SDL_Texture *back = renderHotbarPart(hotbar, backSprites, NULL);
+    back = renderHotbarPart(hotbar, backFrames, back);
 
     if (hotbar.isSwitched) {
         SDL_Texture *temp = front;
@@ -188,7 +212,7 @@ void WindowHandler::updateHotbarSprite(Hotbar &hotbar) {
     }
 
     SDL_SetRenderTarget(renderer, all);
-    // Tell SDL to do trnsparency when it renders
+    // Tell SDL to do transparency when it renders
     SDL_SetTextureBlendMode(all, SDL_BLENDMODE_BLEND);
     // Set draw color to transparent so the texture has a transparent 
     // background
@@ -297,11 +321,35 @@ void WindowHandler::updateInventorySprite(Inventory &inventory) {
     SpriteRect backgroundSquare = SpriteRect(Inventory::squareSprite);
 
     // And actually render
+    // Render the background
     renderGrid(backgroundSquare, inventory.getWidth(), inventory.getHeight());
 
-    // Now render the frames
     // Set render draw color to white
     SDL_SetTextureColorMod(Inventory::squareSprite.texture, 0xFF, 0xFF, 0xFF);
+
+    // Render the items
+    // Create a rectangle to draw them to
+    SDL_Rect rectTo;
+    rectTo.x = 0;
+    rectTo.y = 0;
+    rectTo.w = Inventory::squareSprite.width;
+    rectTo.h = Inventory::squareSprite.height;
+    // Loop through and render each item
+    for (int row = 0; row < inventory.getHeight(); row++) {
+        for (int col = 0; col < inventory.getWidth(); col++) {
+            // Create a spriterect from the item and render it, if the item
+            // exists
+            Item *item = inventory.getItem(row, col);
+            if (item != NULL) {
+                SpriteRect(item -> sprite).render(renderer, &rectTo);
+            }
+            rectTo.x += rectTo.w;
+        }
+        rectTo.x = 0;
+        rectTo.y += rectTo.h;
+    }
+
+    // Now render the frames
     // Make a spriteRect for the frame
     Inventory::squareSprite.row = 0;
     Inventory::squareSprite.col = 1;
@@ -595,6 +643,20 @@ bool WindowHandler::loadHotbar(Hotbar &hotbar) {
     // Update the hotbar sprite
     updateHotbarSprite(hotbar);
 
+    return success;
+}
+
+// Load an item sprite
+// Assumes the item has no sprite to start with
+bool WindowHandler::loadAction(Action &action) {
+    // Ignore if there's already a sprite loaded
+    if (action.sprite.texture != NULL) {
+        return false;
+    }
+    bool success = loadTexture(ICON_PATH + action.sprite.name);
+    if (success) {
+        action.sprite.texture = textures.back();
+    }
     return success;
 }
 

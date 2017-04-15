@@ -10,6 +10,12 @@ Item::Item(ItemType itemType) {
     switch(type) {
         case ItemType::MAPLE_LEAF :
             sprite.name = "maple_leaf.png";
+            sprite.width = 32;
+            sprite.height = 32;
+            sprite.rows = 1;
+            sprite.cols = 1;
+            sprite.row = 0;
+            sprite.col = 0;
             break;
     }
 }
