@@ -251,7 +251,7 @@ void EventHandler::updateKeys(const Uint8 *state) {
 // Change the player's acceleration
 void EventHandler::updatePlayer(Player &player) {
     // Update the player's hotbar
-    player.hotbar.update();
+    player.hotbar.update(player.mouseSlot);
     player.inventory.update();
     player.trash.update();
 

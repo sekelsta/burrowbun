@@ -61,6 +61,9 @@ Player::Player() : inventory(10, 6), trash(1, 1) {
     inventory.updateClickBoxes();
     trash.updateClickBoxes();
 
+    // Start with nothing in the mouse slot
+    mouseSlot = NULL;
+
     isInventoryOpen = false;
 }
 

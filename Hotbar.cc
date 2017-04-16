@@ -77,14 +77,24 @@ void Hotbar::select(int slot) {
 }
 
 // Use mouse input
-void Hotbar::update() {
+void Hotbar::update(Action *mouse) {
     for (unsigned int i = 0; i < clickBoxes.size(); i++) {
-        if (clickBoxes[i].wasClicked) {
-            // Ignore the difference between buttondown and buttonup for now
+        // Ignore mouse button up
+        if (clickBoxes[i].wasClicked 
+                && clickBoxes[i].event.type == SDL_MOUSEBUTTONDOWN ) {
             // Add 12 to i if isSwitched
-            select(i + 12 * (int)isSwitched);
+            int adjusted = i + 12 * (int)isSwitched;
+            select(adjusted);
+            // See if we should put something in the slot
+            if (clickBoxes[i].event.button == SDL_BUTTON_LEFT
+                    && mouse != NULL) {
+                actions[adjusted] = mouse;
+            }
+
             // Now we've use the click for this update
             clickBoxes[i].wasClicked = false;
+            // And something chenged so make sure we update the sprite
+            isSpriteUpdated = false;
         }
     }
 }

@@ -1,5 +1,7 @@
 Changes since last push:
- - Hotbar now renders the actions it has
+ - It's now possible to hold an item with the mouse (though not yet to put it
+in the inventory)
+ - It's now possible to put items in the hotbar
 
 Known "features":
  - The strenth of gravity is independent of the world.

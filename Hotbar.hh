@@ -58,7 +58,7 @@ public:
     void select(int slot);
 
     // Use mouse input
-    void update();
+    void update(Action *mouse);
 };
 
 #endif

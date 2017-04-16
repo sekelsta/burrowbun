@@ -193,7 +193,7 @@ void WindowHandler::updateHotbarSprite(Hotbar &hotbar) {
         }
         if (hotbar.actions[i + 12] != NULL) {
             // Load the sprite if necessary
-            loadAction(*hotbar.actions[i]);
+            loadAction(*hotbar.actions[i + 12]);
             backSprites.push_back(SpriteRect(hotbar.actions[i + 12] -> sprite));
         }
         else {
@@ -341,6 +341,9 @@ void WindowHandler::updateInventorySprite(Inventory &inventory) {
             // exists
             Item *item = inventory.getItem(row, col);
             if (item != NULL) {
+                // Laod the sprite if necessary
+                // Remermber, loadAction does nothing if it already has a sprite
+                loadAction(*item);
                 SpriteRect(item -> sprite).render(renderer, &rectTo);
             }
             rectTo.x += rectTo.w;
@@ -421,6 +424,28 @@ void WindowHandler::renderUI(Player &player) {
         unloadTexture(player.trash.sprite.texture);
         player.trash.sprite.texture = NULL;
         player.trash.isSpriteUpdated = false;
+    }
+
+    // Render the item held by the mouse, if any
+    if (player.mouseSlot != NULL) {
+        // Load the action sprite if it issn't already
+        loadAction(*player.mouseSlot);
+        // Find the mouse
+        int x;
+        int y;
+        SDL_GetMouseState(&x, &y);
+        // Make a rect to render to
+        SDL_Rect rect;
+        rect.w = player.mouseSlot -> sprite.width;
+        rect.h = player.mouseSlot -> sprite.height;
+        // Put it on the center of the mouse
+        rect.x = x - (rect.w / 2);
+        rect.y = y - (rect.h / 2);
+        // Render
+        SpriteRect spriteRect(player.mouseSlot -> sprite);
+        spriteRect.render(renderer, &rect);
+
+        
     }
 }
 
