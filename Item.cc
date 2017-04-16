@@ -5,6 +5,8 @@ Item::Item(ItemType itemType) {
     type = itemType;
     sprite.name = "";
     maxStack = 1; // TODO
+    // It's definately an item
+    isItem = true;
 
     // Do stuff specific to the item type
     switch(type) {
@@ -20,5 +22,8 @@ Item::Item(ItemType itemType) {
     }
 }
 
-
+// Access functions
+ItemType Item::getType() {
+    return type;
+}
 

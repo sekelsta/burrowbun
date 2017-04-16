@@ -12,6 +12,9 @@ public:
     // What sprite should be displayed in the hotbar
     Sprite sprite;
 
+    // Whether it's an item
+    bool isItem;
+
     // Constructor
     Action();
 

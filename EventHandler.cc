@@ -250,10 +250,20 @@ void EventHandler::updateKeys(const Uint8 *state) {
 
 // Change the player's acceleration
 void EventHandler::updatePlayer(Player &player) {
-    // Update the player's hotbar
-    player.hotbar.update(player.mouseSlot);
+    // Update the player's inventories
     player.inventory.update();
     player.trash.update();
+    // Update the player's hotbar
+    // Put the item in the inventory if we should
+    if (player.hotbar.update(player.mouseSlot) && player.mouseSlot != NULL) {
+        // If we can successfully put the item in the inventory, have the mouse
+        // stop holding it.
+        assert(player.mouseSlot -> isItem);
+        Item *mouseItem = (Item *)player.mouseSlot;
+        if (player.inventory.pickup(mouseItem)) {
+            player.mouseSlot = NULL;
+        }
+    }
 
     // and update the player's accelleration
     Point newAccel;

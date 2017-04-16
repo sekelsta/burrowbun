@@ -1,7 +1,6 @@
 Changes since last push:
- - It's now possible to hold an item with the mouse (though not yet to put it
-in the inventory)
- - It's now possible to put items in the hotbar
+ - Now putting an item in the hotbar removes it from the mouseSlot and puts it
+in the inventory
 
 Known "features":
  - The strenth of gravity is independent of the world.

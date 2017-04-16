@@ -41,7 +41,14 @@ public:
     int getWidth() const;
     int getHeight() const;
     Item *getItem(int row, int col) const;
-    void setItem(Item *, int row, int col);
+    void setItem(Item *item, int row, int col);
+
+    // Put the item in the slot, if possible. If not possible, return false.
+    bool add(Item *item, int row, int col);
+
+    // Take an item and put it in the first empty slot of the inventory. Return
+    // false if there isn't room for it.
+    bool pickup(Item *item);
 
     // Call this after changing x or y, puts clickboxes in the right place
     void updateClickBoxes();

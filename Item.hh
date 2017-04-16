@@ -23,6 +23,9 @@ class Item : public Action {
 public:
     // Constructor
     Item(ItemType itemType);
+
+    // Access functions
+    ItemType getType();
 };
 
 #endif

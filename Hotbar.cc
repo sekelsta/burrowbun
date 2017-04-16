@@ -76,8 +76,10 @@ void Hotbar::select(int slot) {
     isSpriteUpdated = false;
 }
 
-// Use mouse input
-void Hotbar::update(Action *mouse) {
+// Use mouse input, return true if the item the mouse was holding should
+// be put in the inventory
+bool Hotbar::update(Action *mouse) {
+    bool answer = false;
     for (unsigned int i = 0; i < clickBoxes.size(); i++) {
         // Ignore mouse button up
         if (clickBoxes[i].wasClicked 
@@ -89,6 +91,10 @@ void Hotbar::update(Action *mouse) {
             if (clickBoxes[i].event.button == SDL_BUTTON_LEFT
                     && mouse != NULL) {
                 actions[adjusted] = mouse;
+                // If it's an item, put it back in the inventory
+                if (mouse -> isItem) {
+                    answer = true;
+                }
             }
 
             // Now we've use the click for this update
@@ -97,5 +103,6 @@ void Hotbar::update(Action *mouse) {
             isSpriteUpdated = false;
         }
     }
+    return answer;
 }
 

@@ -57,8 +57,8 @@ public:
     // Select a slot
     void select(int slot);
 
-    // Use mouse input
-    void update(Action *mouse);
+    // Use mouse input, return true if the item should be put in the inventory
+    bool update(Action *mouse);
 };
 
 #endif
