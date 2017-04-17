@@ -288,6 +288,9 @@ bool WindowHandler::loadInventory() {
 
 /* Draw the whole inventory onto a single sprite. */
 void WindowHandler::updateInventorySprite(Inventory &inventory) {
+    // Here seems like as good a place as any to tell the inventory to figure
+    // out where it cares about being clicked
+    inventory.updateClickBoxes();
     // Unload the current inventory sprite, if there is one
     unloadTexture(inventory.sprite.texture);
     inventory.sprite.texture = NULL;

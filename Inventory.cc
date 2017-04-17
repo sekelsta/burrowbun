@@ -57,41 +57,50 @@ void Inventory::setItem(Item *item, int row, int col) {
     isSpriteUpdated = false;
 }
 
-// Add the item to the slot, if possible. If not possible, return false.
-bool Inventory::add(Item *item, int row, int col) {
+// Add the item to the slot, if possible. Return whatever was not able to be
+// added (NULL if that slot could hold everything being added).
+Item *Inventory::add(Item *item, int row, int col) {
     // If there's nothing in the slot, we can definately add it.
     if (items[row][col] == NULL) {
         setItem(item, row, col);
-        return true;
+        isSpriteUpdated = false;
+        return NULL;
+    }
+
+    // If we're not adding an item, it's successful.
+    if (item == NULL) {
+        return NULL;
     }
 
     // If they're different types of items, then they definately don't stack
     if (items[row][col] -> getType() != item -> getType()) {
-        return false;
+        return item;
     }
 
     // TODO: stack items if possible
-    return false;
+    return item;
     
 }
 
 // Take an item and put it in the first empty slot of the inventory. Return 
-// false if it doesn't fit.
-bool Inventory::pickup(Item *item) {
+// the item if it doesn't fit or NULL if it does.
+Item *Inventory::pickup(Item *item) {
     // TODO: attempt to stack items whenever possible
     // Loop through the inventory looking for a space
     for (int row = 0; row < getHeight(); row++) {
         for (int col = 0; col < getWidth(); col++) {
-            // Return true if we can successfully add it to this spot
-            if (add(item, row, col)) {
-                return true;
+            // Return NULL if we can successfully add it to this spot
+            item = add(item, row, col);
+            // If item is NULL now, then we're done.
+            if (item == NULL) {
+                return NULL;
             }
         }
     }
 
     // If we've looped through the whole inventory and not sucessfully added 
     // it, then we can't.
-    return false;
+    return item;
 }
 
 // Call this after changing x, y, width, or height
@@ -117,12 +126,34 @@ void Inventory::updateClickBoxes() {
 }
 
 // Use mouse input
-void Inventory::update() {
+void Inventory::update(Action *&mouse) {
     for (int row = 0; row < getHeight(); row++) {
         for (int col = 0; col < getWidth(); col++) {
-            if (clickBoxes[row][col].wasClicked) {
-                // TODO: put item
+            // Ignore buttonup
+            if (clickBoxes[row][col].wasClicked 
+                    && clickBoxes[row][col].event.type == SDL_MOUSEBUTTONDOWN) {
+                // Now we've used the input for this clickBox
                 clickBoxes[row][col].wasClicked = false;
+                // If the mouse is holding something but it's not an item,
+                // ignore it
+                if (mouse != NULL && !(mouse -> isItem)) {
+                    // Abort
+                    break;
+                }
+                // Now we don't have to worry that the mouse might be holding
+                // something that isn't an item
+                // TODO: quit assuming it was a left click
+                // Switch the items
+                isSpriteUpdated = false;
+                Item *item = (Item *)mouse;
+                mouse = items[row][col];
+                items[row][col] = item;
+                // Add the item being held to the stack, if possible and if 
+                // there's an item in the slot. If there isn't an item in the
+                // slot, we can assume the player was trying to pick up an item.
+                if (items[row][col] != NULL) {
+                    mouse = add((Item *)mouse, row, col);
+                }
             }
         }
     }

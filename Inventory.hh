@@ -44,17 +44,17 @@ public:
     void setItem(Item *item, int row, int col);
 
     // Put the item in the slot, if possible. If not possible, return false.
-    bool add(Item *item, int row, int col);
+    Item *add(Item *item, int row, int col);
 
     // Take an item and put it in the first empty slot of the inventory. Return
     // false if there isn't room for it.
-    bool pickup(Item *item);
+    Item *pickup(Item *item);
 
     // Call this after changing x or y, puts clickboxes in the right place
     void updateClickBoxes();
 
     // Use mouse input
-    void update();
+    void update(Action *&mouse);
 };
 
 #endif

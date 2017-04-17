@@ -96,6 +96,11 @@ bool Hotbar::update(Action *mouse) {
                     answer = true;
                 }
             }
+            // If it was a right click, we should remove that item from the
+            // hotbar.
+            else if (clickBoxes[i].event.button == SDL_BUTTON_RIGHT) {
+                actions[adjusted] = NULL;
+            }
 
             // Now we've use the click for this update
             clickBoxes[i].wasClicked = false;

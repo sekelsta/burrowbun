@@ -1,6 +1,8 @@
 Changes since last push:
  - Now putting an item in the hotbar removes it from the mouseSlot and puts it
 in the inventory
+ - It's possible to move things around in the inventory, though there isn't yet
+stacking
 
 Known "features":
  - The strenth of gravity is independent of the world.
@@ -11,7 +13,7 @@ Known bugs:
  - Apparently the player can fit in gaps that they can't escape.
 
 Soon to come (though likely not very soon):
- - Items
+ - using items, stacking items, more items
  - More types of tiles
  - Trees!
  - Better map generation

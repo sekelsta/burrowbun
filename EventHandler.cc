@@ -174,8 +174,11 @@ void EventHandler::mouseEvent(const SDL_Event &event, Player &player) {
     // Tell the hotbar and inventories whether they were clicked
     if (event.type != SDL_MOUSEWHEEL) {
         updateMouseBoxes(player.hotbar.clickBoxes, event);
-        updateInventoryClickBoxes(player.inventory, event);
-        updateInventoryClickBoxes(player.trash, event);
+        // Only send the inventory clicks if it's open
+        if (player.isInventoryOpen) {
+            updateInventoryClickBoxes(player.inventory, event);
+            updateInventoryClickBoxes(player.trash, event);
+        }
     }
 }
 
@@ -251,8 +254,8 @@ void EventHandler::updateKeys(const Uint8 *state) {
 // Change the player's acceleration
 void EventHandler::updatePlayer(Player &player) {
     // Update the player's inventories
-    player.inventory.update();
-    player.trash.update();
+    player.inventory.update(player.mouseSlot);
+    player.trash.update(player.mouseSlot);
     // Update the player's hotbar
     // Put the item in the inventory if we should
     if (player.hotbar.update(player.mouseSlot) && player.mouseSlot != NULL) {
@@ -260,9 +263,8 @@ void EventHandler::updatePlayer(Player &player) {
         // stop holding it.
         assert(player.mouseSlot -> isItem);
         Item *mouseItem = (Item *)player.mouseSlot;
-        if (player.inventory.pickup(mouseItem)) {
-            player.mouseSlot = NULL;
-        }
+        // Try to put the item in the inventory
+        player.mouseSlot = player.inventory.pickup(mouseItem);
     }
 
     // and update the player's accelleration

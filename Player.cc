@@ -64,6 +64,8 @@ Player::Player() : inventory(10, 6), trash(1, 1) {
     // Start with nothing in the mouse slot
     mouseSlot = NULL;
 
+    mouseSlot = new Item(ItemType::MAPLE_LEAF);
+
     isInventoryOpen = false;
 }
 
