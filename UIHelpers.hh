@@ -105,6 +105,16 @@ public:
         }
     }
 
+    // Add amount to the full part
+    void addFull(int amount) {
+        setFull(fullStat + amount);
+    }
+
+    // Add amount to the part part
+    void addPart(int amount) {
+        setPart(partStat + amount);
+    }
+
     // Set the stat to as high as it can go
     void fill() {
         setPart(maxStat);

@@ -1,7 +1,20 @@
 #include <cassert>
 #include <iostream>
+#include <vector>
 #include <SDL2/SDL_image.h>
 #include "WindowHandler.hh"
+
+// Include things that were forward declared
+#include "Light.hh"
+#include "Tile.hh"
+#include "Map.hh"
+#include "Movable.hh"
+#include "Hotbar.hh"
+#include "Player.hh"
+#include "UIHelpers.hh"
+#include "Sprite.hh"
+#include "Inventory.hh"
+#include "Action.hh"
 
 using namespace std;
 
@@ -405,13 +418,13 @@ void WindowHandler::renderUI(Player &player) {
     // These numbers are set here in case the window size changed.
     player.health.x = refX + 65;
     player.health.y = refY + 17;
-    player.hunger.x = refX + 65;
-    player.hunger.y = refY + 29;
+    player.stamina.x = refX + 65;
+    player.stamina.y = refY + 29;
     player.mana.x = refX + 65;
     player.mana.y = refY + 41;
     // And actually draw them
     renderStatBar(player.health);
-    renderStatBar(player.hunger);
+    renderStatBar(player.stamina);
     renderStatBar(player.mana);
 
     // Render the inventory, if necessary

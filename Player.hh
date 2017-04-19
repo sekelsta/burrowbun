@@ -7,7 +7,9 @@
 #include "Hotbar.hh"
 #include "Inventory.hh"
 #include "UIHelpers.hh"
-#include "Action.hh"
+
+// Forward declare
+class Action;
 
 using namespace std;
 

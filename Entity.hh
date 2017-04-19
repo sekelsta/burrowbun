@@ -12,7 +12,7 @@ class Entity : public Movable {
 public:
     // To hold information on the stats
     StatBar health;
-    StatBar hunger;
+    StatBar stamina; // Stamina being how much hunger it doesn't have
     StatBar mana;
 
     // Farthest it can fall before taking fall damage (in pixels)

@@ -10,16 +10,20 @@ the only thing screen coordinates are used for. */
 #include <vector>
 #include <string>
 #include <SDL2/SDL.h>
-#include "Light.hh"
-#include "Tile.hh"
-#include "Map.hh"
-#include "Movable.hh"
-#include "Hotbar.hh"
-#include "Player.hh"
-#include "UIHelpers.hh"
+
 #include "Sprite.hh"
-#include "Inventory.hh"
-#include "Action.hh"
+
+// Forawrd declare
+struct Light;
+class Tile;
+class Map;
+class Movable;
+class Hotbar;
+class Player;
+class Inventory;
+class Action;
+struct MouseBox;
+struct StatBar;
 
 // The path to image files
 #define TILE_PATH "content/Blocks/"

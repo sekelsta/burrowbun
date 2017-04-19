@@ -2,6 +2,12 @@
 #include <iostream>
 #include "EventHandler.hh"
 
+// Include things that were forward declared in the header
+#include "WindowHandler.hh"
+#include "Player.hh"
+#include "Hotbar.hh"
+#include "UIHelpers.hh"
+
 using namespace std;
 
 // Tell whether a scancode is in a vector
@@ -29,7 +35,7 @@ bool EventHandler::isHeld(const Uint8 *state, vector<SDL_Scancode> keys) {
 
 // Change the bool values of a MouseBox vector so they know whether they were
 // clicked
-void EventHandler::updateMouseBoxes(vector<MouseBox> &mouseBoxes,
+bool EventHandler::updateMouseBoxes(vector<MouseBox> &mouseBoxes,
         const SDL_Event &event) {
     assert(event.type == SDL_MOUSEMOTION || event.type == SDL_MOUSEBUTTONUP
         || event.type == SDL_MOUSEBUTTONDOWN);
@@ -46,6 +52,9 @@ void EventHandler::updateMouseBoxes(vector<MouseBox> &mouseBoxes,
         y = event.button.y;
     }
 
+    // Whether the mouse clicked a box
+    bool answer = false;
+
     for (unsigned int i = 0; i < mouseBoxes.size(); i++) {
         // Note that MouseBox.contains(x, y) also sets mouseBox.containsMouse
         // to the appropriate value
@@ -54,6 +63,7 @@ void EventHandler::updateMouseBoxes(vector<MouseBox> &mouseBoxes,
         if (mouseBoxes[i].contains(x, y) && event.type != SDL_MOUSEMOTION) {
             // If it was a button press in the box, fill in the
             // appropriate fields
+            answer = true;
             mouseBoxes[i].wasClicked = true;
             mouseBoxes[i].event = event.button;
         }
@@ -61,14 +71,20 @@ void EventHandler::updateMouseBoxes(vector<MouseBox> &mouseBoxes,
         // so we don't want to do that here
     }
 
+    return answer;
+
 }
 
 // Update the mouseboxes in an inventory
-void EventHandler::updateInventoryClickBoxes(Inventory &inventory, 
+bool EventHandler::updateInventoryClickBoxes(Inventory &inventory, 
         const SDL_Event &event) {
+    bool answer = false;
+    // Update each row, and return true if updating any row returns true
     for (int i = 0; i < inventory.getHeight(); i++) {
-        updateMouseBoxes(inventory.clickBoxes[i], event);
+        answer = answer || updateMouseBoxes(inventory.clickBoxes[i], event);
     }
+
+    return answer;
 }
 
 
@@ -170,14 +186,42 @@ void EventHandler::windowEvent(const SDL_Event &event, bool &isFocused,
 }
 
 // Do whatever should be done when a mouse event happens
-void EventHandler::mouseEvent(const SDL_Event &event, Player &player) {
+void EventHandler::mouseEvent(const SDL_Event &event, Player &player, 
+        Map &map) {
+    // Whether the mouse has clicked on something
+    bool isMouseUsed;
+
     // Tell the hotbar and inventories whether they were clicked
     if (event.type != SDL_MOUSEWHEEL) {
-        updateMouseBoxes(player.hotbar.clickBoxes, event);
+        isMouseUsed = updateMouseBoxes(player.hotbar.clickBoxes, event);
         // Only send the inventory clicks if it's open
         if (player.isInventoryOpen) {
-            updateInventoryClickBoxes(player.inventory, event);
-            updateInventoryClickBoxes(player.trash, event);
+            // Update the inventory clickboxes and set isMosueUsed to true if
+            // it clicked on any of them
+            isMouseUsed = isMouseUsed 
+                || updateInventoryClickBoxes(player.inventory, event)
+                || updateInventoryClickBoxes(player.trash, event);
+        }
+        // If the mouse hasn't clicked on any part of the UI, use the item it
+        // is holding, if any
+        if (event.type == SDL_MOUSEBUTTONDOWN) {
+            InputType type = InputType::NONE;
+            if (event.button.button == SDL_BUTTON_LEFT) {
+                type = InputType::LEFT_BUTTON_PRESSED;
+            }
+            else if (event.button.button == SDL_BUTTON_RIGHT) {
+                type = InputType::RIGHT_BUTTON_PRESSED;
+            }
+            // The action selected in the hotbar, in case we have to use it.
+            Action *selected = player.hotbar.actions[player.hotbar.selected];
+            if (player.mouseSlot != NULL && type != InputType::NONE) {
+                player.mouseSlot -> use(type, player, map);
+            }
+            // If the mouse wasn't using an item, use the item in the hotbar
+            // slot selected, if any
+            else if (type != InputType::NONE && selected != NULL) {
+                selected -> use(type, player, map);
+            }
         }
     }
 }
@@ -310,4 +354,16 @@ void EventHandler::updatePlayer(Player &player) {
         cout << player.y << "\n";
     }
     move = 0;
+}
+
+// Do all the things that need to be done every update
+void EventHandler::update(Player &player, Map &map) {
+    // Use keys that need to be held down
+    const Uint8 *state = SDL_GetKeyboardState(NULL);
+    updateKeys(state);
+
+    // Tell the player what they're trying to do
+    updatePlayer(player);
+
+    // TODO: use info about the mouse having a key held down
 }

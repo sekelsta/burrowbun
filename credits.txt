@@ -37,6 +37,6 @@ The frame for the hotbar (both selected and unselected): a resized version of th
 Overlay for health and whatnot bars:an edited version of tthe one by  user Monk
 (http://opengameart.org/content/health-magic-and-stamina-hud)
 
-Leaf: Open Game Art user Johann C (https://opengameart.org/content/svg-inventory-icons)
+Leaf and potion: Open Game Art user Johann C (https://opengameart.org/content/svg-inventory-icons)
 
 All other art was drawn by me.

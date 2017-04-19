@@ -1,11 +1,17 @@
 #ifndef EVENTHANDLER_HH
 #define EVENTHANDLER_HH
 
+#include <vector>
 #include <SDL2/SDL.h>
-#include "WindowHandler.hh"
-#include "Player.hh"
-#include "Hotbar.hh"
-#include "UIHelpers.hh"
+
+// forward declare
+class WindowHandler;
+class Player;
+class Inventory;
+class Hotbar;
+class Map;
+struct MouseBox;
+struct StatBar;
 
 using namespace std;
 
@@ -50,11 +56,13 @@ class EventHandler {
 
     // Change the bool values of a MouseBox vector so they know whether they 
     // were clicked
-    void updateMouseBoxes(vector<MouseBox> &mouseBoxes, 
+    // Return true if the mouse clicked any of the boxes
+    bool updateMouseBoxes(vector<MouseBox> &mouseBoxes, 
         const SDL_Event &event);
 
     // Update the mouseboxes of an inventory
-    void updateInventoryClickBoxes(Inventory &inventory, 
+    // Return true if the mouse clicked any of the boxes
+    bool updateInventoryClickBoxes(Inventory &inventory, 
         const SDL_Event &event);
 
 public:
@@ -70,7 +78,7 @@ public:
                             WindowHandler &window);
 
     // Do whatever should be done when a mouse event happens
-    void mouseEvent(const SDL_Event &event, Player &player);
+    void mouseEvent(const SDL_Event &event, Player &player, Map &map);
 
     // Do whatever should be done when a key is pressed or released
     void keyEvent(const SDL_Event &event, Player &player);
@@ -80,6 +88,9 @@ public:
 
     // Tell the Player what its trying to do
     void updatePlayer(Player &player);
+
+    // Do all the stuff that needs to be done every frame
+    void update(Player &player, Map &map);
 };
 
 #endif

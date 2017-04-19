@@ -8,8 +8,7 @@ enum class ItemType {
     // NONE is just a pointer to NULL instead of an actual object
     MAPLE_LEAF,
     DIRT,
-    TORCH,
-    POTION
+    HEALTH_POTION
 };
 
 /* The thing inventories store. */

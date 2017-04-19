@@ -8,6 +8,6 @@ Action::Action() {
 }
 
 /* Do the action, or use the item or skill. */
-void Action::use() {
+void Action::use(InputType type, Player &player, Map &map) {
     // Pass
 }

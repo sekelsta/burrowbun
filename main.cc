@@ -95,7 +95,7 @@ int main(int argc, char **argv) {
                 case SDL_MOUSEWHEEL:
                 case SDL_MOUSEBUTTONDOWN:
                 case SDL_MOUSEBUTTONUP:
-                    eventHandler.mouseEvent(event, player);
+                    eventHandler.mouseEvent(event, player, map);
                     break;
                 default:
                     // TODO
@@ -104,13 +104,12 @@ int main(int argc, char **argv) {
             }
         }
 
-        // Now that all the events have been handled, look at which keys are
-        // currently being held down and handle those too
-        const Uint8 *state = SDL_GetKeyboardState(NULL);
-        eventHandler.updateKeys(state);
+        // Now that all the events have been handled, do eventhandling things 
+        // that need to be done every update (like checking whether any keys
+        // or mouse buttons are being held down);
+        eventHandler.update(player, map);
 
         // Move things around
-        eventHandler.updatePlayer(player);
         collider.update(map, movables);
         // TODO: make all entities take fall damage
         player.takeFallDamage();

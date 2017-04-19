@@ -1,19 +1,20 @@
 Changes since last push:
- - Now putting an item in the hotbar removes it from the mouseSlot and puts it
-in the inventory
- - It's possible to move things around in the inventory, though there isn't yet
-stacking
+ - Replaced some includes in header files with forward declarations
+ - Items can now be used
+ - Added health potion
 
 Known "features":
  - The strenth of gravity is independent of the world.
  - Things that move multiple tiles per second won't collide as if they were moving in a straight line. The best way to solve this may be to not allow anything to move that fast, possibly via multiple updates between renderings.
  - The spawn point sometimes puts the player on top of dirt. Spawning should be changed so it destroys any tiles in the way.
+ - For now items don't care which mouse button was pressed
 
 Known bugs:
  - Apparently the player can fit in gaps that they can't escape.
 
 Soon to come (though likely not very soon):
- - using items, stacking items, more items
+ - Background tiles
+ - stacking items, throwing / picking up items, more items
  - More types of tiles
  - Trees!
  - Better map generation

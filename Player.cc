@@ -1,5 +1,6 @@
 #include <SDL2/SDL.h>
 #include "Player.hh"
+#include "AllTheItems.hh"
 #include <iostream>
 
 using namespace std;
@@ -32,10 +33,10 @@ Player::Player() : inventory(10, 6), trash(1, 1) {
     health.totalWidth = 190;
     health.h = 8;
     health.fill();
-    hunger.maxStat = 100;
-    hunger.totalWidth = 190;
-    hunger.h = 8;
-    hunger.fill();
+    stamina.maxStat = 100;
+    stamina.totalWidth = 190;
+    stamina.h = 8;
+    stamina.fill();
     mana.maxStat = 100; 
     mana.totalWidth = 190;
     mana.h = 8;
@@ -64,7 +65,7 @@ Player::Player() : inventory(10, 6), trash(1, 1) {
     // Start with nothing in the mouse slot
     mouseSlot = NULL;
 
-    mouseSlot = new Item(ItemType::MAPLE_LEAF);
+    mouseSlot = ItemMaker::makeItem(ItemType::HEALTH_POTION);
 
     isInventoryOpen = false;
 }
