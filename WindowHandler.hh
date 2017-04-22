@@ -183,13 +183,13 @@ public:
     // Render everything the map holds information about
     // x and y are the coordinates of the center of the camera, in pixels,
     // where y = 0 is at the bottom
-    void renderMap(const Map &m, const SDL_Rect &camera);
+    void renderMap(Map &m, const SDL_Rect &camera);
 
     // Render movables (the player, monsters, NPCs, dropped items)
     void renderMovables(const vector<Movable *> &movables);
 
     // Update the screen
-    void update(const Map &m, const vector<Movable *> &movables, 
+    void update(Map &m, const vector<Movable *> &movables, 
         Player &player);
 
     // Unload media to switch maps, currently done by close()

@@ -1,3 +1,4 @@
+#include <iostream>
 #include "Action.hh"
 #include "Inventory.hh"
 
@@ -8,6 +9,6 @@ Action::Action() {
 }
 
 /* Do the action, or use the item or skill. */
-void Action::use(InputType type, Player &player, Map &map) {
+void Action::use(InputType type, int x, int y, Player &player, Map &map) {
     // Pass
 }

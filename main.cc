@@ -20,18 +20,18 @@ const int TICKS_PER_FRAME = 1000 / SCREEN_FPS;
 Sprite Inventory::squareSprite;
 
 int main(int argc, char **argv) {
-    // Do the stuff it would be doing without the images
-    World world = World(WorldType::EARTH);
-    world.save("world.world");
-    Map map = Map("world.world");
-    map.save("map.bmp");
-
+ 
     // Declare variables for rendering a window
     int screenWidth = 800;
     int screenHeight = 600;
 
     const int TILE_WIDTH = 16;
     const int TILE_HEIGHT = 16;
+    // Do the stuff it would be doing without the images
+    World world = World(WorldType::EARTH);
+    world.save("world.world");
+    Map map = Map("world.world", TILE_WIDTH, TILE_HEIGHT);
+    map.save("map.bmp");
 
     // Construct a WindowHandler
     bool enableDarkness = true;

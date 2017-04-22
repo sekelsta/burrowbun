@@ -37,6 +37,9 @@ public:
     // Constructor, given the size
     Inventory(int cols, int rows);
 
+    // Destructor
+    // TODO
+
     // Access functions
     int getWidth() const;
     int getHeight() const;

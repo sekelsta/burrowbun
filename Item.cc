@@ -2,8 +2,8 @@
 #include "Item.hh"
 
 // Constructor
-Item::Item(ItemType itemType) {
-    type = itemType;
+Item::Item(ItemType type) {
+    itemType = type;
     sprite.name = "";
     maxStack = 1; // TODO
     // It's definately an item
@@ -22,17 +22,23 @@ Item::Item(ItemType itemType) {
             sprite.col = 0;
             break;
         case ItemType::HEALTH_POTION :
-            sprite.name = "health_potion.png";
+            sprite.name = "potions.png";
+            sprite.rows = 8;
+            sprite.cols = 8;
+            sprite.row = 4;
+            sprite.col = 1;
+            break;
+        case ItemType::DIRT :
+            sprite.name = "dirt.png";
             sprite.rows = 1;
             sprite.cols = 1;
             sprite.row = 0;
             sprite.col = 0;
-            break;
     }
 }
 
 // Access functions
 ItemType Item::getType() {
-    return type;
+    return itemType;
 }
 

@@ -25,6 +25,10 @@ class Map {
     // The height and width of the map, in number of tiles
     int height, width;
 
+    // The height and width of the tiles, in pixels
+    const int TILE_WIDTH;
+    const int TILE_HEIGHT;
+
     // Default spawn point
     Location spawn;
 
@@ -51,6 +55,10 @@ class Map {
     /* Pick the sprite to use for a tile based on the ones next to it. */
     void chooseSprite(int x, int y);
 
+    /* Return true if the spot is empty of foreground tiles but at least 
+    one tile next to it isn't. */
+    bool canPutTile(int x, int y) const;
+
     /* Return true if neither the foreground nor background are opaque. */
     bool isSky(int x, int y);
 
@@ -65,10 +73,17 @@ class Map {
     /* Set the light of a tile. */
     void setLight(int x, int y);
 
+    /* Set the tiles around a place to show the right sprite and have the
+    right amount of light. */
+    void updateNear(int x, int y);
+
+    /* Return true if this is a place that exists on the map. */
+    bool isOnMap(int x, int y) const;
+
     public:
 
-    // Contructs a map by loading a file
-    Map(string filename);
+    // Constructor, constructs a map by loading a file
+    Map(string filename, int tileWidth, int tileHeight);
 
     // Destructor
     ~Map();
@@ -79,14 +94,20 @@ class Map {
     // Return the width of the map, in number of tiles
     int getWidth() const;
 
+    // Return the height, in pixels of each tile
+    int getTileHeight() const;
+
+    // Retrun the width, in pixels, of each tile
+    int getTileWidth() const;
+
     // Return the default spawn point
     Location getSpawn() const;
 
     // Return which part of the spritesheet should be used
     Location getSpritePlace(int x, int y) const;
 
-    // Return the light at a square. 
-    Light getLight(int x, int y) const;
+    // Return the light at a square, setting it if necessary. 
+    Light getLight(int x, int y);
 
     // Return the color the sun / moon is shining
     Light getSkyColor(int x, int y) const;
@@ -104,6 +125,12 @@ class Map {
 
     // Set the background tile at x, y equal to val
     void setBackground(int x, int y, Tile* const &val);
+
+    // Put a tile in the foreground at x, y, return success
+    bool placeForeground(int x, int y, TileType type);
+
+    // Put a tile in the background at x, y, return whethre it was successful
+    bool placeBackground(int x, int y, TileType type);
 
     // Gets the map's list of the tile pointers it uses
     vector<Tile *> getPointers() const;

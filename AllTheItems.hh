@@ -3,6 +3,7 @@
 
 #include <vector>
 #include "Item.hh"
+#include "Tile.hh"
 
 
 // All the child classes of "Item"
@@ -20,7 +21,19 @@ public:
     Potion(ItemType type);
 
     // What to do when used
-    void use(InputType type, Player &player, Map &map);
+    void use(InputType type, int x, int y, Player &player, Map &map);
+};
+
+// Items that can be placed
+class Block : public Item {
+    TileType tileType;
+
+public:
+    // Constructor
+    Block(ItemType type);
+
+    // What to do when used
+    void use(InputType type, int x, int y, Player &player, Map &map);
 };
 
 // Function to make na item of the correct class given only an item type

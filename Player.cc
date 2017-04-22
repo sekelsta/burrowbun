@@ -1,5 +1,6 @@
 #include <SDL2/SDL.h>
 #include "Player.hh"
+#include "Item.hh"
 #include "AllTheItems.hh"
 #include <iostream>
 
@@ -27,6 +28,11 @@ Player::Player() : inventory(10, 6), trash(1, 1) {
     sprite = "bunny.png";
     spriteWidth = 38;
     spriteHeight = 32;
+
+    // Range for placing and mining tiles
+    tileReachUp = 6;
+    tileReachDown = 4;
+    tileReachSideways = 5;
 
     // Initialize stats
     health.maxStat = 100;
@@ -65,7 +71,9 @@ Player::Player() : inventory(10, 6), trash(1, 1) {
     // Start with nothing in the mouse slot
     mouseSlot = NULL;
 
-    mouseSlot = ItemMaker::makeItem(ItemType::HEALTH_POTION);
+    // Have starting items
+    inventory.pickup(ItemMaker::makeItem(ItemType::HEALTH_POTION));
+    inventory.pickup(ItemMaker::makeItem(ItemType::DIRT));
 
     isInventoryOpen = false;
 }
@@ -73,5 +81,32 @@ Player::Player() : inventory(10, 6), trash(1, 1) {
 // Switch whether the inventory is open or closed
 void Player::toggleInventory() {
     isInventoryOpen = !isInventoryOpen;
+}
+
+// Whether a place is within range for placing tiles
+// x is distance from the player horizontally, in tiles.
+// y is distance from the player in tiles, with positive being above the 
+// player. bonus is the bonus range from possible unknown curcumstances
+// (e.g. this type of tile can be placed farther away, or this pickax has
+// better range).
+bool Player::canReach(int x, int y, int bonus) {
+    // If not in range in the x direction, return false
+    if (abs(x) > tileReachSideways + bonus) {
+        return false;
+    }
+
+    // If too high, return false
+    if (y > tileReachUp + bonus) {
+        return false;
+    }
+
+    // If too low, return false
+    if (-1 * y > tileReachDown + bonus) {
+        return false;
+    }
+
+    // Otherwise, it's within reach
+    return true;
+
 }
 

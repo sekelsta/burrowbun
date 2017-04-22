@@ -14,14 +14,14 @@ enum class ItemType {
 /* The thing inventories store. */
 class Item : public Action {
     // Which item it is
-    ItemType type;
+    ItemType itemType;
 
     // How many can be in a stack in the same slot
     int maxStack;
 
 public:
     // Constructor
-    Item(ItemType itemType);
+    Item(ItemType type);
 
     // Access functions
     ItemType getType();

@@ -20,8 +20,15 @@ using namespace std;
     the eventhandler, the rule of thumb is to ask whether it belongs in the
     player's savefile or in the game's config file. */
 class Player : public Entity {
+    // How far can they reach to place tiles
+    int tileReachUp;
+    int tileReachDown;
+    int tileReachSideways;
 
 public:
+    // Where the player is being rendered on the screen
+    int screenX, screenY;
+
     bool isInventoryOpen;
     Inventory inventory;
     Inventory trash;
@@ -36,6 +43,14 @@ public:
 
     // Switch the open / closed state of the inventory.
     void toggleInventory();
+
+    // Whether a place is within range for placing tiles
+    // x is distance from the player horizontally, in tiles.
+    // y is distance from the player in tiles, with positive being above the 
+    // player. bonus is the bonus range from possible unknown curcumstances
+    // (e.g. this type of tile can be placed farther away, or this pickax has
+    // better range).
+    bool canReach(int x, int y, int bonus);
 };
 
 #endif

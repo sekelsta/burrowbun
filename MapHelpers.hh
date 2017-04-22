@@ -75,6 +75,9 @@ struct SpaceInfo {
     // How well-lit this tile is, and from where
     Light light;
 
+    // Whether the light is actually set to the correct value
+    bool isLightUpdated;
+
     // Which rectangle of the spritesheet to draw
     // spriteRow should be based on which surrounding tiles are empty,
     // spriteCol should be random

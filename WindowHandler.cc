@@ -705,7 +705,7 @@ bool WindowHandler::loadAction(Action &action) {
 // x and y are the center of view of the camera, in pixels, 
 // where y = 0 at the bottom
 // If either value puts the camera past the end of the map, it will be fixed
-void WindowHandler::renderMap(const Map &m, const SDL_Rect &camera) {
+void WindowHandler::renderMap(Map &m, const SDL_Rect &camera) {
     // Make sure the renerer draw color is set to white
     SDL_SetRenderDrawColor(renderer, 0xFF, 0xFF, 0xFF, 0xFF);
 
@@ -801,8 +801,17 @@ void WindowHandler::renderMovables(const vector<Movable *> &movables) {
 }
 
 // Update the screen
-void WindowHandler::update(const Map &map, const vector<Movable *> &movables, 
+void WindowHandler::update(Map &map, const vector<Movable *> &movables, 
         Player &player) {
+    // Tell the player where on the screen it was drawn
+    int w = player.spriteWidth;
+    int h = player.spriteHeight;
+    SDL_Rect camera = findCamera(player.x, player.y, w, h);
+    SDL_Rect playerRect = { player.x, player.y, w, h };
+    playerRect = convertRect(playerRect, camera);
+    player.screenX = playerRect.x;
+    player.screenY = playerRect.y + playerRect.h;
+
     // Make sure the renderer isn't rendering to a texture
     SDL_SetRenderTarget(renderer, NULL);
     // Clear the screen

@@ -204,7 +204,7 @@ void EventHandler::mouseEvent(const SDL_Event &event, Player &player,
         }
         // If the mouse hasn't clicked on any part of the UI, use the item it
         // is holding, if any
-        if (event.type == SDL_MOUSEBUTTONDOWN) {
+        if (event.type == SDL_MOUSEBUTTONDOWN && !isMouseUsed) {
             InputType type = InputType::NONE;
             if (event.button.button == SDL_BUTTON_LEFT) {
                 type = InputType::LEFT_BUTTON_PRESSED;
@@ -212,15 +212,18 @@ void EventHandler::mouseEvent(const SDL_Event &event, Player &player,
             else if (event.button.button == SDL_BUTTON_RIGHT) {
                 type = InputType::RIGHT_BUTTON_PRESSED;
             }
+            // Where the mouse clicked, in world coordinates
+            int x = player.x + event.button.x - player.screenX;
+            int y = player.y - event.button.y + player.screenY;
             // The action selected in the hotbar, in case we have to use it.
             Action *selected = player.hotbar.actions[player.hotbar.selected];
             if (player.mouseSlot != NULL && type != InputType::NONE) {
-                player.mouseSlot -> use(type, player, map);
+                player.mouseSlot -> use(type, x, y, player, map);
             }
             // If the mouse wasn't using an item, use the item in the hotbar
             // slot selected, if any
             else if (type != InputType::NONE && selected != NULL) {
-                selected -> use(type, player, map);
+                selected -> use(type, x, y, player, map);
             }
         }
     }

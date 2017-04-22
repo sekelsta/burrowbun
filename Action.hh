@@ -32,7 +32,7 @@ public:
     Action();
 
     // What it does when used
-    virtual void use(InputType type, Player &player, Map &map);
+    virtual void use(InputType type, int x, int y, Player &player, Map &map);
 };
 
 

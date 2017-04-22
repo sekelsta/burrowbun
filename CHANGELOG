@@ -2,15 +2,21 @@ Changes since last push:
  - Replaced some includes in header files with forward declarations
  - Items can now be used
  - Added health potion
+ - Added dirt block
+ - Made the map load faster, by having it not calculate the lighting of 
+every single block
 
 Known "features":
  - The strenth of gravity is independent of the world.
  - Things that move multiple tiles per second won't collide as if they were moving in a straight line. The best way to solve this may be to not allow anything to move that fast, possibly via multiple updates between renderings.
  - The spawn point sometimes puts the player on top of dirt. Spawning should be changed so it destroys any tiles in the way.
- - For now items don't care which mouse button was pressed
+ - Holding down the mouse button doesn't do anything
+ - You can place dirt on top of creatures, including yourself
+
 
 Known bugs:
  - Apparently the player can fit in gaps that they can't escape.
+ - Reaching the sky top makes an assertion error (from Collider::listCollisions)
 
 Soon to come (though likely not very soon):
  - Background tiles
