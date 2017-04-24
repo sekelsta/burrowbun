@@ -20,6 +20,7 @@ Item::Item(ItemType type) {
             sprite.cols = 1;
             sprite.row = 0;
             sprite.col = 0;
+            useTime = 1;
             break;
         case ItemType::HEALTH_POTION :
             sprite.name = "potions.png";
@@ -27,6 +28,7 @@ Item::Item(ItemType type) {
             sprite.cols = 8;
             sprite.row = 4;
             sprite.col = 1;
+            useTime = 32;
             break;
         case ItemType::DIRT :
             sprite.name = "dirt.png";
@@ -34,6 +36,7 @@ Item::Item(ItemType type) {
             sprite.cols = 1;
             sprite.row = 0;
             sprite.col = 0;
+            useTime = 8;
     }
 }
 

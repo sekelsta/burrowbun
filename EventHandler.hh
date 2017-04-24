@@ -42,6 +42,12 @@ class EventHandler {
     bool isJumping;
     bool hasJumped; // as in, since the last time the key was pressed
 
+    // The state of the mouse
+    bool isLeftButtonDown;
+    bool isRightButtonDown;
+    bool wasLeftButtonDown;
+    bool wasRightButtonDown;
+
     // To move by one pixel at a time, in the vertical direction 
     // This currently only exists for debugging
     int move; // TODO: remove
@@ -57,13 +63,11 @@ class EventHandler {
     // Change the bool values of a MouseBox vector so they know whether they 
     // were clicked
     // Return true if the mouse clicked any of the boxes
-    bool updateMouseBoxes(vector<MouseBox> &mouseBoxes, 
-        const SDL_Event &event);
+    bool updateMouseBoxes(vector<MouseBox> &mouseBoxes);
 
     // Update the mouseboxes of an inventory
     // Return true if the mouse clicked any of the boxes
-    bool updateInventoryClickBoxes(Inventory &inventory, 
-        const SDL_Event &event);
+    bool updateInventoryClickBoxes(Inventory &inventory);
 
 public:
     // Constructor
@@ -77,8 +81,11 @@ public:
     void windowEvent(const SDL_Event &event, bool &isFocused,
                             WindowHandler &window);
 
+    // Update the state of the mouse
+    void mouseEvent(const SDL_Event &event);
+
     // Do whatever should be done when a mouse event happens
-    void mouseEvent(const SDL_Event &event, Player &player, Map &map);
+    void useMouse(Player &player, Map &map);
 
     // Do whatever should be done when a key is pressed or released
     void keyEvent(const SDL_Event &event, Player &player);

@@ -35,37 +35,38 @@ bool EventHandler::isHeld(const Uint8 *state, vector<SDL_Scancode> keys) {
 
 // Change the bool values of a MouseBox vector so they know whether they were
 // clicked
-bool EventHandler::updateMouseBoxes(vector<MouseBox> &mouseBoxes,
-        const SDL_Event &event) {
-    assert(event.type == SDL_MOUSEMOTION || event.type == SDL_MOUSEBUTTONUP
-        || event.type == SDL_MOUSEBUTTONDOWN);
+bool EventHandler::updateMouseBoxes(vector<MouseBox> &mouseBoxes) {
     // Mouse coordinates, relative to the window
     int x;
     int y;
-    if (event.type == SDL_MOUSEMOTION) {
-        x = event.motion.x;
-        y = event.motion.y;
-    }
-    // Else it's a mouse button down or up event
-    else {
-        x = event.button.x;
-        y = event.button.y;
-    }
+    // Find the mosue coordinates
+    SDL_GetMouseState(&x, &y);
 
-    // Whether the mouse clicked a box
+    // Whether the mouse is in a box
     bool answer = false;
 
     for (unsigned int i = 0; i < mouseBoxes.size(); i++) {
         // Note that MouseBox.contains(x, y) also sets mouseBox.containsMouse
         // to the appropriate value
-        // This if statement sets containsMouse and checks whether it was a
-        // button press or just the mouse moving
-        if (mouseBoxes[i].contains(x, y) && event.type != SDL_MOUSEMOTION) {
+        if (mouseBoxes[i].contains(x, y)) {
+            answer = true;
+            mouseBoxes[i].event.x = x;
+            mouseBoxes[i].event.y = y;
             // If it was a button press in the box, fill in the
             // appropriate fields
-            answer = true;
-            mouseBoxes[i].wasClicked = true;
-            mouseBoxes[i].event = event.button;
+            if (isLeftButtonDown || isRightButtonDown) {
+                mouseBoxes[i].wasClicked = true;
+                mouseBoxes[i].event.type = SDL_MOUSEBUTTONDOWN;
+                // If left and right buttons clicked simultaneously, it's left
+                if (isLeftButtonDown) {
+                    mouseBoxes[i].event.button = SDL_BUTTON_LEFT;
+                    mouseBoxes[i].isHeld = wasLeftButtonDown;
+                }
+                else {
+                    mouseBoxes[i].event.button = SDL_BUTTON_RIGHT;
+                    mouseBoxes[i].isHeld = wasRightButtonDown;
+                }
+            }
         }
         // And the mouseBox is responsible for making wasClicked false again,
         // so we don't want to do that here
@@ -76,12 +77,11 @@ bool EventHandler::updateMouseBoxes(vector<MouseBox> &mouseBoxes,
 }
 
 // Update the mouseboxes in an inventory
-bool EventHandler::updateInventoryClickBoxes(Inventory &inventory, 
-        const SDL_Event &event) {
+bool EventHandler::updateInventoryClickBoxes(Inventory &inventory) {
     bool answer = false;
     // Update each row, and return true if updating any row returns true
     for (int i = 0; i < inventory.getHeight(); i++) {
-        answer = answer || updateMouseBoxes(inventory.clickBoxes[i], event);
+        answer = answer || updateMouseBoxes(inventory.clickBoxes[i]);
     }
 
     return answer;
@@ -101,6 +101,11 @@ EventHandler::EventHandler() {
 
     isJumping = false;
     hasJumped = false;
+
+    isLeftButtonDown = false;
+    isRightButtonDown = false;
+    wasLeftButtonDown = false;
+    wasRightButtonDown = false;
 
     move = 0;
 
@@ -185,47 +190,61 @@ void EventHandler::windowEvent(const SDL_Event &event, bool &isFocused,
     }
 }
 
+// Update the state of the mouse
+void EventHandler::mouseEvent(const SDL_Event &event) {
+    // Ignore mouse wheel and mouse motion events
+    if (event.type == SDL_MOUSEBUTTONDOWN || event.type == SDL_MOUSEBUTTONUP) {
+        // What state to set the button to
+        bool which;
+        which = (event.type == SDL_MOUSEBUTTONDOWN);
+        // Which button to set
+        if (event.button.button == SDL_BUTTON_LEFT) {
+            isLeftButtonDown = which;
+        }
+        else if (event.button.button == SDL_BUTTON_RIGHT) {
+            isRightButtonDown = which;
+        }
+    }
+}
+
 // Do whatever should be done when a mouse event happens
-void EventHandler::mouseEvent(const SDL_Event &event, Player &player, 
-        Map &map) {
+void EventHandler::useMouse(Player &player, Map &map) {
     // Whether the mouse has clicked on something
     bool isMouseUsed;
 
     // Tell the hotbar and inventories whether they were clicked
-    if (event.type != SDL_MOUSEWHEEL) {
-        isMouseUsed = updateMouseBoxes(player.hotbar.clickBoxes, event);
-        // Only send the inventory clicks if it's open
-        if (player.isInventoryOpen) {
-            // Update the inventory clickboxes and set isMosueUsed to true if
-            // it clicked on any of them
-            isMouseUsed = isMouseUsed 
-                || updateInventoryClickBoxes(player.inventory, event)
-                || updateInventoryClickBoxes(player.trash, event);
+    isMouseUsed = updateMouseBoxes(player.hotbar.clickBoxes);
+    // Only send the inventory clicks if it's open
+    if (player.isInventoryOpen) {
+        // Update the inventory clickboxes and set isMosueUsed to true if
+        // it clicked on any of them
+        isMouseUsed = isMouseUsed 
+            || updateInventoryClickBoxes(player.inventory)
+            || updateInventoryClickBoxes(player.trash);
+    }
+    // If the mouse hasn't clicked on any part of the UI, use the item it
+    // is holding, if any
+    if (!isMouseUsed) {
+        InputType type = InputType::NONE;
+        if (isLeftButtonDown && !wasLeftButtonDown) {
+            type = InputType::LEFT_BUTTON_PRESSED;
         }
-        // If the mouse hasn't clicked on any part of the UI, use the item it
-        // is holding, if any
-        if (event.type == SDL_MOUSEBUTTONDOWN && !isMouseUsed) {
-            InputType type = InputType::NONE;
-            if (event.button.button == SDL_BUTTON_LEFT) {
-                type = InputType::LEFT_BUTTON_PRESSED;
-            }
-            else if (event.button.button == SDL_BUTTON_RIGHT) {
-                type = InputType::RIGHT_BUTTON_PRESSED;
-            }
-            // Where the mouse clicked, in world coordinates
-            int x = player.x + event.button.x - player.screenX;
-            int y = player.y - event.button.y + player.screenY;
-            // The action selected in the hotbar, in case we have to use it.
-            Action *selected = player.hotbar.actions[player.hotbar.selected];
-            if (player.mouseSlot != NULL && type != InputType::NONE) {
-                player.mouseSlot -> use(type, x, y, player, map);
-            }
-            // If the mouse wasn't using an item, use the item in the hotbar
-            // slot selected, if any
-            else if (type != InputType::NONE && selected != NULL) {
-                selected -> use(type, x, y, player, map);
-            }
+        else if (isRightButtonDown && !wasRightButtonDown) {
+            type = InputType::RIGHT_BUTTON_PRESSED;
         }
+        else if (isLeftButtonDown) {
+            type = InputType::LEFT_BUTTON_HELD;
+        }
+        else if (isRightButtonDown) {
+            type = InputType::RIGHT_BUTTON_HELD;
+        }
+        // Where the mouse clicked, in world coordinates
+        int x, y;
+        SDL_GetMouseState(&x, &y);
+        x = player.x + x - player.screenX;
+        y = player.y - y + player.screenY;
+        // Have the player figure out whether to use an item, and which one
+        player.useAction(type, x, y, map);
     }
 }
 
@@ -300,6 +319,11 @@ void EventHandler::updateKeys(const Uint8 *state) {
 
 // Change the player's acceleration
 void EventHandler::updatePlayer(Player &player) {
+    // Tick down the time until the player can use items again
+    assert(player.useTimeLeft >= 0);
+    if (!player.canUse()) {
+        player.useTimeLeft--;
+    }
     // Update the player's inventories
     player.inventory.update(player.mouseSlot);
     player.trash.update(player.mouseSlot);
@@ -365,8 +389,13 @@ void EventHandler::update(Player &player, Map &map) {
     const Uint8 *state = SDL_GetKeyboardState(NULL);
     updateKeys(state);
 
+    // Use the mouse if a button is being held down
+    useMouse(player, map);
+    // Get ready for next update
+    wasLeftButtonDown = isLeftButtonDown;
+    wasRightButtonDown = isRightButtonDown;
+
     // Tell the player what they're trying to do
     updatePlayer(player);
 
-    // TODO: use info about the mouse having a key held down
 }

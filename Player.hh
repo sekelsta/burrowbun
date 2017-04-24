@@ -26,6 +26,10 @@ class Player : public Entity {
     int tileReachSideways;
 
 public:
+    /* The use time of the last item / skill used, minus the number of ticks 
+    since using it. Items and skills can only be used when this is 0. */
+    int useTimeLeft;
+
     // Where the player is being rendered on the screen
     int screenX, screenY;
 
@@ -51,6 +55,12 @@ public:
     // (e.g. this type of tile can be placed farther away, or this pickax has
     // better range).
     bool canReach(int x, int y, int bonus);
+
+    // Whether the player can use an item / skill right now.
+    bool canUse();
+
+    // Use the item held or selected
+    void useAction(InputType type, int x, int y, Map &map);
 };
 
 #endif

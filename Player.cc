@@ -34,6 +34,9 @@ Player::Player() : inventory(10, 6), trash(1, 1) {
     tileReachDown = 4;
     tileReachSideways = 5;
 
+    // Assume it hasn't used an item
+    useTimeLeft = 0;
+
     // Initialize stats
     health.maxStat = 100;
     health.totalWidth = 190;
@@ -110,3 +113,22 @@ bool Player::canReach(int x, int y, int bonus) {
 
 }
 
+// Whether the player can use an item or skill right now
+bool Player::canUse() {
+    return useTimeLeft == 0;
+}
+
+// Use the item or skill held or selected
+void Player::useAction(InputType type, int x, int y, Map &map) {
+    // Only bother if we actually can
+    if (canUse() && type != InputType::NONE) {
+        // Try to use the item held by the mouse
+        if (mouseSlot != NULL) {
+            mouseSlot -> use(type, x, y, *this, map);
+        }
+        // Try to use the item in the selected hotbar slot
+        else if (hotbar.getSelected() != NULL) {
+            hotbar.getSelected() -> use(type, x, y, *this, map);
+        }
+    }
+}

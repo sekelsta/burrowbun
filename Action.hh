@@ -18,6 +18,7 @@ enum class InputType {
 
 /* A class for storing things that can go on the hotbar (items, skills). */
 class Action {
+protected:
     // Minimum time before another action can be done
     int useTime;
 
@@ -33,6 +34,9 @@ public:
 
     // What it does when used
     virtual void use(InputType type, int x, int y, Player &player, Map &map);
+
+    // Access function
+    int getUseTime() const;
 };
 
 

@@ -81,8 +81,8 @@ void Hotbar::select(int slot) {
 bool Hotbar::update(Action *mouse) {
     bool answer = false;
     for (unsigned int i = 0; i < clickBoxes.size(); i++) {
-        // Ignore mouse button up
-        if (clickBoxes[i].wasClicked 
+        // Ignore mouse button up or mouse button held down
+        if (clickBoxes[i].wasClicked && !clickBoxes[i].isHeld
                 && clickBoxes[i].event.type == SDL_MOUSEBUTTONDOWN ) {
             // Add 12 to i if isSwitched
             int adjusted = i + 12 * (int)isSwitched;
@@ -109,5 +109,10 @@ bool Hotbar::update(Action *mouse) {
         }
     }
     return answer;
+}
+
+// Return the selected action
+Action *Hotbar::getSelected() {
+    return actions[selected];
 }
 

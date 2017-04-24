@@ -59,6 +59,9 @@ public:
 
     // Use mouse input, return true if the item should be put in the inventory
     bool update(Action *mouse);
+
+    // Return the pointer to the selected action
+    Action *getSelected();
 };
 
 #endif

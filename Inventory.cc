@@ -130,7 +130,7 @@ void Inventory::update(Action *&mouse) {
     for (int row = 0; row < getHeight(); row++) {
         for (int col = 0; col < getWidth(); col++) {
             // Ignore buttonup
-            if (clickBoxes[row][col].wasClicked 
+            if (clickBoxes[row][col].wasClicked && !clickBoxes[row][col].isHeld
                     && clickBoxes[row][col].event.type == SDL_MOUSEBUTTONDOWN) {
                 // Now we've used the input for this clickBox
                 clickBoxes[row][col].wasClicked = false;

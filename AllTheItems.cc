@@ -39,6 +39,8 @@ void Potion::use(InputType type, int x, int y, Player &player, Map &map) {
         player.stamina.addFull(staminaGained);
         player.mana.addFull(manaGained);
         // TODO: make consumable
+        // Use use time
+        player.useTimeLeft = useTime;
     }
 }
 
@@ -70,17 +72,22 @@ void Block::use(InputType type, int x, int y, Player &player, Map &map) {
 
     // Only do anything if the tile is within range
     if (player.canReach(xTile - xPlayer, yTile - yPlayer, 0)) {
+        // If success is still false at the end, don't set the player's use
+        // time left
+        bool success = false;
         // If it was a left mouse button, place the tile in the foreground
         if (type == InputType::LEFT_BUTTON_PRESSED
                 || type == InputType::LEFT_BUTTON_HELD) {
-            map.placeForeground(xTile, yTile, tileType);
+            success = map.placeForeground(xTile, yTile, tileType);
         }
         // Otherwise, if it was the right mouse button, put the tile in the
         // background
-        if (type == InputType::RIGHT_BUTTON_PRESSED
+        else if (type == InputType::RIGHT_BUTTON_PRESSED
                 || type == InputType::RIGHT_BUTTON_HELD) {
-            map.placeBackground(xTile, yTile, tileType);
+            success = map.placeBackground(xTile, yTile, tileType);
         }
+        // If success, add the use time
+        player.useTimeLeft += (int)success * useTime;
     }
 }
 

@@ -18,6 +18,9 @@ struct MouseBox {
     bool containsMouse;
     // Whether we should pay any attention to the event this contains
     bool wasClicked;
+    // Whether it was also clicked last time (presumably the mouse button is 
+    // being held down)
+    bool isHeld;
     // The event that happened in this box and needs to be handled
     SDL_MouseButtonEvent event;
 

@@ -95,7 +95,7 @@ int main(int argc, char **argv) {
                 case SDL_MOUSEWHEEL:
                 case SDL_MOUSEBUTTONDOWN:
                 case SDL_MOUSEBUTTONUP:
-                    eventHandler.mouseEvent(event, player, map);
+                    eventHandler.mouseEvent(event);
                     break;
                 default:
                     // TODO

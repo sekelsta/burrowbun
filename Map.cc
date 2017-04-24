@@ -323,12 +323,10 @@ void Map::setBackground(int x, int y, Tile* const &val) {
 bool Map::placeForeground(int x, int y, TileType type) {
     // Can only place atile if there isn't one there already
     if (getForeground(x, y) -> type != TileType::EMPTY) {
-        cout << "There's already a tile there!\n";
         return false;
     }
 
     if (!canPutTile(x, y)) {
-        cout << "The tile needs to be next to a solid tile. \n";
         return false;
     }
 
