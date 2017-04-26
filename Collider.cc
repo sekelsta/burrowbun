@@ -154,6 +154,10 @@ bool Collider::listCollisions(vector<CollisionInfo> &collisions, const Map &map,
         stays.x = l * TILE_WIDTH + xOffset;
         for (int j = to.y / TILE_HEIGHT;
                 j < (to.y + to.h) / TILE_HEIGHT + 1; j++) {
+            // Don't collide with tiles not on the map
+            if (j >= map.getHeight()) {
+                continue;
+            }
             Tile *tile = map.getForeground(l, j);
             // Skip non-collidable tiles
             if (!(tile -> isSolid || tile -> isPlatform)) {

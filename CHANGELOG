@@ -1,5 +1,6 @@
 Changes since last push:
  - Now it reacts properly to clicks where the press and release happen in the same frame
+ - Reaching the sky no longer causes an assertion error
 
 Known "features":
  - The strenth of gravity is independent of the world.
@@ -9,7 +10,6 @@ Known "features":
 
 Known bugs:
  - Apparently the player can fit in gaps that they can't escape.
- - Reaching the sky top makes an assertion error (from Collider::listCollisions)
 
 Soon to come (though likely not very soon):
  - Background tiles
@@ -18,7 +18,6 @@ Soon to come (though likely not very soon):
  - Trees!
  - Better map generation
  - Instead of storing the health of every single tile on the map, I should just have a list of the ones that have been damaged.
- - hud
  - Make the spaceInfo class just store a tiletype, not a Tile*, and use it as
 the index of the Tile*
  - Store data in a file instead of in the source code (eg the size of sprites

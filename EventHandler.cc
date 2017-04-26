@@ -109,6 +109,9 @@ EventHandler::EventHandler() {
     wasLeftButtonDown = false;
     wasRightButtonDown = false;
 
+    leftClicks = 0;
+    rightClicks = 0;
+
     move = 0;
 
     // There might be a less repetitive way to do this.
