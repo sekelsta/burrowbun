@@ -1,16 +1,11 @@
 Changes since last push:
- - Changed the way mouse events are handled
- - Made use time functional (the player must wait that many frmaes before they
-can use another item).
- - Now it recognizes a mouse button being held down
+ - Now it reacts properly to clicks where the press and release happen in the same frame
 
 Known "features":
  - The strenth of gravity is independent of the world.
  - Things that move multiple tiles per second won't collide as if they were moving in a straight line. The best way to solve this may be to not allow anything to move that fast, possibly via multiple updates between renderings.
  - The spawn point sometimes puts the player on top of dirt. Spawning should be changed so it destroys any tiles in the way.
  - You can place dirt on top of creatures, including yourself
- - If the mosue button it pressed and released in the same frame, it won't 
-notice
 
 Known bugs:
  - Apparently the player can fit in gaps that they can't escape.

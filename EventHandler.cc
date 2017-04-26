@@ -54,11 +54,13 @@ bool EventHandler::updateMouseBoxes(vector<MouseBox> &mouseBoxes) {
             mouseBoxes[i].event.y = y;
             // If it was a button press in the box, fill in the
             // appropriate fields
-            if (isLeftButtonDown || isRightButtonDown) {
+            bool clickedLeft = isLeftButtonDown || (leftClicks != 0);
+            bool clickedRight = isRightButtonDown || (rightClicks != 0);
+            if (clickedLeft || clickedRight) {
                 mouseBoxes[i].wasClicked = true;
                 mouseBoxes[i].event.type = SDL_MOUSEBUTTONDOWN;
                 // If left and right buttons clicked simultaneously, it's left
-                if (isLeftButtonDown) {
+                if (clickedLeft) {
                     mouseBoxes[i].event.button = SDL_BUTTON_LEFT;
                     mouseBoxes[i].isHeld = wasLeftButtonDown;
                 }
@@ -199,9 +201,14 @@ void EventHandler::mouseEvent(const SDL_Event &event) {
         which = (event.type == SDL_MOUSEBUTTONDOWN);
         // Which button to set
         if (event.button.button == SDL_BUTTON_LEFT) {
+            // Record a button down and up happening in the same frame
+            leftClicks += (int)(!which && isLeftButtonDown 
+                && !wasLeftButtonDown);
             isLeftButtonDown = which;
         }
         else if (event.button.button == SDL_BUTTON_RIGHT) {
+            rightClicks += (int)(!which && isRightButtonDown 
+                && !wasRightButtonDown);
             isRightButtonDown = which;
         }
     }
@@ -226,10 +233,11 @@ void EventHandler::useMouse(Player &player, Map &map) {
     // is holding, if any
     if (!isMouseUsed) {
         InputType type = InputType::NONE;
-        if (isLeftButtonDown && !wasLeftButtonDown) {
+        if ((isLeftButtonDown && !wasLeftButtonDown) || leftClicks != 0) {
             type = InputType::LEFT_BUTTON_PRESSED;
         }
-        else if (isRightButtonDown && !wasRightButtonDown) {
+        else if ((isRightButtonDown && !wasRightButtonDown) 
+                || rightClicks != 0) {
             type = InputType::RIGHT_BUTTON_PRESSED;
         }
         else if (isLeftButtonDown) {
@@ -246,6 +254,9 @@ void EventHandler::useMouse(Player &player, Map &map) {
         // Have the player figure out whether to use an item, and which one
         player.useAction(type, x, y, map);
     }
+    // All done, set clicks to 0 for next time
+    leftClicks = 0;
+    rightClicks = 0;
 }
 
 // Do whatever should be done when key presses or releases happen

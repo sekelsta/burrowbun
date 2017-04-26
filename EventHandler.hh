@@ -47,6 +47,10 @@ class EventHandler {
     bool isRightButtonDown;
     bool wasLeftButtonDown;
     bool wasRightButtonDown;
+    // For when the button is pressed and released multiple times in a frame
+    int leftClicks;
+    int rightClicks;
+
 
     // To move by one pixel at a time, in the vertical direction 
     // This currently only exists for debugging
