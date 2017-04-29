@@ -6,8 +6,30 @@
 /* Class to enumerate the different types of items. */
 enum class ItemType {
     // NONE is just a pointer to NULL instead of an actual object
-    MAPLE_LEAF,
+    // Types of blocks
     DIRT,
+    HUMUS,
+    SAND,
+    CLAY,
+    CALCAREOUS_OOZE,
+    SNOW,
+    ICE,
+    STONE,
+    GRANITE,
+    BASALT,
+    LIMESTONE,
+    MUDSTONE,
+    PERIDOTITE,
+    SANDSTONE,
+    RED_SANDSTONE,
+    PLATFORM,
+    LUMBER,
+    RED_BRICK,
+    GRAY_BRICK,
+    DARK_BRICK,
+
+    // Other things
+    MAPLE_LEAF,
     HEALTH_POTION
 };
 
@@ -22,6 +44,9 @@ class Item : public Action {
 public:
     // Constructor
     Item(ItemType type);
+
+    // Destructor must be virtual
+    virtual ~Item();
 
     // Access functions
     ItemType getType();

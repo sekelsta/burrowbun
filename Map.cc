@@ -25,6 +25,8 @@ SpaceInfo *Map::findPointer(int x, int y) const {
 // Make a new Tile *, add it to the list of pointers, and return the pointer
 Tile *Map::newTile(TileType val) {
     Tile *tile = new Tile(val, pointers.size());
+    tile -> sprite.width = TILE_WIDTH;
+    tile -> sprite.height = TILE_HEIGHT;
     pointers.push_back(tile);
     return tile;
 }
@@ -103,7 +105,7 @@ int Map::distance(int i, int j, int x, int y) {
    of light (doesn't have an opaque foreground or background). If the distance 
    is more than maxDist, return maxDist. */
 int Map::skyDistance(int x, int y, int maxDist) {
-    if (isSky(x, y)) {
+    if (isSky(x, y) || findPointer(x, y) -> foreground -> opacity == 0) {
         return 0;
     }
     int smallest = distance(0, 0, 0, maxDist);
@@ -167,6 +169,11 @@ void Map::updateNear(int x, int y) {
 Map::Map(string filename, int tileWidth, int tileHeight) 
         : TILE_WIDTH(tileWidth), TILE_HEIGHT(tileHeight) {
     ifstream infile(filename);
+
+    /* Create a tile object for each type. */
+    for (int i = 0; i <= (int)TileType::DARK_BRICK; i++) {
+        makeTile((TileType)i);
+    }
 
     // Check that the file could be opened
     // TODO: use exceptions like a proper person
@@ -331,6 +338,15 @@ bool Map::placeForeground(int x, int y, TileType type) {
     }
 
     setForeground(x, y, makeTile(type));
+    // debug
+    Tile *placed = getForeground(x, y);
+    cout << "TileType is " << (int)type << "\n";
+    cout << "index is  " << placed -> index << "\n";
+    cout << "sprite name is " << placed -> sprite.name << "\n";
+    cout << "sprite width is " << placed -> sprite.width << "\n";
+    cout << "sprite height is " << placed -> sprite.height << "\n";
+    cout << "sprite rows is " << placed -> sprite.rows << "\n";
+    cout << "sprite cols is " << placed -> sprite.cols << "\n";
     // TODO: change this when I add furniture
 
     return true;

@@ -39,6 +39,13 @@ public:
 // Function to make na item of the correct class given only an item type
 // Because everything deserves a namespace
 namespace ItemMaker {
+    /* Turn an ItemType into the corresponding TileType. Requires that the
+    itemTypes and TileTypes are listed in the same order in the enum class. */
+    TileType itemToTile(ItemType itemType);
+
+    /* Turn a TileType into the corresponding ItemType. */
+    ItemType tileToItem(TileType tileType);
+
     // Whether the type is in the vector
     bool isIn(std::vector<ItemType> items, ItemType type);
 

@@ -23,6 +23,9 @@ protected:
     int useTime;
 
 public:
+    // Virtual destructor
+    virtual ~Action();
+
     // What sprite should be displayed in the hotbar
     Sprite sprite;
 

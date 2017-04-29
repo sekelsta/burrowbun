@@ -325,7 +325,7 @@ void WindowHandler::updateInventorySprite(Inventory &inventory) {
     SDL_SetRenderTarget(renderer, texture);
     SDL_SetTextureBlendMode(texture, SDL_BLENDMODE_BLEND);
 
-    // Now loop through each square twice, once to draw the bacxkground and
+    // Now loop through each square twice, once to draw the background and
     // once to draw the frame.
     // Draw the background
     Light color = inventory.squareColor;
@@ -350,6 +350,9 @@ void WindowHandler::updateInventorySprite(Inventory &inventory) {
     rectTo.y = 0;
     rectTo.w = Inventory::squareSprite.width;
     rectTo.h = Inventory::squareSprite.height;
+    // Rectangle that sits in each square, to refer to when the item isn't
+    // the same size as the square
+    SDL_Rect refRect = rectTo;
     // Loop through and render each item
     for (int row = 0; row < inventory.getHeight(); row++) {
         for (int col = 0; col < inventory.getWidth(); col++) {
@@ -357,15 +360,20 @@ void WindowHandler::updateInventorySprite(Inventory &inventory) {
             // exists
             Item *item = inventory.getItem(row, col);
             if (item != NULL) {
-                // Laod the sprite if necessary
+                // Load the sprite if necessary
                 // Remermber, loadAction does nothing if it already has a sprite
                 loadAction(*item);
+                // Center rectTo inside refRect
+                rectTo.w = item -> sprite.width;
+                rectTo.h = item -> sprite.height;
+                rectTo.x = refRect.x + (refRect.w - rectTo.w) / 2;
+                rectTo.y = refRect.y + (refRect.h - rectTo.h) / 2;
                 SpriteRect(item -> sprite).render(renderer, &rectTo);
             }
-            rectTo.x += rectTo.w;
+            refRect.x += refRect.w;
         }
-        rectTo.x = 0;
-        rectTo.y += rectTo.h;
+        refRect.x = 0;
+        refRect.y += refRect.h;
     }
 
     // Now render the frames

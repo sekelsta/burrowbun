@@ -29,6 +29,30 @@ Inventory::Inventory(int cols, int rows) {
     squareColor.b = 255;
 }
 
+/* Copy constructor. Don't use, it just asserts false. If I ever think of a 
+good reason anyone might want to use it, I'll write one that does that. */
+Inventory::Inventory(const Inventory &toCopy) {
+    *this = toCopy;
+}
+
+/* operator=, also don't use, also just asserts false. */
+Inventory Inventory::operator=(const Inventory &toCopy) {
+    assert(false);
+}
+
+/* Destructor. Assumes this inventory is the only object with pointers to 
+the items it contains. */
+Inventory::~Inventory() {
+    for (int row = 0; row < getHeight(); row++) {
+        for (int col = 0; col < getWidth(); col++) {
+            // Destroy each item, if it exists
+            if (items[row][col] != NULL) {
+                delete items[row][col];
+            }
+        }
+    }
+}
+
 // Access functions
 
 // Returns the number of columns in the inventory

@@ -36,6 +36,11 @@ Movable::Movable() {
     spriteHeight = 0;
 }
 
+// Virtual destructor
+Movable::~Movable() {};
+
+// Access functions
+
 Point Movable::getVelocity() const {
     return velocity;
 }

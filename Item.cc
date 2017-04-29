@@ -12,6 +12,9 @@ Item::Item(ItemType type) {
     sprite.width = 32;
     sprite.height = 32;
 
+    // Default use time for blocks
+    int blockTime = 6;
+
     // Do stuff specific to the item type
     switch(type) {
         case ItemType::MAPLE_LEAF :
@@ -30,15 +33,11 @@ Item::Item(ItemType type) {
             sprite.col = 1;
             useTime = 32;
             break;
-        case ItemType::DIRT :
-            sprite.name = "dirt.png";
-            sprite.rows = 1;
-            sprite.cols = 1;
-            sprite.row = 0;
-            sprite.col = 0;
-            useTime = 8;
     }
 }
+
+// Destructor must be virtual
+Item::~Item() {};
 
 // Access functions
 ItemType Item::getType() {

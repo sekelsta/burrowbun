@@ -32,6 +32,9 @@ Entity::Entity() {
     mana.emptyColor = health.emptyColor; // still black
 }
 
+// Virtual destructor
+Entity::~Entity() {}
+
 // Recieve a certain amount of raw damage and wounds, before taking defense
 // into account
 void Entity::takeDamage(int normal, int wounds) {

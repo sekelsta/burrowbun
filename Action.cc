@@ -9,6 +9,9 @@ Action::Action() {
     useTime = 1;
 }
 
+// Virtual destructor
+Action::~Action() {};
+
 /* Do the action, or use the item or skill. */
 void Action::use(InputType type, int x, int y, Player &player, Map &map) {
     // Pass

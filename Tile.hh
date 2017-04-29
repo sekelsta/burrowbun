@@ -10,14 +10,26 @@ using namespace std;
 // A class for keeping track of which tiles there are
 enum class TileType {
     EMPTY,
-    IMPASSABLE,
     DIRT,
+    HUMUS,
+    SAND,
+    CLAY,
+    CALCAREOUS_OOZE,
+    SNOW,
+    ICE,
+    STONE,
+    GRANITE,
+    BASALT,
+    LIMESTONE,
     MUDSTONE,
+    PERIDOTITE,
     SANDSTONE,
     RED_SANDSTONE,
-    PERIDOTITE,
-    DIAMOND,
     PLATFORM,
+    LUMBER,
+    RED_BRICK,
+    GRAY_BRICK,
+    DARK_BRICK
 };
 
 /* A class to make tiles based on their type, and store their infos. */
@@ -39,8 +51,6 @@ public:
 
     // Variables for how it interacts with the players
     bool isPlatform; // Whether players collide with the underside
-    bool isTiledLikePlatform; // Platforms look at the tiles next to them and
-                              // diagonal when deciding which sprite to use
     bool isSolid;
 
     /* For lighting. Tiles with 0 opacity are completely permeable to light.*/

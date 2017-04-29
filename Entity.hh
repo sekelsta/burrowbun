@@ -21,6 +21,9 @@ public:
     // Constructor
     Entity(); 
 
+    // Virtual destructor
+    virtual ~Entity();
+
     virtual void takeDamage(int normal, int wounds);
 
     // Calculate fall damage

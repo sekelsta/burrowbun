@@ -4,6 +4,9 @@
 #include "Player.hh"
 #include "Map.hh"
 
+#define TILE_WIDTH 16
+#define TILE_HEIGHT 16
+
 // Potion constructor
 Potion::Potion(ItemType type) : Item(type) {
     // Set values to defaults
@@ -47,16 +50,19 @@ void Potion::use(InputType type, int x, int y, Player &player, Map &map) {
 
 // Block constructor
 Block::Block(ItemType type) : Item(type) {
-    switch (type) {
-        case ItemType::DIRT :
-            tileType = TileType::DIRT;
-            break;
-        default :
-            // Either we forgot a case, or something tried to make a block
-            // out of something that's not a block
-            assert(false);
-            break;
-    }
+    /* Set the tile type. */
+    tileType = ItemMaker::itemToTile(type);
+    useTime = 6;
+    sprite.name = "blocks.png";
+    sprite.rows = 5;
+    sprite.cols = 4;
+    sprite.width = TILE_WIDTH;
+    sprite.height = TILE_HEIGHT;
+    /* Number is the number in the enum class minus the number of the first
+    one, dirt. It's also the order the sprites are in on the spritesheet. */
+    int number = (int)type - (int)ItemType::DIRT;
+    sprite.row = number / sprite.cols;
+    sprite.col = number % sprite.cols;
 }
 
 // When used, place the tile
@@ -91,6 +97,51 @@ void Block::use(InputType type, int x, int y, Player &player, Map &map) {
     }
 }
 
+/* Turn an ItemType into the corresponding TileType. Requires that the 
+tileTypes and ItemTypes are listed in the same order in their enum classes. */
+TileType ItemMaker::itemToTile(ItemType itemType) {
+    /* The first and last tiletypes that are also items are dirt and 
+    dark brick. */
+    int firstTile = (int)TileType::DIRT;
+    int lastTile = (int)TileType::DARK_BRICK;
+    /* The first and last ItemTypes that are also tiles are dirt and 
+    dark brick as well. */
+    int firstItem = (int)ItemType::DIRT;
+    int lastItem = (int)ItemType::DARK_BRICK;
+
+    assert(lastTile - firstTile == lastItem - firstItem);
+    assert(firstItem <= (int)itemType);
+    assert((int)itemType <= lastItem);
+
+    /* Now just convert. */
+    int answer = (int)itemType - firstItem + firstTile;
+    assert(firstTile <= answer);
+    assert(answer <= lastTile);
+    return (TileType)answer;
+}
+
+/* Turn a TileType into the corresponding ItemType. */
+ItemType ItemMaker::tileToItem(TileType tileType) {
+    /* The first and last tiletypes that are also items are dirt and 
+    dark brick. */
+    int firstTile = (int)TileType::DIRT;
+    int lastTile = (int)TileType::DARK_BRICK;
+    /* The first and last ItemTypes that are also tiles are dirt and 
+    dark brick as well. */
+    int firstItem = (int)ItemType::DIRT;
+    int lastItem = (int)ItemType::DARK_BRICK;
+
+    assert(lastTile - firstTile == lastItem - firstItem);
+    assert(firstTile <= (int)tileType);
+    assert((int)tileType <= lastTile);
+
+    /* Now just convert. */
+    int answer = (int)tileType + firstItem - firstTile;
+    assert(firstItem <= answer);
+    assert(answer <= lastItem);
+    return (ItemType)answer;
+}
+
 // Whether the type is in the vector
 bool ItemMaker::isIn(std::vector<ItemType> items, ItemType type) {
     for (unsigned int i = 0; i < items.size(); i++) {
@@ -109,8 +160,13 @@ Item *ItemMaker::makeItem(ItemType type) {
     potions.push_back(ItemType::HEALTH_POTION);
 
     // A list of all the item types that should be blocks
-    std::vector<ItemType> blocks;
-    blocks.push_back(ItemType::DIRT);
+    std::vector<ItemType> blocks({ ItemType::DIRT, ItemType::HUMUS, 
+        ItemType::SAND, ItemType::CLAY, ItemType::CALCAREOUS_OOZE,
+        ItemType::SNOW, ItemType::ICE, ItemType::STONE, ItemType::GRANITE, 
+        ItemType::BASALT, ItemType::LIMESTONE, ItemType::MUDSTONE, 
+        ItemType::PERIDOTITE, ItemType::SANDSTONE, ItemType::RED_SANDSTONE, 
+        ItemType::PLATFORM, ItemType::LUMBER, ItemType::RED_BRICK, 
+        ItemType::GRAY_BRICK, ItemType::DARK_BRICK });
 
     // If it's a potion, make a potion
     if (isIn(potions, type)) {

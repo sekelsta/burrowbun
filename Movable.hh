@@ -59,6 +59,9 @@ public:
     // Constructor
     Movable();
 
+    // Destructor
+    virtual ~Movable();
+
     // Access functions
     Point getVelocity() const;
     void setVelocity(Point newVelocity); // Very few things should use this.

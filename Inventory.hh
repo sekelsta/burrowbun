@@ -37,8 +37,16 @@ public:
     // Constructor, given the size
     Inventory(int cols, int rows);
 
+    /* Copy constructor. Don't use; all it does it assert false. If I ever
+    think of any good reason why anyone would use a copy constructor of an
+    inventory, I'll write a proper one. */
+    Inventory(const Inventory &toCopy);
+
+    /* operator=. Also don't use, also just asserts false. */
+    Inventory operator=(const Inventory &toCopy);
+
     // Destructor
-    // TODO
+    ~Inventory();
 
     // Access functions
     int getWidth() const;
