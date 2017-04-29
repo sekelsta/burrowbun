@@ -92,6 +92,7 @@ Tile::Tile(TileType tileType, unsigned index)
             break;
         case TileType::PLATFORM :
             sprite.name = "platform.png";
+            sprite.cols = 1;
             opacity = 0;
             maxHealth = 2;
             isPlatform = true;

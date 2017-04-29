@@ -1,7 +1,5 @@
 Changes since last push:
- - Added virtual destructors to every base class
- - Added more types of tiles, some with very placeholder graphics
- - Inventory and hotbar no longer require their items to be exactly 32x32.
+ - added actual graphics for some more of the tiles
 
 Known "features":
  - The strenth of gravity is independent of the world.
