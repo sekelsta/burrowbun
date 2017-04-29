@@ -120,20 +120,21 @@ SDL_Texture *WindowHandler::renderHotbarPart(const Hotbar &hotbar,
     assert(textures.size() == 12);
     // Make a texture if necessary
     if (texture == NULL) {
-    // Create texture to draw to
-    // Get the width and height of the textures to render
-    // This function assumes they are all the same
-    int width = hotbar.frame.width;
-    int height = hotbar.frame.height;
-    int totalWidth = 12 * width + 12 * hotbar.smallGap + 2 * hotbar.largeGap;
-    Uint32 pixelFormat = SDL_PIXELFORMAT_ARGB8888;
-    texture = SDL_CreateTexture(renderer, pixelFormat, 
+        // Create texture to draw to
+        // Get the width and height of the textures to render
+        // This function assumes they are all the same
+        int width = hotbar.frame.width;
+        int height = hotbar.frame.height;
+        int totalWidth = 12 * width + 12 * hotbar.smallGap;
+        totalWidth += 2 * hotbar.largeGap;
+        Uint32 pixelFormat = SDL_PIXELFORMAT_ARGB8888;
+        texture = SDL_CreateTexture(renderer, pixelFormat, 
         SDL_TEXTUREACCESS_TARGET, totalWidth, height);
-    // Make the new texture have a transparent background
-    SDL_SetRenderTarget(renderer, texture);
-    SDL_SetTextureBlendMode(texture, SDL_BLENDMODE_BLEND);
-    SDL_SetRenderDrawColor(renderer, 0, 0, 0 ,0);
-    SDL_RenderClear(renderer);
+        // Make the new texture have a transparent background
+        SDL_SetRenderTarget(renderer, texture);
+        SDL_SetTextureBlendMode(texture, SDL_BLENDMODE_BLEND);
+        SDL_SetRenderDrawColor(renderer, 0, 0, 0 ,0);
+        SDL_RenderClear(renderer);
     }
 
     // Set render settings
@@ -147,12 +148,18 @@ SDL_Texture *WindowHandler::renderHotbarPart(const Hotbar &hotbar,
     SDL_Rect rectTo;
     rectTo.w = hotbar.frame.width;
     rectTo.h = hotbar.frame.height;
+    SDL_Rect refRect = rectTo;
     // For each slot
     for (int i = 0; i < 12; i++) {
         // We know the clickboxes have the correct spacing, but the first one 
         // probably isn't at 0, 0. So we just correct for that.
-        rectTo.x = hotbar.clickBoxes[i].x - hotbar.clickBoxes[0].x;
-        rectTo.y = hotbar.clickBoxes[i].y - hotbar.clickBoxes[0].y;
+        refRect.x = hotbar.clickBoxes[i].x - hotbar.clickBoxes[0].x;
+        refRect.y = hotbar.clickBoxes[i].y - hotbar.clickBoxes[0].y;
+        // Put rectTo in the middle of refRect
+        rectTo.w = textures[i].rect.w;
+        rectTo.h = textures[i].rect.h;
+        rectTo.x = refRect.x + (refRect.w - rectTo.w) / 2;
+        rectTo.y = refRect.y + (refRect.h - rectTo.h) / 2;
         textures[i].render(renderer, &rectTo);
     }
 

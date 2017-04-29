@@ -49,7 +49,6 @@ int main(int argc, char **argv) {
 
     // Player
     Player player;
-    assert(player.hotbar.smallGap == 4);
 
     // A vector to hold all the things that need to collide
     vector<Movable *> movables;

@@ -129,7 +129,9 @@ void Map::setLight(int x, int y) {
     place -> light.g = 0;
     place -> light.b = 0;
     int dist = skyDistance(x, y, 25);
-    place -> light.skyIntensity = 255 * max(0.0, exp((1 - dist) / 8.0));
+    // make sure skyIntensity is between 0 and 255
+    double lightIntensity = min(1.0, exp((1 - dist) / 8.0));
+    place -> light.skyIntensity = 255 * max(0.0, lightIntensity);
     // And now the values are correct
     place -> isLightUpdated = true;
 }
@@ -338,15 +340,6 @@ bool Map::placeForeground(int x, int y, TileType type) {
     }
 
     setForeground(x, y, makeTile(type));
-    // debug
-    Tile *placed = getForeground(x, y);
-    cout << "TileType is " << (int)type << "\n";
-    cout << "index is  " << placed -> index << "\n";
-    cout << "sprite name is " << placed -> sprite.name << "\n";
-    cout << "sprite width is " << placed -> sprite.width << "\n";
-    cout << "sprite height is " << placed -> sprite.height << "\n";
-    cout << "sprite rows is " << placed -> sprite.rows << "\n";
-    cout << "sprite cols is " << placed -> sprite.cols << "\n";
     // TODO: change this when I add furniture
 
     return true;

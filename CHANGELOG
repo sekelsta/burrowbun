@@ -1,20 +1,21 @@
 Changes since last push:
- - Now it reacts properly to clicks where the press and release happen in the same frame
- - Reaching the sky no longer causes an assertion error
+ - Added virtual destructors to every base class
+ - Added more types of tiles, some with very placeholder graphics
+ - Inventory and hotbar no longer require their items to be exactly 32x32.
 
 Known "features":
  - The strenth of gravity is independent of the world.
  - Things that move multiple tiles per second won't collide as if they were moving in a straight line. The best way to solve this may be to not allow anything to move that fast, possibly via multiple updates between renderings.
  - The spawn point sometimes puts the player on top of dirt. Spawning should be changed so it destroys any tiles in the way.
  - You can place dirt on top of creatures, including yourself
+ - Tiles have an opacity between 0 and 64, but right now it only matters whether it's zero or not.
 
 Known bugs:
  - Apparently the player can fit in gaps that they can't escape.
 
 Soon to come (though likely not very soon):
  - Background tiles
- - stacking items, throwing / picking up items, more items
- - More types of tiles
+ - stacking items, throwing / picking up items
  - Trees!
  - Better map generation
  - Instead of storing the health of every single tile on the map, I should just have a list of the ones that have been damaged.

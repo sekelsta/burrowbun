@@ -77,6 +77,25 @@ Player::Player() : inventory(10, 6), trash(1, 1) {
     // Have starting items
     inventory.pickup(ItemMaker::makeItem(ItemType::HEALTH_POTION));
     inventory.pickup(ItemMaker::makeItem(ItemType::DIRT));
+    inventory.pickup(ItemMaker::makeItem(ItemType::HUMUS));
+    inventory.pickup(ItemMaker::makeItem(ItemType::SAND));
+    inventory.pickup(ItemMaker::makeItem(ItemType::CLAY));
+    inventory.pickup(ItemMaker::makeItem(ItemType::CALCAREOUS_OOZE));
+    inventory.pickup(ItemMaker::makeItem(ItemType::SNOW));
+    inventory.pickup(ItemMaker::makeItem(ItemType::ICE));
+    inventory.pickup(ItemMaker::makeItem(ItemType::STONE));
+    inventory.pickup(ItemMaker::makeItem(ItemType::GRANITE));
+    inventory.pickup(ItemMaker::makeItem(ItemType::BASALT));
+    inventory.pickup(ItemMaker::makeItem(ItemType::LIMESTONE));
+    inventory.pickup(ItemMaker::makeItem(ItemType::MUDSTONE));
+    inventory.pickup(ItemMaker::makeItem(ItemType::PERIDOTITE));
+    inventory.pickup(ItemMaker::makeItem(ItemType::SANDSTONE));
+    inventory.pickup(ItemMaker::makeItem(ItemType::RED_SANDSTONE));
+    inventory.pickup(ItemMaker::makeItem(ItemType::PLATFORM));
+    inventory.pickup(ItemMaker::makeItem(ItemType::LUMBER));
+    inventory.pickup(ItemMaker::makeItem(ItemType::RED_BRICK));
+    inventory.pickup(ItemMaker::makeItem(ItemType::GRAY_BRICK));
+    inventory.pickup(ItemMaker::makeItem(ItemType::DARK_BRICK));
 
     isInventoryOpen = false;
 }
