@@ -1,0 +1,6 @@
+*.o
+*.gch
+main
+map.bmp
+*.swp
+*.world

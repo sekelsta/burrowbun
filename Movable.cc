@@ -104,3 +104,7 @@ void Movable::accelerate() {
     velocity.y = ceil(velocity.y);
 }
 
+/* Take damage. */
+void Movable::takeDamage(int normal, int wounds) {
+    // Pass
+}

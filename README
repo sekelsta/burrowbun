@@ -1,3 +1,1 @@
-This may someday be a sandbox game. Currently it generates a world in which the player can run around.
-
-To compile, it requires SDL2. The Makefile also expects gcc to be installed, but could be edited to use a different compiler. This program is written for and tested on Debian Linux (Jessie), but might work if compiled on other operating stystems. (Windows definitely requires edits to the source code, if only to change the including of SDL2/SDL.h to including SDL2.)
+To compile, it requires SDL2 and libnoise. The Makefile also expects gcc to be installed, but could be edited to use a different compiler. This program is written for and tested on Debian Linux (Jessie), but might work if compiled on other operating stystems. (Windows definitely requires edits to the source code, if only to change the include locations of libraries.)

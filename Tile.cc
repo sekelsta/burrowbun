@@ -3,6 +3,29 @@
 
 using namespace std;
 
+// All the access functions
+bool Tile::getIsPlatform() const {
+    return isPlatform;
+}
+
+bool Tile::getIsSolid() const {
+    return isSolid;
+}
+
+int Tile::getOpacity() const {
+    return opacity;
+}
+
+int Tile::getMaxHealth() const {
+    return maxHealth;
+}
+
+/* Deal damage to whatever is overlapping this, and stop it if this tile is 
+solid. */
+void Tile::dealOverlapDamage(Movable &movable) const {
+    movable.takeDamage(overlapDamage, 0);
+}
+
 // Constructor, based on the tile type
 // This is basically a long list of the attributes of each tile type
 Tile::Tile(TileType tileType, unsigned index) 
@@ -15,8 +38,8 @@ Tile::Tile(TileType tileType, unsigned index)
     sprite.cols = 4;
     isSolid = true;
     isPlatform = false;
+    overlapDamage = 0;
     maxHealth = 1;
-    erodeResist = -1;
     opacity = 64;
 
     // Set things to the right values
@@ -29,7 +52,6 @@ Tile::Tile(TileType tileType, unsigned index)
         case TileType::DIRT :
             sprite.name = "dirt.png";
             maxHealth = 5;
-            erodeResist = 10;
             break;
         case TileType::HUMUS :
             sprite.name = "humus.png";
@@ -38,6 +60,7 @@ Tile::Tile(TileType tileType, unsigned index)
         case TileType::SAND : 
             sprite.name = "sand.png";
             maxHealth = 3;
+            overlapDamage = 10;
             break;
         case TileType::CLAY :
             sprite.name = "clay.png";
@@ -74,7 +97,6 @@ Tile::Tile(TileType tileType, unsigned index)
         case TileType::MUDSTONE :
             sprite.name = "mudstone.png";
             maxHealth = 10;
-            erodeResist = 100;
             break;
         case TileType::PERIDOTITE :
             sprite.name = "peridotite.png";
@@ -83,12 +105,10 @@ Tile::Tile(TileType tileType, unsigned index)
         case TileType::SANDSTONE :
             sprite.name = "sandstone.png";
             maxHealth = 8;
-            erodeResist = 100;
             break;
         case TileType::RED_SANDSTONE :
             sprite.name = "red_sandstone.png";
             maxHealth = 8;
-            erodeResist = 100;
             break;
         case TileType::PLATFORM :
             sprite.name = "platform.png";

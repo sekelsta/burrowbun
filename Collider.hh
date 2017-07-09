@@ -46,22 +46,22 @@ struct CollisionInfo {
         cornerX = -1;
         switch(type) {
             case CollisionType::DOWN :
-                yCoefficient *= (int)(!(tile -> isPlatform));
+                yCoefficient *= (int)(!(tile -> getIsPlatform()));
                 // Purposely no break
             case CollisionType::UP :
                 newY = y;
-                yCoefficient *= (int)(!(tile -> isSolid));
+                yCoefficient *= (int)(!(tile -> getIsSolid()));
                 break;
             case CollisionType::LEFT :
             case CollisionType::RIGHT :
                 newX = x;
-                if (tile -> isSolid) {
+                if (tile -> getIsSolid()) {
                     xCoefficient = 0;
                 }
                 break;
             case CollisionType::LEFT_CORNER :
             case CollisionType::RIGHT_CORNER :
-                if (tile -> isSolid) {
+                if (tile -> getIsSolid()) {
                     cornerX = x;
                 }
                 break;
@@ -69,7 +69,7 @@ struct CollisionInfo {
                 break;
             }
             // Ignore collisions with platforms from most directions
-            if (tile -> isPlatform && type != CollisionType::DOWN) {
+            if (tile -> getIsPlatform() && type != CollisionType::DOWN) {
                 type = CollisionType::NONE;
             }
         }

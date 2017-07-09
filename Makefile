@@ -18,10 +18,10 @@ main.o : main.cc World.hh Tile.hh Map.hh WindowHandler.hh EventHandler.hh \
         Item.hh Action.hh AllTheItems.hh
 	$(CC) $(CXXFLAGS) $(LINKER_FLAGS) $^ -c $(LDFLAGS)
 
-Map.o : Map.cc Map.hh Tile.hh MapHelpers.hh Light.hh
+Map.o : Map.cc Map.hh Tile.hh MapHelpers.hh Light.hh Movable.hh Sprite.hh
 	$(CC) $(CXXFLAGS) $^ -c $(LDFLAGS)
 
-Tile.o : Tile.cc Tile.hh Sprite.hh
+Tile.o : Tile.cc Tile.hh Sprite.hh Movable.hh
 	$(CC) $(CXXFLAGS) $^ -c $(LDFLAGS)
 
 WindowHandler.o : WindowHandler.cc WindowHandler.hh Tile.hh Map.hh Movable.hh \
@@ -45,7 +45,7 @@ Collider.o : Collider.cc Collider.hh Tile.hh Map.hh Movable.hh Point.hh \
         Sprite.hh
 	$(CC) $(CXXFLAGS) $^ -c $(LDFLAGS)
 
-World.o : World.cc World.hh Tile.hh MapHelpers.hh Sprite.hh
+World.o : World.cc World.hh Tile.hh MapHelpers.hh Sprite.hh Movable.hh
 	$(CC) $(CXXFLAGS) $^ -c $(LDFLAGS) $(NOISE_FLAGS)
 
 Hotbar.o : Hotbar.cc Hotbar.hh Sprite.hh UIHelpers.hh Action.hh Item.hh

@@ -1,5 +1,6 @@
 Changes since last push:
- - added actual graphics for some more of the tiles
+ - Refactored Tile
+ - Some tiles now deal damage
 
 Known "features":
  - The strenth of gravity is independent of the world.
@@ -11,7 +12,9 @@ Known "features":
 Known bugs:
  - Apparently the player can fit in gaps that they can't escape.
 
-Soon to come (though likely not very soon):
+To do:
+ - rewrite almost all world generation code to use noise
+ - rethink interactions between the collider and movables
  - Background tiles
  - stacking items, throwing / picking up items
  - Trees!
@@ -20,4 +23,4 @@ Soon to come (though likely not very soon):
  - Make the spaceInfo class just store a tiletype, not a Tile*, and use it as
 the index of the Tile*
  - Store data in a file instead of in the source code (eg the size of sprites
-and the properties of the different types of tiles)
+and the properties of the different types of tiles) (probably XML)

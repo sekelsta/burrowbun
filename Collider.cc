@@ -160,11 +160,11 @@ bool Collider::listCollisions(vector<CollisionInfo> &collisions, const Map &map,
             }
             Tile *tile = map.getForeground(l, j);
             // Skip non-collidable tiles
-            if (!(tile -> isSolid || tile -> isPlatform)) {
+            if (!(tile -> getIsSolid() || tile -> getIsPlatform())) {
                 continue;
             }
             // Skip platforms if we should drop through them
-            if (tile -> isPlatform && dropDown) {
+            if (tile -> getIsPlatform() && dropDown) {
                 continue;
             }
             stays.y = j * TILE_HEIGHT + yOffset;
@@ -241,10 +241,13 @@ void Collider::collide(const Map &map, Movable &movable) {
         stays.x = l * TILE_WIDTH + xOffset;
         for (int j = startY; j < startY + height; j++) {
             stays.y = j * TILE_HEIGHT + yOffset;
+            /* If the player starts off overlapping this tile */
             if (stays.intersects(from) && enableCollisions) {
-                // If I add sand that falls and does damage, I should 
-                // deal that damage here.
-                if (map.getForeground(l, j) -> isSolid) {
+                /* Deal damage based on tile type. */
+                Tile *tile = map.getForeground(l, j);
+                tile -> dealOverlapDamage(movable);
+                /* If the tile is solid, set velocity to 0. */
+                if (tile -> getIsSolid()) {
                     xVelocity = 0;
                     yVelocity = 0;
                 }
@@ -256,7 +259,7 @@ void Collider::collide(const Map &map, Movable &movable) {
     double xCoefficient = 1;
     double yCoefficient = 1;
     while (xVelocity != 0 || yVelocity != 0) {
-        // The n is in case moludo results in 0 inconviniently
+        // The n is in case moludo results in 0 inconveniently
         int n = max(min(1, xVelocity), -1);
         int dx = (xVelocity - n) % (TILE_WIDTH / 2) + n;
         n = max(min(1, yVelocity), -1);

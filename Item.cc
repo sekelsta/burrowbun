@@ -12,9 +12,6 @@ Item::Item(ItemType type) {
     sprite.width = 32;
     sprite.height = 32;
 
-    // Default use time for blocks
-    int blockTime = 6;
-
     // Do stuff specific to the item type
     switch(type) {
         case ItemType::MAPLE_LEAF :
@@ -32,6 +29,9 @@ Item::Item(ItemType type) {
             sprite.row = 4;
             sprite.col = 1;
             useTime = 32;
+            break;
+        default :
+            // pass
             break;
     }
 }

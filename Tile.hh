@@ -2,6 +2,7 @@
 #define TILE_HH
 
 #include "Sprite.hh"
+#include "Movable.hh"
 
 using namespace std;
 
@@ -34,8 +35,26 @@ enum class TileType {
 
 /* A class to make tiles based on their type, and store their infos. */
 // Maybe since maps are filled with pointers to the same tile, everything
-// should be constant
+// should be constant?
 class Tile {
+    // Collision-related varables
+    /* Whether the tile is a platform. Palyers only colide with the tops side
+    of platforms. */
+    bool isPlatform;
+    /* Whether players can pass through the tile. */
+    bool isSolid;
+    /* How much damage the player takes from sharing space with this tile. */
+    int overlapDamage;
+
+    // Display-related variables
+    /* Tiles with 0 opacity are completely permeable to light. */
+    int opacity;
+
+    // Mining-related variables
+    /* How much health the tile has determines how many hits it can take from
+    a pickax before it breaks. */
+    int maxHealth;
+
 public:
     // The name of this type of tile
     const TileType type;
@@ -50,21 +69,17 @@ public:
     Sprite sprite;
 
     // Variables for how it interacts with the players
-    bool isPlatform; // Whether players collide with the underside
-    bool isSolid;
+    bool getIsPlatform() const;
+    bool getIsSolid() const;
+    void dealOverlapDamage(Movable &movable) const;
 
     /* For lighting. Tiles with 0 opacity are completely permeable to light.*/
-    int opacity;
+    int getOpacity() const;
 
     // Basically the number of hits with a pickax to break it
-    int maxHealth;
-
-    // Variables to use in map generation and upkeep
-    // In these ones, -1 means infinity
-    double erodeResist;  // How hard it is to erode
+    int getMaxHealth() const;
 
     // Constructor, based on the tile type
-    // Also the only actual method Tiles have
     Tile(TileType tileType, unsigned index);
 };
 

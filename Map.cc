@@ -92,8 +92,8 @@ bool Map::canPutTile(int x, int y) const {
 
 /* Return true if neither the foreground nor background is opaque. */
 inline bool Map::isSky(int x, int y) {
-    return (getForeground(x, y) -> opacity == 0
-        && getBackground(x, y) -> opacity == 0);
+    return (getForeground(x, y) -> getOpacity() == 0
+        && getBackground(x, y) -> getOpacity() == 0);
 }
 
 /* Return the square of the distance between i, j and x, y. */
@@ -105,7 +105,7 @@ int Map::distance(int i, int j, int x, int y) {
    of light (doesn't have an opaque foreground or background). If the distance 
    is more than maxDist, return maxDist. */
 int Map::skyDistance(int x, int y, int maxDist) {
-    if (isSky(x, y) || findPointer(x, y) -> foreground -> opacity == 0) {
+    if (isSky(x, y) || findPointer(x, y) -> foreground -> getOpacity() == 0) {
         return 0;
     }
     int smallest = distance(0, 0, 0, maxDist);

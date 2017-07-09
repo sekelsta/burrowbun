@@ -73,6 +73,11 @@ public:
 
     // Updates velocity
     void accelerate();
+
+    /* Take damage. Since movables in general don't have health, this mostly
+    exists so the collider can tell movables to take damage from overlapping a
+    tile without hacing to handle entities differently. */
+    virtual void takeDamage(int normal, int wounds);
 };
 
 #endif
