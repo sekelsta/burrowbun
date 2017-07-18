@@ -24,7 +24,9 @@ SpaceInfo *Map::findPointer(int x, int y) const {
 
 // Make a new Tile *, add it to the list of pointers, and return the pointer
 Tile *Map::newTile(TileType val) {
-    Tile *tile = new Tile(val, pointers.size());
+    Tile *tile = new Tile(val);
+    /* Make sure tiles are added in the right order. */
+    assert((unsigned int)val == pointers.size());
     tile -> sprite.width = TILE_WIDTH;
     tile -> sprite.height = TILE_HEIGHT;
     pointers.push_back(tile);

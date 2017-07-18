@@ -59,9 +59,6 @@ public:
     // The name of this type of tile
     const TileType type;
 
-    // This tile's position in the map's vector of tile pointers
-    unsigned index;
-
     // Information about the sprite
     // Tile spritesheets use rows for the different versions that depend on
     // whether each side is next to air, and the cols are the different 
@@ -81,7 +78,7 @@ public:
 
 
     // Constructor, based on the tile type
-    Tile(TileType tileType, unsigned index);
+    Tile(TileType tileType);
 };
 
 #endif

@@ -35,8 +35,8 @@ void Tile::dealOverlapDamage(Movable &movable) const {
 
 // Constructor, based on the tile type
 // This is basically a long list of the attributes of each tile type
-Tile::Tile(TileType tileType, unsigned index) 
-        : type(tileType), index(index) {
+Tile::Tile(TileType tileType) 
+        : type(tileType) {
     string filename;
     string prefix = "tiles/";
     // Make the pointer point to nothing
