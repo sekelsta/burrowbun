@@ -1,0 +1,12 @@
+{
+    "sprite": {
+        "rows": 16,
+        "cols": 4,
+        "name": "clay.png"
+    },
+    "isSolid": true,
+    "isPlatform": false,
+    "overlapDamage": 0,
+    "maxHealth": 4,
+    "opacity": 64
+}

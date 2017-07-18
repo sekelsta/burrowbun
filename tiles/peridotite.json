@@ -1,0 +1,12 @@
+{
+    "sprite": {
+        "rows": 16,
+        "cols": 4,
+        "name": "peridotite.png"
+    },
+    "isSolid": true,
+    "isPlatform": false,
+    "overlapDamage": 0,
+    "maxHealth": 11,
+    "opacity": 64
+}

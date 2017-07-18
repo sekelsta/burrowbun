@@ -1,0 +1,12 @@
+{
+    "sprite": {
+        "rows": 16,
+        "cols": 1,
+        "name": "red_brick.png"
+    },
+    "isSolid": true,
+    "isPlatform": false,
+    "overlapDamage": 0,
+    "maxHealth": 12,
+    "opacity": 64
+}

@@ -1,3 +1,5 @@
+JSON parser - written by Niels Lohman, released under MIT license
+
 The mudstone used a small piece from http://opengameart.org/content/alien-planet-platformer-tileset which was then heavily edited.
 The peridotite used a small piece from http://opengameart.org/content/opp-jungle-tiles, which was also heavily edited. The contributors to the jungle tiles are:
     Hapiel

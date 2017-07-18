@@ -79,6 +79,7 @@ public:
     // Basically the number of hits with a pickax to break it
     int getMaxHealth() const;
 
+
     // Constructor, based on the tile type
     Tile(TileType tileType, unsigned index);
 };

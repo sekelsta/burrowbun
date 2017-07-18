@@ -1,0 +1,12 @@
+{
+    "sprite": {
+        "rows": 16,
+        "cols": 4,
+        "name": "sand.png"
+    },
+    "isSolid": true,
+    "isPlatform": false,
+    "overlapDamage": 10,
+    "maxHealth": 3,
+    "opacity": 64
+}

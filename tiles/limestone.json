@@ -1,0 +1,12 @@
+{
+    "sprite": {
+        "rows": 16,
+        "cols": 4,
+        "name": "limestone.png"
+    },
+    "isSolid": true,
+    "isPlatform": false,
+    "overlapDamage": 0,
+    "maxHealth": 7,
+    "opacity": 64
+}

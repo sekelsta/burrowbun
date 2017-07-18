@@ -1,4 +1,5 @@
 #include <iostream>
+#include <cassert>
 #include "Tile.hh"
 #include "Map.hh"
 #include "World.hh"
@@ -20,7 +21,6 @@ const int TICKS_PER_FRAME = 1000 / SCREEN_FPS;
 Sprite Inventory::squareSprite;
 
 int main(int argc, char **argv) {
- 
     // Declare variables for rendering a window
     int screenWidth = 800;
     int screenHeight = 600;

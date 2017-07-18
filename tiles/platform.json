@@ -1,0 +1,12 @@
+{
+    "sprite": {
+        "rows": 16,
+        "cols": 1,
+        "name": "platform.png"
+    },
+    "isSolid": false,
+    "isPlatform": true,
+    "overlapDamage": 0,
+    "maxHealth": 2,
+    "opacity": 0
+}

@@ -21,7 +21,7 @@ main.o : main.cc World.hh Tile.hh Map.hh WindowHandler.hh EventHandler.hh \
 Map.o : Map.cc Map.hh Tile.hh MapHelpers.hh Light.hh Movable.hh Sprite.hh
 	$(CC) $(CXXFLAGS) $^ -c $(LDFLAGS)
 
-Tile.o : Tile.cc Tile.hh Sprite.hh Movable.hh
+Tile.o : Tile.cc Tile.hh Sprite.hh Movable.hh json.hpp
 	$(CC) $(CXXFLAGS) $^ -c $(LDFLAGS)
 
 WindowHandler.o : WindowHandler.cc WindowHandler.hh Tile.hh Map.hh Movable.hh \

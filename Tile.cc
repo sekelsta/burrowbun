@@ -1,5 +1,12 @@
 #include <cassert>
+#include <iostream>
+#include <fstream>
+#include <string>
 #include "Tile.hh"
+#include "json.hpp"
+
+// For convenience
+using json = nlohmann::json;
 
 using namespace std;
 
@@ -30,115 +37,91 @@ void Tile::dealOverlapDamage(Movable &movable) const {
 // This is basically a long list of the attributes of each tile type
 Tile::Tile(TileType tileType, unsigned index) 
         : type(tileType), index(index) {
+    string filename;
+    string prefix = "tiles/";
     // Make the pointer point to nothing
     sprite.texture = NULL;
 
-    // These variables will usually be these values
-    sprite.rows = 16;
-    sprite.cols = 4;
-    isSolid = true;
-    isPlatform = false;
-    overlapDamage = 0;
-    maxHealth = 1;
-    opacity = 64;
-
-    // Set things to the right values
+    /* Figure out the right json file to use. */
     switch(tileType) {
         case TileType::EMPTY : 
-            isSolid = false;
-            sprite.name = "";
-            opacity = 0;
+            filename = "empty.json";
             break;
         case TileType::DIRT :
-            sprite.name = "dirt.png";
-            maxHealth = 5;
+            filename = "dirt.json";
             break;
         case TileType::HUMUS :
-            sprite.name = "humus.png";
-            maxHealth = 3;
+            filename = "humus.json";
             break;
         case TileType::SAND : 
-            sprite.name = "sand.png";
-            maxHealth = 3;
-            overlapDamage = 10;
+            filename = "sand.json";
             break;
         case TileType::CLAY :
-            sprite.name = "clay.png";
-            maxHealth = 4;
+            filename = "clay.json";
             break;
         case TileType::CALCAREOUS_OOZE :
-            sprite.name = "calcareous_ooze.png";
-            maxHealth = 2;
+            filename = "calcareous_ooze.json";
             break;
         case TileType::SNOW :
-            sprite.name = "snow.png";
-            maxHealth = 3;
+            filename = "snow.json";
             break;
         case TileType::ICE :
-            sprite.name = "ice.png";
-            maxHealth = 6;
+            filename = "ice.json";
             break;
         case TileType::STONE :
-            sprite.name = "stone.png";
-            maxHealth = 8;
+            filename = "stone.json";
             break;
         case TileType::GRANITE :
-            sprite.name = "granite.png";
-            maxHealth = 8;
+            filename = "granite.json";
             break;
         case TileType::BASALT : 
-            sprite.name = "basalt.png";
-            maxHealth = 8;
+            filename = "basalt.json";
             break;
         case TileType::LIMESTONE : 
-            sprite.name = "limestone.png";
-            maxHealth = 7;
+            filename = "limestone.json";
             break;
         case TileType::MUDSTONE :
-            sprite.name = "mudstone.png";
-            maxHealth = 10;
+            filename = "mudstone.json";
             break;
         case TileType::PERIDOTITE :
-            sprite.name = "peridotite.png";
-            maxHealth = 3;
+            filename = "peridotite.json";
             break;
         case TileType::SANDSTONE :
-            sprite.name = "sandstone.png";
-            maxHealth = 8;
+            filename = "sandstone.json";
             break;
         case TileType::RED_SANDSTONE :
-            sprite.name = "red_sandstone.png";
-            maxHealth = 8;
+            filename = "red_sandstone.json";
             break;
         case TileType::PLATFORM :
-            sprite.name = "platform.png";
-            sprite.cols = 1;
-            opacity = 0;
-            maxHealth = 2;
-            isPlatform = true;
-            isSolid = false;
+            filename = "platform.json";
             break;
         case TileType::LUMBER :
-            sprite.name = "lumber.png";
-            sprite.cols = 1;
-            maxHealth = 8;
+            filename = "lumber.json";
             break;
         case TileType::RED_BRICK :
-            sprite.name = "red_brick.png";
-            sprite.cols = 1;
-            maxHealth = 12;
+            filename = "red_brick.json";
             break;
         case TileType::GRAY_BRICK :
-            sprite.name = "gray_brick.png";
-            sprite.cols = 1;
-            maxHealth = 12;
+            filename = "gray_brick.json";
             break;
         case TileType::DARK_BRICK : 
-            sprite.name = "dark_brick.png";
-            sprite.cols = 1;
-            maxHealth = 20;
+            filename = "dark_brick.json";
             break;
     }
+
+    /* Put data in json. */
+    ifstream infile(prefix + filename);
+    json j = json::parse(infile);
+    /* Set each of this tile's non-const values equal to the json's values. */
+    sprite.name = j["sprite"]["name"];
+    sprite.rows = j["sprite"]["rows"];
+    sprite.cols = j["sprite"]["cols"];
+    sprite.texture = NULL;
+    isSolid = j["isSolid"];
+    isPlatform = j["isPlatform"];
+    overlapDamage = j["overlapDamage"];
+    maxHealth = j["maxHealth"];
+    opacity = j["opacity"];
 }
 
 

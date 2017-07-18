@@ -1,0 +1,12 @@
+{
+    "sprite": {
+        "rows": 16,
+        "cols": 1,
+        "name": "lumber.png"
+    },
+    "isSolid": true,
+    "isPlatform": false,
+    "overlapDamage": 0,
+    "maxHealth": 8,
+    "opacity": 64
+}
