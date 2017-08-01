@@ -1,8 +1,13 @@
 #ifndef TILE_HH
 #define TILE_HH
 
+#include <vector>
 #include "Sprite.hh"
-#include "Movable.hh"
+
+/* Forward declare! */
+class Map;
+class Movable;
+struct Location;
 
 using namespace std;
 
@@ -13,7 +18,6 @@ enum class TileType {
     EMPTY,
     DIRT,
     HUMUS,
-    SAND,
     CLAY,
     CALCAREOUS_OOZE,
     SNOW,
@@ -30,7 +34,14 @@ enum class TileType {
     LUMBER,
     RED_BRICK,
     GRAY_BRICK,
-    DARK_BRICK
+    DARK_BRICK,
+    SAND,
+    FIRST_TILE = EMPTY,
+    FIRST_ITEMED_TILE = DIRT, // First tile with an equivalent item
+    LAST_TILE = SAND,
+    LAST_PURE_TILE = DARK_BRICK, // Last tile that's not a subclass
+    FIRST_BOULDER = SAND,
+    LAST_BOULDER = SAND
 };
 
 /* A class to make tiles based on their type, and store their infos. */
@@ -76,9 +87,15 @@ public:
     // Basically the number of hits with a pickax to break it
     int getMaxHealth() const;
 
+    /* Change the map in whatever way needs doing. */
+    virtual bool update(Map &map, Location place, vector<Movable*> &movables, 
+        int tick);
 
     // Constructor, based on the tile type
     Tile(TileType tileType);
+
+    /* Virtual destructor. */
+    virtual ~Tile();
 };
 
 #endif

@@ -8,5 +8,12 @@
     "isPlatform": false,
     "overlapDamage": 10,
     "maxHealth": 3,
-    "opacity": 64
+    "opacity": 64,
+    "moveTicks": 0,
+    "tilesDestroyed": [],
+    "tilesCrushed": [],
+    "tilesDisplaced": [],
+    "tilesSunk": [],
+    "isFloating": false,
+    "carriesMovables": false
 }

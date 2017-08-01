@@ -5,7 +5,6 @@
 #include "Item.hh"
 #include "Tile.hh"
 
-
 // All the child classes of "Item"
 // Items that change the player's stats
 class Potion : public Item {

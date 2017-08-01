@@ -1,6 +1,9 @@
 Changes since last push:
- - Refactored Tile
- - Some tiles now deal damage
+ - Added boulders as a subclass of tiles
+ - Added an update function for tiles and boulders
+ - Added a LAST_ENUM value to enum classes that needed one
+ - Renamed Map::makeTile to Map::getTile and modified Map::newTile so it makes 
+a boulder instead where appropriate
 
 Known "features":
  - The strenth of gravity is independent of the world.
@@ -13,6 +16,8 @@ Known bugs:
  - Apparently the player can fit in gaps that they can't escape.
 
 To do:
+ - Tiles should have a function to decide which version of the sprite to
+use, not make the map do that
  - rewrite almost all world generation code to use noise
  - rethink interactions between the collider and movables
  - Background tiles

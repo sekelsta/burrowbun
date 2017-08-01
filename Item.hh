@@ -9,7 +9,6 @@ enum class ItemType {
     // Types of blocks
     DIRT,
     HUMUS,
-    SAND,
     CLAY,
     CALCAREOUS_OOZE,
     SNOW,
@@ -27,10 +26,16 @@ enum class ItemType {
     RED_BRICK,
     GRAY_BRICK,
     DARK_BRICK,
+    SAND,
+    FIRST_BLOCK = DIRT,
+    LAST_BLOCK = SAND,
 
     // Other things
     MAPLE_LEAF,
-    HEALTH_POTION
+    HEALTH_POTION,
+
+    FIRST_ITEM = DIRT,
+    LAST_ITEM = HEALTH_POTION
 };
 
 /* The thing inventories store. */

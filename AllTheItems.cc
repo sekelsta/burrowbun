@@ -59,8 +59,8 @@ Block::Block(ItemType type) : Item(type) {
     sprite.width = TILE_WIDTH;
     sprite.height = TILE_HEIGHT;
     /* Number is the number in the enum class minus the number of the first
-    one, dirt. It's also the order the sprites are in on the spritesheet. */
-    int number = (int)type - (int)ItemType::DIRT;
+    one. It's also the order the sprites are in on the spritesheet. */
+    int number = (int)type - (int)ItemType::FIRST_BLOCK;
     sprite.row = number / sprite.cols;
     sprite.col = number % sprite.cols;
 }
@@ -102,12 +102,12 @@ tileTypes and ItemTypes are listed in the same order in their enum classes. */
 TileType ItemMaker::itemToTile(ItemType itemType) {
     /* The first and last tiletypes that are also items are dirt and 
     dark brick. */
-    int firstTile = (int)TileType::DIRT;
-    int lastTile = (int)TileType::DARK_BRICK;
+    int firstTile = (int)TileType::FIRST_ITEMED_TILE;
+    int lastTile = (int)TileType::LAST_TILE;
     /* The first and last ItemTypes that are also tiles are dirt and 
     dark brick as well. */
-    int firstItem = (int)ItemType::DIRT;
-    int lastItem = (int)ItemType::DARK_BRICK;
+    int firstItem = (int)ItemType::FIRST_BLOCK;
+    int lastItem = (int)ItemType::LAST_BLOCK;
 
     assert(lastTile - firstTile == lastItem - firstItem);
     assert(firstItem <= (int)itemType);
@@ -124,12 +124,12 @@ TileType ItemMaker::itemToTile(ItemType itemType) {
 ItemType ItemMaker::tileToItem(TileType tileType) {
     /* The first and last tiletypes that are also items are dirt and 
     dark brick. */
-    int firstTile = (int)TileType::DIRT;
-    int lastTile = (int)TileType::DARK_BRICK;
+    int firstTile = (int)TileType::FIRST_ITEMED_TILE;
+    int lastTile = (int)TileType::LAST_TILE;
     /* The first and last ItemTypes that are also tiles are dirt and 
     dark brick as well. */
-    int firstItem = (int)ItemType::DIRT;
-    int lastItem = (int)ItemType::DARK_BRICK;
+    int firstItem = (int)ItemType::FIRST_BLOCK;
+    int lastItem = (int)ItemType::LAST_BLOCK;
 
     assert(lastTile - firstTile == lastItem - firstItem);
     assert(firstTile <= (int)tileType);
@@ -159,21 +159,13 @@ Item *ItemMaker::makeItem(ItemType type) {
     std::vector<ItemType> potions;
     potions.push_back(ItemType::HEALTH_POTION);
 
-    // A list of all the item types that should be blocks
-    std::vector<ItemType> blocks({ ItemType::DIRT, ItemType::HUMUS, 
-        ItemType::SAND, ItemType::CLAY, ItemType::CALCAREOUS_OOZE,
-        ItemType::SNOW, ItemType::ICE, ItemType::STONE, ItemType::GRANITE, 
-        ItemType::BASALT, ItemType::LIMESTONE, ItemType::MUDSTONE, 
-        ItemType::PERIDOTITE, ItemType::SANDSTONE, ItemType::RED_SANDSTONE, 
-        ItemType::PLATFORM, ItemType::LUMBER, ItemType::RED_BRICK, 
-        ItemType::GRAY_BRICK, ItemType::DARK_BRICK });
-
     // If it's a potion, make a potion
     if (isIn(potions, type)) {
         return new Potion(type);
     }
     // If it's a block, make a block
-    else if (isIn(blocks, type)) {
+    else if ((int)ItemType::FIRST_BLOCK <= (int)type
+                && (int)type <= (int)ItemType::LAST_BLOCK) {
         return new Block(type);
     }
     // If it's not a subclass of item, than it's a plain old item

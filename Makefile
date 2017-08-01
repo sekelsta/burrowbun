@@ -9,7 +9,7 @@ all : main
 
 main : main.o Map.o World.o Tile.o WindowHandler.o EventHandler.o Movable.o \
         Player.o Collider.o Hotbar.o Entity.o Inventory.o Item.o Action.o \
-        Sprite.o AllTheItems.o
+        Sprite.o AllTheItems.o Boulder.o
 	$(CC) $(CXXFLAGS) $(LINKER_FLAGS) $^ -o $@ $(LDFLAGS) $(NOISE_FLAGS)
 
 main.o : main.cc World.hh Tile.hh Map.hh WindowHandler.hh EventHandler.hh \
@@ -68,6 +68,9 @@ AllTheItems.o : AllTheItems.cc AllTheItems.hh Item.hh Action.hh
 	$(CC) $(CXXFLAGS) $^ -c $(LDFLAGS)
 
 Sprite.o : Sprite.cc Sprite.hh
+	$(CC) $(CXXFLAGS) $^ -c $(LDFLAGS)
+
+Boulder.o : Boulder.cc Boulder.hh Map.hh Tile.hh MapHelpers.hh Sprite.hh
 	$(CC) $(CXXFLAGS) $^ -c $(LDFLAGS)
 
 clean :

@@ -50,7 +50,7 @@ class Map {
 
     // Find a Tile object of type val. If it does not exist, create it. If
     // multiple exist, return the first one.
-    Tile *makeTile(TileType val);
+    Tile *getTile(TileType val);
 
     /* Pick the sprite to use for a tile based on the ones next to it. */
     void chooseSprite(int x, int y);

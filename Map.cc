@@ -6,6 +6,7 @@
 #include <math.h> // Because pi
 #include <tgmath.h> // for exponentiation
 #include "Map.hh"
+#include "Boulder.hh"
 
 using namespace std;
 
@@ -22,26 +23,50 @@ SpaceInfo *Map::findPointer(int x, int y) const {
     return tiles + (y * width + x);
 }
 
-// Make a new Tile *, add it to the list of pointers, and return the pointer
+// Make a new Tile * or one of its child classes
 Tile *Map::newTile(TileType val) {
-    Tile *tile = new Tile(val);
-    /* Make sure tiles are added in the right order. */
-    assert((unsigned int)val == pointers.size());
+    Tile *tile = NULL;
+    /* If it's a boulder, make a boulder. */
+    if ((unsigned int)TileType::FIRST_BOULDER <= (unsigned int)val
+            && (unsigned int)val <= (unsigned int)TileType::LAST_BOULDER) {
+        tile = new Boulder(val);
+    }
+    /* Otherwise it's just a plain tile. */
+    else {
+        tile = new Tile(val);
+        assert((unsigned int)TileType::FIRST_TILE <= (unsigned int)val);
+        assert((unsigned int)val <= (unsigned int)TileType::LAST_PURE_TILE);
+    }
+
+    /* Set values that aren't set by the constructor. */
     tile -> sprite.width = TILE_WIDTH;
     tile -> sprite.height = TILE_HEIGHT;
-    pointers.push_back(tile);
     return tile;
 }
 
 // Find a Tile object of type val. If it does not exist, create it. If 
 // multiple exist, return the first one found.
-Tile *Map::makeTile(TileType val) {
-    for (unsigned int i = 0; i < pointers.size(); i++) {
-        if (pointers[i] -> type == val) {
-            return pointers[i];
-        }
+Tile *Map::getTile(TileType val) {
+    /* Return the tile if it exists. */
+    if (pointers.size() > (unsigned int)val
+            && pointers[(unsigned int)val] != NULL) {
+        return pointers[(unsigned int)val];
     }
-    return newTile(val);
+    /* Otherwise make a new tile (or appropriate tile subclass) and add it to 
+    the list of pointers. */
+    Tile *tile = newTile(val);
+
+    /* If the vector isn't big enough to hold this tile with its value as the
+    index, resize it so this is so annd fill the new part with zeros. */
+    if (pointers.size() <= (unsigned int)val) {
+        pointers.resize((unsigned int)val + 1);
+        /* Make sure it did get filled with zeros. */
+        assert(pointers.back() == NULL);
+    }
+    /* Now stick in our tile. */
+    pointers[(unsigned int)val] = tile;
+ 
+    return tile;
 }
 
 /* Pick the sprite for a tile based on the ones next to it. */
@@ -175,8 +200,8 @@ Map::Map(string filename, int tileWidth, int tileHeight)
     ifstream infile(filename);
 
     /* Create a tile object for each type. */
-    for (int i = 0; i <= (int)TileType::DARK_BRICK; i++) {
-        makeTile((TileType)i);
+    for (int i = 0; i <= (int)TileType::LAST_TILE; i++) {
+        getTile((TileType)i);
     }
 
     // Check that the file could be opened
@@ -213,8 +238,8 @@ Map::Map(string filename, int tileWidth, int tileHeight)
     while (index < height * width) {
         infile >> count >> tile;
         current = (TileType)tile;
-        matchingTile = makeTile(current);
-        matchingBackground = makeTile(TileType::EMPTY);
+        matchingTile = getTile(current);
+        matchingBackground = getTile(TileType::EMPTY);
         for (int i = 0; i < count; i++) {
             assert(index < width * height);
             tiles[index].foreground = matchingTile;
@@ -341,7 +366,7 @@ bool Map::placeForeground(int x, int y, TileType type) {
         return false;
     }
 
-    setForeground(x, y, makeTile(type));
+    setForeground(x, y, getTile(type));
     // TODO: change this when I add furniture
 
     return true;
@@ -349,7 +374,7 @@ bool Map::placeForeground(int x, int y, TileType type) {
 
 // Put a tile in the background at x, y if possible, return success
 bool Map::placeBackground(int x, int y, TileType type) {
-    setBackground(x, y, makeTile(type));
+    setBackground(x, y, getTile(type));
     return true;
 }
 

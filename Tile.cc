@@ -3,6 +3,8 @@
 #include <fstream>
 #include <string>
 #include "Tile.hh"
+#include "Map.hh"
+#include "Movable.hh"
 #include "json.hpp"
 
 // For convenience
@@ -31,6 +33,12 @@ int Tile::getMaxHealth() const {
 solid. */
 void Tile::dealOverlapDamage(Movable &movable) const {
     movable.takeDamage(overlapDamage, 0);
+}
+
+/* Change the map in whatever way needs doing. */
+bool Tile::update(Map &map, Location place, vector<Movable*> &movables, 
+        int tick) {
+    return false;
 }
 
 // Constructor, based on the tile type
@@ -124,5 +132,6 @@ Tile::Tile(TileType tileType)
     opacity = j["opacity"];
 }
 
-
+/* Virtual destructor. */
+Tile::~Tile() {}
 
