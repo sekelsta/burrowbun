@@ -50,23 +50,30 @@ void Potion::use(InputType type, int x, int y, Player &player, Map &map) {
 
 // Block constructor
 Block::Block(ItemType type) : Item(type) {
-    /* Set the tile type. */
-    tileType = ItemMaker::itemToTile(type);
-    useTime = 6;
-    sprite.name = "blocks.png";
-    sprite.rows = 5;
-    sprite.cols = 4;
-    sprite.width = TILE_WIDTH;
-    sprite.height = TILE_HEIGHT;
-    /* Number is the number in the enum class minus the number of the first
-    one. It's also the order the sprites are in on the spritesheet. */
-    int number = (int)type - (int)ItemType::FIRST_BLOCK;
-    sprite.row = number / sprite.cols;
-    sprite.col = number % sprite.cols;
+    /* TODO: get this info from a file instead. */
+    if (type != ItemType::PICKAXE) {
+        /* Set the tile type. */
+        tileType = ItemMaker::itemToTile(type);
+        useTime = 6;
+        bonusReach = 0;
+        sprite.name = "blocks.png";
+        sprite.rows = 5;
+        sprite.cols = 4;
+        sprite.width = TILE_WIDTH;
+        sprite.height = TILE_HEIGHT;
+        /* Number is the number in the enum class minus the number of the first
+        one. It's also the order the sprites are in on the spritesheet. */
+        int number = (int)type - (int)ItemType::FIRST_BLOCK;
+        sprite.row = number / sprite.cols;
+        sprite.col = number % sprite.cols;
+    }
 }
 
-// When used, place the tile
-void Block::use(InputType type, int x, int y, Player &player, Map &map) {
+/* Destructor must be virtual. */
+Block::~Block() {};
+
+/* Tell whether the player can reach far enough to place the block here. */
+bool Block::canPlace(int x, int y, const Player &player, const Map &map) {
     // Figure out which tile the mouse is over
     int xTile = x / map.getTileWidth();
     int yTile = y / map.getTileHeight();
@@ -76,22 +83,76 @@ void Block::use(InputType type, int x, int y, Player &player, Map &map) {
     int xPlayer = (player.x + (player.spriteWidth / 2)) / map.getTileWidth();
     int yPlayer = (player.y + player.spriteHeight) / map.getTileHeight();
 
-    // Only do anything if the tile is within range
-    if (player.canReach(xTile - xPlayer, yTile - yPlayer, 0)) {
-        // If success is still false at the end, don't set the player's use
-        // time left
-        bool success = false;
+    /* And now we have our answer. */
+    return player.canReach(xTile - xPlayer, yTile - yPlayer, bonusReach);
+ 
+}
+
+MapLayer Block::getLayer(InputType type) {
+        /* Which layer to damage. */
+        MapLayer layer = MapLayer::NONE;
         // If it was a left mouse button, place the tile in the foreground
         if (type == InputType::LEFT_BUTTON_PRESSED
                 || type == InputType::LEFT_BUTTON_HELD) {
-            success = map.placeForeground(xTile, yTile, tileType);
+            layer = MapLayer::FOREGROUND;
         }
         // Otherwise, if it was the right mouse button, put the tile in the
         // background
         else if (type == InputType::RIGHT_BUTTON_PRESSED
                 || type == InputType::RIGHT_BUTTON_HELD) {
-            success = map.placeBackground(xTile, yTile, tileType);
+            layer = MapLayer::BACKGROUND;
         }
+        return layer; 
+}
+
+// When used, place the tile
+void Block::use(InputType type, int x, int y, Player &player, Map &map) {
+    // Only do anything if the tile is within range
+    if (canPlace(x, y, player, map)) {
+        // If success is still false at the end, don't set the player's use
+        // time left
+        bool success = false;
+        MapLayer layer = getLayer(type);
+        /* Only do anything if it's a real layer. */
+        if (layer != MapLayer::NONE) {
+            success = map.placeTile(x / map.getTileWidth(), 
+                    y / map.getTileHeight(), tileType, layer);
+        }
+        // If success, add the use time
+        player.useTimeLeft += (int)success * useTime;
+    }
+}
+
+/* Pickaxe constructor. */
+Pickaxe::Pickaxe(ItemType type) : Block(type) {
+    /* Load the right json based on the type. */
+    switch(type) {
+        case ItemType::PICKAXE :
+            // TODO
+            break;
+        default:
+            assert(false);
+            break;
+    }
+
+    /* Temporary, TODO: delete. */
+    sprite.name = "pickaxe01.png";
+    useTime = 9;
+    blockDamage = 1;
+    pickaxeTier = 1;
+}
+
+/* Pickaxe use. */
+void Pickaxe::use(InputType type, int x, int y, Player &player, Map &map) {
+    // Only do anything if the tile is within range
+    if (canPlace(x, y, player, map)) {
+        // If success is still false at the end, don't set the player's use
+        // time left
+        bool success = false;
+        /* Which layer to damage. */
+        MapLayer layer = getLayer(type);
+        success = map.damage(x / map.getTileWidth(), y / map.getTileHeight(), 
+                blockDamage, layer);
         // If success, add the use time
         player.useTimeLeft += (int)success * useTime;
     }
@@ -167,6 +228,10 @@ Item *ItemMaker::makeItem(ItemType type) {
     else if ((int)ItemType::FIRST_BLOCK <= (int)type
                 && (int)type <= (int)ItemType::LAST_BLOCK) {
         return new Block(type);
+    }
+    /* If it's a pickaxe, make a pickaxe. */
+    else if (type == ItemType::PICKAXE) {
+        return new Pickaxe(type);
     }
     // If it's not a subclass of item, than it's a plain old item
     else {

@@ -1,7 +1,6 @@
 Changes since last push:
- - Makefile is now compatible with newer versions of g++ that care about the order of arguments
- - Began adding a way to keep track of the health of tiles
- - Moved the Point class to Movable.hh
+ - Added pickaxe (and functionality)
+ - Removed most map functions specific to the foreground or background layers.
 
 Known "features":
  - The strenth of gravity is independent of the world.
@@ -9,6 +8,8 @@ Known "features":
  - The spawn point sometimes puts the player on top of dirt. Spawning should be changed so it destroys any tiles in the way.
  - You can place dirt on top of creatures, including yourself
  - Tiles have an opacity between 0 and 64, but right now it only matters whether it's zero or not.
+ - Doesn't yet render background tiles (I haven't decided how they should look)
+ - Background tiles don't affect light levels
 
 Known bugs:
  - Apparently the player can fit in gaps that they can't escape.
@@ -18,12 +19,10 @@ To do:
 use, not make the map do that
  - rewrite almost all world generation code to use noise
  - rethink interactions between the collider and movables
- - Background tiles
  - stacking items, throwing / picking up items
  - Trees!
  - Better map generation
- - Instead of storing the health of every single tile on the map, I should just have a list of the ones that have been damaged.
  - Make the spaceInfo class just store a tiletype, not a Tile*, and use it as
 the index of the Tile*
  - Store data in a file instead of in the source code (eg the size of sprites
-and the properties of the different types of tiles) (probably XML)
+and the properties of the different types of tiles)

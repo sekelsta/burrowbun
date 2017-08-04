@@ -33,9 +33,10 @@ enum class ItemType {
     // Other things
     MAPLE_LEAF,
     HEALTH_POTION,
+    PICKAXE,
 
     FIRST_ITEM = DIRT,
-    LAST_ITEM = HEALTH_POTION
+    LAST_ITEM = PICKAXE
 };
 
 /* The thing inventories store. */

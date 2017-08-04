@@ -7,7 +7,8 @@
 /* An enum class to refer to the different layers of the map. */
 enum class MapLayer {
     FOREGROUND,
-    BACKGROUND
+    BACKGROUND,
+    NONE
 };
 
 /* A struct for holding an x and a y coordinate, plus a layer type. */

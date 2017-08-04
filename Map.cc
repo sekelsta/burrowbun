@@ -98,22 +98,27 @@ void Map::chooseSprite(int x, int y) {
     findPointer(x, y) -> spritePlace.x = row;
 }
 
-/* Return true if there's a nonempty foreground tile next to this place. */
-bool Map::canPutTile(int x, int y) const {
-    // Can only place a tile next to one already there
-    bool canPut = false;
+/* Return true if there's a nonempty tile of the same layer at or next to 
+this place. */
+bool Map::isBesideTile(int x, int y, MapLayer layer) const {
+    /* Check at this place. */
+    if (getTile(x, y, layer) -> type != TileType::EMPTY) {
+        return true;
+    }
+
+    /* Check each tile next to it. */
     for (int i = -1; i < 2; i++) {
         for (int j = -1; j < 2; j++) {
             // Don't check the status of tiles off the edge of the map, 
             // or if it's part of a diagonal line through the center tile
             if (isOnMap(x + i, y + j) && i != j && i != -1 * j
-                    && getForeground(x + i, y + j) -> type != TileType::EMPTY) {
-                canPut = true;
+                    && getTile(x+i, y+j, layer) -> type != TileType::EMPTY) {
+                return true;
             }
         }
     }
 
-    return canPut;
+    return false;
 
 }
 
@@ -333,16 +338,20 @@ Light Map::getSkyColor(int x, int y) const {
     return light;
 }
 
-/* Get the tile at this location. */
+/* Returns the tile at x, y, layer. */
 Tile *Map::getTile(Location place) const {
-    if (place.layer == MapLayer::FOREGROUND) {
-        return findPointer(place.x, place.y) -> foreground;
+    return getTile(place.x, place.y, place.layer);
+}
+
+/* Returns the tile at x, y, layer. */
+Tile *Map::getTile(int x, int y, MapLayer layer) const {
+    if (layer == MapLayer::FOREGROUND) {
+        return findPointer(x, y) -> foreground;
     }
-    else if (place.layer == MapLayer::BACKGROUND) {
-        return findPointer(place.x, place.y) -> background;
+    else if (layer == MapLayer::BACKGROUND) {
+        return findPointer(x, y) -> background;
     }
     else {
-        assert(false);
         return NULL;
     }
 }
@@ -359,38 +368,45 @@ Tile *Map::getBackground(int x, int y) const {
     return findPointer(x, y) -> background;
 }
 
-// Set the foreground tile at x, y equal to val
-void Map::setForeground(int x, int y, Tile* const &val) {
-    findPointer(x, y) -> foreground = val;
-    // Set all the sprite and light values nearby
+/* Sets the tile at x, y, layer equal to val. */
+void Map::setTile(int x, int y, MapLayer layer, Tile* const &val) {
+    if (layer == MapLayer::FOREGROUND) {
+        findPointer(x, y) -> foreground = val;
+    }
+    else if (layer == MapLayer::BACKGROUND) {
+        findPointer(x, y) -> background = val;
+    }
+    else {
+        /* We didn't change anything. */
+        return;
+    }
+
+    /* If we made it this far we changed something, so the amount of light
+    reaching nearby tiles may have changed. */
     updateNear(x, y);
 }
 
-// Set the background tile at x, y equal to val
-void Map::setBackground(int x, int y, Tile* const &val) {
-    findPointer(x, y) -> background = val;
+/* Sets the tile at x, y, layer equal to val. */
+void Map::setTile(const Location &place, Tile* const &val) {
+    setTile(place.x, place.y, place.layer, val);
 }
 
-// Put a tile at the foreground at x, y if possible, return success
-bool Map::placeForeground(int x, int y, TileType type) {
-    // Can only place atile if there isn't one there already
-    if (getForeground(x, y) -> type != TileType::EMPTY) {
+bool Map::placeTile(int x, int y, TileType type, MapLayer layer) {
+    /* Can only place a tile if there isn't one there already. */
+    if (getTile(x, y, layer) -> type != TileType::EMPTY) {
         return false;
     }
 
-    if (!canPutTile(x, y)) {
+    /* Can only place a tile if one in the foreground or background 
+    is next to it. */
+    if (!isBesideTile(x, y, MapLayer::FOREGROUND)
+            && !isBesideTile(x, y, MapLayer::BACKGROUND)) {
         return false;
     }
 
-    setForeground(x, y, getTile(type));
+    setTile(x, y, layer, getTile(type));
     // TODO: change this when I add furniture
 
-    return true;
-}
-
-// Put a tile in the background at x, y if possible, return success
-bool Map::placeBackground(int x, int y, TileType type) {
-    setBackground(x, y, getTile(type));
     return true;
 }
 
@@ -449,26 +465,51 @@ void Map::update(vector<Movable*> &movables) {
     tick++;
 }
 
-void Map::damage(int x, int y, int amount, MapLayer layer) {
+/* Damage the tile. Return false if there was no tile there to damage. */
+bool Map::damage(int x, int y, int amount, MapLayer layer) {
+    /* If there's no tile here, just return false. */
+    if (getTile(x, y, layer) -> type == TileType::EMPTY) {
+        return false;
+    }
+
     Location place;
     place.x = x;
     place.y = y;
     place.layer = layer;
     
+    /* Index of the tilehealth, or -1 if it doesn't exist. */
+    int index = -1;
     /* First check if that tile has already been damaged before. */
     for (unsigned int i = 0; i < damaged.size(); i++) {
         if (damaged[i].place == place) {
             damaged[i].health -= amount;
-            /* If health <= 0, destroy the tile. */
-            // TODO
-            return;
+            index = i;
         }
     }
 
     /* If not, we add a new entry to the list. */
-    damaged.emplace_back();
-    damaged.back().place = place;
-    damaged.back().health = getTile(place) -> getMaxHealth() - amount;
-    damaged.back().lastUpdated = tick;
+    if (index == -1) {
+        damaged.emplace_back();
+        damaged.back().place = place;
+        damaged.back().health = getTile(place) -> getMaxHealth() - amount;
+        damaged.back().lastUpdated = tick;
+        index = damaged.size() - 1;
+    }
 
+    /* Now see if we need to destroy the tile. */
+    if (destroy(damaged[index])) {
+        /* If it was destroyed, removed it from the list. */
+        damaged.erase(damaged.begin() + index);
+    }
+
+    return true;
+}
+
+/* Destroy a tile if it has no health left. */
+bool Map::destroy(const TileHealth &health) {
+    if (health.health <= 0) {
+        setTile(health.place, getTile(TileType::EMPTY));
+    }
+
+    return health.health <= 0;
 }

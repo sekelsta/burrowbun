@@ -66,7 +66,7 @@ class Map {
 
     /* Return true if the spot is empty of foreground tiles but at least 
     one tile next to it isn't. */
-    bool canPutTile(int x, int y) const;
+    bool isBesideTile(int x, int y, MapLayer layer) const;
 
     /* Return true if neither the foreground nor background are opaque. */
     bool isSky(int x, int y);
@@ -123,6 +123,7 @@ class Map {
 
     /* Return the pointer the the tile at this location. */
     Tile *getTile(Location place) const;
+    Tile *getTile(int x, int y, MapLayer layer) const;
 
     // Returns the foreground tile pointer at x, y
     // 0, 0 is the bottom right
@@ -132,17 +133,12 @@ class Map {
     // 0, 0 is the bottom right
     Tile *getBackground(int x, int y) const;
 
-    // Set the foreground tile at x, y equal to val
-    void setForeground(int x, int y, Tile* const &val);
+    /* Set the tile at x, y, layer equal to val. */
+    void setTile(int x, int y, MapLayer layer, Tile* const &val);
+    void setTile(const Location &place, Tile* const &val);
 
-    // Set the background tile at x, y equal to val
-    void setBackground(int x, int y, Tile* const &val);
-
-    // Put a tile in the foreground at x, y, return success
-    bool placeForeground(int x, int y, TileType type);
-
-    // Put a tile in the background at x, y, return whethre it was successful
-    bool placeBackground(int x, int y, TileType type);
+    /* Place a tile in the correct layer. Return whether it was successful. */
+    bool placeTile(int x, int y, TileType type, MapLayer layer);
 
     // Gets the map's list of the tile pointers it uses
     vector<Tile *> getPointers() const;
@@ -157,8 +153,13 @@ class Map {
     /* Update the map. */
     void update(vector<Movable*> &movables);
 
-    /* Damage a tile (with a pickax or something). */
-    void damage(int x, int y, int amount, MapLayer layer);
+    /* Damage a tile (with a pickax or something). Return false if there
+    was no tile to damage. */
+    bool damage(int x, int y, int amount, MapLayer layer);
+
+    /* Destroy a tile if it has no health. Return true if it was destroyed, or
+    false if it still had health and lived. */
+    bool destroy(const TileHealth &health);
 };
 
 #endif

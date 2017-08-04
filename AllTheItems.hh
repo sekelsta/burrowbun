@@ -4,6 +4,8 @@
 #include <vector>
 #include "Item.hh"
 #include "Tile.hh"
+#include "MapHelpers.hh"
+
 
 // All the child classes of "Item"
 // Items that change the player's stats
@@ -26,16 +28,41 @@ public:
 // Items that can be placed
 class Block : public Item {
     TileType tileType;
+    /* For blocks that let the player place them extra far away. */
+    int bonusReach;
+
+protected:
+    /* Tell whether the player can reach far enough to place a block here. */
+    bool canPlace(int x, int y, const Player &player, const Map &map);
+
+    /* If it was a left click, return foreground, if right click, return
+    background. */
+    MapLayer getLayer(InputType type);
 
 public:
     // Constructor
     Block(ItemType type);
 
+    /* Destructor must be virtual. */
+    virtual ~Block();
+
     // What to do when used
     void use(InputType type, int x, int y, Player &player, Map &map);
 };
 
-// Function to make na item of the correct class given only an item type
+/* Items that can damage blocks. */
+class Pickaxe: public Block {
+    int blockDamage;
+    int pickaxeTier;
+public:
+    /* Constructor. */
+    Pickaxe(ItemType type);
+
+    /* What to do when used. */
+    void use(InputType type, int x, int y, Player &player, Map &map);
+};
+
+// Function to make an item of the correct class given only an item type
 // Because everything deserves a namespace
 namespace ItemMaker {
     /* Turn an ItemType into the corresponding TileType. Requires that the

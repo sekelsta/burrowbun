@@ -54,7 +54,7 @@ public:
     // player. bonus is the bonus range from possible unknown curcumstances
     // (e.g. this type of tile can be placed farther away, or this pickax has
     // better range).
-    bool canReach(int x, int y, int bonus);
+    bool canReach(int x, int y, int bonus) const;
 
     // Whether the player can use an item / skill right now.
     bool canUse();

@@ -96,6 +96,7 @@ Player::Player() : inventory(10, 6), trash(1, 1) {
     inventory.pickup(ItemMaker::makeItem(ItemType::RED_BRICK));
     inventory.pickup(ItemMaker::makeItem(ItemType::GRAY_BRICK));
     inventory.pickup(ItemMaker::makeItem(ItemType::DARK_BRICK));
+    inventory.pickup(ItemMaker::makeItem(ItemType::PICKAXE));
 
     isInventoryOpen = false;
 }
@@ -111,7 +112,7 @@ void Player::toggleInventory() {
 // player. bonus is the bonus range from possible unknown curcumstances
 // (e.g. this type of tile can be placed farther away, or this pickax has
 // better range).
-bool Player::canReach(int x, int y, int bonus) {
+bool Player::canReach(int x, int y, int bonus) const {
     // If not in range in the x direction, return false
     if (abs(x) > tileReachSideways + bonus) {
         return false;
