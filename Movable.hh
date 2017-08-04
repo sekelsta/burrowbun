@@ -2,7 +2,12 @@
 #define MOVABLE_HH
 
 #include <string>
-#include "Point.hh"
+
+// For holding an x and a y coordinate, but doubles instead of ints
+struct Point {
+    double x;
+    double y;
+};
 
 // Forward declare
 struct SDL_Texture;

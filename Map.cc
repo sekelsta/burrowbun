@@ -168,7 +168,7 @@ bool Map::isOnMap(int x, int y) const {
     return (x >= 0 && y >= 0 && x < width && y < height);
 }
 
-/* Tell all thetiles nearby to have the right sprite and the right amount of 
+/* Tell all the tiles nearby to have the right sprite and the right amount of 
 light. */
 void Map::updateNear(int x, int y) {
     // Update the sprites
@@ -197,6 +197,8 @@ void Map::updateNear(int x, int y) {
 // Constructor, based on a world file that exists
 Map::Map(string filename, int tileWidth, int tileHeight) 
         : TILE_WIDTH(tileWidth), TILE_HEIGHT(tileHeight) {
+    /* It's the 0th tick. */
+    tick = 0;
     ifstream infile(filename);
 
     /* Create a tile object for each type. */
@@ -331,6 +333,20 @@ Light Map::getSkyColor(int x, int y) const {
     return light;
 }
 
+/* Get the tile at this location. */
+Tile *Map::getTile(Location place) const {
+    if (place.layer == MapLayer::FOREGROUND) {
+        return findPointer(place.x, place.y) -> foreground;
+    }
+    else if (place.layer == MapLayer::BACKGROUND) {
+        return findPointer(place.x, place.y) -> background;
+    }
+    else {
+        assert(false);
+        return NULL;
+    }
+}
+
 // Returns the foreground tile at x, y
 // 0, 0 is the bottom right
 Tile *Map::getForeground(int x, int y) const {
@@ -406,3 +422,53 @@ void Map::save(const string &filename) const {
     outfile.close();
 }
 
+/* Update the map. */
+void Map::update(vector<Movable*> &movables) {
+    // TODO
+    /* Update tiles. */
+    /* Heal tiles that have been damaged for a while. */
+    /* Tiles stay damaged for this many ticks, with about 20-40 ticks/sec. */
+    const int healTime = 300;
+    /* Put everything to keep at the front and then erase the rest. */
+    /*damaged.erase(std::remove_if(damaged.begin(), damaged.end(),
+            [](TileHealth health) 
+            {return tick - health.lastUpdated > healTime;}), damaged.end());
+*/
+    /* Iterate while removing. */
+    vector<TileHealth>::iterator it = damaged.begin();
+    while (it != damaged.end()) {
+        if (tick - it -> lastUpdated > healTime) {
+            it = damaged.erase(it);
+        }
+        else {
+            ++it;
+        }
+    }
+
+    /* It's a new tick. */
+    tick++;
+}
+
+void Map::damage(int x, int y, int amount, MapLayer layer) {
+    Location place;
+    place.x = x;
+    place.y = y;
+    place.layer = layer;
+    
+    /* First check if that tile has already been damaged before. */
+    for (unsigned int i = 0; i < damaged.size(); i++) {
+        if (damaged[i].place == place) {
+            damaged[i].health -= amount;
+            /* If health <= 0, destroy the tile. */
+            // TODO
+            return;
+        }
+    }
+
+    /* If not, we add a new entry to the list. */
+    damaged.emplace_back();
+    damaged.back().place = place;
+    damaged.back().health = getTile(place) -> getMaxHealth() - amount;
+    damaged.back().lastUpdated = tick;
+
+}

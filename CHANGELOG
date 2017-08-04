@@ -1,9 +1,7 @@
 Changes since last push:
- - Added boulders as a subclass of tiles
- - Added an update function for tiles and boulders
- - Added a LAST_ENUM value to enum classes that needed one
- - Renamed Map::makeTile to Map::getTile and modified Map::newTile so it makes 
-a boulder instead where appropriate
+ - Makefile is now compatible with newer versions of g++ that care about the order of arguments
+ - Began adding a way to keep track of the health of tiles
+ - Moved the Point class to Movable.hh
 
 Known "features":
  - The strenth of gravity is independent of the world.

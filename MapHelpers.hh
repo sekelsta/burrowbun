@@ -4,19 +4,26 @@
 #include "Tile.hh"
 #include "Light.hh"
 
-// A struct for holding an x and a y coordinate.
-struct Location {
-    // The x and y values of the location
-    int x;
-    int y;
+/* An enum class to refer to the different layers of the map. */
+enum class MapLayer {
+    FOREGROUND,
+    BACKGROUND
 };
 
-// A class to talk about directions. Down and West are smaller numbers.
-enum class Direction {
-    DOWN,
-    UP,
-    WEST,
-    EAST
+/* A struct for holding an x and a y coordinate, plus a layer type. */
+struct Location {
+    int x;
+    int y;
+    MapLayer layer;
+
+    /* Return true if every value is the same. */
+    bool operator==(const Location &location);
+};
+
+struct TileHealth {
+    Location place;
+    int health;
+    int lastUpdated;
 };
 
 /* A class for passing a global-biome argument, to pick which pattern of 

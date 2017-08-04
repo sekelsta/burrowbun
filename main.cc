@@ -113,6 +113,9 @@ int main(int argc, char **argv) {
         // TODO: make all entities take fall damage
         player.takeFallDamage();
 
+        /* Have the map update itself and relevent movables. */
+        map.update(movables);
+
         // Put pictures on the screen
         // But only if rendering isn't really slow
         Uint32 frameTicks = SDL_GetTicks() - ticks;

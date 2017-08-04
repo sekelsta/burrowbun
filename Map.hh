@@ -14,6 +14,9 @@ using namespace std;
 class Map {
     // Fields:
 
+    /* How many ticks since the map was loaded. */
+    unsigned int tick;
+
     // The array to hold the map info
     // This is a 2d array squished into 1d
     SpaceInfo *tiles;
@@ -31,6 +34,12 @@ class Map {
 
     // Default spawn point
     Location spawn;
+
+    /* The tiles whose update function should be called. */
+    vector<Location> toUpdate;
+
+    /* Tiles that have been damaged. */
+    vector<TileHealth> damaged;
 
     // Have a random number generator
     default_random_engine generator;
@@ -112,6 +121,9 @@ class Map {
     // Return the color the sun / moon is shining
     Light getSkyColor(int x, int y) const;
 
+    /* Return the pointer the the tile at this location. */
+    Tile *getTile(Location place) const;
+
     // Returns the foreground tile pointer at x, y
     // 0, 0 is the bottom right
     Tile *getForeground(int x, int y) const;
@@ -141,6 +153,12 @@ class Map {
 
     // Write the map to a file
     void save(const string &filename) const;
+
+    /* Update the map. */
+    void update(vector<Movable*> &movables);
+
+    /* Damage a tile (with a pickax or something). */
+    void damage(int x, int y, int amount, MapLayer layer);
 };
 
 #endif
