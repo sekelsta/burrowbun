@@ -47,8 +47,6 @@ Tile::Tile(TileType tileType)
         : type(tileType) {
     string filename;
     string prefix = "tiles/";
-    // Make the pointer point to nothing
-    sprite.texture = NULL;
 
     /* Figure out the right json file to use. */
     switch(tileType) {
@@ -121,9 +119,10 @@ Tile::Tile(TileType tileType)
     ifstream infile(prefix + filename);
     json j = json::parse(infile);
     /* Set each of this tile's non-const values equal to the json's values. */
-    sprite.name = j["sprite"]["name"];
-    sprite.rows = j["sprite"]["rows"];
-    sprite.cols = j["sprite"]["cols"];
+    //sprite.name = j["sprite"]["name"];
+    //sprite.rows = j["sprite"]["rows"];
+    //sprite.cols = j["sprite"]["cols"];
+    sprite = j["sprite"].get<Sprite>();
     sprite.texture = NULL;
     isSolid = j["isSolid"];
     isPlatform = j["isPlatform"];

@@ -1,4 +1,10 @@
+#include <fstream>
 #include "Sprite.hh"
+#include "json.hpp"
+
+/* For convinence. */
+using json = nlohmann::json;
+using namespace std;
 
 // Constructor
 Sprite::Sprite() {
@@ -11,5 +17,29 @@ Sprite::Sprite() {
     cols = 0;
     row = 0;
     col = 0;
+}
+
+/* Assignment operator. */
+void Sprite::operator=(const Sprite &sprite) {
+    name = sprite.name;
+    texture = sprite.texture;
+    width = sprite.width;
+    height = sprite.height;
+    rows = sprite.rows;
+    cols = sprite.cols;
+    row = sprite.row;
+    col = sprite.col;
+}
+
+void from_json(const json &j, Sprite &sprite) {
+    /* Set each of this tile's non-const values equal to the json's values. */
+    sprite.name = j["name"];
+    sprite.rows = j["rows"];
+    sprite.cols = j["cols"];
+    sprite.row = j["row"];
+    sprite.col = j["col"];
+    sprite.width = j["width"];
+    sprite.height = j["height"];
+    sprite.texture = NULL; 
 }
 

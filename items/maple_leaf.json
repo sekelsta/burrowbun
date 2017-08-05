@@ -1,0 +1,14 @@
+{
+    "sprite": {
+        "rows": 1,
+        "cols": 1,
+        "row": 0,
+        "col": 0,
+        "width": 32,
+        "height": 32,
+        "name": "maple_leaf.png"
+    },
+    "isItem": true,
+	"maxStack": 1,
+	"useTime": 1
+}

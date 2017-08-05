@@ -2,6 +2,10 @@
     "sprite": {
         "rows": 16,
         "cols": 1,
+        "row": 0,
+        "col": 0,
+        "width": 16,
+        "height": 16,
         "name": "lumber.png"
     },
     "isSolid": true,

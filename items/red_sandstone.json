@@ -1,0 +1,15 @@
+{
+    "sprite": {
+        "rows": 4,
+        "cols": 4,
+        "row": 3,
+        "col": 1,
+        "width": 16,
+        "height": 16,
+        "name": "blocks_0.png"
+    },
+	"bonusReach": 0,
+    "isItem": true,
+	"maxStack": 1,
+	"useTime": 6
+}

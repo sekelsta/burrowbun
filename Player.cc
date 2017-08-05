@@ -42,10 +42,10 @@ Player::Player() : inventory(10, 6), trash(1, 1) {
     health.totalWidth = 190;
     health.h = 8;
     health.fill();
-    stamina.maxStat = 100;
-    stamina.totalWidth = 190;
-    stamina.h = 8;
-    stamina.fill();
+    fullness.maxStat = 100;
+    fullness.totalWidth = 190;
+    fullness.h = 8;
+    fullness.fill();
     mana.maxStat = 100; 
     mana.totalWidth = 190;
     mana.h = 8;

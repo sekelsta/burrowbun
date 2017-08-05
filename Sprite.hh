@@ -2,6 +2,7 @@
 #define SPRITE_HH
 
 #include <string>
+#include "json.hpp"
 
 // Forward declare
 struct SDL_Texture;
@@ -25,6 +26,12 @@ struct Sprite {
 
     // The constructor
     Sprite();
+
+    /* Assignment operator. */
+    void operator=(const Sprite &sprite);
 };
+
+/* Get a sprite from a json. */
+void from_json(const nlohmann::json &j, Sprite &sprite);
 
 #endif

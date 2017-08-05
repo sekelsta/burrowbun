@@ -1,0 +1,17 @@
+{
+    "sprite": {
+        "rows": 1,
+        "cols": 1,
+        "row": 0,
+        "col": 0,
+        "width": 32,
+        "height": 32,
+        "name": "pickaxe01.png"
+    },
+	"blockDamage": 1,
+	"pickaxeTier": 1,
+	"bonusReach": 0,
+    "isItem": true,
+	"maxStack": 1,
+	"useTime": 9
+}

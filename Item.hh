@@ -1,6 +1,7 @@
 #ifndef ITEM_HH
 #define ITEM_HH
 
+#include <string>
 #include "Action.hh"
 
 /* Class to enumerate the different types of items. */
@@ -56,6 +57,9 @@ public:
 
     // Access functions
     ItemType getType();
+
+    /* Get json filename from itemtype. */
+    static std::string getJsonFilename(ItemType type);
 };
 
 #endif

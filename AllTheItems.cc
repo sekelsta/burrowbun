@@ -1,33 +1,33 @@
 #include <cassert>
+#include <string>
+#include <fstream>
 #include <iostream>
 #include "AllTheItems.hh"
 #include "Player.hh"
 #include "Map.hh"
+#include "json.hpp"
 
 #define TILE_WIDTH 16
 #define TILE_HEIGHT 16
 
+using json = nlohmann::json;
+
 // Potion constructor
 Potion::Potion(ItemType type) : Item(type) {
-    // Set values to defaults
-    healthGained = 0;
-    staminaGained = 0;
-    manaGained = 0;
-    woundsCured = 0;
-    hungerCured = 0;
-    manaCured = 0;
- 
-    // Changed some values based on what type of potion
-    switch (type) {
-        case ItemType::HEALTH_POTION :
-            healthGained = 50;
-            break;
-        default :
-            // We forgot a case, or something's trying to make a potion out of 
-            // something that's not a potion
-            assert(false);
-            break;
-    }
+    /* Figure out which json file to use. */
+    string filename = Item::getJsonFilename(type);
+
+    /* Put the data into the json. */
+    ifstream infile(filename);
+    json j = json::parse(infile);
+
+    /* Set values equal to the json's values. */
+    healthGained = j["healthGained"];
+    fullnessGained = j["fullnessGained"];
+    manaGained = j["manaGained"];
+    woundsCured = j["woundsCured"];
+    hungerCured = j["hungerCured"];
+    manaCured = j["manaCured"];
 }
 
 // Add the potion amount to all the stats
@@ -36,13 +36,13 @@ void Potion::use(InputType type, int x, int y, Player &player, Map &map) {
     // button wqs pressed (not held, and not the right button).
     if (type == InputType::LEFT_BUTTON_PRESSED) {
         player.health.addPart(woundsCured);
-        player.stamina.addPart(hungerCured);
+        player.fullness.addPart(hungerCured);
         player.mana.addPart(manaCured);
         player.health.addFull(healthGained);
-        player.stamina.addFull(staminaGained);
+        player.fullness.addFull(fullnessGained);
         player.mana.addFull(manaGained);
         // TODO: make consumable
-        // Use use time
+        // Use useTime
         player.useTimeLeft = useTime;
     }
 }
@@ -50,29 +50,20 @@ void Potion::use(InputType type, int x, int y, Player &player, Map &map) {
 
 // Block constructor
 Block::Block(ItemType type) : Item(type) {
-    /* TODO: get this info from a file instead. */
-    if (type != ItemType::PICKAXE) {
-        /* Set the tile type. */
-        tileType = ItemMaker::itemToTile(type);
-        useTime = 6;
-        bonusReach = 0;
-        sprite.name = "blocks.png";
-        sprite.rows = 5;
-        sprite.cols = 4;
-        sprite.width = TILE_WIDTH;
-        sprite.height = TILE_HEIGHT;
-        /* Number is the number in the enum class minus the number of the first
-        one. It's also the order the sprites are in on the spritesheet. */
-        int number = (int)type - (int)ItemType::FIRST_BLOCK;
-        sprite.row = number / sprite.cols;
-        sprite.col = number % sprite.cols;
-    }
+    /* Read in the json. */
+    string filename = Item::getJsonFilename(type);
+    ifstream infile(filename);
+    json j = json::parse(infile);
+
+    /* Set values. */
+    bonusReach = j["bonusReach"];
 }
 
 /* Destructor must be virtual. */
 Block::~Block() {};
 
 /* Tell whether the player can reach far enough to place the block here. */
+// TODO: deal with wrapping around the edge of the map
 bool Block::canPlace(int x, int y, const Player &player, const Map &map) {
     // Figure out which tile the mouse is over
     int xTile = x / map.getTileWidth();
@@ -126,33 +117,22 @@ void Block::use(InputType type, int x, int y, Player &player, Map &map) {
 /* Pickaxe constructor. */
 Pickaxe::Pickaxe(ItemType type) : Block(type) {
     /* Load the right json based on the type. */
-    switch(type) {
-        case ItemType::PICKAXE :
-            // TODO
-            break;
-        default:
-            assert(false);
-            break;
-    }
+    string filename = Item::getJsonFilename(type);
+    ifstream infile(filename);
+    json j = json::parse(infile);
 
-    /* Temporary, TODO: delete. */
-    sprite.name = "pickaxe01.png";
-    useTime = 9;
-    blockDamage = 1;
-    pickaxeTier = 1;
+    blockDamage = j["blockDamage"];
+    pickaxeTier = j["pickaxeTier"];
 }
 
 /* Pickaxe use. */
 void Pickaxe::use(InputType type, int x, int y, Player &player, Map &map) {
     // Only do anything if the tile is within range
     if (canPlace(x, y, player, map)) {
-        // If success is still false at the end, don't set the player's use
-        // time left
-        bool success = false;
         /* Which layer to damage. */
         MapLayer layer = getLayer(type);
-        success = map.damage(x / map.getTileWidth(), y / map.getTileHeight(), 
-                blockDamage, layer);
+        bool success = map.damage(x / map.getTileWidth(), 
+                y / map.getTileHeight(), blockDamage, layer);
         // If success, add the use time
         player.useTimeLeft += (int)success * useTime;
     }

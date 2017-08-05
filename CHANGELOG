@@ -1,6 +1,7 @@
 Changes since last push:
- - Added pickaxe (and functionality)
- - Removed most map functions specific to the foreground or background layers.
+ - fixed a bug where pickaxe distance was unlimited, caused by an uninitiazed value
+ - made items initialize their values based on json files
+ - wrote from_json for sprites
 
 Known "features":
  - The strenth of gravity is independent of the world.
@@ -9,7 +10,7 @@ Known "features":
  - You can place dirt on top of creatures, including yourself
  - Tiles have an opacity between 0 and 64, but right now it only matters whether it's zero or not.
  - Doesn't yet render background tiles (I haven't decided how they should look)
- - Background tiles don't affect light levels
+ - Background tiles don't affect light levels quite right
 
 Known bugs:
  - Apparently the player can fit in gaps that they can't escape.
@@ -24,5 +25,4 @@ use, not make the map do that
  - Better map generation
  - Make the spaceInfo class just store a tiletype, not a Tile*, and use it as
 the index of the Tile*
- - Store data in a file instead of in the source code (eg the size of sprites
-and the properties of the different types of tiles)
+ - Store data for movables in a file instead of the source code

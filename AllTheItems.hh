@@ -11,10 +11,10 @@
 // Items that change the player's stats
 class Potion : public Item {
     int healthGained;
-    int staminaGained;
+    int fullnessGained;
     int manaGained;
     int woundsCured; // Removes the completely empty part of health
-    int hungerCured; // Removes the completely empty part of stamina
+    int hungerCured; // Removes the completely empty part of fullness
     int manaCured; // Removed the completely empty part of mana
 
 public:
@@ -27,11 +27,12 @@ public:
 
 // Items that can be placed
 class Block : public Item {
+    /* The type of the associated tile. */
     TileType tileType;
+protected:
     /* For blocks that let the player place them extra far away. */
     int bonusReach;
 
-protected:
     /* Tell whether the player can reach far enough to place a block here. */
     bool canPlace(int x, int y, const Player &player, const Map &map);
 
@@ -47,7 +48,7 @@ public:
     virtual ~Block();
 
     // What to do when used
-    void use(InputType type, int x, int y, Player &player, Map &map);
+    virtual void use(InputType type, int x, int y, Player &player, Map &map);
 };
 
 /* Items that can damage blocks. */
