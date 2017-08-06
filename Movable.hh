@@ -83,6 +83,9 @@ public:
     exists so the collider can tell movables to take damage from overlapping a
     tile without hacing to handle entities differently. */
     virtual void takeDamage(int normal, int wounds);
+
+    /* Take fall damage. Also does nothing unless the movables is an entity. */
+    virtual void takeFallDamage();
 };
 
 #endif

@@ -38,9 +38,7 @@ struct CollisionInfo {
     int cornerX;
 
     // Resolve a collision
-    // Technically it says the pointer to the Tile is const, but the Tile 
-    // should be const as well. It just shouldn't be a pointer to a const tile.
-    void resolve(const Tile *tile) {
+    void resolve(Tile const *tile) {
         newX = -1;
         newY = -1;
         cornerX = -1;
@@ -86,20 +84,46 @@ public:
     int w;
     int h;
 
-    // Function to tell whether another rectangle intersects this one.
+    /* Function to tell whether another rectangle intersects this one.
+    Note that it may be the case that one rectangle or other has x < 0
+    or x > worldWidth. */
     inline bool intersects(const Rect &that) const {
-        bool intersectsX = x + w > that.x && x < that.x + that.w;
+        /* Get x values within the correct range. */
+        int thisX = (x + worldWidth) % worldWidth;
+        int thatX = (that.x + worldWidth) % worldWidth;
+        assert(0 <= thisX);
+        assert(0 <= y);
+        assert(0 <= w);
+        assert(0 <= thatX);
+        assert(0 <= that.y);
+        assert(0 <= that.w);
+        assert(x < worldWidth);
+        assert(thatX < worldWidth);
+
+        bool intersectsX = (thisX + w > thatX) && (thisX < thatX + that.w);
         /* If either rectangle wraps but not both, we should also see if they
-           intersect when  one is moved to the other side of the line. */
-        if ((x + w < worldWidth) != (that.x + that.w < worldWidth)) {
-            intersectsX = intersectsX || (x + w + worldWidth > that.x 
-                && x + worldWidth < that.x + that.w) 
-                || (x + w > that.x + worldWidth
-                && x < that.x + that.w + worldWidth);
+           intersect when one is moved to the other side of the line. */
+        if ((thisX + w < worldWidth) != (thatX + that.w < worldWidth)) {
+            bool thisWraps = (thatX + worldWidth < thisX + w)
+                    && (thisX < thatX + that.w + worldWidth);
+            bool thatWraps = (thatX < thisX + w + worldWidth) 
+                    && (thisX + worldWidth < thatX + that.w);
+            if ((y + h > that.y) && (y < that.y + that.h) && !intersectsX
+                    && (thisX > worldWidth - 20 || thatX > worldWidth - 20)
+                    && (!thisWraps && !thatWraps)) {
+            std::cout << "A rectangle wrapped." << std::endl;
+            std::cout << "thisX, this.y, this.w, this.h = " << thisX << ", ";
+            std::cout << y << ", " << w << ", " << h << std::endl;
+            std::cout << "thatX, that.y, that.w, that.h = " << thatX << ", ";
+            std::cout << that.y << ", " << that.w << ", " << that.h << "\n";
+            std::cout << "this wrapping: " << thisWraps << std::endl;
+            std::cout << "that wrapping: " << thatWraps << std::endl;
+            }
+            intersectsX = intersectsX || thisWraps || thatWraps;
         }
         
 
-        return (intersectsX && y + h > that.y && y < that.y + that.h);
+        return (intersectsX && (y + h > that.y) && (y < that.y + that.h));
     }
 };
 
@@ -138,11 +162,11 @@ class Collider {
     them to the vactor collisions. If any of the collisions are inevitable, it 
     returns true. Otherwise, it returns false. If dropDown is true, it will 
     not count collisions with platforms. */
-    bool listCollisions(vector<CollisionInfo> &collisions, const Map &map, 
+    bool listCollisions(vector<CollisionInfo> &collisions, Map &map, 
         const Rect &to, const Rect &from, bool dropDown) const;
 
     // Takes a movable and a map, and moves it to where it should end up
-    void collide(const Map &map, Movable &movable);
+    void collide(Map &map, Movable &movable);
 
 public:
     // Constructor
@@ -150,7 +174,7 @@ public:
 
     // A function that takes a map and a list of things and moves them, 
     // colliding when necessary
-    void update(const Map &map, vector<Movable *> &movables);
+    void update(Map &map, vector<Movable *> &movables);
 };
 
 #endif

@@ -431,15 +431,16 @@ void WindowHandler::renderUI(Player &player) {
     // The magic numbers here come from the positions required by the sprite I
     // want to put the bars next to. The refX and refY are its coordinates.
     // These numbers are set here in case the window size changed.
+    // TODO: move magic numbers to json file
     player.health.x = refX + 65;
     player.health.y = refY + 17;
-    player.stamina.x = refX + 65;
-    player.stamina.y = refY + 29;
+    player.fullness.x = refX + 65;
+    player.fullness.y = refY + 29;
     player.mana.x = refX + 65;
     player.mana.y = refY + 41;
     // And actually draw them
     renderStatBar(player.health);
-    renderStatBar(player.stamina);
+    renderStatBar(player.fullness);
     renderStatBar(player.mana);
 
     // Render the inventory, if necessary

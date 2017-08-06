@@ -132,7 +132,7 @@ CollisionInfo Collider::findCollision(const Rect &to, const Rect &stays,
 /* Goes through the tiles near the player and adds all collisions found to 
 the vector collisions. If any are inevitable, it returns true. Otherwise, it
 returns false. If dropDown is true, it will ignore collisions with platforms. */
-bool Collider::listCollisions(vector<CollisionInfo> &collisions, const Map &map,
+bool Collider::listCollisions(vector<CollisionInfo> &collisions, Map &map,
     const Rect &to, const Rect &from, bool dropDown) const {
     // The rectangle of the current tile to check
     Rect stays;
@@ -141,13 +141,16 @@ bool Collider::listCollisions(vector<CollisionInfo> &collisions, const Map &map,
     int worldWidth = map.getWidth() * TILE_WIDTH;
     stays.worldWidth = worldWidth;
 
-    // Calculate the distance we move.
+    // Calculate the distance we move. Note that to.x can be less than 0. */
     int dx = to.x - from.x;
     int dy = to.y - from.y;
 
     bool anyInevitable = false;
 
-    // Only these tiles can possibly be colliding
+    /* Only these tiles can be colliding, given that we're moving 
+    up to half a tilewidth and tileheight at a time and that we've already
+    checked for collisions with the tiles we started on. */
+    /* (Though it may miss a corner that was just barely hit) */
     for (int k = to.x / TILE_WIDTH;
             k < (to.x + to.w) / TILE_WIDTH + 1; k++) {
         int l = (k + map.getWidth()) % map.getWidth();
@@ -155,7 +158,7 @@ bool Collider::listCollisions(vector<CollisionInfo> &collisions, const Map &map,
         for (int j = to.y / TILE_HEIGHT;
                 j < (to.y + to.h) / TILE_HEIGHT + 1; j++) {
             // Don't collide with tiles not on the map
-            if (j >= map.getHeight()) {
+            if (j < 0 || j >= map.getHeight()) {
                 continue;
             }
             Tile *tile = map.getForeground(l, j);
@@ -197,7 +200,7 @@ bool Collider::listCollisions(vector<CollisionInfo> &collisions, const Map &map,
 // direction. This is not always the case, so after calling this function once
 // it's best to call it again with the results assuming the y position is 
 // correct but the x may have farther to move.
-void Collider::collide(const Map &map, Movable &movable) {
+void Collider::collide(Map &map, Movable &movable) {
     // Calculate the world width and height
     int worldWidth = map.getWidth() * TILE_WIDTH;
     int worldHeight = map.getHeight() * TILE_HEIGHT;
@@ -210,8 +213,11 @@ void Collider::collide(const Map &map, Movable &movable) {
     Rect to;
     Rect stays;
 
+    /* Set the height and width of the rectangle that will hold each tile. */
     stays.w = TILE_WIDTH - 2 * xOffset;
     stays.h = TILE_HEIGHT - 2 * yOffset;
+    assert(0 <= stays.w);
+    assert(0 <= stays.h);
 
     // Tell all the Rects the world width, so they can wrap when checking for
     // collisions
@@ -219,7 +225,9 @@ void Collider::collide(const Map &map, Movable &movable) {
     from.worldWidth = worldWidth;
     to.worldWidth = worldWidth;
 
-    // Move, collide, and stop at the edge of the map
+    // Move, collide, and stop at the edge of the mapi
+
+    /* Set the starting location and the width and height. */
     from.x = movable.x;
     from.y = movable.y;
     from.w = movable.spriteWidth;
@@ -227,8 +235,18 @@ void Collider::collide(const Map &map, Movable &movable) {
     from.h = movable.spriteHeight;
     to.h = movable.spriteHeight;
 
+    assert(0 <= from.x);
+    assert(0 <= from.y);
+    assert(0 <= from.w);
+    assert(0 <= from.h);
+    assert(from.x < worldWidth);
+
+    assert(0 <= to.w);
+    assert(0 <= to.h);
+
     // Collide with tiles
-    // Get basic information
+    /* width and height are how many tiles away to check for collisions
+    with tiles that it was already colliding with. */
     int width = movable.spriteWidth / TILE_WIDTH + 2;
     int height = movable.spriteHeight / TILE_HEIGHT + 2;
     int xVelocity = movable.getVelocity().x;
@@ -237,10 +255,14 @@ void Collider::collide(const Map &map, Movable &movable) {
     int startY = from.y / TILE_HEIGHT; 
     // Collide with the tiles it starts on
     for (int k = startX; k < startX + width; k++) {
+        /* Adjust so 0 <= l < map.getWidth() */
         int l = (k + map.getWidth()) % map.getWidth();
         stays.x = l * TILE_WIDTH + xOffset;
+        assert(0 <= stays.x);
+        assert(stays.x < worldWidth);
         for (int j = startY; j < startY + height; j++) {
             stays.y = j * TILE_HEIGHT + yOffset;
+            assert(0 <= stays.y);
             /* If the player starts off overlapping this tile */
             if (stays.intersects(from) && enableCollisions) {
                 /* Deal damage based on tile type. */
@@ -275,7 +297,7 @@ void Collider::collide(const Map &map, Movable &movable) {
         assert(abs(yVelocity - dy) <= abs(yVelocity));
         xVelocity -= dx;
         yVelocity -= dy;
-        // Check whether there are and inevitable collisions we should 
+        // Check whether there are andy inevitable collisions we should 
         // handle first (they do need to be first, otherwise the player can
         // climb walls).
         bool anyInevitable = false;
@@ -373,7 +395,7 @@ void Collider::collide(const Map &map, Movable &movable) {
 
 // A function to move and collide the movables
 // Note that this only ever resets distance fallen when it hits the ground.
-void Collider::update(const Map &map, vector<Movable *> &movables) {
+void Collider::update(Map &map, vector<Movable *> &movables) {
     // Update the velocity of everything
     for (unsigned i = 0; i < movables.size(); i++) {
         // If it fell, figure out how far

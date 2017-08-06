@@ -629,6 +629,8 @@ World::World(WorldType worldType) {
     }
 
     spawn.x = width / 2;
+    // TODO:: remove
+    spawn.x = 5;
     // I should be careful to make sure there are never cloud cities or 
     // floating islands or whatever directly above the spawn point, so the
     // player doesn't die of fall damage every time they respawn.

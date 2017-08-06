@@ -252,6 +252,8 @@ void EventHandler::useMouse(Player &player, Map &map) {
         // Where the mouse clicked, in world coordinates
         int x, y;
         SDL_GetMouseState(&x, &y);
+        /* Note that this will give a negative answer if it wraps around with
+        the player near 0 and the click near the width of the map. */
         x = player.x + x - player.screenX;
         y = player.y - y + player.screenY;
         // Have the player figure out whether to use an item, and which one
@@ -357,7 +359,7 @@ void EventHandler::updatePlayer(Player &player) {
     newAccel.x = 0;
     newAccel.y = 0;
 
-    // TODO: It would probably be better to replace left, ect, with newAccel
+    /* Accelerate in the direction the keys are saying we should. */
     if (right) {
         newAccel.x += player.getDAccel().x;
     }

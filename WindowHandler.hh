@@ -137,7 +137,7 @@ class WindowHandler {
     void renderInventory(Inventory &inventory);
 
     // Load the images used by all inventories
-    bool loadInventory(); //TODO
+    bool loadInventory();
 
     /* Draw the whole inventory onto a single sprite. */
     void updateInventorySprite(Inventory &inventory);

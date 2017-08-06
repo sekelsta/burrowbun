@@ -54,5 +54,16 @@ Return false if it didn't move and should therefore be removed from any
 lists of boulders to try to move. */
 bool Boulder::update(Map &map, Location place, vector<Movable*> &movables, int tick) {
 // TODO
+    /* If it can fall, it should. */
+
+    /* If it hasn't fallen this update, and wants to move sideways but not as
+    a unit, it should do that. */
+
+    /* If it hasn't fallen this update, and wants to move sideways as a unit, 
+    it should do that. */
+        /* Make sure we're the end of a row and no other places in the row
+        are in the list of things to update. If the row stretched across the
+        whole world with no end, just move the things on top. */
+
     return false;
 }

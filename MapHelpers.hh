@@ -75,10 +75,8 @@ the foreground and background objects, where 'health' is roughly equivalent to
 the number of times it can be hit with a pickax before it breaks. */
 struct SpaceInfo {
     // The foreground and background objects
-    // TODO: just store the tiletype here. Then have an array of tile objects
-    // indexed by tiletype to refer to.
-    Tile *foreground;
-    Tile *background;
+    TileType foreground;
+    TileType background;
 
     // How well-lit this tile is, and from where
     Light light;

@@ -66,7 +66,7 @@ class Map {
 
     /* Return true if the spot is empty of foreground tiles but at least 
     one tile next to it isn't. */
-    bool isBesideTile(int x, int y, MapLayer layer) const;
+    bool isBesideTile(int x, int y, MapLayer layer);
 
     /* Return true if neither the foreground nor background are opaque. */
     bool isSky(int x, int y);
@@ -122,44 +122,53 @@ class Map {
     Light getSkyColor(int x, int y) const;
 
     /* Return the pointer the the tile at this location. */
-    Tile *getTile(Location place) const;
-    Tile *getTile(int x, int y, MapLayer layer) const;
+    Tile *getTile(Location place);
+    Tile *getTile(int x, int y, MapLayer layer);
 
     // Returns the foreground tile pointer at x, y
     // 0, 0 is the bottom right
-    Tile *getForeground(int x, int y) const;
+    Tile *getForeground(int x, int y);
 
     // Returns the background tile pointer at x, y
     // 0, 0 is the bottom right
-    Tile *getBackground(int x, int y) const;
+    Tile *getBackground(int x, int y);
 
     /* Set the tile at x, y, layer equal to val. */
-    void setTile(int x, int y, MapLayer layer, Tile* const &val);
-    void setTile(const Location &place, Tile* const &val);
+    void setTile(int x, int y, MapLayer layer, TileType val);
+    void setTile(const Location &place, TileType val);
 
     /* Place a tile in the correct layer. Return whether it was successful. */
-    bool placeTile(int x, int y, TileType type, MapLayer layer);
+    bool placeTile(Location place, TileType type);
 
     // Gets the map's list of the tile pointers it uses
     vector<Tile *> getPointers() const;
 
+    // TODO: remove, if possible
     // Gets a reference to the map's list of the tile pointers it uses
     // This might only be for setting the tile textures
     vector<Tile *> &getPointersRef();
 
     // Write the map to a file
-    void save(const string &filename) const;
+    void save(const string &filename);
 
     /* Update the map. */
     void update(vector<Movable*> &movables);
 
     /* Damage a tile (with a pickax or something). Return false if there
     was no tile to damage. */
-    bool damage(int x, int y, int amount, MapLayer layer);
+    bool damage(Location place, int amount);
 
     /* Destroy a tile if it has no health. Return true if it was destroyed, or
     false if it still had health and lived. */
     bool destroy(const TileHealth &health);
+
+    /* Take an invalid x location and add or subtract width until
+    0 <= x < width. */
+    int wrapX(int x);
+
+    /* Take in world coordinates and a layer and convert to a location in 
+    map coordinates. */
+    Location getMapCoords(int x, int y, MapLayer layer);
 };
 
 #endif

@@ -50,6 +50,10 @@ void Potion::use(InputType type, int x, int y, Player &player, Map &map) {
 
 // Block constructor
 Block::Block(ItemType type) : Item(type) {
+    /* Make sure we should actually be a block. */
+    assert(ItemType::FIRST_BLOCK <= type);
+    assert(type <= ItemType::LAST_BLOCK);
+
     /* Read in the json. */
     string filename = Item::getJsonFilename(type);
     ifstream infile(filename);
@@ -57,13 +61,20 @@ Block::Block(ItemType type) : Item(type) {
 
     /* Set values. */
     bonusReach = j["bonusReach"];
+    
+    /* (The json doesn't include the tiletype) */
+    if (type <= ItemType::LAST_PURE_BLOCK) {
+        tileType = ItemMaker::itemToTile(type);
+    }
+    else {
+        tileType = TileType::EMPTY;
+    }
 }
 
 /* Destructor must be virtual. */
 Block::~Block() {};
 
 /* Tell whether the player can reach far enough to place the block here. */
-// TODO: deal with wrapping around the edge of the map
 bool Block::canPlace(int x, int y, const Player &player, const Map &map) {
     // Figure out which tile the mouse is over
     int xTile = x / map.getTileWidth();
@@ -74,9 +85,16 @@ bool Block::canPlace(int x, int y, const Player &player, const Map &map) {
     int xPlayer = (player.x + (player.spriteWidth / 2)) / map.getTileWidth();
     int yPlayer = (player.y + player.spriteHeight) / map.getTileHeight();
 
-    /* And now we have our answer. */
-    return player.canReach(xTile - xPlayer, yTile - yPlayer, bonusReach);
- 
+    /* TODO: remove */
+    int magic = 20;
+    if ((xPlayer < magic) || (xPlayer + magic > map.getWidth())) {
+        cout << "xPlayer = " << xPlayer << ", xTile = " << xTile << endl;
+    }
+
+    /* And now we have our answer. We don't need to do anything special about 
+    wrapping the map because xTile will already be outside of the map range if 
+    that's needed to get it numerically closer to the player. */
+    return player.canReach(xTile - xPlayer, yTile - yPlayer, bonusReach); 
 }
 
 MapLayer Block::getLayer(InputType type) {
@@ -99,19 +117,23 @@ MapLayer Block::getLayer(InputType type) {
 // When used, place the tile
 void Block::use(InputType type, int x, int y, Player &player, Map &map) {
     // Only do anything if the tile is within range
-    if (canPlace(x, y, player, map)) {
-        // If success is still false at the end, don't set the player's use
-        // time left
-        bool success = false;
-        MapLayer layer = getLayer(type);
-        /* Only do anything if it's a real layer. */
-        if (layer != MapLayer::NONE) {
-            success = map.placeTile(x / map.getTileWidth(), 
-                    y / map.getTileHeight(), tileType, layer);
-        }
-        // If success, add the use time
-        player.useTimeLeft += (int)success * useTime;
+    if (!canPlace(x, y, player, map)) {
+        return;
     }
+
+    MapLayer layer = getLayer(type);
+
+    /* Only do anything if it's a real layer. */
+    if (layer == MapLayer::NONE) {
+        return;
+    }
+
+    /* If success is still false at the end, don't set the player's use
+    time left. */
+    bool success = map.placeTile(map.getMapCoords(x, y, layer), tileType);
+
+    // If success, add the use time
+    player.useTimeLeft += (int)success * useTime;
 }
 
 /* Pickaxe constructor. */
@@ -131,8 +153,7 @@ void Pickaxe::use(InputType type, int x, int y, Player &player, Map &map) {
     if (canPlace(x, y, player, map)) {
         /* Which layer to damage. */
         MapLayer layer = getLayer(type);
-        bool success = map.damage(x / map.getTileWidth(), 
-                y / map.getTileHeight(), blockDamage, layer);
+        bool success = map.damage(map.getMapCoords(x, y, layer), blockDamage);
         // If success, add the use time
         player.useTimeLeft += (int)success * useTime;
     }
@@ -148,7 +169,7 @@ TileType ItemMaker::itemToTile(ItemType itemType) {
     /* The first and last ItemTypes that are also tiles are dirt and 
     dark brick as well. */
     int firstItem = (int)ItemType::FIRST_BLOCK;
-    int lastItem = (int)ItemType::LAST_BLOCK;
+    int lastItem = (int)ItemType::LAST_PURE_BLOCK;
 
     assert(lastTile - firstTile == lastItem - firstItem);
     assert(firstItem <= (int)itemType);
@@ -170,7 +191,7 @@ ItemType ItemMaker::tileToItem(TileType tileType) {
     /* The first and last ItemTypes that are also tiles are dirt and 
     dark brick as well. */
     int firstItem = (int)ItemType::FIRST_BLOCK;
-    int lastItem = (int)ItemType::LAST_BLOCK;
+    int lastItem = (int)ItemType::LAST_PURE_BLOCK;
 
     assert(lastTile - firstTile == lastItem - firstItem);
     assert(firstTile <= (int)tileType);
@@ -206,7 +227,7 @@ Item *ItemMaker::makeItem(ItemType type) {
     }
     // If it's a block, make a block
     else if ((int)ItemType::FIRST_BLOCK <= (int)type
-                && (int)type <= (int)ItemType::LAST_BLOCK) {
+                && (int)type <= (int)ItemType::LAST_PURE_BLOCK) {
         return new Block(type);
     }
     /* If it's a pickaxe, make a pickaxe. */

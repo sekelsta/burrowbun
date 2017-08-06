@@ -81,16 +81,16 @@ void Map::chooseSprite(int x, int y) {
         && getForeground(x, y + 1) -> type == TileType::EMPTY) {
             col += 1;
     }
-    if (x != width - 1
-        && getForeground(x + 1, y) -> type == TileType::EMPTY) {
+    /* WrapX is called so it matches up with the tile on the other side
+    of the map, wich it's next to when it wraps around. */
+    if (getForeground(wrapX(x + 1), y) -> type == TileType::EMPTY) {
             col += 2;
     }
     if (y != 0
         && getForeground(x, y - 1) -> type == TileType::EMPTY) {
             col += 4;
     }
-    if (x != 0
-        && getForeground(x - 1, y) -> type == TileType::EMPTY) {
+    if (getForeground(wrapX(x - 1), y) -> type == TileType::EMPTY) {
             col += 8;
     }
     findPointer(x, y) -> spritePlace.y = col;
@@ -100,7 +100,7 @@ void Map::chooseSprite(int x, int y) {
 
 /* Return true if there's a nonempty tile of the same layer at or next to 
 this place. */
-bool Map::isBesideTile(int x, int y, MapLayer layer) const {
+bool Map::isBesideTile(int x, int y, MapLayer layer) {
     /* Check at this place. */
     if (getTile(x, y, layer) -> type != TileType::EMPTY) {
         return true;
@@ -136,8 +136,9 @@ int Map::distance(int i, int j, int x, int y) {
 /* Compute the square of the distance to the nearest sky tile that is a source 
    of light (doesn't have an opaque foreground or background). If the distance 
    is more than maxDist, return maxDist. */
+// TODO: wrap around the edges of the map
 int Map::skyDistance(int x, int y, int maxDist) {
-    if (isSky(x, y) || findPointer(x, y) -> foreground -> getOpacity() == 0) {
+    if (isSky(x, y) || getForeground(x, y) -> getOpacity() == 0) {
         return 0;
     }
     int smallest = distance(0, 0, 0, maxDist);
@@ -177,10 +178,13 @@ bool Map::isOnMap(int x, int y) const {
 light. */
 void Map::updateNear(int x, int y) {
     // Update the sprites
+    /* Value that takes into account x-wrapping of the map. */
+    int newx;
     for (int i = -1; i < 2; i++) {
+        newx = wrapX(x + i);
         for (int j = -1; j < 2; j++) {
-            if (isOnMap(x + i, y + j)) {
-                chooseSprite(x + i, y + j);
+            if (isOnMap(newx, y + j)) {
+                chooseSprite(newx, y + j);
             }
         }
     }
@@ -189,9 +193,10 @@ void Map::updateNear(int x, int y) {
     // The range to update lighting, in each direction
     int range = 8;
     for (int i = -1 * range; i < range + 1; i++) {
+        newx = wrapX(x + i);
         for (int j = -1 * range; j < range + 1; j++) {
-            if (isOnMap(x + i, y + j)) {
-                findPointer(x + i, y + j) -> isLightUpdated = false;
+            if (isOnMap(newx, y + j)) {
+                findPointer(newx, y + j) -> isLightUpdated = false;
             }
         }
     }
@@ -239,24 +244,18 @@ Map::Map(string filename, int tileWidth, int tileHeight)
     // Read the map
     int index = 0;
     int count, tile;
-    TileType current;
-    Tile *matchingTile = NULL;
-    Tile *matchingBackground = NULL;
+    TileType foregroundTile;
     while (index < height * width) {
         infile >> count >> tile;
-        current = (TileType)tile;
-        matchingTile = getTile(current);
-        matchingBackground = getTile(TileType::EMPTY);
+        foregroundTile = (TileType)tile;
         for (int i = 0; i < count; i++) {
             assert(index < width * height);
-            tiles[index].foreground = matchingTile;
-            tiles[index].background = matchingBackground;
-            tiles[index].spritePlace.x = rand() % matchingTile -> sprite.cols;
-            tiles[index].spritePlace.y = 0;
+            tiles[index].foreground = foregroundTile;
+            tiles[index].background = TileType::EMPTY; // TODO: load background
             index++;
         }
     }
-    assert(getForeground(0, 0) -> type == tiles[0].foreground -> type);
+    assert(getForeground(0, 0) -> type == tiles[0].foreground);
 
     /* Iterate over the map finding the tiles that need a special border 
        sprite and figuring out how well-lit each tile is. */
@@ -339,17 +338,17 @@ Light Map::getSkyColor(int x, int y) const {
 }
 
 /* Returns the tile at x, y, layer. */
-Tile *Map::getTile(Location place) const {
+Tile *Map::getTile(Location place) {
     return getTile(place.x, place.y, place.layer);
 }
 
 /* Returns the tile at x, y, layer. */
-Tile *Map::getTile(int x, int y, MapLayer layer) const {
+Tile *Map::getTile(int x, int y, MapLayer layer) {
     if (layer == MapLayer::FOREGROUND) {
-        return findPointer(x, y) -> foreground;
+        return getTile(findPointer(x, y) -> foreground);
     }
     else if (layer == MapLayer::BACKGROUND) {
-        return findPointer(x, y) -> background;
+        return getTile(findPointer(x, y) -> background);
     }
     else {
         return NULL;
@@ -358,18 +357,18 @@ Tile *Map::getTile(int x, int y, MapLayer layer) const {
 
 // Returns the foreground tile at x, y
 // 0, 0 is the bottom right
-Tile *Map::getForeground(int x, int y) const {
-    return findPointer(x, y) -> foreground;
+Tile *Map::getForeground(int x, int y) {
+    return getTile(findPointer(x, y) -> foreground);
 }
 
 // Returns the background tile at x, y
 // 0, 0 is the bottom right
-Tile *Map::getBackground(int x, int y) const {
-    return findPointer(x, y) -> background;
+Tile *Map::getBackground(int x, int y) {
+    return getTile(findPointer(x, y) -> background);
 }
 
 /* Sets the tile at x, y, layer equal to val. */
-void Map::setTile(int x, int y, MapLayer layer, Tile* const &val) {
+void Map::setTile(int x, int y, MapLayer layer, TileType val) {
     if (layer == MapLayer::FOREGROUND) {
         findPointer(x, y) -> foreground = val;
     }
@@ -387,24 +386,24 @@ void Map::setTile(int x, int y, MapLayer layer, Tile* const &val) {
 }
 
 /* Sets the tile at x, y, layer equal to val. */
-void Map::setTile(const Location &place, Tile* const &val) {
+void Map::setTile(const Location &place, TileType val) {
     setTile(place.x, place.y, place.layer, val);
 }
 
-bool Map::placeTile(int x, int y, TileType type, MapLayer layer) {
+bool Map::placeTile(Location place, TileType type) {
     /* Can only place a tile if there isn't one there already. */
-    if (getTile(x, y, layer) -> type != TileType::EMPTY) {
+    if (getTile(place) -> type != TileType::EMPTY) {
         return false;
     }
 
     /* Can only place a tile if one in the foreground or background 
     is next to it. */
-    if (!isBesideTile(x, y, MapLayer::FOREGROUND)
-            && !isBesideTile(x, y, MapLayer::BACKGROUND)) {
+    if (!isBesideTile(place.x, place.y, MapLayer::FOREGROUND)
+            && !isBesideTile(place.x, place.y, MapLayer::BACKGROUND)) {
         return false;
     }
 
-    setTile(x, y, layer, getTile(type));
+    setTile(place, type);
     // TODO: change this when I add furniture
 
     return true;
@@ -421,7 +420,7 @@ vector<Tile *> &Map::getPointersRef() {
 }
 
 // Write the map to a file
-void Map::save(const string &filename) const {
+void Map::save(const string &filename) {
     // Saves in .bmp file format in black and white
     ofstream outfile;
     outfile.open(filename);
@@ -466,17 +465,12 @@ void Map::update(vector<Movable*> &movables) {
 }
 
 /* Damage the tile. Return false if there was no tile there to damage. */
-bool Map::damage(int x, int y, int amount, MapLayer layer) {
+bool Map::damage(Location place, int amount) {
     /* If there's no tile here, just return false. */
-    if (getTile(x, y, layer) -> type == TileType::EMPTY) {
+    if (getTile(place) -> type == TileType::EMPTY) {
         return false;
     }
 
-    Location place;
-    place.x = x;
-    place.y = y;
-    place.layer = layer;
-    
     /* Index of the tilehealth, or -1 if it doesn't exist. */
     int index = -1;
     /* First check if that tile has already been damaged before. */
@@ -508,8 +502,49 @@ bool Map::damage(int x, int y, int amount, MapLayer layer) {
 /* Destroy a tile if it has no health left. */
 bool Map::destroy(const TileHealth &health) {
     if (health.health <= 0) {
-        setTile(health.place, getTile(TileType::EMPTY));
+        setTile(health.place, TileType::EMPTY);
     }
 
     return health.health <= 0;
+}
+
+/* Take an invalid x location and add or subtract the width until
+0 <= x < width. */
+int Map::wrapX(int x) {
+    /* Fix if x is too large. */
+    x %= getWidth();
+
+    /* Fix if x is too small. */
+    while (x < 0) {
+        x += getWidth();
+    }
+
+    return x;
+}
+
+/* Take in world coordinates and a layer and convert to a location in 
+map coordinates. */
+Location Map::getMapCoords(int x, int y, MapLayer layer) {
+    /* Make sure x isn't negative. */
+    x += getWidth() * getTileWidth();
+    assert(x >= 0);
+
+    /* Create a location to store the answer in. */
+    Location place;
+    place.layer = layer;
+
+    /* Divide to get map coordinates. */
+    place.x = x / getTileWidth();
+    place.y = y / getTileHeight();
+
+    /* And make sure they actually point to somewhere on the map. */
+    place.x = wrapX(place.x);
+
+    /* Double check our work. */
+    assert(0 <= place.x);
+    assert(place.x < getWidth());
+    assert(0 <= place.y);
+    assert(place.y < getHeight());
+
+    return place;
 }

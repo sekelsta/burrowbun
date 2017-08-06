@@ -104,7 +104,8 @@ void Movable::accelerate() {
     velocity.y = ceil(velocity.y);
 }
 
-/* Take damage. */
-void Movable::takeDamage(int normal, int wounds) {
-    // Pass
-}
+/* Take damage. Does nothing. */
+void Movable::takeDamage(int normal, int wounds) {}
+
+/* Take fall damage. Does nothing. */
+void Movable::takeFallDamage() {}

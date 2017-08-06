@@ -1,7 +1,8 @@
 Changes since last push:
- - fixed a bug where pickaxe distance was unlimited, caused by an uninitiazed value
- - made items initialize their values based on json files
- - wrote from_json for sprites
+ - went through updating TODOs in comments
+ - now every entity can take fall damage, not just the player
+ - changed SpaceInfo to store the tiletype instead of a pointer
+ - fixed numerous bugs 
 
 Known "features":
  - The strenth of gravity is independent of the world.
@@ -14,6 +15,7 @@ Known "features":
 
 Known bugs:
  - Apparently the player can fit in gaps that they can't escape.
+ - Collision detection does not work correctly where the map wraps
 
 To do:
  - Tiles should have a function to decide which version of the sprite to
@@ -23,6 +25,4 @@ use, not make the map do that
  - stacking items, throwing / picking up items
  - Trees!
  - Better map generation
- - Make the spaceInfo class just store a tiletype, not a Tile*, and use it as
-the index of the Tile*
- - Store data for movables in a file instead of the source code
+ - Store data for movables and sprites in a file instead of the source code

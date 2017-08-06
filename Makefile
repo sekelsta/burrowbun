@@ -26,7 +26,7 @@ Tile.o : Tile.cc Tile.hh Map.hh Sprite.hh Movable.hh json.hpp
 
 WindowHandler.o : WindowHandler.cc WindowHandler.hh Tile.hh Map.hh Movable.hh \
         Light.hh MapHelpers.hh Hotbar.hh Sprite.hh Inventory.hh Action.hh \
-        Item.hh
+        Item.hh Entity.hh Player.hh
 	$(CC) $(CXXFLAGS) $^ -c $(LDFLAGS) $(LINKER_FLAGS)
 
 EventHandler.o : EventHandler.cc EventHandler.hh WindowHandler.hh Player.hh \

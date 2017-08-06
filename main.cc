@@ -97,8 +97,7 @@ int main(int argc, char **argv) {
                     eventHandler.mouseEvent(event);
                     break;
                 default:
-                    // TODO
-                    // cerr << "Received unsupported event." << endl;
+                    // Pass
                     break;
             }
         }
@@ -110,8 +109,10 @@ int main(int argc, char **argv) {
 
         // Move things around
         collider.update(map, movables);
-        // TODO: make all entities take fall damage
-        player.takeFallDamage();
+        /* Have every movable take fall damage. */
+        for (unsigned int i = 0; i < movables.size(); i++) {
+            movables[i] -> takeFallDamage();
+        }
 
         /* Have the map update itself and relevent movables. */
         map.update(movables);
