@@ -10,7 +10,6 @@
 using namespace std;
 
 // A class for a map for a sandbox game
-// Currently its only focus is on generating the map
 class Map {
     // Fields:
 
@@ -143,9 +142,8 @@ class Map {
     // Gets the map's list of the tile pointers it uses
     vector<Tile *> getPointers() const;
 
-    // TODO: remove, if possible
     // Gets a reference to the map's list of the tile pointers it uses
-    // This might only be for setting the tile textures
+    // This should only be used to set the tile textures
     vector<Tile *> &getPointersRef();
 
     // Write the map to a file

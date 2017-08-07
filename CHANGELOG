@@ -1,8 +1,8 @@
 Changes since last push:
- - went through updating TODOs in comments
- - now every entity can take fall damage, not just the player
- - changed SpaceInfo to store the tiletype instead of a pointer
- - fixed numerous bugs 
+ - fixed collision detection bugs near the edge of the map
+ - fixed lighting bug near the edge of the map
+ - general refactoring
+ - started adding a test suite
 
 Known "features":
  - The strenth of gravity is independent of the world.
@@ -21,8 +21,8 @@ To do:
  - Tiles should have a function to decide which version of the sprite to
 use, not make the map do that
  - rewrite almost all world generation code to use noise
- - rethink interactions between the collider and movables
  - stacking items, throwing / picking up items
  - Trees!
- - Better map generation
  - Store data for movables and sprites in a file instead of the source code
+ - Actually save and load the map properly
+ - Actually display background tiles

@@ -122,8 +122,10 @@ bool Map::isBesideTile(int x, int y, MapLayer layer) {
 
 }
 
-/* Return true if neither the foreground nor background is opaque. */
+/* Return true if neither the foreground nor background is opaque. Accept
+out-of-bounds x coordintes and loop them so they are in bounds. */
 inline bool Map::isSky(int x, int y) {
+    x = wrapX(x);
     return (getForeground(x, y) -> getOpacity() == 0
         && getBackground(x, y) -> getOpacity() == 0);
 }
@@ -136,14 +138,13 @@ int Map::distance(int i, int j, int x, int y) {
 /* Compute the square of the distance to the nearest sky tile that is a source 
    of light (doesn't have an opaque foreground or background). If the distance 
    is more than maxDist, return maxDist. */
-// TODO: wrap around the edges of the map
 int Map::skyDistance(int x, int y, int maxDist) {
     if (isSky(x, y) || getForeground(x, y) -> getOpacity() == 0) {
         return 0;
     }
     int smallest = distance(0, 0, 0, maxDist);
-    for (int i = max(0, x + 1 - maxDist); i < maxDist + x && i < width; 
-            i++) {
+    /* It's okay if i is negative. */
+    for (int i = x + 1 - maxDist; i < maxDist + x; i++) {
         for (int j = max(0, y + 1 - maxDist);
                 j < maxDist + y && j < height; j++) {
             if (isSky(i, j)) {

@@ -46,14 +46,17 @@ inline void Collider::findYCollision(CollisionInfo &info, int dy,
 
 // Return information about a collision between a moving thing and a non-moving
 // thing. 
-CollisionInfo Collider::findCollision(const Rect &to, const Rect &stays, 
-        int dx, int dy) const {
+CollisionInfo Collider::findCollision(const Rect &from, const Rect &to, 
+        const Rect &stays) const {
     CollisionInfo info;
     info.x = 0;
     info.y = 0;
     info.xCoefficient = 1;
     info.yCoefficient = 1;
     info.isInevitable = false;
+
+    int dx = to.x - from.x;
+    int dy = to.y - from.y;
 
     // Check for collisions
     if (stays.intersects(to)) {
@@ -62,16 +65,11 @@ CollisionInfo Collider::findCollision(const Rect &to, const Rect &stays,
         // and now it is, we know the direction. (Actually, it can be two
         // parallel ones, since we know velocity.)
         // If the left or right side started off in the collision area
-        if ((stays.x >= to.x - dx && stays.x < to.x + to.w - dx)
-                || (to.x - dx < stays.x + stays.w && to.x - dx >= stays.x)
-                || (to.x + to.w - dx < stays.x + stays.w 
-                && to.x + to.w - dx > stays.x)) {
+        if (stays.intersectsX(from)) {
             // Since this should only be called for things that didn't start 
             // already colliding, we know neither y side started in the 
             // collision area.
-            assert(to.y - dy >= stays.y + stays.h || to.y - dy < stays.y);
-            assert(to.y + to.h - dy > stays.y + stays.h
-                || to.y + to.h - dy <= stays.y);
+            assert(!stays.intersectsY(from));
             // Since there definately is a collision, it has to be up or down
             assert(dy != 0);
             findYCollision(info, dy, to.h, stays);
@@ -80,14 +78,11 @@ CollisionInfo Collider::findCollision(const Rect &to, const Rect &stays,
             return info;
         }
         // If the top or bottom started off in the collision area
-        else if ((stays.y >= to.y - dy && stays.y < to.y + to.h - dy)
-                || (to.y - dy < stays.y + stays.h && to.y - dy >= stays.y) 
-                || (to.y + to.h - dy < stays.y + stays.h
-                && to.y + to.h - dy > stays.y)) {
+        else if (stays.intersectsY(from)) {
             // Likewise, we know it must be left or right
             assert(dx != 0);
             findXCollision(info, dx, to.w, stays);
-            // And whether it happens doesn't dedpend on y velocity
+            // And whether it happens doesn't depend on y velocity
             info.isInevitable = true;
             return info;
         }
@@ -95,10 +90,10 @@ CollisionInfo Collider::findCollision(const Rect &to, const Rect &stays,
         // so since we know there is a collision, there must be at least two
         // edges in the collision area.
         // Also for any of these cases isInevitable should stay false.
-        int tx = min(abs(to.x - dx - stays.x - stays.w), 
-            abs(to.x - dx - to.w - stays.x));
-        int ty = min(abs(to.y - dy - stays.y - stays.h),
-            abs(to.y - dy - to.h - stays.y));
+        int tx = min(abs(from.x - stays.x - stays.w), 
+            abs(from.x - from.w - stays.x));
+        int ty = min(abs(from.y - stays.y - stays.h),
+            abs(from.y - from.h - stays.y));
         // Multiplying is more efficient than dividing, and only their
         // relative values matter anyway
         tx *= abs(dy);
@@ -131,7 +126,8 @@ CollisionInfo Collider::findCollision(const Rect &to, const Rect &stays,
 
 /* Goes through the tiles near the player and adds all collisions found to 
 the vector collisions. If any are inevitable, it returns true. Otherwise, it
-returns false. If dropDown is true, it will ignore collisions with platforms. */
+returns false. If dropDown is true, it will ignore collisions with platforms.
+Note that to.x can be less than 0 or greater than worldWidth. */
 bool Collider::listCollisions(vector<CollisionInfo> &collisions, Map &map,
     const Rect &to, const Rect &from, bool dropDown) const {
     // The rectangle of the current tile to check
@@ -141,18 +137,17 @@ bool Collider::listCollisions(vector<CollisionInfo> &collisions, Map &map,
     int worldWidth = map.getWidth() * TILE_WIDTH;
     stays.worldWidth = worldWidth;
 
-    // Calculate the distance we move. Note that to.x can be less than 0. */
-    int dx = to.x - from.x;
-    int dy = to.y - from.y;
-
     bool anyInevitable = false;
 
     /* Only these tiles can be colliding, given that we're moving 
     up to half a tilewidth and tileheight at a time and that we've already
-    checked for collisions with the tiles we started on. */
-    /* (Though it may miss a corner that was just barely hit) */
-    for (int k = to.x / TILE_WIDTH;
-            k < (to.x + to.w) / TILE_WIDTH + 1; k++) {
+    checked for collisions with the tiles we started on. 
+    (Though it may miss a corner that was just barely hit) */
+    /* If to.x is negative, to.x / TILE_WIDTH will round in the wrong
+    direction. */
+    int toX = to.x + to.worldWidth;
+    for (int k = toX / TILE_WIDTH;
+            k < (toX + to.w) / TILE_WIDTH + 1; k++) {
         int l = (k + map.getWidth()) % map.getWidth();
         stays.x = l * TILE_WIDTH + xOffset;
         for (int j = to.y / TILE_HEIGHT;
@@ -176,7 +171,7 @@ bool Collider::listCollisions(vector<CollisionInfo> &collisions, Map &map,
             if (stays.intersects(from)) {
                 continue;
             }
-            CollisionInfo info = findCollision(to, stays, dx, dy);
+            CollisionInfo info = findCollision(from, to, stays);
             // Include information about what tile was collided
             info.resolve(tile);
 

@@ -5,7 +5,7 @@ CXXFLAGS = -std=c++14 -Wall -D_GLIBCXX_DEBUG -D_LIBCXX_DEBUG_PEDANTIC -Og -g
 LINKER_FLAGS = -lSDL2 -lSDL2_image
 NOISE_FLAGS = -I/usr/include/libnoise -L/usr/lib -lnoise
 
-all : main
+all : main tests
 
 main : main.o Map.o World.o Tile.o WindowHandler.o EventHandler.o Movable.o \
         Player.o Collider.o Hotbar.o Entity.o Inventory.o Item.o Action.o \
@@ -74,6 +74,12 @@ Boulder.o : Boulder.cc Boulder.hh Map.hh Tile.hh MapHelpers.hh Sprite.hh
 
 MapHelpers.o : MapHelpers.cc MapHelpers.hh
 	$(CC) $(CXXFLAGS) $^ -c $(LDFLAGS)
+
+tests : collider_tests.o
+	$(CC) $(CXXFLAGS) $^ -o $@ $(LDFLAGS) $(NOISE_FLAGS) $(LINKER_FLAGS)
+
+collider_tests.o : collider_tests.cc Collider.hh
+	$(CC) $(CXXFLAGS) $^ -c $(LDFLAGS) $(LINKER_FLAGS)
 
 clean :
 	rm -f *.o *.gch *~ *.world
