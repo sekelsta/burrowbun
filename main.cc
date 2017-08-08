@@ -102,6 +102,9 @@ int main(int argc, char **argv) {
             }
         }
 
+        /* TODO: move elsewhere, and update all entities. */
+        player.update();
+
         // Now that all the events have been handled, do eventhandling things 
         // that need to be done every update (like checking whether any keys
         // or mouse buttons are being held down);

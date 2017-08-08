@@ -28,6 +28,9 @@ public:
 
     // Calculate fall damage
     virtual void takeFallDamage();
+
+    /* Do the things! */
+    virtual void update();
 };
 
 #endif

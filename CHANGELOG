@@ -1,6 +1,5 @@
 Changes since last push:
- - Hotbar no longer updates it's sprite every tick. (The isSpriteUpdated value
-was only being set to true in a copy, which was then being destroyed.)
+ - Health, mana, and hunger now regenerate every tick
 
 Known "features":
  - The strenth of gravity is independent of the world.

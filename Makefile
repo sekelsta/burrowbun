@@ -26,7 +26,7 @@ Tile.o : Tile.cc Tile.hh Map.hh Sprite.hh Movable.hh json.hpp
 
 WindowHandler.o : WindowHandler.cc WindowHandler.hh Tile.hh Map.hh Movable.hh \
         Light.hh MapHelpers.hh Hotbar.hh Sprite.hh Inventory.hh Action.hh \
-        Item.hh Entity.hh Player.hh
+        Item.hh Entity.hh Player.hh UIHelpers.hh
 	$(CC) $(CXXFLAGS) $^ -c $(LDFLAGS) $(LINKER_FLAGS)
 
 EventHandler.o : EventHandler.cc EventHandler.hh WindowHandler.hh Player.hh \
@@ -50,7 +50,7 @@ World.o : World.cc World.hh Tile.hh MapHelpers.hh Sprite.hh Movable.hh
 Hotbar.o : Hotbar.cc Hotbar.hh Sprite.hh UIHelpers.hh Action.hh Item.hh
 	$(CC) $(CXXFLAGS) $^ -c $(LDFLAGS)
 
-Entity.o : Entity.cc Entity.hh Movable.hh
+Entity.o : Entity.cc Entity.hh Movable.hh UIHelpers.hh
 	$(CC) $(CXXFLAGS) $^ -c $(LDFLAGS)
 
 Inventory.o : Inventory.cc Inventory.hh Light.hh UIHelpers.hh Sprite.hh \
