@@ -2,6 +2,7 @@
 #define BOULDER_HH
 
 #include <vector>
+#include <set>
 #include "Tile.hh"
 
 /* A Tile that moves. */
@@ -12,16 +13,16 @@ class Boulder: public Tile {
 
     /* List of tile types which drop as an item when this type of boulder
     runs into them sideways. */
-    vector<TileType> tilesDestroyed;
+    set<TileType> tilesDestroyed;
 
     /* Same, but for falling. */
-    vector<TileType> tilesCrushed;
+    set<TileType> tilesCrushed;
 
     /* List of tile types which this boulder will switch places with. */
-    vector<TileType> tilesDisplaced;
+    set<TileType> tilesDisplaced;
 
     /* Same, but for falling. */
-    vector<TileType> tilesSunk;
+    set<TileType> tilesSunk;
 
     /* Does it float or fall? */
     bool isFloating;
@@ -30,7 +31,10 @@ class Boulder: public Tile {
     bool carriesMovables;
 
     /* Convert a vector<int> to a vector<TileType> */
-    static vector<TileType> vectorConvert(const vector<int> &input);
+    static set<TileType> vectorConvert(const vector<int> &input);
+
+    /* Check if it can fall one tile. */
+    bool fall(Map &map, const Location &place) const;
 
 public:
     /* Constructor. */
@@ -42,6 +46,8 @@ public:
     bool update(Map &map, Location place, vector<Movable*> &movables, 
         int tick);
 
+    /* Whether this tile will ever need to call its update function. */
+    bool getNeedsUpdating() const;
 };
 
 #endif

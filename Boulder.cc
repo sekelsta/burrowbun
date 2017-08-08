@@ -10,12 +10,39 @@
 using json = nlohmann::json;
 
 /* Convert a vector<int> to a vector<TileType>. */
-vector<TileType> Boulder::vectorConvert(const vector<int> &input) {
-    vector<TileType> output;
+set<TileType> Boulder::vectorConvert(const vector<int> &input) {
+    set<TileType> output;
     for (unsigned int i = 0; i < input.size(); i++) {
-        output.push_back((TileType)input[i]);
+        output.insert((TileType)input[i]);
     }
     return output;
+}
+
+/* Check if it can fall one tile. If it can, do. */
+bool Boulder::fall(Map &map, const Location &place) const {
+    TileType blocking = TileType::EMPTY;
+    /* If it isn't a type of boulder that can fall, return false. */
+    if (isFloating) {
+        return false;
+    }
+
+    /* If there's a tile beneath, figure out which. */
+    if (map.isOnMap(place.x, place.y - 1)) {
+        /* If its path is blocked, it can't fall. */
+        blocking = map.getTile(place.x, place.y - 1, place.layer) -> type;
+    }
+    
+    /* If it can crush it, do so. */
+    if (tilesCrushed.count(blocking)) {
+        map.moveDown(place);
+        return true;
+    }
+    else if (tilesSunk.count(blocking)) {
+        map.displaceDown(place);
+        return true;
+    }
+
+    return false;
 }
 
 /* Constructor. */
@@ -55,6 +82,9 @@ lists of boulders to try to move. */
 bool Boulder::update(Map &map, Location place, vector<Movable*> &movables, int tick) {
 // TODO
     /* If it can fall, it should. */
+    if (fall(map, place)) {
+        return true;
+    }
 
     /* If it hasn't fallen this update, and wants to move sideways but not as
     a unit, it should do that. */
@@ -66,4 +96,8 @@ bool Boulder::update(Map &map, Location place, vector<Movable*> &movables, int t
         whole world with no end, just move the things on top. */
 
     return false;
+}
+
+bool Boulder::getNeedsUpdating() const {
+    return true;
 }

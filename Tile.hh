@@ -96,6 +96,10 @@ public:
 
     /* Virtual destructor. */
     virtual ~Tile();
+
+    /* Whether the tile will ever need to call its update function. */
+    virtual bool getNeedsUpdating() const;
+
 };
 
 #endif

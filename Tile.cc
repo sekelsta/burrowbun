@@ -134,3 +134,7 @@ Tile::Tile(TileType tileType)
 /* Virtual destructor. */
 Tile::~Tile() {}
 
+/* Whether the tile will ever need to call its update function. */
+bool Tile::getNeedsUpdating() const {
+    return false;
+}

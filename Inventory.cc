@@ -36,8 +36,11 @@ Inventory::Inventory(const Inventory &toCopy) {
 }
 
 /* operator=, also don't use, also just asserts false. */
-Inventory Inventory::operator=(const Inventory &toCopy) {
+Inventory &Inventory::operator=(const Inventory &toCopy) {
+    /* If this were actually going to do anything I would remember to check
+    for self-assignment here. */
     assert(false);
+    return *this;
 }
 
 /* Destructor. Assumes this inventory is the only object with pointers to 

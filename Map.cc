@@ -175,16 +175,51 @@ bool Map::isOnMap(int x, int y) const {
     return (x >= 0 && y >= 0 && x < width && y < height);
 }
 
+/* Add a placeto the list of places to be updated, if the tile there will ever
+need to be updated. */
+void Map::addToUpdate(int x, int y, MapLayer layer) {
+    /* Ignore it if it isn't a type of tile that needs to be updated. */
+    if (!getTile(x, y, layer) -> getNeedsUpdating()) {
+        return;
+    }
+
+    /* Time to add it to the list. */
+    Location place;
+    place.x = x;
+    place.y = y;
+    place.layer = layer;
+    toUpdate.insert(place);
+}
+
+/* Go through the list of tiles to update and remove the ones that don't 
+need to be updated anymore. */
+void Map::trimUpdateList() {
+    set<Location>::iterator iter = toUpdate.begin();
+    while (iter != toUpdate.end()) {
+        /* Remove if expired. */
+        if (!getTile(*iter) -> getNeedsUpdating()) {
+            iter = toUpdate.erase(iter);
+        }
+        else {
+            ++iter;
+        }
+    }
+}
+
 /* Tell all the tiles nearby to have the right sprite and the right amount of 
-light. */
+light, and recheck if they need to run their own update functions. */
 void Map::updateNear(int x, int y) {
-    // Update the sprites
+    // Update the sprites and tiles
     /* Value that takes into account x-wrapping of the map. */
     int newx;
     for (int i = -1; i < 2; i++) {
         newx = wrapX(x + i);
         for (int j = -1; j < 2; j++) {
             if (isOnMap(newx, y + j)) {
+                /* Update the tiles. */
+                addToUpdate(newx, y + j, MapLayer::FOREGROUND);
+                addToUpdate(newx, y + j, MapLayer::BACKGROUND);
+                /* Update the sprites. */
                 chooseSprite(newx, y + j);
             }
         }
@@ -258,16 +293,19 @@ Map::Map(string filename, int tileWidth, int tileHeight)
     }
     assert(getForeground(0, 0) -> type == tiles[0].foreground);
 
-    /* Iterate over the map finding the tiles that need a special border 
-       sprite and figuring out how well-lit each tile is. */
+    /* Iterate over the entire map. */
     for (int i = 0; i < width; i++) {
         for (int j = 0; j < height; j++) {
+            /* Set special sprites for all the tiles that need them. */
             if (getForeground(i, j) -> type != TileType::EMPTY) {
                 chooseSprite(i, j);
             }
-            // Tell the spaces they should figure out how wel-lit they are 
+            // Tell the spaces they should figure out how well-lit they are 
             // before they get rendered
             findPointer(i, j) -> isLightUpdated = false;
+            /* Add the appropriate tiles to our list of tiles to update. */
+            addToUpdate(i, j, MapLayer::FOREGROUND);
+            addToUpdate(i, j, MapLayer::BACKGROUND);
         }
     }
 }
@@ -442,14 +480,26 @@ void Map::save(const string &filename) {
 void Map::update(vector<Movable*> &movables) {
     // TODO
     /* Update tiles. */
+    /* Iterate over a copy of the list. */
+    set<Location> newUpdate = toUpdate;
+    set<Location>::iterator iter = newUpdate.begin();
+    while (iter != newUpdate.end()) {
+        Tile *tile = getTile(*iter);
+        tile -> update(*this, *iter, movables, tick);
+        iter++;
+    }
+    /* And get rid of the ones that don't need to be updated anymore. */
+    trimUpdateList();
+
+    /*
+    for (unsigned int i = 0; i < toUpdate.size(); i++) {
+        Tile *tile = getTile(toUpdate[i]);
+        tile -> update(*this, toUpdate[i], movables, tick);
+    }*/
+
     /* Heal tiles that have been damaged for a while. */
     /* Tiles stay damaged for this many ticks, with about 20-40 ticks/sec. */
     const int healTime = 300;
-    /* Put everything to keep at the front and then erase the rest. */
-    /*damaged.erase(std::remove_if(damaged.begin(), damaged.end(),
-            [](TileHealth health) 
-            {return tick - health.lastUpdated > healTime;}), damaged.end());
-*/
     /* Iterate while removing. */
     vector<TileHealth>::iterator it = damaged.begin();
     while (it != damaged.end()) {
@@ -503,10 +553,18 @@ bool Map::damage(Location place, int amount) {
 /* Destroy a tile if it has no health left. */
 bool Map::destroy(const TileHealth &health) {
     if (health.health <= 0) {
-        setTile(health.place, TileType::EMPTY);
+        kill(health.place);
     }
 
     return health.health <= 0;
+}
+
+/* Destroy a tile and (TODO) drop itself as an item. */
+void Map::kill(int x, int y, MapLayer layer) {
+    setTile(x, y, layer, TileType::EMPTY);
+}
+void Map::kill(const Location &place) {
+    kill(place.x, place.y, place.layer);
 }
 
 /* Take an invalid x location and add or subtract the width until
@@ -548,4 +606,32 @@ Location Map::getMapCoords(int x, int y, MapLayer layer) {
     assert(place.y < getHeight());
 
     return place;
+}
+
+/* Move a tile one down. If it was just above the bottom, it ceases to exist. */
+void Map::moveDown(const Location &place) {
+    /* If it's just above the bottom, it vanishes. */
+    if (!isOnMap(place.x, place.y - 1)) {
+        setTile(place, TileType::EMPTY);
+        return;
+    }
+
+    /* Otherwise, kill the tile below and move down. */
+    kill(place.x, place.y - 1, place.layer);
+    setTile(place.x, place.y - 1, place.layer, getTile(place) -> type);
+    setTile(place, TileType::EMPTY);
+}
+
+/* Switch this tile with the one below it. If there is no tile below it, it 
+does nothing. */
+void Map::displaceDown(const Location &place) {
+    /* Check if the place below is actually on the map. */
+    if (!isOnMap(place.x, place.y - 1)) {
+        return;
+    }
+
+    /* And displace. */
+    TileType temp = getTile(place) -> type;
+    setTile(place, getTile(place.x, place.y - 1, place.layer) -> type);
+    setTile(place.x, place.y - 1, place.layer, temp);
 }

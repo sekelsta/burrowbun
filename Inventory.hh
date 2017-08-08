@@ -43,7 +43,7 @@ public:
     Inventory(const Inventory &toCopy);
 
     /* operator=. Also don't use, also just asserts false. */
-    Inventory operator=(const Inventory &toCopy);
+    Inventory &operator=(const Inventory &toCopy);
 
     // Destructor
     ~Inventory();

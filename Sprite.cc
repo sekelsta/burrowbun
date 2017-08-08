@@ -20,7 +20,11 @@ Sprite::Sprite() {
 }
 
 /* Assignment operator. */
-void Sprite::operator=(const Sprite &sprite) {
+Sprite &Sprite::operator=(const Sprite &sprite) {
+    /* Check for self-assignment. */
+    if (this == &sprite) {
+        return *this;
+    }
     name = sprite.name;
     texture = sprite.texture;
     width = sprite.width;
@@ -29,6 +33,8 @@ void Sprite::operator=(const Sprite &sprite) {
     cols = sprite.cols;
     row = sprite.row;
     col = sprite.col;
+
+    return *this;
 }
 
 void from_json(const json &j, Sprite &sprite) {

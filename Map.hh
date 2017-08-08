@@ -2,12 +2,11 @@
 #define MAP_HH
 
 #include <vector>
+#include <set>
 #include <string>
 #include <random> // For the fancy randomness like a normal distribution
 #include "Tile.hh"
 #include "MapHelpers.hh"
-
-using namespace std;
 
 // A class for a map for a sandbox game
 class Map {
@@ -35,7 +34,7 @@ class Map {
     Location spawn;
 
     /* The tiles whose update function should be called. */
-    vector<Location> toUpdate;
+    set<Location> toUpdate;
 
     /* Tiles that have been damaged. */
     vector<TileHealth> damaged;
@@ -85,13 +84,21 @@ class Map {
     right amount of light. */
     void updateNear(int x, int y);
 
-    /* Return true if this is a place that exists on the map. */
-    bool isOnMap(int x, int y) const;
+    /* Add a place to the list of places to be updated, if the tile there
+    will ever need to be updated. */
+    void addToUpdate(int x, int y, MapLayer layer);
+
+    /* Go through the list of tiles to update and remove the ones that don't 
+    need to be updated. Hopefully soon this will be depracated. */
+    void trimUpdateList();
 
     public:
 
+    /* Return true if this is a place that exists on the map. */
+    bool isOnMap(int x, int y) const;
+
     // Constructor, constructs a map by loading a file
-    Map(string filename, int tileWidth, int tileHeight);
+    Map(std::string filename, int tileWidth, int tileHeight);
 
     // Destructor
     ~Map();
@@ -147,7 +154,7 @@ class Map {
     vector<Tile *> &getPointersRef();
 
     // Write the map to a file
-    void save(const string &filename);
+    void save(const std::string &filename);
 
     /* Update the map. */
     void update(vector<Movable*> &movables);
@@ -160,6 +167,10 @@ class Map {
     false if it still had health and lived. */
     bool destroy(const TileHealth &health);
 
+    /* Destroy a tile. */
+    void kill(int x, int y, MapLayer layer);
+    void kill(const Location &place);
+
     /* Take an invalid x location and add or subtract width until
     0 <= x < width. */
     int wrapX(int x);
@@ -167,6 +178,13 @@ class Map {
     /* Take in world coordinates and a layer and convert to a location in 
     map coordinates. */
     Location getMapCoords(int x, int y, MapLayer layer);
+
+    /* Move a tile one down. If it was just above the bottom of the map, 
+    it ceases to exist. It there's a tile in the way, it will be destroyed. */
+    void moveDown(const Location &place);
+
+    /* Switch this tile with the one below it. */
+    void displaceDown(const Location &place);
 };
 
 #endif

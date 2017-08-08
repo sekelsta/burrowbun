@@ -15,7 +15,7 @@
     "opacity": 64,
     "moveTicks": 0,
     "tilesDestroyed": [],
-    "tilesCrushed": [],
+    "tilesCrushed": [0],
     "tilesDisplaced": [],
     "tilesSunk": [],
     "isFloating": false,

@@ -28,7 +28,7 @@ struct Sprite {
     Sprite();
 
     /* Assignment operator. */
-    void operator=(const Sprite &sprite);
+    Sprite &operator=(const Sprite &sprite);
 };
 
 /* Get a sprite from a json. */

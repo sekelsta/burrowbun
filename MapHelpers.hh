@@ -18,7 +18,13 @@ struct Location {
     MapLayer layer;
 
     /* Return true if every value is the same. */
-    bool operator==(const Location &location);
+    bool operator==(const Location &location) const;
+
+    /* Return false if the value is the same. */
+    bool operator!=(const Location &location) const;
+
+    /* Return true if the first is less than the second. */
+    bool operator<(const Location &location) const;
 };
 
 struct TileHealth {

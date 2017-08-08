@@ -85,12 +85,6 @@ bool Block::canPlace(int x, int y, const Player &player, const Map &map) {
     int xPlayer = (player.x + (player.spriteWidth / 2)) / map.getTileWidth();
     int yPlayer = (player.y + player.spriteHeight) / map.getTileHeight();
 
-    /* TODO: remove */
-    int magic = 20;
-    if ((xPlayer < magic) || (xPlayer + magic > map.getWidth())) {
-        cout << "xPlayer = " << xPlayer << ", xTile = " << xTile << endl;
-    }
-
     /* And now we have our answer. We don't need to do anything special about 
     wrapping the map because xTile will already be outside of the map range if 
     that's needed to get it numerically closer to the player. */
