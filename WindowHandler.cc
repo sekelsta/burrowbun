@@ -179,8 +179,18 @@ void WindowHandler::updateHotbarSprite(Hotbar &hotbar) {
     hotbar.sprite.height = height;
     Uint32 pixelFormat = SDL_PIXELFORMAT_ARGB8888;
     // Actually create the texture
-    SDL_Texture *all = SDL_CreateTexture(renderer, pixelFormat,
-        SDL_TEXTUREACCESS_TARGET, width, height);
+    SDL_Texture *all = NULL;
+    if (hotbar.sprite.texture == NULL) {
+        all = SDL_CreateTexture(renderer, pixelFormat,
+                SDL_TEXTUREACCESS_TARGET, width, height);
+        textures.push_back(all);
+        // Set the sprite thing in the hotbar to the texture we just made
+        hotbar.sprite.texture = all;
+    }
+    else {
+        all = hotbar.sprite.texture;
+    }
+
 
     // Fill a vector with frame images to render
     // The frame to put around each sprite
@@ -254,11 +264,7 @@ void WindowHandler::updateHotbarSprite(Hotbar &hotbar) {
     rectTo.y = hotbar.offsetDown;
     SDL_RenderCopy(renderer, front, NULL, &rectTo);
 
-    // Set the sprite thing in the hotbar to the texture we just made
-    hotbar.sprite.texture = all;
-
     // Not leak memory
-    textures.push_back(all);
     SDL_DestroyTexture(front);
     SDL_DestroyTexture(back);
 

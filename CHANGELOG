@@ -1,8 +1,6 @@
 Changes since last push:
- - fixed collision detection bugs near the edge of the map
- - fixed lighting bug near the edge of the map
- - general refactoring
- - started adding a test suite
+ - sand falls properly now (last commit, forgot to update changelog)
+ - minor fixes to the updating of the hotbar sprite
 
 Known "features":
  - The strenth of gravity is independent of the world.
