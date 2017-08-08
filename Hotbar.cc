@@ -35,6 +35,7 @@ Hotbar::Hotbar(void) {
     sprite.texture = NULL;
 
     isSpriteUpdated = false;
+
     isSwitched = false;
     selected = 0;
 
@@ -72,8 +73,10 @@ void Hotbar::toggle() {
 
 // Select a slot
 void Hotbar::select(int slot) {
-    selected = slot;
-    isSpriteUpdated = false;
+    if (slot != selected) {
+        selected = slot;
+        isSpriteUpdated = false;
+    }
 }
 
 // Use mouse input, return true if the item the mouse was holding should
@@ -86,6 +89,7 @@ bool Hotbar::update(Action *mouse) {
                 && clickBoxes[i].event.type == SDL_MOUSEBUTTONDOWN ) {
             // Add 12 to i if isSwitched
             int adjusted = i + 12 * (int)isSwitched;
+            /* Select it if it wasn't already. */
             select(adjusted);
             // See if we should put something in the slot
             if (clickBoxes[i].event.button == SDL_BUTTON_LEFT
@@ -95,17 +99,18 @@ bool Hotbar::update(Action *mouse) {
                 if (mouse -> isItem) {
                     answer = true;
                 }
+                /* And now the sprite needs to change. */
+                isSpriteUpdated = false;
             }
             // If it was a right click, we should remove that item from the
             // hotbar.
             else if (clickBoxes[i].event.button == SDL_BUTTON_RIGHT) {
                 actions[adjusted] = NULL;
+                /* And again the sprite needs to change. */
+                isSpriteUpdated = false;
             }
 
-            // Now we've use the click for this update
-            clickBoxes[i].wasClicked = false;
-            // And something chenged so make sure we update the sprite
-            isSpriteUpdated = false;
+            // And something changed so make sure we update the sprite
         }
     }
     return answer;

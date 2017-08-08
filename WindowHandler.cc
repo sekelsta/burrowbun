@@ -169,6 +169,8 @@ SDL_Texture *WindowHandler::renderHotbarPart(const Hotbar &hotbar,
 // Draw the entire hotbar sprite to a texture. This only needs to be called 
 // when the hotbar is first made, or when anything about it changes.
 void WindowHandler::updateHotbarSprite(Hotbar &hotbar) {
+    /* Sprite will soon be updated. */
+    hotbar.isSpriteUpdated = true;
     // Make the texture to render the sprite of the hotbar to
     // Hardcoding 12 because I don't expect to change my mind (12 is the
     // number of F keys).
@@ -267,10 +269,6 @@ void WindowHandler::updateHotbarSprite(Hotbar &hotbar) {
     // Not leak memory
     SDL_DestroyTexture(front);
     SDL_DestroyTexture(back);
-
-
-    // Now the sprite has been updated
-    hotbar.isSpriteUpdated = true;
 }
 
 // Render the inventory to the screen
@@ -406,10 +404,9 @@ void WindowHandler::updateInventorySprite(Inventory &inventory) {
 
 // Currently this just renders the hotbar
 void WindowHandler::renderUI(Player &player) {
-    Hotbar hotbar = player.hotbar;
     // Re-render the hotbar sprite if necessary
-    if (!hotbar.isSpriteUpdated) {
-        updateHotbarSprite(hotbar);
+    if (!player.hotbar.isSpriteUpdated) {
+        updateHotbarSprite(player.hotbar);
     }
 
     // Make sure the renderer isn't rendering to a texture
@@ -417,13 +414,13 @@ void WindowHandler::renderUI(Player &player) {
 
     // Create a rect to render to
     SDL_Rect rectTo;
-    rectTo.w = hotbar.sprite.width;
-    rectTo.h = hotbar.sprite.height;
+    rectTo.w = player.hotbar.sprite.width;
+    rectTo.h = player.hotbar.sprite.height;
 
     // Render
-    rectTo.x = hotbar.xStart;
-    rectTo.y = hotbar.yStart;
-    SDL_RenderCopy(renderer, hotbar.sprite.texture, NULL, &rectTo);
+    rectTo.x = player.hotbar.xStart;
+    rectTo.y = player.hotbar.yStart;
+    SDL_RenderCopy(renderer, player.hotbar.sprite.texture, NULL, &rectTo);
 
     // Render the stat bars
     // Reference distance from the bottom of the screen

@@ -1,6 +1,6 @@
 Changes since last push:
- - sand falls properly now (last commit, forgot to update changelog)
- - minor fixes to the updating of the hotbar sprite
+ - Hotbar no longer updates it's sprite every tick. (The isSpriteUpdated value
+was only being set to true in a copy, which was then being destroyed.)
 
 Known "features":
  - The strenth of gravity is independent of the world.
