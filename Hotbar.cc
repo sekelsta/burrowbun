@@ -91,8 +91,6 @@ bool Hotbar::update(Action *mouse) {
             if (clickBoxes[i].event.button == SDL_BUTTON_LEFT
                     && mouse != NULL) {
                 actions[adjusted] = mouse;
-                /* Now the sprite needs updating. */
-                isSpriteUpdated = false;
                 // If it's an item, put it back in the inventory
                 if (mouse -> isItem) {
                     answer = true;
@@ -102,12 +100,12 @@ bool Hotbar::update(Action *mouse) {
             // hotbar.
             else if (clickBoxes[i].event.button == SDL_BUTTON_RIGHT) {
                 actions[adjusted] = NULL;
-                /* Again we need to update the sprite. */
-                isSpriteUpdated = false;
             }
 
             // Now we've use the click for this update
             clickBoxes[i].wasClicked = false;
+            // And something chenged so make sure we update the sprite
+            isSpriteUpdated = false;
         }
     }
     return answer;
