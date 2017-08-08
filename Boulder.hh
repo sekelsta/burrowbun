@@ -11,6 +11,9 @@ class Boulder: public Tile {
     then this type of boulder never moves left of right. */
     int moveTicks;
 
+    /* How many ticks to wait before falling. */
+    int fallTicks;
+
     /* List of tile types which drop as an item when this type of boulder
     runs into them sideways. */
     set<TileType> tilesDestroyed;
@@ -34,7 +37,7 @@ class Boulder: public Tile {
     static set<TileType> vectorConvert(const vector<int> &input);
 
     /* Check if it can fall one tile. */
-    bool fall(Map &map, const Location &place) const;
+    bool fall(Map &map, const Location &place, int ticks) const;
 
 public:
     /* Constructor. */

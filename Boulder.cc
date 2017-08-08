@@ -19,13 +19,18 @@ set<TileType> Boulder::vectorConvert(const vector<int> &input) {
 }
 
 /* Check if it can fall one tile. If it can, do. */
-bool Boulder::fall(Map &map, const Location &place) const {
-    TileType blocking = TileType::EMPTY;
+bool Boulder::fall(Map &map, const Location &place, int ticks) const {
     /* If it isn't a type of boulder that can fall, return false. */
     if (isFloating) {
         return false;
     }
 
+    /* If it hasn't been long enough for it to fall, return false. */
+    if (ticks % fallTicks != 0) {
+        return false;
+    }
+
+    TileType blocking = TileType::EMPTY;
     /* If there's a tile beneath, figure out which. */
     if (map.isOnMap(place.x, place.y - 1)) {
         /* If its path is blocked, it can't fall. */
@@ -68,6 +73,7 @@ Boulder::Boulder(TileType type) : Tile(type) {
     /* Set the boulder's values to the json values. (The tile-but-not-boulder
     values should have already been set.) */
     moveTicks = j["moveTicks"];
+    fallTicks = j["fallTicks"];
     tilesDestroyed = vectorConvert(j["tilesDestroyed"].get<vector<int>>());
     tilesCrushed = vectorConvert(j["tilesCrushed"].get<vector<int>>());
     tilesDisplaced = vectorConvert(j["tilesDisplaced"].get<vector<int>>());
@@ -82,7 +88,7 @@ lists of boulders to try to move. */
 bool Boulder::update(Map &map, Location place, vector<Movable*> &movables, int tick) {
 // TODO
     /* If it can fall, it should. */
-    if (fall(map, place)) {
+    if (fall(map, place, tick)) {
         return true;
     }
 
