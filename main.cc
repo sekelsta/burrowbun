@@ -51,7 +51,7 @@ int main(int argc, char **argv) {
     Player player;
 
     // A vector to hold all the things that need to collide
-    vector<Movable *> movables;
+    vector<movable::Movable *> movables;
     movables.push_back(&player);
     // Set the player's position to the spawnpoint
     player.x = map.getSpawn().x * TILE_WIDTH;

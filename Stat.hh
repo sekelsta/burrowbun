@@ -1,5 +1,5 @@
-#ifndef UIHELPERS_HH
-#define UIHELPERS_HH
+#ifndef STAT_HH
+#define STAT_HH
 
 #include <iostream>
 #include "Light.hh"

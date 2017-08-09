@@ -182,7 +182,7 @@ class Collider {
         const Rect &to, const Rect &from, bool dropDown) const;
 
     // Takes a movable and a map, and moves it to where it should end up
-    void collide(Map &map, Movable &movable);
+    void collide(Map &map, movable::Movable &movable);
 
 public:
     // Constructor
@@ -190,7 +190,7 @@ public:
 
     // A function that takes a map and a list of things and moves them, 
     // colliding when necessary
-    void update(Map &map, vector<Movable *> &movables);
+    void update(Map &map, vector<movable::Movable *> &movables);
 };
 
 #endif

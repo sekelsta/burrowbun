@@ -3,10 +3,10 @@
 
 #include <vector>
 #include "Sprite.hh"
+#include "Movable.hh"
 
 /* Forward declare! */
 class Map;
-class Movable;
 struct Location;
 
 using namespace std;
@@ -79,7 +79,7 @@ public:
     // Variables for how it interacts with the players
     bool getIsPlatform() const;
     bool getIsSolid() const;
-    void dealOverlapDamage(Movable &movable) const;
+    void dealOverlapDamage(movable::Movable &movable) const;
 
     /* For lighting. Tiles with 0 opacity are completely permeable to light.*/
     int getOpacity() const;
@@ -88,8 +88,8 @@ public:
     int getMaxHealth() const;
 
     /* Change the map in whatever way needs doing. */
-    virtual bool update(Map &map, Location place, vector<Movable*> &movables, 
-        int tick);
+    virtual bool update(Map &map, Location place, 
+        vector<movable::Movable*> &movables, int tick);
 
     // Constructor, based on the tile type
     Tile(TileType tileType);

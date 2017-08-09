@@ -85,7 +85,8 @@ Boulder::Boulder(TileType type) : Tile(type) {
 /* Look at the map and move, bringing movables along if required. 
 Return false if it didn't move and should therefore be removed from any
 lists of boulders to try to move. */
-bool Boulder::update(Map &map, Location place, vector<Movable*> &movables, int tick) {
+bool Boulder::update(Map &map, Location place, 
+        vector<movable::Movable*> &movables, int tick) {
 // TODO
     /* If it can fall, it should. */
     if (fall(map, place, tick)) {

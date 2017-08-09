@@ -12,12 +12,13 @@ the only thing screen coordinates are used for. */
 #include <SDL2/SDL.h>
 
 #include "Sprite.hh"
+#include "Movable.hh"
+#include "UIHelpers.hh"
 
 // Forawrd declare
 struct Light;
 class Tile;
 class Map;
-class Movable;
 class Hotbar;
 class Player;
 class Inventory;
@@ -158,8 +159,8 @@ public:
     bool init();
 
     // Load the images
-    bool loadMedia(vector<Tile *> &pointers, vector<Movable *> &movables,
-        Hotbar &hotbar);
+    bool loadMedia(vector<Tile *> &pointers, 
+        vector<movable::Movable *> &movables, Hotbar &hotbar);
 
     // Load a texture, return true on success
     bool loadTexture(const string &name);
@@ -172,7 +173,7 @@ public:
     bool loadTiles(vector<Tile *> &pointers);
 
     // Load a texture for each movable
-    bool loadMovables(vector<Movable *> &movables);
+    bool loadMovables(vector<movable::Movable *> &movables);
 
     // Load textures for the hotbar
     bool loadHotbar(Hotbar &hotbar);
@@ -186,10 +187,10 @@ public:
     void renderMap(Map &m, const SDL_Rect &camera);
 
     // Render movables (the player, monsters, NPCs, dropped items)
-    void renderMovables(const vector<Movable *> &movables);
+    void renderMovables(const vector<movable::Movable *> &movables);
 
     // Update the screen
-    void update(Map &m, const vector<Movable *> &movables, 
+    void update(Map &m, const vector<movable::Movable *> &movables, 
         Player &player);
 
     // Unload media to switch maps, currently done by close()

@@ -195,7 +195,7 @@ bool Collider::listCollisions(vector<CollisionInfo> &collisions, Map &map,
 // direction. This is not always the case, so after calling this function once
 // it's best to call it again with the results assuming the y position is 
 // correct but the x may have farther to move.
-void Collider::collide(Map &map, Movable &movable) {
+void Collider::collide(Map &map, movable::Movable &movable) {
     // Calculate the world width and height
     int worldWidth = map.getWidth() * TILE_WIDTH;
     int worldHeight = map.getHeight() * TILE_HEIGHT;
@@ -371,7 +371,7 @@ void Collider::collide(Map &map, Movable &movable) {
     }
     // If there were collisions, set the velocity to 0
     // But only in the x direction because otherwise it breaks stepping up
-    Point velocity = movable.getVelocity();
+    movable::Point velocity = movable.getVelocity();
     velocity.y *= yCoefficient;
     movable.setVelocity(velocity);
 
@@ -390,7 +390,7 @@ void Collider::collide(Map &map, Movable &movable) {
 
 // A function to move and collide the movables
 // Note that this only ever resets distance fallen when it hits the ground.
-void Collider::update(Map &map, vector<Movable *> &movables) {
+void Collider::update(Map &map, vector<movable::Movable *> &movables) {
     // Update the velocity of everything
     for (unsigned i = 0; i < movables.size(); i++) {
         // If it fell, figure out how far
@@ -425,10 +425,10 @@ void Collider::update(Map &map, vector<Movable *> &movables) {
         // as well fix it anyway.
         if (movables[i] -> isCollidingX) {
             // Have it move only the rest of the way in the x direction, now.
-            Point newVelocity;
+            movable::Point newVelocity;
             newVelocity.x = toX - movables[i] -> x;
             newVelocity.y = 0;
-            Point oldVelocity = movables[i] -> getVelocity();
+            movable::Point oldVelocity = movables[i] -> getVelocity();
             movables[i] -> setVelocity(newVelocity);
             collide(map, *movables[i]);
             movables[i] -> setVelocity(oldVelocity);
@@ -437,7 +437,7 @@ void Collider::update(Map &map, vector<Movable *> &movables) {
         // Do the thing where colliding with a wall one block high doesn't
         // stop you
         if (movables[i] -> isCollidingX) {
-            Movable hypothetical;
+            movable::Movable hypothetical;
             hypothetical.x = movables[i] -> x;
             hypothetical.y = movables[i] -> y;
             hypothetical.sprite.width = movables[i] -> sprite.width;
@@ -449,7 +449,7 @@ void Collider::update(Map &map, vector<Movable *> &movables) {
             int dy = TILE_HEIGHT - ((oldY + yOffset) % TILE_HEIGHT);
             assert(dy <= TILE_HEIGHT);
             assert(dy > 0);
-            Point newVelocity;
+            movable::Point newVelocity;
             newVelocity.x = 0;
             newVelocity.y = dy;
             hypothetical.setVelocity(newVelocity);
@@ -463,7 +463,7 @@ void Collider::update(Map &map, vector<Movable *> &movables) {
                 // dx is how much more it could have gone in the x direction, 
                 // if it didn't collide with the tile it's stepping up
                 int dx = toX - hypothetical.x;
-                Point newVelocity;
+                movable::Point newVelocity;
                 newVelocity.x = dx;
                 newVelocity.y = 0;
                 hypothetical.setVelocity(newVelocity);

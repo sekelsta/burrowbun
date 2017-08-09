@@ -46,7 +46,7 @@ public:
     /* Look at the map and move, bringing movables along if required. 
     Return false if it didn't move and should therefore be removed from any
     lists of boulders to try to move. */
-    bool update(Map &map, Location place, vector<Movable*> &movables, 
+    bool update(Map &map, Location place, vector<movable::Movable*> &movables, 
         int tick);
 
     /* Whether this tile will ever need to call its update function. */

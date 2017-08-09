@@ -5,6 +5,8 @@
 #include "Sprite.hh"
 #include "json.hpp"
 
+namespace movable {
+
 // For holding an x and a y coordinate, but doubles instead of ints
 struct Point {
     double x;
@@ -79,5 +81,7 @@ public:
 
 /* Get a movable from a json file. */
 void from_json(const nlohmann::json &j, Movable &movable);
+
+} // End namespace movable
 
 #endif

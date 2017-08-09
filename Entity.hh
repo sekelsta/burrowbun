@@ -2,25 +2,31 @@
 #define ENTITY_HH
 
 #include <string>
+#include <fstream>
 #include "Movable.hh"
-#include "UIHelpers.hh"
+#include "Stat.hh"
+#include "json.hpp"
+
+using json = nlohmann::json;
 
 /* A class for monsters, NPCs, and players to inherit from.
 If any features are added later that should reset fall damage, they should
 do the resetting of the fall damage in this class or one of its children. */
-class Entity : public Movable {
+class Entity : public movable::Movable {
 
 public:
     // To hold information on the stats
-    StatBar health;
-    StatBar fullness; // Stamina being how much hunger it doesn't have
-    StatBar mana;
+    Stat health;
+    Stat fullness;
+    Stat mana;
 
-    // Farthest it can fall before taking fall damage (in pixels)
+    /* Farthest it can fall before taking fall damage (in pixels), 
+    -1 for infinity. */
     int maxFallDistance;
 
     // Constructor
     Entity(std::string filename); 
+    Entity();
 
     // Virtual destructor
     virtual ~Entity();
@@ -33,5 +39,7 @@ public:
     /* Do the things! */
     virtual void update();
 };
+
+void from_json(const nlohmann::json &j, Entity &entity);
 
 #endif

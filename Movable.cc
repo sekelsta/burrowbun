@@ -7,6 +7,8 @@
 using namespace std;
 using json = nlohmann::json;
 
+namespace movable {
+
 /* Get a point from a json file. */
 void from_json(const json &j, Point &point) {
     point.x = j["x"];
@@ -40,13 +42,12 @@ Movable::Movable() {
 
 /* Constructor from json file. */
 Movable::Movable(std::string filename) {
-    string prefix = "entities/";
-    string suffix = ".json";
     /* open file */
-    ifstream infile(prefix + filename + suffix);
+    ifstream infile(filename);
     /* Put data in json. */
     json j = json::parse(infile);
     *this = j.get<Movable>();
+    assert(sprite.name != "");
 }
 
 // Virtual destructor
@@ -144,3 +145,5 @@ void from_json(const json &j, Movable &movable) {
     movable.x = j["x"];
     movable.y = j["y"];
 }
+
+} // End namespace movable

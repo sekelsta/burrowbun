@@ -3,14 +3,23 @@
 #include "Item.hh"
 #include "AllTheItems.hh"
 #include <iostream>
+#include "json.hpp"
 
 using namespace std;
+using json = nlohmann::json;
 
 // Constructor
-Player::Player() : Entity("bunny"), inventory(10, 6), trash(1, 1) {
-    // Set the maximum distance it can fall before taking damage (-1 for
-    // infinity)
-    maxFallDistance = 300;
+Player::Player() : Entity("entities/bunny.json"), inventory(10, 6), trash(1, 1) {
+    /* Open json file that contains info about the stat bars. */
+    ifstream bar_infile("UI/stat_bars.json");
+    json jstats = json::parse(bar_infile);
+
+    healthBar = jstats["healthBar"].get<StatBar>();
+    fullnessBar = jstats["fullnessBar"].get<StatBar>();
+    manaBar = jstats["manaBar"].get<StatBar>();
+
+    ifstream infile("entities/bunny.json");
+    json j = json::parse(infile);
 
     // Range for placing and mining tiles
     tileReachUp = 6;
@@ -22,17 +31,25 @@ Player::Player() : Entity("bunny"), inventory(10, 6), trash(1, 1) {
 
     // Initialize stats
     health.maxStat = 100;
-    health.totalWidth = 190;
-    health.h = 8;
+    healthBar.totalWidth = 190;
+    healthBar.h = 8;
     health.fill();
     fullness.maxStat = 100;
-    fullness.totalWidth = 190;
-    fullness.h = 8;
+    fullnessBar.totalWidth = 190;
+    fullnessBar.h = 8;
     fullness.fill();
     mana.maxStat = 100; 
-    mana.totalWidth = 190;
-    mana.h = 8;
+    manaBar.totalWidth = 190;
+    manaBar.h = 8;
     mana.fill();  
+
+    // TODO: remove
+    healthBar.part = healthBar.totalWidth;
+    healthBar.full = healthBar.totalWidth;
+    fullnessBar.part = fullnessBar.totalWidth;
+    fullnessBar.full = fullnessBar.totalWidth;
+    manaBar.part = manaBar.totalWidth;
+    manaBar.full = manaBar.totalWidth;
 
     // We don't need to set the statbar colors because the entity constructor
     // already did.

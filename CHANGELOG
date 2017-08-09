@@ -1,5 +1,7 @@
 Changes since last push:
- - more things now use json files to initialize their values
+ - put Movable and Point in the movable namespace
+ - continued splitting Stat from StatBar
+ - continued progress towards making the player initialize from a json
 
 Known "features":
  - The strenth of gravity is independent of the world.

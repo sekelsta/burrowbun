@@ -355,7 +355,7 @@ void EventHandler::updatePlayer(Player &player) {
     }
 
     // and update the player's accelleration
-    Point newAccel;
+    movable::Point newAccel;
     newAccel.x = 0;
     newAccel.y = 0;
 

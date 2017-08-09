@@ -157,7 +157,7 @@ class Map {
     void save(const std::string &filename);
 
     /* Update the map. */
-    void update(vector<Movable*> &movables);
+    void update(vector<movable::Movable*> &movables);
 
     /* Damage a tile (with a pickax or something). Return false if there
     was no tile to damage. */

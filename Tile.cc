@@ -31,13 +31,13 @@ int Tile::getMaxHealth() const {
 
 /* Deal damage to whatever is overlapping this, and stop it if this tile is 
 solid. */
-void Tile::dealOverlapDamage(Movable &movable) const {
+void Tile::dealOverlapDamage(movable::Movable &movable) const {
     movable.takeDamage(overlapDamage, 0);
 }
 
 /* Change the map in whatever way needs doing. */
-bool Tile::update(Map &map, Location place, vector<Movable*> &movables, 
-        int tick) {
+bool Tile::update(Map &map, Location place, 
+        vector<movable::Movable*> &movables, int tick) {
     return false;
 }
 

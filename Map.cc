@@ -477,7 +477,7 @@ void Map::save(const string &filename) {
 }
 
 /* Update the map. */
-void Map::update(vector<Movable*> &movables) {
+void Map::update(vector<movable::Movable*> &movables) {
     // TODO
     /* Update tiles. */
     /* Iterate over a copy of the list. */

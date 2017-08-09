@@ -8,7 +8,6 @@
 #include "Light.hh"
 #include "Tile.hh"
 #include "Map.hh"
-#include "Movable.hh"
 #include "Hotbar.hh"
 #include "Player.hh"
 #include "UIHelpers.hh"
@@ -372,7 +371,7 @@ void WindowHandler::updateInventorySprite(Inventory &inventory) {
             Item *item = inventory.getItem(row, col);
             if (item != NULL) {
                 // Load the sprite if necessary
-                // Remermber, loadAction does nothing if it already has a sprite
+                // Remember, loadAction does nothing if it already has a sprite
                 loadAction(*item);
                 // Center rectTo inside refRect
                 rectTo.w = item -> sprite.width;
@@ -435,16 +434,16 @@ void WindowHandler::renderUI(Player &player) {
     // want to put the bars next to. The refX and refY are its coordinates.
     // These numbers are set here in case the window size changed.
     // TODO: move magic numbers to json file
-    player.health.x = refX + 65;
-    player.health.y = refY + 17;
-    player.fullness.x = refX + 65;
-    player.fullness.y = refY + 29;
-    player.mana.x = refX + 65;
-    player.mana.y = refY + 41;
+    player.healthBar.x = refX + 65;
+    player.healthBar.y = refY + 17;
+    player.fullnessBar.x = refX + 65;
+    player.fullnessBar.y = refY + 29;
+    player.manaBar.x = refX + 65;
+    player.manaBar.y = refY + 41;
     // And actually draw them
-    renderStatBar(player.health);
-    renderStatBar(player.fullness);
-    renderStatBar(player.mana);
+    renderStatBar(player.healthBar);
+    renderStatBar(player.fullnessBar);
+    renderStatBar(player.manaBar);
 
     // Render the inventory, if necessary
     if (player.isInventoryOpen) {
@@ -515,7 +514,8 @@ void WindowHandler::resize(int width, int height) {
     // Access goes [x][y]
     tileRects.resize(ceil((float)screenWidth / (float)TILE_WIDTH) + 1);
     for (unsigned i = 0; i < tileRects.size(); i++) {
-        tileRects[i].resize(ceil((float)screenHeight / (float)TILE_HEIGHT) + 1);
+        int newSize = ceil((float)screenHeight / (float)TILE_HEIGHT) + 1;
+        tileRects[i].resize(newSize);
         // Set the tileRects to have the correct width and height
         for (unsigned j = 0; j < tileRects[i].size(); j++) {
             tileRects[i][j].w = TILE_WIDTH;
@@ -584,7 +584,7 @@ bool WindowHandler::init() {
 
 // Load all the pictures, return true if successful
 bool WindowHandler::loadMedia(vector<Tile *> &pointers, 
-        vector<Movable *> &movables, Hotbar &hotbar) {
+        vector<movable::Movable *> &movables, Hotbar &hotbar) {
     bool success = true;
 
     // Load the overlay for the player's stats
@@ -617,6 +617,7 @@ bool WindowHandler::loadTexture(const string &name) {
     if (surface == NULL) {
         cerr << "Unable to load image " << name << endl;
         cerr << "SDLError: " << SDL_GetError() << endl;
+        assert(false);
     }
     // Make a texture
     else {
@@ -667,6 +668,7 @@ bool WindowHandler::loadTiles(vector<Tile *> &pointers) {
     bool success = true;
     for (unsigned i = 0; i < pointers.size(); i++) {
         string name = TILE_PATH + pointers[i] -> sprite.name;
+        /* Sprites that have no name shouldn't be rendered. */
         if (name != TILE_PATH) {
             success = success && loadTexture(name);
 
@@ -680,7 +682,7 @@ bool WindowHandler::loadTiles(vector<Tile *> &pointers) {
 }
 
 // Load a texture for each movable
-bool WindowHandler::loadMovables(vector<Movable *> &movables) {
+bool WindowHandler::loadMovables(vector<movable::Movable *> &movables) {
     bool success = true;
     for (unsigned int i = 0; i < movables.size(); i++) {
         string name = MOVABLE_PATH + movables[i] -> sprite.name;
@@ -785,7 +787,7 @@ void WindowHandler::renderMap(Map &m, const SDL_Rect &camera) {
 }
 
 // Render any movables (the player, monsters NPCs, dropped items)
-void WindowHandler::renderMovables(const vector<Movable *> &movables) {
+void WindowHandler::renderMovables(const vector<movable::Movable *> &movables) {
     // Make sure the renerer draw color is set to white
     SDL_SetRenderDrawColor(renderer, 0xFF, 0xFF, 0xFF, 0xFF);
 
@@ -820,8 +822,8 @@ void WindowHandler::renderMovables(const vector<Movable *> &movables) {
 }
 
 // Update the screen
-void WindowHandler::update(Map &map, const vector<Movable *> &movables, 
-        Player &player) {
+void WindowHandler::update(Map &map, 
+        const vector<movable::Movable *> &movables, Player &player) {
     // Tell the player where on the screen it was drawn
     int w = player.sprite.width;
     int h = player.sprite.height;

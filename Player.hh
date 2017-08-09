@@ -26,6 +26,12 @@ class Player : public Entity {
     int tileReachSideways;
 
 public:
+
+    /* Info for rendering stat amounts. */
+    StatBar healthBar;
+    StatBar fullnessBar;
+    StatBar manaBar;
+
     /* The use time of the last item / skill used, minus the number of ticks 
     since using it. Items and skills can only be used when this is 0. */
     int useTimeLeft;

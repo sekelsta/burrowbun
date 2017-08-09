@@ -43,9 +43,13 @@ Actually maybe I'll add a bool later, if I need to, but for now all
 statbars are horizontal.  */
 struct StatBar {
     // Basically three rectangles
-    // Location of the top-left corner.
+    // Location of the top-left corner. y will depend on window size and should
+    // be set by WindowHandler
     int x;
     int y;
+    /* Distance between the bottom of the screen and what the y value
+    sould be. */
+    int distFromBottom;
     // Assume it's horizontal and the height of the rectangles never changes
     int h;
     // Width of the part that has the stat.
@@ -173,5 +177,7 @@ public:
     }
 };
 
+/* Get a statbar from a json. */
+void from_json(const nlohmann::json &j, StatBar &bar);
 
 #endif
