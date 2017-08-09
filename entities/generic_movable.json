@@ -1,0 +1,30 @@
+{
+    "sprite": {
+        "rows": 1,
+        "cols": 1,
+        "row": 0,
+        "col": 0,
+        "width": 38,
+        "height": 32,
+        "name": "bunny.png"
+    },
+    "drag": {
+        "x": 0.3,
+        "y": 0.9166
+    },
+    "velocity": {
+        "x":0,
+        "y":0
+    },
+    "dAccel": {
+        "x": 10,
+        "y": 3
+    },
+    "timeOffGround":0,
+    "maxJumpTime": 8,
+    "pixelsFallen": 0,
+    "maxHeight": 0,
+    "x": 0,
+    "y": 0,
+    
+}

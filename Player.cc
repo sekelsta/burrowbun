@@ -7,27 +7,10 @@
 using namespace std;
 
 // Constructor
-Player::Player() : inventory(10, 6), trash(1, 1) {
-    // Set the drag to not 0
-    drag.x = 0.3;
-    drag.y = 11.0 / 12.0;
-
-    // Set the amount to accelerate by
-    dAccel.x = 10;
-    dAccel.y = 3;
-
-    // Set the number of updates a jump can last
-    maxJumpTime = 8;
-
+Player::Player() : Entity("bunny"), inventory(10, 6), trash(1, 1) {
     // Set the maximum distance it can fall before taking damage (-1 for
     // infinity)
     maxFallDistance = 300;
-
-    // Set the sprite name
-    // Todo: have a race
-    sprite = "bunny.png";
-    spriteWidth = 38;
-    spriteHeight = 32;
 
     // Range for placing and mining tiles
     tileReachUp = 6;

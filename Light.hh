@@ -3,6 +3,7 @@
 
 #include <SDL2/SDL.h>
 #include <algorithm>
+#include "json.hpp"
 
 using namespace std;
 
@@ -39,5 +40,7 @@ struct Light {
         b = b * intensity / 255;
     }
 };
+
+void from_json(const nlohmann::json &j, Light &light);
 
 #endif

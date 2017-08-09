@@ -225,10 +225,10 @@ void Collider::collide(Map &map, Movable &movable) {
     /* Set the starting location and the width and height. */
     from.x = movable.x;
     from.y = movable.y;
-    from.w = movable.spriteWidth;
-    to.w = movable.spriteWidth;
-    from.h = movable.spriteHeight;
-    to.h = movable.spriteHeight;
+    from.w = movable.sprite.width;
+    to.w = movable.sprite.width;
+    from.h = movable.sprite.height;
+    to.h = movable.sprite.height;
 
     assert(0 <= from.x);
     assert(0 <= from.y);
@@ -242,8 +242,8 @@ void Collider::collide(Map &map, Movable &movable) {
     // Collide with tiles
     /* width and height are how many tiles away to check for collisions
     with tiles that it was already colliding with. */
-    int width = movable.spriteWidth / TILE_WIDTH + 2;
-    int height = movable.spriteHeight / TILE_HEIGHT + 2;
+    int width = movable.sprite.width / TILE_WIDTH + 2;
+    int height = movable.sprite.height / TILE_HEIGHT + 2;
     int xVelocity = movable.getVelocity().x;
     int yVelocity = movable.getVelocity().y;
     int startX = from.x / TILE_WIDTH;
@@ -383,7 +383,7 @@ void Collider::collide(Map &map, Movable &movable) {
     movable.x %= worldWidth;
     // Collide in the y direction
     movable.y = max(TILE_HEIGHT, movable.y);
-    int worldTop = worldHeight - movable.spriteHeight - TILE_HEIGHT;
+    int worldTop = worldHeight - movable.sprite.height - TILE_HEIGHT;
     movable.y = min(movable.y, worldTop);
 }
 
@@ -408,8 +408,7 @@ void Collider::update(Map &map, vector<Movable *> &movables) {
 
         // TODO: replace this with gravity as a function of height
         double gravity = -1.5;
-        movables[i] -> gravity = gravity;
-        movables[i] -> accelerate();
+        movables[i] -> accelerate(gravity);
         movables[i] -> isDroppingDown = movables[i] -> isCollidingDown
             && !(movables[i] -> collidePlatforms);
         movables[i] -> isSteppingUp = false;
@@ -441,8 +440,8 @@ void Collider::update(Map &map, vector<Movable *> &movables) {
             Movable hypothetical;
             hypothetical.x = movables[i] -> x;
             hypothetical.y = movables[i] -> y;
-            hypothetical.spriteWidth = movables[i] -> spriteWidth;
-            hypothetical.spriteHeight = movables[i] -> spriteHeight;
+            hypothetical.sprite.width = movables[i] -> sprite.width;
+            hypothetical.sprite.height = movables[i] -> sprite.height;
             // See if it can go up one tile or less without colliding
             int oldY = hypothetical.y;
             // The amount to move by to go up one tile or less, assuming 

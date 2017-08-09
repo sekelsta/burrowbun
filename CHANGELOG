@@ -1,5 +1,5 @@
 Changes since last push:
- - Health, mana, and hunger now regenerate every tick
+ - more things now use json files to initialize their values
 
 Known "features":
  - The strenth of gravity is independent of the world.
@@ -12,7 +12,6 @@ Known "features":
 
 Known bugs:
  - Apparently the player can fit in gaps that they can't escape.
- - Collision detection does not work correctly where the map wraps
 
 To do:
  - Tiles should have a function to decide which version of the sprite to
@@ -20,6 +19,6 @@ use, not make the map do that
  - rewrite almost all world generation code to use noise
  - stacking items, throwing / picking up items
  - Trees!
- - Store data for movables and sprites in a file instead of the source code
+ - Store data for entities and sprites in a file instead of the source code
  - Actually save and load the map properly
  - Actually display background tiles

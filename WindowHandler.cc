@@ -683,10 +683,10 @@ bool WindowHandler::loadTiles(vector<Tile *> &pointers) {
 bool WindowHandler::loadMovables(vector<Movable *> &movables) {
     bool success = true;
     for (unsigned int i = 0; i < movables.size(); i++) {
-        string name = MOVABLE_PATH + movables[i] -> getSprite();
+        string name = MOVABLE_PATH + movables[i] -> sprite.name;
         success = success && loadTexture(name);
 
-        movables[i] -> texture = textures.back();
+        movables[i] -> sprite.texture = textures.back();
     }
 
     return success;
@@ -792,8 +792,8 @@ void WindowHandler::renderMovables(const vector<Movable *> &movables) {
     // Find where the player and camera are
     int x = movables[0] -> x;
     int y = movables[0] -> y;
-    int w = movables[0] -> spriteWidth;
-    int h = movables[0] -> spriteHeight;
+    int w = movables[0] -> sprite.width;
+    int h = movables[0] -> sprite.height;
     SDL_Rect camera = findCamera(x, y, w, h);
     SDL_Rect rectTo;
 
@@ -801,8 +801,8 @@ void WindowHandler::renderMovables(const vector<Movable *> &movables) {
     for (unsigned int i = 0; i < movables.size(); i++) {
         rectTo.x = movables[i] -> x;
         rectTo.y = movables[i] -> y;
-        rectTo.w = movables[i] -> spriteWidth;
-        rectTo.h = movables[i] -> spriteHeight;
+        rectTo.w = movables[i] -> sprite.width;
+        rectTo.h = movables[i] -> sprite.height;
 
         // Convert the rectangle to screen coordinates
         rectTo = convertRect(rectTo, camera);
@@ -814,7 +814,7 @@ void WindowHandler::renderMovables(const vector<Movable *> &movables) {
 
         // Draw!
         // TODO: check whether it's actually anywhere near the screen
-        SDL_RenderCopy(renderer, movables[i] -> texture, NULL, &rectTo);
+        SDL_RenderCopy(renderer, movables[i] -> sprite.texture, NULL, &rectTo);
     }
 
 }
@@ -823,8 +823,8 @@ void WindowHandler::renderMovables(const vector<Movable *> &movables) {
 void WindowHandler::update(Map &map, const vector<Movable *> &movables, 
         Player &player) {
     // Tell the player where on the screen it was drawn
-    int w = player.spriteWidth;
-    int h = player.spriteHeight;
+    int w = player.sprite.width;
+    int h = player.sprite.height;
     SDL_Rect camera = findCamera(player.x, player.y, w, h);
     SDL_Rect playerRect = { player.x, player.y, w, h };
     playerRect = convertRect(playerRect, camera);
@@ -848,8 +848,8 @@ void WindowHandler::update(Map &map, const vector<Movable *> &movables,
         // movables[0] should be the player
         int x = movables[0] -> x;
         int y = movables[0] -> y;
-        int w = movables[0] -> spriteWidth;
-        int h = movables[0] -> spriteHeight;
+        int w = movables[0] -> sprite.width;
+        int h = movables[0] -> sprite.height;
         SDL_Rect camera = findCamera(x, y, w, h);
         renderMap(map, camera);
 

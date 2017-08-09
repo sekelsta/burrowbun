@@ -1,7 +1,7 @@
 #include "Entity.hh"
 
 // Constructor
-Entity::Entity() {
+Entity::Entity(std::string filename) : Movable(filename) {
     // Initialize the maxFall damage, but whatever class inherits probably 
     // wats to put it's own value
     maxFallDistance = 0;

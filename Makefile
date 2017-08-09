@@ -9,7 +9,7 @@ all : main tests
 
 main : main.o Map.o World.o Tile.o WindowHandler.o EventHandler.o Movable.o \
         Player.o Collider.o Hotbar.o Entity.o Inventory.o Item.o Action.o \
-        Sprite.o AllTheItems.o Boulder.o MapHelpers.o
+        Sprite.o AllTheItems.o Boulder.o MapHelpers.o Light.o
 	$(CC) $(CXXFLAGS) $^ -o $@ $(LDFLAGS) $(NOISE_FLAGS) $(LINKER_FLAGS)
 
 main.o : main.cc World.hh Tile.hh Map.hh WindowHandler.hh EventHandler.hh \
@@ -73,6 +73,9 @@ Boulder.o : Boulder.cc Boulder.hh Map.hh Tile.hh MapHelpers.hh Sprite.hh
 	$(CC) $(CXXFLAGS) $^ -c $(LDFLAGS)
 
 MapHelpers.o : MapHelpers.cc MapHelpers.hh
+	$(CC) $(CXXFLAGS) $^ -c $(LDFLAGS)
+
+Light.o : Light.cc Light.hh
 	$(CC) $(CXXFLAGS) $^ -c $(LDFLAGS)
 
 tests : collider_tests.o

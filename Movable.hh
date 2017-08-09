@@ -2,6 +2,8 @@
 #define MOVABLE_HH
 
 #include <string>
+#include "Sprite.hh"
+#include "json.hpp"
 
 // For holding an x and a y coordinate, but doubles instead of ints
 struct Point {
@@ -9,24 +11,18 @@ struct Point {
     double y;
 };
 
-// Forward declare
-struct SDL_Texture;
-
-using namespace std;
+/* Get a point out of a json. */
+void from_json(const nlohmann::json &j, Point &point);
 
 /*  A base class for anything that can move and collide on the map, 
     not including tiles. Monsters, NPCs, the player, and dropped items should
     all be subclasses. */
 class Movable {
-protected:
-    // Fields
-    string sprite;
-
+public:
     // Movement-related fields
     // Drag is a number between 0 and 1 which the velocity is multiplied by
     Point drag, velocity, accel, dAccel;
 
-public:
     // Information about recent collisions
     // We need to know whether there was a collision down so that we can
     // avoid jumping midair, and we need isCollidingX to not be stopped by
@@ -51,18 +47,14 @@ public:
     // Location
     int x, y;
 
-    // How strong is gravity (may vary by location)
-    double gravity;
-
-    // Sprite, as a texture
-    SDL_Texture *texture;
-
-    // How big is the sprite?
-    int spriteWidth;
-    int spriteHeight;
+    // Sprite
+    Sprite sprite;
 
     // Constructor
     Movable();
+
+    /* Constructor from json. */
+    Movable(std::string filename);
 
     // Destructor
     virtual ~Movable();
@@ -72,12 +64,9 @@ public:
     void setVelocity(Point newVelocity); // Very few things should use this.
     void setAccel(Point newAccel);
     Point getDAccel() const;
-    string getSprite() const;
-    int getSpriteWidth() const;
-    int getSpriteHeight() const;
 
     // Updates velocity
-    void accelerate();
+    void accelerate(double gravity);
 
     /* Take damage. Since movables in general don't have health, this mostly
     exists so the collider can tell movables to take damage from overlapping a
@@ -87,5 +76,8 @@ public:
     /* Take fall damage. Also does nothing unless the movables is an entity. */
     virtual void takeFallDamage();
 };
+
+/* Get a movable from a json file. */
+void from_json(const nlohmann::json &j, Movable &movable);
 
 #endif

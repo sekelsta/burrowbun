@@ -1,9 +1,17 @@
 #include <cassert>
 #include <cmath> // For rounding
+#include <fstream>
 #include "Movable.hh"
 #include <iostream>
 
 using namespace std;
+using json = nlohmann::json;
+
+/* Get a point from a json file. */
+void from_json(const json &j, Point &point) {
+    point.x = j["x"];
+    point.y = j["y"];
+}
 
 // Constructor
 Movable::Movable() {
@@ -11,7 +19,6 @@ Movable::Movable() {
     velocity.y = 0;
     accel.x = 0;
     accel.y = 0;
-    texture = NULL;
     isCollidingDown = false;
     ticksCollidingDown = 0;
     isCollidingX = false;
@@ -23,17 +30,23 @@ Movable::Movable() {
     pixelsFallen = 0;
     maxHeight = 0;
 
-    gravity = 0;
-
     // These should be changed by the child class's init.
     drag.x = 0;
     drag.y = 0;
     // The amount to accelerate by when trying to move
     dAccel.x = 0;
     dAccel.y = 0;
-    sprite = "";
-    spriteWidth = 0;
-    spriteHeight = 0;
+}
+
+/* Constructor from json file. */
+Movable::Movable(std::string filename) {
+    string prefix = "entities/";
+    string suffix = ".json";
+    /* open file */
+    ifstream infile(prefix + filename + suffix);
+    /* Put data in json. */
+    json j = json::parse(infile);
+    *this = j.get<Movable>();
 }
 
 // Virtual destructor
@@ -57,13 +70,9 @@ Point Movable::getDAccel() const {
     return dAccel;
 }
 
-string Movable::getSprite() const {
-    return sprite;
-}
-
 // This adds acceleration to speed, and limits speed at maxSpeed. This also
 // updates the value of timeOffGround.
-void Movable::accelerate() {
+void Movable::accelerate(double gravity) {
     // If on the ground, timeOffGround should be 0, otherwise it should be
     // one more than it was before
     if (isCollidingDown) {
@@ -109,3 +118,29 @@ void Movable::takeDamage(int normal, int wounds) {}
 
 /* Take fall damage. Does nothing. */
 void Movable::takeFallDamage() {}
+
+/* Get a movable from a json file. */
+void from_json(const json &j, Movable &movable) {
+    movable.sprite = j["sprite"].get<Sprite>();
+    movable.drag = j["drag"].get<Point>();
+    assert(movable.drag.x <= 1.0);
+    assert(movable.drag.y <= 1.0);
+    assert(0 < movable.drag.x);
+    assert(0 < movable.drag.y);
+    movable.velocity = j["velocity"].get<Point>();
+    movable.accel.x = 0;
+    movable.accel.y = 0;
+    movable.dAccel = j["dAccel"].get<Point>();
+    movable.isCollidingX = false;
+    movable.isCollidingDown = false;
+    movable.ticksCollidingDown = 0;
+    movable.isSteppingUp = false;
+    movable.timeOffGround = j["timeOffGround"];
+    movable.collidePlatforms = true;
+    movable.isDroppingDown = false;
+    movable.maxJumpTime = j["maxJumpTime"];
+    movable.pixelsFallen = j["pixelsFallen"];
+    movable.maxHeight = j["maxHeight"];
+    movable.x = j["x"];
+    movable.y = j["y"];
+}

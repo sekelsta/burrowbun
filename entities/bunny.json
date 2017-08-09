@@ -1,0 +1,106 @@
+{
+    "sprite": {
+        "rows": 1,
+        "cols": 1,
+        "row": 0,
+        "col": 0,
+        "width": 38,
+        "height": 32,
+        "name": "bunny.png"
+    },
+    "drag": {
+        "x": 0.3,
+        "y": 0.9166
+    },
+    "velocity": {
+        "x":0,
+        "y":0
+    },
+    "dAccel": {
+        "x": 10,
+        "y": 3
+    },
+    "timeOffGround":0,
+    "maxJumpTime": 8,
+    "pixelsFallen": 0,
+    "maxHeight": 0,
+    "x": 0,
+    "y": 0,
+    "maxFallDistance": 300,
+    "health": {
+        "linearRegen": 0.0,
+        "percentRegen": 0.00001,
+        "quadraticRegen": 0.0,
+        "timeRegen": 0.005,
+        "baseRegenTicks": 80,
+        "fullColor": {
+            "r": 0xFF,
+            "g": 0x10,
+            "b": 0x20,
+            "a": 0x00
+        },
+        "partColor": {
+            "r": 0x40,
+            "g": 0x00,
+            "b": 0x10,
+            "a": 0x00
+        },
+        "emptyColor": {
+            "r": 0x00,
+            "g": 0x00,
+            "b": 0x00,
+            "a": 0x00
+        }
+    },
+    "fullness": {
+        "linearRegen": -0.0007,
+        "percentRegen": 0.0,
+        "quadraticRegen": 0.0,
+        "timeRegen": 0.0,
+        "baseRegenTicks": 1,
+        "fullColor": {
+            "r": 0xF0,
+            "g": 0xF0,
+            "b": 0x00,
+            "a": 0x00
+        },
+        "partColor": {
+            "r": 0x40,
+            "g": 0x40,
+            "b": 0x00,
+            "a": 0x00
+        },
+        "emptyColor": {
+            "r": 0x00,
+            "g": 0x00,
+            "b": 0x00,
+            "a": 0x00
+        }
+
+    },
+    "mana": {
+        "linearRegen": 0.001,
+        "percentRegen": 0.0,
+        "quadraticRegen": 0.00001,
+        "timeRegen": 0.0001,
+        "baseRegenTicks": 60,
+        "fullColor": {
+            "r": 0x18,
+            "g": 0x30,
+            "b": 0xFF,
+            "a": 0x00
+        },
+        "partColor": {
+            "r": 0x04,
+            "g": 0x14,
+            "b": 0x66,
+            "a": 0x00
+        },
+        "emptyColor": {
+            "r": 0x00,
+            "g": 0x00,
+            "b": 0x00,
+            "a": 0x00
+        }
+    }
+}

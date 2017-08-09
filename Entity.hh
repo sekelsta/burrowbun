@@ -1,6 +1,7 @@
 #ifndef ENTITY_HH
 #define ENTITY_HH
 
+#include <string>
 #include "Movable.hh"
 #include "UIHelpers.hh"
 
@@ -19,7 +20,7 @@ public:
     int maxFallDistance;
 
     // Constructor
-    Entity(); 
+    Entity(std::string filename); 
 
     // Virtual destructor
     virtual ~Entity();

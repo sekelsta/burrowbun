@@ -37,6 +37,7 @@ Sprite &Sprite::operator=(const Sprite &sprite) {
     return *this;
 }
 
+/* Get a sprite out of a json. */
 void from_json(const json &j, Sprite &sprite) {
     /* Set each of this tile's non-const values equal to the json's values. */
     sprite.name = j["name"];
