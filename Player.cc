@@ -21,35 +21,12 @@ Player::Player() : Entity("entities/bunny.json"), inventory(10, 6), trash(1, 1) 
     ifstream infile("entities/bunny.json");
     json j = json::parse(infile);
 
-    // Range for placing and mining tiles
-    tileReachUp = 6;
-    tileReachDown = 4;
-    tileReachSideways = 5;
+    tileReachUp = j["tileReachUp"];
+    tileReachDown = j["tileReachDown"];
+    tileReachSideways = j["tileReachSideways"];
 
     // Assume it hasn't used an item
     useTimeLeft = 0;
-
-    // Initialize stats
-    health.maxStat = 100;
-    healthBar.totalWidth = 190;
-    healthBar.h = 8;
-    health.fill();
-    fullness.maxStat = 100;
-    fullnessBar.totalWidth = 190;
-    fullnessBar.h = 8;
-    fullness.fill();
-    mana.maxStat = 100; 
-    manaBar.totalWidth = 190;
-    manaBar.h = 8;
-    mana.fill();  
-
-    // TODO: remove
-    healthBar.part = healthBar.totalWidth;
-    healthBar.full = healthBar.totalWidth;
-    fullnessBar.part = fullnessBar.totalWidth;
-    fullnessBar.full = fullnessBar.totalWidth;
-    manaBar.part = manaBar.totalWidth;
-    manaBar.full = manaBar.totalWidth;
 
     // We don't need to set the statbar colors because the entity constructor
     // already did.
@@ -151,4 +128,12 @@ void Player::useAction(InputType type, int x, int y, Map &map) {
             hotbar.getSelected() -> use(type, x, y, *this, map);
         }
     }
+}
+
+void Player::update() {
+    Entity::update();
+    /* Update the bars so changes to the stats will actually be displayed. */
+    healthBar.update(health);
+    fullnessBar.update(fullness);
+    manaBar.update(mana);
 }

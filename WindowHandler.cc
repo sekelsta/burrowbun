@@ -422,24 +422,10 @@ void WindowHandler::renderUI(Player &player) {
     SDL_RenderCopy(renderer, player.hotbar.sprite.texture, NULL, &rectTo);
 
     // Render the stat bars
-    // Reference distance from the bottom of the screen
-    int up = 90;
-    // Reference distance from the left side of the screen
-    int right = 30;
+    player.healthBar.y = screenHeight - player.healthBar.distFromBottom;
+    player.fullnessBar.y = screenHeight - player.fullnessBar.distFromBottom;
+    player.manaBar.y = screenHeight - player.manaBar.distFromBottom;
 
-    int refX = right;
-    int refY = screenHeight - up;
-
-    // The magic numbers here come from the positions required by the sprite I
-    // want to put the bars next to. The refX and refY are its coordinates.
-    // These numbers are set here in case the window size changed.
-    // TODO: move magic numbers to json file
-    player.healthBar.x = refX + 65;
-    player.healthBar.y = refY + 17;
-    player.fullnessBar.x = refX + 65;
-    player.fullnessBar.y = refY + 29;
-    player.manaBar.x = refX + 65;
-    player.manaBar.y = refY + 41;
     // And actually draw them
     renderStatBar(player.healthBar);
     renderStatBar(player.fullnessBar);

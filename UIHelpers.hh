@@ -4,6 +4,7 @@
 #include <iostream>
 #include <SDL2/SDL.h>
 #include "Light.hh"
+#include "Stat.hh"
 
 /* A struct with a rectangle and bools. The rectangle is in screen
 coordinates, and the bools are for whether the mouse is in the box and 
@@ -59,21 +60,6 @@ struct StatBar {
     // Width of the entire bar.
     int totalWidth;
 
-    // The actual stats
-    double maxStat;
-    double fullStat;
-    double partStat;
-
-    /* Affects how fast it regenerates. */
-    double linearRegen;
-    double percentRegen;
-    double quadraticRegen;
-    /* How much faster more time passing since being damaged makes it 
-    regenerate. */
-    double timeRegen;
-    int ticksUntilRegen;
-    int baseRegenTicks;
-
     // What color to draw the different rects
     Light fullColor;
     Light partColor;
@@ -81,7 +67,7 @@ struct StatBar {
 
 private:
     // Translate from portion of max health to portion of bar filled
-    int convert(double newValue) {
+    int convert(double newValue, double maxStat) {
         if (maxStat != 0) {
             double fraction = newValue / maxStat;
             return fraction * totalWidth;
@@ -91,89 +77,35 @@ private:
         }
     }
 
-    /* Slightly increase the amount of fullStat. */
-    void regenerate() {
-        double total = 0;
-        if (ticksUntilRegen < 0) {
-            total = percentRegen * (maxStat + partStat);
-            total += quadraticRegen * fullStat;
-            total *= -1 * timeRegen * ticksUntilRegen;
-        }
-        total += linearRegen;
-        addFull(total);
-    }
-
 public:
     // Constructor
     StatBar() {
-        fullStat = 0;
-        partStat = 0;
-        linearRegen = 0;
-        percentRegen = 0;
-        quadraticRegen = 0;
-        timeRegen = 0;
-        ticksUntilRegen = 0;
-        baseRegenTicks = 1;
+        part = 0;
+        full = 0;
     }
 
     // Set the amount of the stat
-    void setFull(double newValue) {
-        // Can't set it below 0 or above the max
-        newValue = max(0.0, newValue);
-        newValue = min(maxStat, newValue);
-        fullStat = newValue;
-        // And you can't recover a stat past the temporary cap
-        if (fullStat > partStat) {
-            fullStat = partStat;
-        }
-        full = convert(fullStat);
+    void setFull(double newValue, double maxStat) {
+        assert(0 <= newValue);
+        assert(newValue <= maxStat);
+
+        full = convert(newValue, maxStat);
     }
 
     // Set the temporary cap (which prevents the stat from regenerating 
     // completely)
-    void setPart(double newValue) {
-        newValue  = max(0.0, newValue);
-        newValue = min(maxStat, newValue);
-        partStat = newValue;
-        part = convert(newValue);
-        if (fullStat > partStat) {
-            setFull(partStat);
-        }
+    void setPart(double newValue, double maxStat) {
+        assert(0 <= newValue);
+        assert(newValue <= maxStat);
+
+        part = convert(newValue, maxStat);
     }
 
-    // Add amount to the full part
-    void addFull(double amount) {
-        /* If we lost the stat, we shouldn't start regenerating right away. */
-        if (amount < 0) {
-            resetRegen();
-        }
-        setFull(fullStat + amount);
-    }
-
-    // Add amount to the part part
-    void addPart(double amount) {
-        /* Again, reset regen. */
-        if (amount < 0) {
-            resetRegen();
-        }
-        setPart(partStat + amount);
-    }
-
-    // Set the stat to as high as it can go
-    void fill() {
-        setPart(maxStat);
-        setFull(maxStat);
-    }
-
-    /* Reset the time until it can regenerate again. */
-    void resetRegen() {
-        ticksUntilRegen = baseRegenTicks;
-    }
-
-    /* Do the things! */
-    void update() {
-        regenerate();
-        ticksUntilRegen -= 1;
+    /* Set the values based on stat. */
+    void update(const Stat &stat) {
+        setFull(stat.full, stat.maxStat);
+        setPart(stat.part, stat.maxStat);
+        assert(full <= part);
     }
 };
 
