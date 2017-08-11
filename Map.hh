@@ -139,6 +139,9 @@ class Map {
     // 0, 0 is the bottom right
     Tile *getBackground(int x, int y);
 
+    /* Get the type of the tile at place.x + x, place.y + y, place.layer. */
+    TileType getTileType(const Location &place, int x, int y);
+
     /* Set the tile at x, y, layer equal to val. */
     void setTile(int x, int y, MapLayer layer, TileType val);
     void setTile(const Location &place, TileType val);
@@ -185,6 +188,14 @@ class Map {
 
     /* Switch this tile with the one below it. */
     void displaceDown(const Location &place);
+
+    /* Move a tile dist in the +x direction. If there's a tile in the way,
+    it will be destroyed. */
+    void moveSideways(const Location &place, int dist);
+
+    /* Move a tile dist in the +x direction. If there's a tile there, they
+    switch places. */
+    void displaceSideways(const Location &place, int dist);
 };
 
 #endif

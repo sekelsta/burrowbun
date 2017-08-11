@@ -406,6 +406,18 @@ Tile *Map::getBackground(int x, int y) {
     return getTile(findPointer(x, y) -> background);
 }
 
+/* Get the type of the tile at place.x + x, place.y + y, place.layer. */
+TileType Map::getTileType(const Location &place, int x, int y) {
+    int newX = wrapX(place.x + x);
+    if (place.layer == MapLayer::FOREGROUND) {
+        return findPointer(newX, place.y + y) -> foreground;
+    }
+    else {
+        assert(place.layer == MapLayer::BACKGROUND);
+        return findPointer(newX, place.y + y) -> background;
+    }
+}
+
 /* Sets the tile at x, y, layer equal to val. */
 void Map::setTile(int x, int y, MapLayer layer, TileType val) {
     if (layer == MapLayer::FOREGROUND) {
@@ -635,3 +647,25 @@ void Map::displaceDown(const Location &place) {
     setTile(place, getTile(place.x, place.y - 1, place.layer) -> type);
     setTile(place.x, place.y - 1, place.layer, temp);
 }
+
+/* Move a tile dist in the +x direction. If there's a tile in the way,
+it will be destroyed. Any tiles along the path are ignored. */
+void Map::moveSideways(const Location &place, int dist) {
+    assert(dist != 0);
+    int newX = wrapX(place.x + dist);
+    kill(newX, place.y, place.layer);
+    TileType val = getTileType(place, 0, 0);
+    setTile(newX, place.y, place.layer, val);
+    setTile(place, TileType::EMPTY);
+}
+
+/* Move a tile dist in the +x direction. If there's a tile there, they
+switch places. */
+void Map::displaceSideways(const Location &place, int dist) {
+    assert(dist != 0);
+    int newX = wrapX(place.x + dist);
+    TileType destination = getTileType(place, dist, 0);
+    setTile(newX, place.y, place.layer, getTile(place) -> type);
+    setTile(place, destination);
+}
+

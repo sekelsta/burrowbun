@@ -27,8 +27,16 @@ class Boulder: public Tile {
     /* Same, but for falling. */
     set<TileType> tilesSunk;
 
+    /* The amount it moves in the x direction. Positive is to the right,
+    negative is to the left, and 0 is for a boulder that doesn't ever move
+    sideways. */
+    int direction;
+
     /* Does it float or fall? */
     bool isFloating;
+
+    /* Can the get in each other's way? */
+    bool movesTogether;
 
     /* If someone stands on it while it moves, does it bring them? */
     bool carriesMovables;
@@ -36,8 +44,12 @@ class Boulder: public Tile {
     /* Convert a vector<int> to a vector<TileType> */
     static set<TileType> vectorConvert(const vector<int> &input);
 
-    /* Check if it can fall one tile. */
+    /* Try to fall one tile. Return true on success. */
     bool fall(Map &map, const Location &place, int ticks) const;
+
+    /* Try to move one tile. Return true on success. */
+    bool move(Map &map, const Location &place, 
+            vector<movable::Movable*> &movables, int tick) const;
 
 public:
     /* Constructor. */

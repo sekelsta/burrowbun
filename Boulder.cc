@@ -50,6 +50,44 @@ bool Boulder::fall(Map &map, const Location &place, int ticks) const {
     return false;
 }
 
+/* Try to move one tile. Return true on success. */
+bool Boulder::move(Map &map, const Location &place,
+        vector<movable::Movable*> &movables, int tick) const {
+    /* If it doesn't moves sideways at all ever, then it doesn't move.*/
+    if (direction == 0) {
+        return false;
+    }
+    /* Otherwise if it moves as a unit, this isn't the right function. */
+    else if (movesTogether) {
+        return false;
+    }
+    /* If it can't move yet, don't. */
+    else if (tick % moveTicks != 0) {
+        return false;
+    }
+
+    TileType blocking = map.getTileType(place, direction, 0);
+    if (tilesDestroyed.count(blocking)) {
+        map.moveSideways(place, direction);
+    }
+    else if (tilesDisplaced.count(blocking)) {
+        map.displaceSideways(place, direction);
+    }
+    else {
+        return false;
+    }
+
+    /* We moved, so we should see if we need to carry movables. */
+    if (carriesMovables) {
+        /* TODO. First need some way of knowing which movables are colliding
+        with which tiles. */
+    }
+
+    return true;
+
+}
+
+
 /* Constructor. */
 Boulder::Boulder(TileType type) : Tile(type) {
     /* The name of the file where the initial values are stored. */
@@ -78,7 +116,9 @@ Boulder::Boulder(TileType type) : Tile(type) {
     tilesCrushed = vectorConvert(j["tilesCrushed"].get<vector<int>>());
     tilesDisplaced = vectorConvert(j["tilesDisplaced"].get<vector<int>>());
     tilesSunk = vectorConvert(j["tilesSunk"].get<vector<int>>());
+    direction = j["direction"];
     isFloating = j["isFloating"];
+    movesTogether = j["movesTogether"];
     carriesMovables = j["carriesMovables"];
 }
 
@@ -95,7 +135,9 @@ bool Boulder::update(Map &map, Location place,
 
     /* If it hasn't fallen this update, and wants to move sideways but not as
     a unit, it should do that. */
-
+    if (move(map, place, movables, tick)) {
+        return true;
+    }
     /* If it hasn't fallen this update, and wants to move sideways as a unit, 
     it should do that. */
         /* Make sure we're the end of a row and no other places in the row
