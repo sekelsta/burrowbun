@@ -34,8 +34,12 @@ SDL_Rect WindowHandler::findCamera(int x, int y, int w, int h) {
     // Because modulo can return a negative
     camera.x += worldWidth;
     camera.x %= worldWidth;
+    /* TODO:remove
     camera.y = min(camera.y, worldHeight - screenHeight - TILE_HEIGHT);
     camera.y = max(TILE_HEIGHT, camera.y);
+    */
+    camera.y = min(camera.y, worldHeight - screenHeight);
+    camera.y = max(0, camera.y);
 
     // If, God forbid, the map is smaller than the camera, shrink the camera
     camera.w = min(camera.w, worldWidth - TILE_HEIGHT);
@@ -753,8 +757,10 @@ void WindowHandler::renderMap(Map &m, const SDL_Rect &camera) {
             // But only if it's a tile that exists on the map
             assert (0 <= xTile);
             assert (xTile < mapWidth);
-            assert (0 <= yTile); 
-            assert (yTile < worldHeight / TILE_HEIGHT);
+            if (!m.isOnMap(xTile, yTile)) {
+                break;
+            }
+
             SDL_Texture *texture 
                 = m.getForeground(xTile, yTile) -> sprite.texture;
             if (texture != NULL) {

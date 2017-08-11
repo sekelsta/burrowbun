@@ -1,6 +1,7 @@
 Changes since last push:
- - Boulders now move sideways (but don't yet carry movables)
- - Added sprites for a couple more tiles
+ - got rid of the invisible layer of tiles at the top and bottom of the world
+ - changed stepping up so it's possible to do from the bottom of the world
+ - created a valgrind suppression file
 
 Known "features":
  - The strenth of gravity is independent of the world.

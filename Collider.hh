@@ -140,6 +140,15 @@ public:
     inline bool intersects(const Rect &that) const {
         return intersectsX(that) && intersectsY(that);
     }
+
+    /* Collide with the top or bottom of the map. */
+    inline void collideEdge(movable::Movable &movable, int worldHeight) {
+        if (y <= 0) {
+            movable.isCollidingDown = true;
+            y = 0;
+        }
+        y = min(y, worldHeight - h - 1);
+    }
 };
 
 

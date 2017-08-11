@@ -258,6 +258,10 @@ void Collider::collide(Map &map, movable::Movable &movable) {
         for (int j = startY; j < startY + height; j++) {
             stays.y = j * TILE_HEIGHT + yOffset;
             assert(0 <= stays.y);
+            /* Ignore tiles that don't exist. */
+            if (!map.isOnMap(l, j)) {
+                break;
+            }
             /* If the player starts off overlapping this tile */
             if (stays.intersects(from) && enableCollisions) {
                 /* Deal damage based on tile type. */
@@ -283,6 +287,9 @@ void Collider::collide(Map &map, movable::Movable &movable) {
         int dy = (yVelocity - n) % (TILE_HEIGHT / 2) + n;
         to.x = from.x + dx;
         to.y = from.y + dy;
+        /* Collide with the bottom and top of the map. */
+        to.collideEdge(movable, worldHeight);
+
         int newX = from.x;
         int newY = from.y;
         // A separate variable so that corner collisions can only happen if
@@ -353,6 +360,8 @@ void Collider::collide(Map &map, movable::Movable &movable) {
             from.y = newY;
             to.x = from.x + dx;
             to.y = from.y + dy;
+            /* But still collide with the top and bottom of the map. */
+            to.collideEdge(movable, worldHeight);
 
            if (!anyInevitable && !usedCorner) {
                 // This actually happens surprisingly rarely
@@ -381,10 +390,11 @@ void Collider::collide(Map &map, movable::Movable &movable) {
     // Wrap in the x direction
     movable.x += worldWidth;
     movable.x %= worldWidth;
-    // Collide in the y direction
-    movable.y = max(TILE_HEIGHT, movable.y);
+    // Collide in the y direction TODO: remove, we already did this
+    /*movable.y = max(TILE_HEIGHT, movable.y);
     int worldTop = worldHeight - movable.sprite.height - TILE_HEIGHT;
     movable.y = min(movable.y, worldTop);
+    */
 }
 
 
@@ -476,10 +486,16 @@ void Collider::update(Map &map, vector<movable::Movable *> &movables) {
                     // but we actually only want to go up by one x velocity
                     // (not one y velocity because the whole point of this is 
                     // that you go up without jumping).
-                    if (dy < movables[i] -> getVelocity().x) {
+                    /* If it can jump up and still go sideways, or if it
+                    is within one tile of the bottom of the map, it can stand
+                    on the tile it's stepping up to. */
+                    if (dy < movables[i] -> getVelocity().x
+                                || movables[i] -> y < TILE_HEIGHT) {
                         movables[i] -> x = hypothetical.x;
                         movables[i] -> y = hypothetical.y;
                     }
+                    /* Else it will go partway up and temporarily ignore
+                    gravity. */
                     else {
                         movables[i] -> y += abs(movables[i] -> getVelocity().x);
                         movables[i] -> isSteppingUp = true;

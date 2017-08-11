@@ -35,7 +35,7 @@ class Boulder: public Tile {
     /* Does it float or fall? */
     bool isFloating;
 
-    /* Can the get in each other's way? */
+    /* Can they get in each other's way? */
     bool movesTogether;
 
     /* If someone stands on it while it moves, does it bring them? */

@@ -1,6 +1,8 @@
 *.o
 *.gch
 main
+tests
 map.bmp
 *.swp
 *.world
+catch.hpp

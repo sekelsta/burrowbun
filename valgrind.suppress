@@ -1,0 +1,5 @@
+{
+  NVidia-driver
+  Memcheck:Cond
+  obj:/usr/lib/x86_64-linux-gnu/libnvidia-glcore.so.*
+}
