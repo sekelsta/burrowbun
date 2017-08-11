@@ -1,7 +1,6 @@
 Changes since last push:
- - got rid of the invisible layer of tiles at the top and bottom of the world
- - changed stepping up so it's possible to do from the bottom of the world
- - created a valgrind suppression file
+ - Boulders can now carry movables
+ - addedd a few much-needed assert statements
 
 Known "features":
  - The strenth of gravity is independent of the world.

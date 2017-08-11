@@ -31,6 +31,7 @@ Movable::Movable() {
 
     pixelsFallen = 0;
     maxHeight = 0;
+    boulderSpeed = 0;
 
     // These should be changed by the child class's init.
     drag.x = 0;
@@ -144,6 +145,7 @@ void from_json(const json &j, Movable &movable) {
     movable.maxHeight = j["maxHeight"];
     movable.x = j["x"];
     movable.y = j["y"];
+    movable.boulderSpeed = 0;
 }
 
 } // End namespace movable

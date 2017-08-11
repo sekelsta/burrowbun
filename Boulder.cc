@@ -4,6 +4,7 @@
 #include "Tile.hh"
 #include "Map.hh"
 #include "MapHelpers.hh"
+#include "Rect.hh"
 #include "json.hpp"
 
 // For convenience
@@ -61,8 +62,9 @@ bool Boulder::move(Map &map, const Location &place,
     else if (movesTogether) {
         return false;
     }
+    assert(moveTicks != 0);
     /* If it can't move yet, don't. */
-    else if (tick % moveTicks != 0) {
+    if (tick % moveTicks != 0) {
         return false;
     }
 
@@ -79,12 +81,28 @@ bool Boulder::move(Map &map, const Location &place,
 
     /* We moved, so we should see if we need to carry movables. */
     if (carriesMovables) {
-        /* TODO. First need some way of knowing which movables are colliding
-        with which tiles. */
+        /* Find the movables that are within one block above, 
+        and add to their boulderSpeed. */
+        Rect boulderRect;
+        Rect movableRect;
+        boulderRect.worldWidth = map.getWidth() * map.getTileWidth();
+        movableRect.worldWidth = boulderRect.worldWidth;
+        boulderRect.x = place.x * map.getTileWidth();
+        boulderRect.y = place.y * map.getTileHeight();
+        boulderRect.w = map.getTileWidth();
+        boulderRect.h = 2 * map.getTileHeight();
+        for (unsigned int i = 0; i < movables.size(); i++) {
+            movableRect.x = movables[i] -> x;
+            movableRect.y = movables[i] -> y;
+            movableRect.w = movables[i] -> sprite.width;
+            movableRect.h = movables[i] -> sprite.height;
+            if (boulderRect.intersects(movableRect)) {
+                movables[i] -> boulderSpeed += direction * map.getTileWidth();
+            }
+        }
     }
 
     return true;
-
 }
 
 

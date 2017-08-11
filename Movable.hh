@@ -2,6 +2,7 @@
 #define MOVABLE_HH
 
 #include <string>
+#include <set>
 #include "Sprite.hh"
 #include "json.hpp"
 
@@ -51,6 +52,9 @@ public:
 
     // Sprite
     Sprite sprite;
+
+    /* How fast are all the boulders trying to move it this update. */
+    int boulderSpeed;
 
     // Constructor
     Movable();

@@ -43,7 +43,8 @@ Player.o : Player.cc Player.hh Movable.hh Hotbar.hh UIHelpers.hh \
         Stat.hh
 	$(CC) $(CXXFLAGS) $^ -c $(LDFLAGS)
 
-Collider.o : Collider.cc Collider.hh Tile.hh Map.hh Movable.hh Sprite.hh
+Collider.o : Collider.cc Collider.hh Tile.hh Map.hh Movable.hh Sprite.hh \
+        Rect.hh
 	$(CC) $(CXXFLAGS) $^ -c $(LDFLAGS)
 
 World.o : World.cc World.hh Tile.hh MapHelpers.hh Sprite.hh Movable.hh
@@ -72,7 +73,8 @@ AllTheItems.o : AllTheItems.cc AllTheItems.hh Item.hh Action.hh Player.hh \
 Sprite.o : Sprite.cc Sprite.hh
 	$(CC) $(CXXFLAGS) $^ -c $(LDFLAGS)
 
-Boulder.o : Boulder.cc Boulder.hh Map.hh Tile.hh MapHelpers.hh Sprite.hh
+Boulder.o : Boulder.cc Boulder.hh Map.hh Tile.hh MapHelpers.hh Sprite.hh \
+        Rect.hh
 	$(CC) $(CXXFLAGS) $^ -c $(LDFLAGS)
 
 MapHelpers.o : MapHelpers.cc MapHelpers.hh
