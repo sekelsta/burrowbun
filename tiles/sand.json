@@ -19,6 +19,8 @@
     "tilesCrushed": [0],
     "tilesDisplaced": [],
     "tilesSunk": [],
+    "direction": 0,
+    "movesTogether": false,
     "isFloating": false,
     "carriesMovables": false
 }
