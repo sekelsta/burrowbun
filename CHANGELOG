@@ -1,5 +1,6 @@
 Changes since last push:
- - removed using declaration from header files
+ - Movables now have a minimum velocity used in calculating fall damage,
+so that if one slows down during the fall, one can prevent taking fall damage
 
 Known "features":
  - The strenth of gravity is independent of the world.

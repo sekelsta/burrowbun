@@ -404,11 +404,6 @@ void Collider::collide(Map &map, movable::Movable &movable) {
     // Wrap in the x direction
     movable.x += worldWidth;
     movable.x %= worldWidth;
-    // Collide in the y direction TODO: remove, we already did this
-    /*movable.y = max(TILE_HEIGHT, movable.y);
-    int worldTop = worldHeight - movable.sprite.height - TILE_HEIGHT;
-    movable.y = min(movable.y, worldTop);
-    */
 }
 
 

@@ -24,6 +24,7 @@
     "maxJumpTime": 8,
     "pixelsFallen": 0,
     "maxHeight": 0,
+    "minVelocity": -6,
     "x": 0,
     "y": 0,
     "maxFallDistance": 300,

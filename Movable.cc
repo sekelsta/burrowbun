@@ -73,7 +73,7 @@ Point Movable::getDAccel() const {
 }
 
 // This adds acceleration to speed, and limits speed at maxSpeed. This also
-// updates the value of timeOffGround.
+// updates the value of timeOffGround and maxHeight.
 void Movable::accelerate(double gravity) {
     // If on the ground, timeOffGround should be 0, otherwise it should be
     // one more than it was before
@@ -103,6 +103,11 @@ void Movable::accelerate(double gravity) {
         velocity.y = 0;
     }
     
+    /* Reset maxHeight if it isn't falling fast enough. */
+    if (velocity.y > minVelocity) {
+        maxHeight = min(maxHeight, y);
+    }
+
     // Since location is an int, make velocity an int by rounding away from 0
     if (velocity.x < 0) {
         velocity.x = floor(velocity.x);
@@ -143,6 +148,7 @@ void from_json(const json &j, Movable &movable) {
     movable.maxJumpTime = j["maxJumpTime"];
     movable.pixelsFallen = j["pixelsFallen"];
     movable.maxHeight = j["maxHeight"];
+    movable.minVelocity = j["minVelocity"];
     movable.x = j["x"];
     movable.y = j["y"];
     movable.boulderSpeed = 0;

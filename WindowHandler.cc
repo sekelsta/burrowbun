@@ -34,10 +34,6 @@ SDL_Rect WindowHandler::findCamera(int x, int y, int w, int h) {
     // Because modulo can return a negative
     camera.x += worldWidth;
     camera.x %= worldWidth;
-    /* TODO:remove
-    camera.y = min(camera.y, worldHeight - screenHeight - TILE_HEIGHT);
-    camera.y = max(TILE_HEIGHT, camera.y);
-    */
     camera.y = min(camera.y, worldHeight - screenHeight);
     camera.y = max(0, camera.y);
 

@@ -47,6 +47,11 @@ public:
     // the ground
     int maxHeight;
 
+    /* The minimum downward velocity required to prevent the movable from 
+    resetting its maxHeight. (To avoid taking fall damage, slow down to this
+    speed.) */
+    double minVelocity;
+
     // Location
     int x, y;
 
