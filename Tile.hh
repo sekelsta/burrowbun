@@ -10,7 +10,7 @@ class Map;
 struct Location;
 
 // A class for keeping track of which tiles there are
-enum class TileType {
+enum class TileType : short {
     EMPTY,
     DIRT,
     HUMUS,
@@ -82,6 +82,9 @@ public:
 
     // Basically the number of hits with a pickax to break it
     int getMaxHealth() const;
+
+    /* Which sprite on the spritesheet to use. */
+    uint8_t getSpritePlace(const Map &map, const Location &place) const;
 
     /* Change the map in whatever way needs doing. */
     virtual bool update(Map &map, Location place, 

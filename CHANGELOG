@@ -1,6 +1,8 @@
 Changes since last push:
- - Actually saves and loads the background layer. The map still doesn't have a
-load function, mostly because I might change the savefile format.
+ - now renders background tiles, though I still don't have good sprites 
+for them
+ - fixed a bug allowing players to fit in spaces they couldn't escape
+ - Moved the function that picks a sprite for a tile to the tile class
 
 Known "features":
  - The strenth of gravity is independent of the world.
@@ -8,19 +10,11 @@ Known "features":
  - The spawn point sometimes puts the player on top of dirt. Spawning should be changed so it destroys any tiles in the way.
  - You can place dirt on top of creatures, including yourself
  - Tiles have an opacity between 0 and 64, but right now it only matters whether it's zero or not.
- - Doesn't yet render background tiles (I haven't decided how they should look)
- - Background tiles don't affect light levels quite right
-
-Known bugs:
- - Apparently the player can fit in gaps that they can't escape.
 
 To do:
- - Tiles should have a function to decide which version of the sprite to
-use, not make the map do that
  - load and unload textures
  - rewrite almost all world generation code to use noise
  - stacking items, throwing / picking up items
  - Trees!
  - Store data for UI and sprites in a file instead of the source code
  - save and load the player
- - Actually display background tiles

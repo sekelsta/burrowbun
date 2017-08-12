@@ -94,6 +94,9 @@ class Map {
 
     public:
 
+    /* Return a number from 0-15 depending on which tiles border this one. */
+    int bordering(const Location &place) const;
+
     /* Return true if this is a place that exists on the map. */
     bool isOnMap(int x, int y) const;
 
@@ -121,7 +124,8 @@ class Map {
     Location getSpawn() const;
 
     // Return which part of the spritesheet should be used
-    Location getSpritePlace(int x, int y) const;
+    uint8_t getForegroundSprite(int x, int y) const;
+    uint8_t getBackgroundSprite(int x, int y) const;
 
     // Return the light at a square, setting it if necessary. 
     Light getLight(int x, int y);
@@ -142,7 +146,7 @@ class Map {
     Tile *getBackground(int x, int y);
 
     /* Get the type of the tile at place.x + x, place.y + y, place.layer. */
-    TileType getTileType(const Location &place, int x, int y);
+    TileType getTileType(const Location &place, int x, int y) const;
 
     /* Set the tile at x, y, layer equal to val. */
     void setTile(int x, int y, MapLayer layer, TileType val);
@@ -178,7 +182,7 @@ class Map {
 
     /* Take an invalid x location and add or subtract width until
     0 <= x < width. */
-    int wrapX(int x);
+    int wrapX(int x) const;
 
     /* Take in world coordinates and a layer and convert to a location in 
     map coordinates. */

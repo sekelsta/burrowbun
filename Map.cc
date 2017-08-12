@@ -70,33 +70,16 @@ Tile *Map::getTile(TileType val) {
     return tile;
 }
 
-/* Pick the sprite for a tile based on the ones next to it. */
 void Map::chooseSprite(int x, int y) {
-    // The value at getSpritePlace.y should be between 0 and 15.
-    // In fact, it should be the binary number that you get if
-    // you start at the top and go counterclockwise, treating
-    // a non-air tile to that side as 0 and an air tile to that 
-    // side as 1.
-    int col = 0;
-    if (y != height - 1 
-        && getForeground(x, y + 1) -> type == TileType::EMPTY) {
-            col += 1;
-    }
-    /* WrapX is called so it matches up with the tile on the other side
-    of the map, wich it's next to when it wraps around. */
-    if (getForeground(wrapX(x + 1), y) -> type == TileType::EMPTY) {
-            col += 2;
-    }
-    if (y != 0
-        && getForeground(x, y - 1) -> type == TileType::EMPTY) {
-            col += 4;
-    }
-    if (getForeground(wrapX(x - 1), y) -> type == TileType::EMPTY) {
-            col += 8;
-    }
-    findPointer(x, y) -> spritePlace.y = col;
-    int row = rand() % getForeground(x, y) -> sprite.cols;
-    findPointer(x, y) -> spritePlace.x = row;
+    Location place;
+    place.x = x;
+    place.y = y;
+    place.layer = MapLayer::FOREGROUND;
+    uint8_t spritePlace = getTile(place) -> getSpritePlace(*this, place);
+    findPointer(x, y) -> foregroundSprite = spritePlace;
+    place.layer = MapLayer::BACKGROUND;
+    spritePlace = getTile(place) -> getSpritePlace(*this, place);
+    findPointer(x, y) -> backgroundSprite = spritePlace;
 }
 
 /* Return true if there's a nonempty tile of the same layer at or next to 
@@ -140,7 +123,9 @@ int Map::distance(int i, int j, int x, int y) {
    of light (doesn't have an opaque foreground or background). If the distance 
    is more than maxDist, return maxDist. */
 int Map::skyDistance(int x, int y, int maxDist) {
-    if (isSky(x, y) || getForeground(x, y) -> getOpacity() == 0) {
+    // TODO: remove
+    //if (isSky(x, y) || getForeground(x, y) -> getOpacity() == 0) {
+    if (isSky(x, y)) {
         return 0;
     }
     int smallest = distance(0, 0, 0, maxDist);
@@ -205,6 +190,31 @@ void Map::trimUpdateList() {
             ++iter;
         }
     }
+}
+
+int Map::bordering(const Location &place) const {
+    // The value at getSpritePlace.y should be between 0 and 15.
+    // In fact, it should be the binary number that you get if
+    // you start at the top and go counterclockwise, treating
+    // a non-air tile to that side as 0 and an air tile to that 
+    // side as 1.
+    int col = 0;
+    if (place.y != height - 1 
+            && getTileType(place, 0, 1) == TileType::EMPTY) {
+        col += 1;
+    }
+    /* WrapX is called so it matches up with the tile on the other side
+    of the map, wich it's next to when it wraps around. */
+    if (getTileType(place, 1, 0) == TileType::EMPTY) {
+        col += 2;
+    }
+    if (place.y != 0 && getTileType(place, 0, -1) == TileType::EMPTY) {
+        col += 4;
+    }
+    if (getTileType(place, -1, 0) == TileType::EMPTY) {
+        col += 8;
+    }
+    return col;
 }
 
 /* Tell all the tiles nearby to have the right sprite and the right amount of 
@@ -388,8 +398,12 @@ Location Map::getSpawn() const {
 }
 
 // Return the part of the spritesheet that should be used
-Location Map::getSpritePlace(int x, int y) const {
-    return findPointer(x, y) -> spritePlace;
+uint8_t Map::getForegroundSprite(int x, int y) const {
+    return findPointer(x, y) -> foregroundSprite;
+}
+
+uint8_t Map::getBackgroundSprite(int x, int y) const {
+    return findPointer(x, y) -> backgroundSprite;
 }
 
 // Return lighting
@@ -447,7 +461,7 @@ Tile *Map::getBackground(int x, int y) {
 }
 
 /* Get the type of the tile at place.x + x, place.y + y, place.layer. */
-TileType Map::getTileType(const Location &place, int x, int y) {
+TileType Map::getTileType(const Location &place, int x, int y) const {
     int newX = wrapX(place.x + x);
     if (place.layer == MapLayer::FOREGROUND) {
         return findPointer(newX, place.y + y) -> foreground;
@@ -621,7 +635,7 @@ void Map::kill(const Location &place) {
 
 /* Take an invalid x location and add or subtract the width until
 0 <= x < width. */
-int Map::wrapX(int x) {
+int Map::wrapX(int x) const {
     /* Fix if x is too large. */
     x %= getWidth();
 

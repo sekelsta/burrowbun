@@ -91,9 +91,23 @@ struct SpaceInfo {
     bool isLightUpdated;
 
     // Which rectangle of the spritesheet to draw
-    // spriteRow should be based on which surrounding tiles are empty,
-    // spriteCol should be random
-    Location spritePlace;
+    uint8_t foregroundSprite;
+    uint8_t backgroundSprite;
+
+    static inline void fromSpritePlace(Location &place, Uint8 spritePlace) {
+        place.x = spritePlace % 16;
+        place.y = spritePlace / 16;
+    }
+
+    static inline Uint8 toSpritePlace(const Location &place) {
+        return toSpritePlace(place.x, place.y);
+    }
+
+    static inline Uint8 toSpritePlace(int x, int y) {
+        return 16 * y + x;
+    } 
 };
+
+
 
 #endif
