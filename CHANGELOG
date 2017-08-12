@@ -1,5 +1,6 @@
 Changes since last push:
- - now keeps track of version
+ - Actually saves and loads the background layer. The map still doesn't have a
+load function, mostly because I might change the savefile format.
 
 Known "features":
  - The strenth of gravity is independent of the world.
@@ -20,7 +21,6 @@ use, not make the map do that
  - rewrite almost all world generation code to use noise
  - stacking items, throwing / picking up items
  - Trees!
- - Store data for entities and sprites in a file instead of the source code
- - Actually save and load the map properly
+ - Store data for UI and sprites in a file instead of the source code
  - save and load the player
  - Actually display background tiles

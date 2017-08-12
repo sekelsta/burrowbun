@@ -1,6 +1,5 @@
 #include <iostream>
 #include <cassert>
-#include <sstream>
 #include "Tile.hh"
 #include "Map.hh"
 #include "World.hh"
@@ -11,11 +10,6 @@
 #include "Player.hh"
 #include "Collider.hh"
 #include "Hotbar.hh"
-
-/* Know the version. */
-#define MAJOR 0
-#define MINOR 1
-#define PATCH 0
 
 using namespace std;
 
@@ -35,10 +29,8 @@ int main(int argc, char **argv) {
     const int TILE_HEIGHT = 16;
     // Do the stuff it would be doing without the images
     World world = World(WorldType::EARTH);
-    stringstream version;
-    version << MAJOR << "." << MINOR << "." << PATCH;
-    world.save("world.world", version.str());
-    Map map = Map("world.world", TILE_WIDTH, TILE_HEIGHT, MAJOR, MINOR, PATCH);
+    world.save("world.world");
+    Map map = Map("world.world", TILE_WIDTH, TILE_HEIGHT);
     map.save("map.bmp");
 
     // Construct a WindowHandler

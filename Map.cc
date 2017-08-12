@@ -7,6 +7,7 @@
 #include <tgmath.h> // for exponentiation
 #include "Map.hh"
 #include "Boulder.hh"
+#include "version.hh"
 
 using namespace std;
 
@@ -238,13 +239,39 @@ void Map::updateNear(int x, int y) {
     }
 }
 
+
+
 // Public methods
 
+/* Read a file containing a map layer. */
+void Map::loadLayer(MapLayer layer, ifstream &infile) {
+    int index = 0;
+    int count, tile;
+    TileType current;
+    while (index < height * width) {
+        infile >> count >> tile;
+        current = (TileType)tile;
+        for (int i = 0; i < count; i++) {
+            assert(index < width * height);
+            if (layer == MapLayer::FOREGROUND) {
+                tiles[index].foreground  = current;
+            }
+            else {
+                assert(layer == MapLayer::BACKGROUND);
+                tiles[index].background = current;
+            }
+            index++;
+        }
+    }
+    assert(getForeground(0, 0) -> type == tiles[0].foreground);
+
+   
+}
+
+
 // Constructor, based on a world file that exists
-Map::Map(string filename, int tileWidth, int tileHeight, int major, int minor,
-        int patch) 
-        : TILE_WIDTH(tileWidth), TILE_HEIGHT(tileHeight), MAJOR(major),
-        MINOR(minor), PATCH(patch) {
+Map::Map(string filename, int tileWidth, int tileHeight) 
+        : TILE_WIDTH(tileWidth), TILE_HEIGHT(tileHeight) {
     /* It's the 0th tick. */
     tick = 0;
     ifstream infile(filename);
@@ -267,12 +294,20 @@ Map::Map(string filename, int tileWidth, int tileHeight, int major, int minor,
         cerr << filename << " doesn't say it's a map." << "\n";
     }
 
+    string major;
+    string minor;
+    string patch;
+    infile >> major >> minor >> patch;
+    if (stoi(major) != MAJOR || stoi(minor) != MINOR) {
+        cerr << "Warning: This map was written with version ";
+        cerr << major << "." << minor << "." << patch << ", ";
+        cerr << "but this software is version " << MAJOR << ".";
+        cerr << MINOR << "." << PATCH << "." << "The save format may";
+        cerr << "have changed.\n";
+    }
+
     // Read the height and width
     infile >> width >> height;
-
-    string version;
-    infile >> version;
-    cout << version;
 
     // Create an array of tiles
     tiles = new SpaceInfo[width * height];
@@ -283,21 +318,20 @@ Map::Map(string filename, int tileWidth, int tileHeight, int major, int minor,
     // Read the seed
     infile >> seed;
 
-    // Read the map
-    int index = 0;
-    int count, tile;
-    TileType foregroundTile;
-    while (index < height * width) {
-        infile >> count >> tile;
-        foregroundTile = (TileType)tile;
-        for (int i = 0; i < count; i++) {
-            assert(index < width * height);
-            tiles[index].foreground = foregroundTile;
-            tiles[index].background = TileType::EMPTY; // TODO: load background
-            index++;
-        }
+    infile >> header;
+    if (header != "#Foreground") {
+        cerr << "Couldn't load foreground!\n";
     }
-    assert(getForeground(0, 0) -> type == tiles[0].foreground);
+
+    loadLayer(MapLayer::FOREGROUND, infile);
+
+    infile >> header;
+    if (header != "#Background") {
+        cerr << "Couldn't load background!";
+        cerr << " May have improperly loaded foreground.\n";
+    }
+
+    loadLayer(MapLayer::BACKGROUND, infile);
 
     /* Iterate over the entire map. */
     for (int i = 0; i < width; i++) {

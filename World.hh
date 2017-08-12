@@ -154,8 +154,12 @@ public:
     // Set the tile at x, y equal to val
     void setTile(int x, int y, TileType val, TileType *array);
 
+    /* Save the foreground or background to the given ofstream. 
+    Assume the array has a length of width * height. */
+    void saveArray(TileType *array, std::ofstream &outfile) const;
+
     // Write the map to a file
-    void save(const std::string &filename, const std::string &version) const;
+    void save(const std::string &filename) const;
 };
 
 #endif

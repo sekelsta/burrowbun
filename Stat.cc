@@ -30,8 +30,8 @@ Stat::Stat() {
 // Set the amount of the stat
 void Stat::setFull(double newValue) {
     // Can't set it below 0 or above the max
-    newValue = max(0.0, newValue);
-    newValue = min(maxStat, newValue);
+    newValue = std::max(0.0, newValue);
+    newValue = std::min(maxStat, newValue);
     full = newValue;
     // And you can't recover a stat past the temporary cap
     if (full > part) {
@@ -42,8 +42,8 @@ void Stat::setFull(double newValue) {
 // Set the temporary cap (which prevents the stat from regenerating 
 // completely)
 void Stat::setPart(double newValue) {
-    newValue  = max(0.0, newValue);
-    newValue = min(maxStat, newValue);
+    newValue  = std::max(0.0, newValue);
+    newValue = std::min(maxStat, newValue);
     part = newValue;
     if (full > part) {
         setFull(part);

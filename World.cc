@@ -8,6 +8,7 @@
 #include <noise.h> // Finding this requires having libnoise installed and may
 // require looking in non-standard places.
 #include "World.hh"
+#include "version.hh"
 
 using namespace std;
 
@@ -667,27 +668,17 @@ void World::setTile(int x, int y, TileType val, TileType *array) {
     *findPointer(x, y, array) = val;
 }
 
-// Write the map to a file
-void World::save(const string &filename, const string &version) const {
-    // Saves in .bmp file format in black and white
-    ofstream outfile;
-    outfile.open(filename);
-
-    // Write an informative header
-    outfile << "#Map\n" << width << " " << height << "\n";
-    outfile << version << "\n";
-    outfile << spawn.x << " " << spawn.y << "\n";
-    outfile << seed << "\n";
-    // Write tile values
-
+/* Save an array to the outfile. Assume the array is of length 
+width * height.*/
+void World::saveArray(TileType *array, std::ofstream &outfile) const {
     // For keeping track of a lot of the same tile in a row
     int count = 0;
-    TileType last = foreground[0];
+    TileType last = array[0];
     TileType current;
 
-    // Treat foreground as the 1D array it is.
+    // Treat the array as the 1D array it is.
     for (int index = 0; index < height * width; index++) {
-        current = foreground[index];
+        current = array[index];
         if(current != last) {
             outfile << count << " ";
             outfile << (int)last << " ";
@@ -701,5 +692,30 @@ void World::save(const string &filename, const string &version) const {
     
     // Write the last set of numbers
     outfile << count << " " << (int)last << " ";
+
+
+}
+
+// Write the map to a file
+void World::save(const string &filename) const {
+    // Saves in .bmp file format in black and white
+    std::ofstream outfile;
+    outfile.open(filename);
+
+    // Write an informative header
+    outfile << "#Map\n" << MAJOR << " " << MINOR << " " << PATCH << "\n";
+    outfile << width << " " << height << "\n";
+    outfile << spawn.x << " " << spawn.y << "\n";
+    outfile << seed << "\n";
+    // Write tile values
+    outfile << "#Foreground\n";
+    saveArray(foreground, outfile);
+
+    /* Time for the background. */
+    outfile << "\n#Background\n";
+    saveArray(background, outfile);
+    
+
     outfile.close();
+
 }
