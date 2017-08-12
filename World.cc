@@ -83,8 +83,8 @@ void World::generateSmolTest() {
 // Make an Earth-style world
 void World::generateEarth() {
     // TODO: make this actually do something interesting
-    height = 500;
-    width = 1024;
+    height = 2048;
+    width = 4096;
 
     // Create the array of tiles
     foreground = new TileType[height * width];
@@ -668,13 +668,14 @@ void World::setTile(int x, int y, TileType val, TileType *array) {
 }
 
 // Write the map to a file
-void World::save(const string &filename) const {
+void World::save(const string &filename, const string &version) const {
     // Saves in .bmp file format in black and white
     ofstream outfile;
     outfile.open(filename);
 
     // Write an informative header
     outfile << "#Map\n" << width << " " << height << "\n";
+    outfile << version << "\n";
     outfile << spawn.x << " " << spawn.y << "\n";
     outfile << seed << "\n";
     // Write tile values

@@ -30,6 +30,11 @@ class Map {
     const int TILE_WIDTH;
     const int TILE_HEIGHT;
 
+    /* What version are we running. */
+    const int MAJOR;
+    const int MINOR;
+    const int PATCH;
+
     // Default spawn point
     Location spawn;
 
@@ -98,7 +103,8 @@ class Map {
     bool isOnMap(int x, int y) const;
 
     // Constructor, constructs a map by loading a file
-    Map(std::string filename, int tileWidth, int tileHeight);
+    Map(std::string filename, int tileWidth, int tileHeight, int major,
+            int minor, int patch);
 
     // Destructor
     ~Map();

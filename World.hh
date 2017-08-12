@@ -155,7 +155,7 @@ public:
     void setTile(int x, int y, TileType val, TileType *array);
 
     // Write the map to a file
-    void save(const std::string &filename) const;
+    void save(const std::string &filename, const std::string &version) const;
 };
 
 #endif

@@ -241,8 +241,10 @@ void Map::updateNear(int x, int y) {
 // Public methods
 
 // Constructor, based on a world file that exists
-Map::Map(string filename, int tileWidth, int tileHeight) 
-        : TILE_WIDTH(tileWidth), TILE_HEIGHT(tileHeight) {
+Map::Map(string filename, int tileWidth, int tileHeight, int major, int minor,
+        int patch) 
+        : TILE_WIDTH(tileWidth), TILE_HEIGHT(tileHeight), MAJOR(major),
+        MINOR(minor), PATCH(patch) {
     /* It's the 0th tick. */
     tick = 0;
     ifstream infile(filename);
@@ -267,6 +269,10 @@ Map::Map(string filename, int tileWidth, int tileHeight)
 
     // Read the height and width
     infile >> width >> height;
+
+    string version;
+    infile >> version;
+    cout << version;
 
     // Create an array of tiles
     tiles = new SpaceInfo[width * height];

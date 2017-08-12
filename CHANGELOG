@@ -1,6 +1,5 @@
 Changes since last push:
- - Movables now have a minimum velocity used in calculating fall damage,
-so that if one slows down during the fall, one can prevent taking fall damage
+ - now keeps track of version
 
 Known "features":
  - The strenth of gravity is independent of the world.
@@ -17,9 +16,11 @@ Known bugs:
 To do:
  - Tiles should have a function to decide which version of the sprite to
 use, not make the map do that
+ - load and unload textures
  - rewrite almost all world generation code to use noise
  - stacking items, throwing / picking up items
  - Trees!
  - Store data for entities and sprites in a file instead of the source code
  - Actually save and load the map properly
+ - save and load the player
  - Actually display background tiles
