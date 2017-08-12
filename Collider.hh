@@ -9,8 +9,6 @@
 #include "Movable.hh"
 #include "Rect.hh"
 
-using namespace std;
-
 /* To be able to describe collisions better. */
 enum class CollisionType {
     NONE,
@@ -116,7 +114,7 @@ class Collider {
     them to the vactor collisions. If any of the collisions are inevitable, it 
     returns true. Otherwise, it returns false. If dropDown is true, it will 
     not count collisions with platforms. */
-    bool listCollisions(vector<CollisionInfo> &collisions, Map &map, 
+    bool listCollisions(std::vector<CollisionInfo> &collisions, Map &map, 
         const Rect &to, const Rect &from, bool dropDown) const;
 
     // Takes a movable and a map, and moves it to where it should end up
@@ -128,7 +126,7 @@ public:
 
     // A function that takes a map and a list of things and moves them, 
     // colliding when necessary
-    void update(Map &map, vector<movable::Movable *> &movables);
+    void update(Map &map, std::vector<movable::Movable *> &movables);
 };
 
 #endif

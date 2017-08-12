@@ -1,4 +1,5 @@
 #include <SDL2/SDL.h>
+#include <vector>
 #include "Player.hh"
 #include "Item.hh"
 #include "AllTheItems.hh"

@@ -15,10 +15,10 @@ using json = nlohmann::json;
 // Potion constructor
 Potion::Potion(ItemType type) : Item(type) {
     /* Figure out which json file to use. */
-    string filename = Item::getJsonFilename(type);
+    std::string filename = Item::getJsonFilename(type);
 
     /* Put the data into the json. */
-    ifstream infile(filename);
+    std::ifstream infile(filename);
     json j = json::parse(infile);
 
     /* Set values equal to the json's values. */
@@ -55,8 +55,8 @@ Block::Block(ItemType type) : Item(type) {
     assert(type <= ItemType::LAST_BLOCK);
 
     /* Read in the json. */
-    string filename = Item::getJsonFilename(type);
-    ifstream infile(filename);
+    std::string filename = Item::getJsonFilename(type);
+    std::ifstream infile(filename);
     json j = json::parse(infile);
 
     /* Set values. */
@@ -133,8 +133,8 @@ void Block::use(InputType type, int x, int y, Player &player, Map &map) {
 /* Pickaxe constructor. */
 Pickaxe::Pickaxe(ItemType type) : Block(type) {
     /* Load the right json based on the type. */
-    string filename = Item::getJsonFilename(type);
-    ifstream infile(filename);
+    std::string filename = Item::getJsonFilename(type);
+    std::ifstream infile(filename);
     json j = json::parse(infile);
 
     blockDamage = j["blockDamage"];

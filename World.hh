@@ -7,8 +7,6 @@
 #include "Tile.hh"
 #include "MapHelpers.hh"
 
-using namespace std;
-
 // A class for generating a map for a sandbox game
 class World {
     // Fields:
@@ -25,7 +23,7 @@ class World {
     Location spawn;
 
     // Have a random number generator
-    default_random_engine generator;
+    std::default_random_engine generator;
     // The seed that was used to generate the world
     int seed;
 
@@ -58,26 +56,26 @@ class World {
     int findChange(int x, int top, TileType *array) const;
 
     // Merge two arrays, adding them wherever they overlap
-    vector<double> merge(int start1, int stop1, 
-        const vector<double> &heights1, int start2, int stop2, 
-        const vector<double> &heights2) const;
+    std::vector<double> merge(int start1, int stop1, 
+        const std::vector<double> &heights1, int start2, int stop2, 
+        const std::vector<double> &heights2) const;
 
     // Set everything from y1 to y2 to tile
     void setTo(int x, int y1, int y2, TileType tile, TileType *array);
 
     // Set everything from y1 to y2 to something picked randomly from fill
-    void setTo(int x, int y1, int y2, const vector<TileType> &fill, 
+    void setTo(int x, int y1, int y2, const std::vector<TileType> &fill, 
         TileType *array);
 
     // From x = start to x = stop, add heights[x - start] of a randomly 
     // selected Tile* from fill, above the line given by findChange(x, top)
-    void addHeights(int start, int stop, const vector<double> &heights, 
-        const vector<TileType> &fill, int top, TileType *array);
+    void addHeights(int start, int stop, const std::vector<double> &heights, 
+        const std::vector<TileType> &fill, int top, TileType *array);
 
     // Move the line from findChange(x, top) to heights[x - start]
-    void setHeights(int start, int stop, const vector<double> &heights, 
-        const vector<TileType> &above, const vector<TileType> &below, int top,
-        TileType *array);
+    void setHeights(int start, int stop, const std::vector<double> &heights, 
+        const std::vector<TileType> &above, 
+        const std::vector<TileType> &below, int top, TileType *array);
 
     // Set all tiles in a circle with radius r centered on location center, 
     // to TileType val on the array array (eg foreground, background)
@@ -86,7 +84,8 @@ class World {
 
     // Put a circle at each location in centers, with the corresponding radius
     // from r. r and centers should be the same length.
-    void setPath(const vector<float> &r, const vector<Location> &centers,
+    void setPath(const std::vector<float> &r,
+         const std::vector<Location> &centers,
         TileType val, TileType *array);
 
     // Put a gently sloping tunnel with a given start point.
@@ -96,7 +95,7 @@ class World {
     double lerp(double lo, double hi, double t) const;
 
     // Generate Perlin noise of length times * wavelength
-    vector<double> noise(double range, int times, int wavelength) const;
+    std::vector<double> noise(double range, int times, int wavelength) const;
 
     // Generate a heightmap recursively by midpoint displacement
     // length is best as (a power of 2) + 1, start, end, and mid are the 
@@ -105,12 +104,12 @@ class World {
     // every  iteration. For best results,
     // use a  number between 0 and 1. An exp closer to 0 will make smoother 
     // terrain, one closer to 1 will make more jagged terrain.
-    vector<double> midpointDisplacement(int length, double start, double end,
-        double mid, double exp, double variance);
+    std::vector<double> midpointDisplacement(int length, double start, 
+        double end, double mid, double exp, double variance);
 
     // Make an array containing the information for an irregular triangle with
     // width b and height h
-    vector<double> makeTriangle(int b, int h, double mean, double stddev);
+    std::vector<double> makeTriangle(int b, int h, double mean, double stddev);
 
     /* Make a canyon, and fill it with alternating layers of fill
        This can also be used to make triangles with alternating layers of fill
@@ -121,13 +120,13 @@ class World {
        expected from the height and width is divided by mean to get the
        actual slope, and stddev is devietion from an exact triangle. */
     void canyon(int x, int y, int width, int height, 
-        const vector<TileType> &fill, double mean, double stddev);
+        const std::vector<TileType> &fill, double mean, double stddev);
 
     // Make a mountain at x, y
     void mountain(int x, int y, int height);
 
     // Make an array containing the information for sinusoidal hills
-    vector<double> makeHills(int length, int maxAmp, double maxFreq) const;
+    std::vector<double> makeHills(int length, int maxAmp, double maxFreq) const;
 
     // Actually put said sinusoidal hills on the map, adjusting for height
     void setHills(int start, int stop, int maxAmp, double maxFreq);
@@ -156,7 +155,7 @@ public:
     void setTile(int x, int y, TileType val, TileType *array);
 
     // Write the map to a file
-    void save(const string &filename) const;
+    void save(const std::string &filename) const;
 };
 
 #endif

@@ -13,22 +13,20 @@ class Map;
 struct MouseBox;
 struct StatBar;
 
-using namespace std;
-
 /* A struct to hold information about which keys do what. This is so that
    later the player can change these settings. */
 struct KeySettings {
     // Which keys are for movement
-    vector<SDL_Scancode> leftKeys, rightKeys, upKeys, downKeys, jumpKeys;
+    std::vector<SDL_Scancode> leftKeys, rightKeys, upKeys, downKeys, jumpKeys;
 
     // Key to open the inventory and whatever opens along with it
-    vector<SDL_Scancode> inventoryKeys;
+    std::vector<SDL_Scancode> inventoryKeys;
 
     // Key to toggle the hotbar
-    vector<SDL_Scancode> toggleHotbarKeys;
+    std::vector<SDL_Scancode> toggleHotbarKeys;
 
     // 24 keys to select a hotbar slot
-    vector<SDL_Scancode> hotbarKeys;
+    std::vector<SDL_Scancode> hotbarKeys;
 };
 
 /* A class to handle events such as keyboard input or mouse movement. */
@@ -59,15 +57,15 @@ class EventHandler {
     // Helper functions
 
     // Tell whether a scancode is in a vector
-    bool isIn(SDL_Scancode key, vector<SDL_Scancode> keys);
+    bool isIn(SDL_Scancode key, std::vector<SDL_Scancode> keys);
 
     // Tell whether a vector has a key that's being held down
-    bool isHeld(const Uint8 *state, vector<SDL_Scancode> keys);
+    bool isHeld(const Uint8 *state, std::vector<SDL_Scancode> keys);
 
     // Change the bool values of a MouseBox vector so they know whether they 
     // were clicked
     // Return true if the mouse clicked any of the boxes
-    bool updateMouseBoxes(vector<MouseBox> &mouseBoxes);
+    bool updateMouseBoxes(std::vector<MouseBox> &mouseBoxes);
 
     // Update the mouseboxes of an inventory
     // Return true if the mouse clicked any of the boxes

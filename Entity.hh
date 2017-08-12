@@ -7,8 +7,6 @@
 #include "Stat.hh"
 #include "json.hpp"
 
-using json = nlohmann::json;
-
 /* A class for monsters, NPCs, and players to inherit from.
 If any features are added later that should reset fall damage, they should
 do the resetting of the fall damage in this class or one of its children. */

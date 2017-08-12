@@ -21,7 +21,7 @@ class Map {
 
     // A list of the pointers in the map
     // Basically these are the ones that contain manually allocated memeory
-    vector<Tile *> pointers;
+    std::vector<Tile *> pointers;
 
     // The height and width of the map, in number of tiles
     int height, width;
@@ -34,13 +34,13 @@ class Map {
     Location spawn;
 
     /* The tiles whose update function should be called. */
-    set<Location> toUpdate;
+    std::set<Location> toUpdate;
 
     /* Tiles that have been damaged. */
-    vector<TileHealth> damaged;
+    std::vector<TileHealth> damaged;
 
     // Have a random number generator
-    default_random_engine generator;
+    std::default_random_engine generator;
     // The seed that was used to generate the map
     int seed;
 
@@ -150,17 +150,17 @@ class Map {
     bool placeTile(Location place, TileType type);
 
     // Gets the map's list of the tile pointers it uses
-    vector<Tile *> getPointers() const;
+    std::vector<Tile *> getPointers() const;
 
     // Gets a reference to the map's list of the tile pointers it uses
     // This should only be used to set the tile textures
-    vector<Tile *> &getPointersRef();
+    std::vector<Tile *> &getPointersRef();
 
     // Write the map to a file
     void save(const std::string &filename);
 
     /* Update the map. */
-    void update(vector<movable::Movable*> &movables);
+    void update(std::vector<movable::Movable*> &movables);
 
     /* Damage a tile (with a pickax or something). Return false if there
     was no tile to damage. */

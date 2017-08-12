@@ -6,8 +6,6 @@
 #include "UIHelpers.hh"
 #include "Action.hh"
 
-using namespace std;
-
 /* The hotbar consists of 24 slots that action shortcuts can be stored. These
 action shortcuts can be items, skills, or maybe other things I haven't added 
 yet. It has two vectors with 12 each. 12 go with the number keys plus - and =,
@@ -43,10 +41,10 @@ public:
     bool isSwitched;
 
     // What actions are held in the hotbar slots
-    vector<Action *> actions;
+    std::vector<Action *> actions;
 
     // For telling whether any of the buttons were clicked
-    vector<MouseBox> clickBoxes;
+    std::vector<MouseBox> clickBoxes;
 
     // Constructor
     Hotbar();

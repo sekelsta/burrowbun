@@ -1,9 +1,11 @@
 #include "Entity.hh"
 
+using json = nlohmann::json;
+
 // Constructor
 Entity::Entity(std::string filename) : movable::Movable(filename) {
     /* Open the json file. */
-    ifstream infile(filename);
+    std::ifstream infile(filename);
     /* Put data in json. */
     json j = json::parse(infile);
     maxFallDistance = j["maxFallDistance"];

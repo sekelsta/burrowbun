@@ -11,8 +11,8 @@
 using json = nlohmann::json;
 
 /* Convert a vector<int> to a vector<TileType>. */
-set<TileType> Boulder::vectorConvert(const vector<int> &input) {
-    set<TileType> output;
+std::set<TileType> Boulder::vectorConvert(const std::vector<int> &input) {
+    std::set<TileType> output;
     for (unsigned int i = 0; i < input.size(); i++) {
         output.insert((TileType)input[i]);
     }
@@ -53,7 +53,7 @@ bool Boulder::fall(Map &map, const Location &place, int ticks) const {
 
 /* Try to move one tile. Return true on success. */
 bool Boulder::move(Map &map, const Location &place,
-        vector<movable::Movable*> &movables, int tick) const {
+        std::vector<movable::Movable*> &movables, int tick) const {
     /* If it doesn't moves sideways at all ever, then it doesn't move.*/
     if (direction == 0) {
         return false;
@@ -109,9 +109,9 @@ bool Boulder::move(Map &map, const Location &place,
 /* Constructor. */
 Boulder::Boulder(TileType type) : Tile(type) {
     /* The name of the file where the initial values are stored. */
-    string filename;
+    std::string filename;
     /* The name of the folder in which the files are stored. */
-    string prefix = "tiles/";
+    std::string prefix = "tiles/";
     switch(type) {
         case TileType::SAND :
             filename = "sand.json";
@@ -123,17 +123,17 @@ Boulder::Boulder(TileType type) : Tile(type) {
     }
 
     /* Put data in a json. */
-    ifstream infile(prefix + filename);
+    std::ifstream infile(prefix + filename);
     json j = json::parse(infile);
 
     /* Set the boulder's values to the json values. (The tile-but-not-boulder
     values should have already been set.) */
     moveTicks = j["moveTicks"];
     fallTicks = j["fallTicks"];
-    tilesDestroyed = vectorConvert(j["tilesDestroyed"].get<vector<int>>());
-    tilesCrushed = vectorConvert(j["tilesCrushed"].get<vector<int>>());
-    tilesDisplaced = vectorConvert(j["tilesDisplaced"].get<vector<int>>());
-    tilesSunk = vectorConvert(j["tilesSunk"].get<vector<int>>());
+    tilesDestroyed = vectorConvert(j["tilesDestroyed"].get<std::vector<int>>());
+    tilesCrushed = vectorConvert(j["tilesCrushed"].get<std::vector<int>>());
+    tilesDisplaced = vectorConvert(j["tilesDisplaced"].get<std::vector<int>>());
+    tilesSunk = vectorConvert(j["tilesSunk"].get<std::vector<int>>());
     direction = j["direction"];
     isFloating = j["isFloating"];
     movesTogether = j["movesTogether"];
@@ -144,7 +144,7 @@ Boulder::Boulder(TileType type) : Tile(type) {
 Return false if it didn't move and should therefore be removed from any
 lists of boulders to try to move. */
 bool Boulder::update(Map &map, Location place, 
-        vector<movable::Movable*> &movables, int tick) {
+        std::vector<movable::Movable*> &movables, int tick) {
 // TODO
     /* If it can fall, it should. */
     if (fall(map, place, tick)) {

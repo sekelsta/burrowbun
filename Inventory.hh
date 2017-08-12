@@ -7,12 +7,10 @@
 #include "Light.hh"
 #include "Item.hh"
 
-using namespace std;
-
 /* An inventory is basically just a thing that holds items. */
 class Inventory {
     // For storing the list of items
-    vector<vector<Item*>> items;
+    std::vector<std::vector<Item*>> items;
 
 public:
     // Where the top left corner of the inventory is
@@ -20,7 +18,7 @@ public:
     int y;
 
     // For storing information about where has been clicked
-    vector<vector<MouseBox>> clickBoxes;
+    std::vector<std::vector<MouseBox>> clickBoxes;
 
     /* The sprite of the square to use for the background, which other than
     the color is the same for all inventories. */

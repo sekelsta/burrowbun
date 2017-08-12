@@ -1,6 +1,5 @@
 Changes since last push:
- - Boulders can now carry movables
- - addedd a few much-needed assert statements
+ - removed using declaration from header files
 
 Known "features":
  - The strenth of gravity is independent of the world.

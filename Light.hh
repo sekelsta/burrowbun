@@ -5,8 +5,6 @@
 #include <algorithm>
 #include "json.hpp"
 
-using namespace std;
-
 /* A struct to store the color (rgb) and intensity of light. */
 struct Light {
     Uint8 r;
@@ -17,9 +15,9 @@ struct Light {
     /* Sets this light equal to the sum of two other lights. */
     void sum(const Light &one, const Light &two) {
         // Take the max of each component.
-        r = max(one.r, two.r);
-        g = max(one.g, two.g);
-        b = max(one.b, two.b);
+        r = std::max(one.r, two.r);
+        g = std::max(one.g, two.g);
+        b = std::max(one.b, two.b);
     }
 
     /* Sum the light provided and the light from the sky (which has the 

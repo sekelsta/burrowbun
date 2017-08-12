@@ -9,10 +9,6 @@
 class Map;
 struct Location;
 
-using namespace std;
-
-
-
 // A class for keeping track of which tiles there are
 enum class TileType {
     EMPTY,
@@ -89,7 +85,7 @@ public:
 
     /* Change the map in whatever way needs doing. */
     virtual bool update(Map &map, Location place, 
-        vector<movable::Movable*> &movables, int tick);
+        std::vector<movable::Movable*> &movables, int tick);
 
     // Constructor, based on the tile type
     Tile(TileType tileType);

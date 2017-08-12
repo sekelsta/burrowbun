@@ -32,8 +32,6 @@ struct StatBar;
 #define UI_PATH "content/"
 #define ICON_PATH "content/Icons/"
 
-using namespace std;
-
 // A struct to hold an SDL_Texture pointer and an SDL_Rect
 struct SpriteRect {
     // Fields
@@ -97,10 +95,10 @@ class WindowHandler {
     SDL_Renderer *renderer;
 
     // A list of all textures that have been loaded
-    vector<SDL_Texture *> textures;
+    std::vector<SDL_Texture *> textures;
 
     // A 2D vector of SLD rects for rendering the map
-    vector<vector<SDL_Rect>> tileRects;
+    std::vector<std::vector<SDL_Rect>> tileRects;
 
     // Store the texture to draw over the player's stat bars
     Sprite statBarOverlay; // TODO: make this a static member of StatBar
@@ -128,7 +126,7 @@ class WindowHandler {
     // variables from hotbar. The texture to is expected to have the correct 
     // width and height, and the vector is expected to have length 12.
     SDL_Texture *renderHotbarPart(const Hotbar &hotbar, 
-        vector<SpriteRect> textures, SDL_Texture *texture) const;
+        std::vector<SpriteRect> textures, SDL_Texture *texture) const;
 
     // Draw the entire hotbar sprite to a texture. This only needs to be called
     // when the hotbar is first made, or when anything about it changes.
@@ -159,21 +157,21 @@ public:
     bool init();
 
     // Load the images
-    bool loadMedia(vector<Tile *> &pointers, 
-        vector<movable::Movable *> &movables, Hotbar &hotbar);
+    bool loadMedia(std::vector<Tile *> &pointers, 
+        std::vector<movable::Movable *> &movables, Hotbar &hotbar);
 
     // Load a texture, return true on success
-    bool loadTexture(const string &name);
+    bool loadTexture(const std::string &name);
 
     // Unload a texture. After calling this function, make sure to set all
     // pointers to the texture to NULL.
     bool unloadTexture(SDL_Texture *texture);
 
     // Load a texture for each tile
-    bool loadTiles(vector<Tile *> &pointers);
+    bool loadTiles(std::vector<Tile *> &pointers);
 
     // Load a texture for each movable
-    bool loadMovables(vector<movable::Movable *> &movables);
+    bool loadMovables(std::vector<movable::Movable *> &movables);
 
     // Load textures for the hotbar
     bool loadHotbar(Hotbar &hotbar);
@@ -187,14 +185,14 @@ public:
     void renderMap(Map &m, const SDL_Rect &camera);
 
     // Render movables (the player, monsters, NPCs, dropped items)
-    void renderMovables(const vector<movable::Movable *> &movables);
+    void renderMovables(const std::vector<movable::Movable *> &movables);
 
     // Update the screen
-    void update(Map &m, const vector<movable::Movable *> &movables, 
+    void update(Map &m, const std::vector<movable::Movable *> &movables, 
         Player &player);
 
     // Unload media to switch maps, currently done by close()
-    void unloadMedia(vector<Tile *> &pointers);
+    void unloadMedia(std::vector<Tile *> &pointers);
 
     // Clean up and close SDL
     void close();

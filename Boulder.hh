@@ -16,16 +16,16 @@ class Boulder: public Tile {
 
     /* List of tile types which drop as an item when this type of boulder
     runs into them sideways. */
-    set<TileType> tilesDestroyed;
+    std::set<TileType> tilesDestroyed;
 
     /* Same, but for falling. */
-    set<TileType> tilesCrushed;
+    std::set<TileType> tilesCrushed;
 
     /* List of tile types which this boulder will switch places with. */
-    set<TileType> tilesDisplaced;
+    std::set<TileType> tilesDisplaced;
 
     /* Same, but for falling. */
-    set<TileType> tilesSunk;
+    std::set<TileType> tilesSunk;
 
     /* The amount it moves in the x direction. Positive is to the right,
     negative is to the left, and 0 is for a boulder that doesn't ever move
@@ -42,14 +42,14 @@ class Boulder: public Tile {
     bool carriesMovables;
 
     /* Convert a vector<int> to a vector<TileType> */
-    static set<TileType> vectorConvert(const vector<int> &input);
+    static std::set<TileType> vectorConvert(const std::vector<int> &input);
 
     /* Try to fall one tile. Return true on success. */
     bool fall(Map &map, const Location &place, int ticks) const;
 
     /* Try to move one tile. Return true on success. */
     bool move(Map &map, const Location &place, 
-            vector<movable::Movable*> &movables, int tick) const;
+            std::vector<movable::Movable*> &movables, int tick) const;
 
 public:
     /* Constructor. */
@@ -58,8 +58,9 @@ public:
     /* Look at the map and move, bringing movables along if required. 
     Return false if it didn't move and should therefore be removed from any
     lists of boulders to try to move. */
-    bool update(Map &map, Location place, vector<movable::Movable*> &movables, 
-        int tick);
+    bool update(Map &map, Location place, 
+            std::vector<movable::Movable*> &movables, 
+            int tick);
 
     /* Whether this tile will ever need to call its update function. */
     bool getNeedsUpdating() const;
