@@ -732,6 +732,8 @@ void WindowHandler::renderMap(Map &m, const SDL_Rect &camera) {
     int mapWidth = worldWidth / TILE_WIDTH;
     int xMapStart = ((camera.x / TILE_WIDTH) + mapWidth) % mapWidth;
     int yMapStart = (camera.y + camera.h) / TILE_HEIGHT;
+    /* Location to hold which sprite on the sheet to render. */
+    Location spritePlace; 
     for (int i = 0; i < width; i++) {
         int xRectTo = i * TILE_WIDTH - (camera.x % TILE_WIDTH);
         for (int j = 0; j < height; j++) {
@@ -757,18 +759,34 @@ void WindowHandler::renderMap(Map &m, const SDL_Rect &camera) {
                 break;
             }
 
-            SDL_Texture *texture 
-                = m.getForeground(xTile, yTile) -> sprite.texture;
-            if (texture != NULL) {
+            SDL_Texture *backTexture 
+                    = m.getBackground(xTile, yTile) -> sprite.texture;
+            SDL_Texture *foreTexture 
+                    = m.getForeground(xTile, yTile) -> sprite.texture;
+            if (backTexture != NULL || foreTexture != NULL) {
                 // Modulate the color due to lighting
                 Light light = m.getLight(xTile, yTile);
                 // Only add darkness if darkness is enabled
                 if(enableDarkness) {
-                    SDL_SetTextureColorMod(texture, light.r, light.g, light.b);
+                    SDL_SetTextureColorMod(backTexture, 
+                            light.r, light.g, light.b);
+                    SDL_SetTextureColorMod(foreTexture, 
+                            light.r, light.g, light.b);
                 }
-                rectFrom.x = m.getSpritePlace(xTile, yTile).x * TILE_WIDTH;
-                rectFrom.y = m.getSpritePlace(xTile, yTile).y * TILE_HEIGHT;
-                SDL_RenderCopy(renderer, texture, &rectFrom, rectTo);
+                if (backTexture != NULL) {
+                    uint8_t background = m.getBackgroundSprite(xTile, yTile);
+                    SpaceInfo::fromSpritePlace(spritePlace, background);
+                    rectFrom.x = spritePlace.x * TILE_WIDTH;
+                    rectFrom.y = spritePlace.y * TILE_HEIGHT;
+                    SDL_RenderCopy(renderer, backTexture, &rectFrom, rectTo);
+                }
+                if (foreTexture != NULL) {
+                    uint8_t foreground = m.getForegroundSprite(xTile, yTile);
+                    SpaceInfo::fromSpritePlace(spritePlace, foreground);
+                    rectFrom.x = spritePlace.x * TILE_WIDTH;
+                    rectFrom.y = spritePlace.y * TILE_HEIGHT;
+                    SDL_RenderCopy(renderer, foreTexture, &rectFrom, rectTo);
+                }
             }
         }
     }

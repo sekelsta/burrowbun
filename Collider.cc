@@ -465,7 +465,9 @@ void Collider::update(Map &map, vector<movable::Movable *> &movables) {
             int oldY = hypothetical.y;
             // The amount to move by to go up one tile or less, assuming 
             // gravity is in the usual direction
-            int dy = TILE_HEIGHT - ((oldY + yOffset) % TILE_HEIGHT);
+            // TODO: it probably doesn't matter, but this is inaccurate when 
+            // the movable is in the air
+            int dy = TILE_HEIGHT - ((oldY + yOffset)  % TILE_HEIGHT);
             assert(dy <= TILE_HEIGHT);
             assert(dy > 0);
             movable::Point newVelocity;
@@ -498,7 +500,7 @@ void Collider::update(Map &map, vector<movable::Movable *> &movables) {
                     /* If it can jump up and still go sideways, or if it
                     is within one tile of the bottom of the map, it can stand
                     on the tile it's stepping up to. */
-                    if (dy < movables[i] -> getVelocity().x
+                    if (dy < abs(movables[i] -> getVelocity().x)
                                 || movables[i] -> y < TILE_HEIGHT) {
                         movables[i] -> x = hypothetical.x;
                         movables[i] -> y = hypothetical.y;

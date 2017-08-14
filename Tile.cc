@@ -35,6 +35,18 @@ void Tile::dealOverlapDamage(movable::Movable &movable) const {
     movable.takeDamage(overlapDamage, 0);
 }
 
+uint8_t Tile::getSpritePlace(const Map &map, const Location &place) const {
+    int y = map.bordering(place);
+    int x = rand() % sprite.cols / 2;
+    /* On the sprite, the equivalent background tile is moved over by
+    sprite.cols / 2. */
+    if (place.layer == MapLayer::BACKGROUND) {
+        x += sprite.cols / 2;
+    }
+
+    return SpaceInfo::toSpritePlace(x, y);
+}
+
 /* Change the map in whatever way needs doing. */
 bool Tile::update(Map &map, Location place, 
         vector<movable::Movable*> &movables, int tick) {
