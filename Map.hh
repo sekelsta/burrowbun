@@ -19,8 +19,8 @@ class Map {
     // This is a 2d array squished into 1d
     SpaceInfo *tiles;
 
-    // A list of the pointers in the map
-    // Basically these are the ones that contain manually allocated memeory
+    /* A list of Tiles. They contain memory that must be manually garbage
+    collected becuase of the SDL textures. */
     std::vector<Tile *> pointers;
 
     // The height and width of the map, in number of tiles
@@ -84,15 +84,17 @@ class Map {
     right amount of light. */
     void updateNear(int x, int y);
 
-    /* Add a place to the list of places to be updated, if the tile there
-    will ever need to be updated. */
-    void addToUpdate(int x, int y, MapLayer layer);
-
-    /* Go through the list of tiles to update and remove the ones that don't 
-    need to be updated. Hopefully soon this will be depracated. */
-    void trimUpdateList();
-
     public:
+
+    /* Add a place to the list of places to be updated, if the tile there
+    will need to be updated. */
+    void addToUpdate(int x, int y, MapLayer layer);
+    void addToUpdate(const Location &place);
+
+    void removeFromUpdate(int x, int y, MapLayer layer);
+    void removeFromUpdate(const Location &place);
+
+    bool updateContains(const Location &place) const;
 
     /* Return a number from 0-15 depending on which tiles border this one. */
     int bordering(const Location &place) const;

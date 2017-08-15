@@ -1,8 +1,5 @@
 Changes since last push:
- - now renders background tiles, though I still don't have good sprites 
-for them
- - fixed a bug allowing players to fit in spaces they couldn't escape
- - Moved the function that picks a sprite for a tile to the tile class
+ - Boulders can now move together and carry movables
 
 Known "features":
  - The strenth of gravity is independent of the world.
@@ -10,6 +7,8 @@ Known "features":
  - The spawn point sometimes puts the player on top of dirt. Spawning should be changed so it destroys any tiles in the way.
  - You can place dirt on top of creatures, including yourself
  - Tiles have an opacity between 0 and 64, but right now it only matters whether it's zero or not.
+ - If carried by a boulder with another boulder right behind you, the top
+boulder updates first and traps you.
 
 To do:
  - load and unload textures
@@ -18,3 +17,4 @@ To do:
  - Trees!
  - Store data for UI and sprites in a file instead of the source code
  - save and load the player
+ - Make all public Map functions accept any x value

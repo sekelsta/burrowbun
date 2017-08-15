@@ -5,6 +5,9 @@
 #include <set>
 #include "Tile.hh"
 
+/* Forward declare. */
+struct Rect;
+
 /* A Tile that moves. */
 class Boulder: public Tile {
     /* How many ticks to wait before moving left or right. If this is 0,
@@ -45,11 +48,19 @@ class Boulder: public Tile {
     static std::set<TileType> vectorConvert(const std::vector<int> &input);
 
     /* Try to fall one tile. Return true on success. */
-    bool fall(Map &map, const Location &place, int ticks) const;
+    bool fall(Map &map, const Location &place) const;
 
     /* Try to move one tile. Return true on success. */
     bool move(Map &map, const Location &place, 
-            std::vector<movable::Movable*> &movables, int tick) const;
+            std::vector<movable::Movable*> &movables) const;
+
+    /* Try to move together. Return true on success. */
+    bool moveTogether(Map &map, const Location &place,
+            std::vector<movable::Movable*> &movables) const;
+
+    /* Find which movables are on top and tell them to move. */
+    void carryMovables(const Map &map, const Rect &boulderRect, 
+            std::vector<movable::Movable*> &movables) const;
 
 public:
     /* Constructor. */
@@ -58,12 +69,12 @@ public:
     /* Look at the map and move, bringing movables along if required. 
     Return false if it didn't move and should therefore be removed from any
     lists of boulders to try to move. */
-    bool update(Map &map, Location place, 
+    virtual bool update(Map &map, Location place, 
             std::vector<movable::Movable*> &movables, 
-            int tick);
+            int tick) const;
 
-    /* Whether this tile will ever need to call its update function. */
-    bool getNeedsUpdating() const;
+    /* Look at the map and see if it can move, but don't do anything. */
+    virtual bool canUpdate(const Map &map, const Location &place) const;
 };
 
 #endif

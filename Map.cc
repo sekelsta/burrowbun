@@ -164,32 +164,35 @@ bool Map::isOnMap(int x, int y) const {
 /* Add a placeto the list of places to be updated, if the tile there will ever
 need to be updated. */
 void Map::addToUpdate(int x, int y, MapLayer layer) {
-    /* Ignore it if it isn't a type of tile that needs to be updated. */
-    if (!getTile(x, y, layer) -> getNeedsUpdating()) {
-        return;
-    }
-
     /* Time to add it to the list. */
     Location place;
     place.x = x;
     place.y = y;
     place.layer = layer;
-    toUpdate.insert(place);
+    addToUpdate(place);
 }
 
-/* Go through the list of tiles to update and remove the ones that don't 
-need to be updated anymore. */
-void Map::trimUpdateList() {
-    set<Location>::iterator iter = toUpdate.begin();
-    while (iter != toUpdate.end()) {
-        /* Remove if expired. */
-        if (!getTile(*iter) -> getNeedsUpdating()) {
-            iter = toUpdate.erase(iter);
-        }
-        else {
-            ++iter;
-        }
+void Map::addToUpdate(const Location &place) {
+    /* Ignore it if it isn't a type of tile that needs to be updated. */
+    if (getTile(place) -> canUpdate(*this, place)) {
+        toUpdate.insert(place);
     }
+}
+
+void Map::removeFromUpdate(int x, int y, MapLayer layer) {
+    Location place;
+    place.x = x;
+    place.y = y;
+    place.layer = layer;
+    removeFromUpdate(place);
+}
+
+void Map::removeFromUpdate(const Location &place) {
+    toUpdate.erase(place);
+}
+
+bool Map::updateContains(const Location &place) const {
+    return toUpdate.count(place);
 }
 
 int Map::bordering(const Location &place) const {
@@ -460,9 +463,13 @@ Tile *Map::getBackground(int x, int y) {
     return getTile(findPointer(x, y) -> background);
 }
 
-/* Get the type of the tile at place.x + x, place.y + y, place.layer. */
+/* Get the type of the tile at place.x + x, place.y + y, place.layer. 
+If the tile isn't on the map, returns EMPTY. */
 TileType Map::getTileType(const Location &place, int x, int y) const {
     int newX = wrapX(place.x + x);
+    if (!isOnMap(newX, place.y + y)) {
+        return TileType::EMPTY;
+    }
     if (place.layer == MapLayer::FOREGROUND) {
         return findPointer(newX, place.y + y) -> foreground;
     }
@@ -544,8 +551,17 @@ void Map::save(const string &filename) {
 
 /* Update the map. */
 void Map::update(vector<movable::Movable*> &movables) {
-    // TODO
-    /* Update tiles. */
+    /* Make sure we're updating tiles that need to be updated. */
+    set<Location>::iterator removeIter = toUpdate.begin();
+    while (removeIter != toUpdate.end()) {
+        if (!(getTile(*removeIter) -> canUpdate(*this, *removeIter))) {
+            removeIter = toUpdate.erase(removeIter);
+        }
+        else {
+            ++removeIter;
+        }
+    }
+
     /* Iterate over a copy of the list. */
     set<Location> newUpdate = toUpdate;
     set<Location>::iterator iter = newUpdate.begin();
@@ -554,26 +570,18 @@ void Map::update(vector<movable::Movable*> &movables) {
         tile -> update(*this, *iter, movables, tick);
         iter++;
     }
-    /* And get rid of the ones that don't need to be updated anymore. */
-    trimUpdateList();
-
-    /*
-    for (unsigned int i = 0; i < toUpdate.size(); i++) {
-        Tile *tile = getTile(toUpdate[i]);
-        tile -> update(*this, toUpdate[i], movables, tick);
-    }*/
 
     /* Heal tiles that have been damaged for a while. */
     /* Tiles stay damaged for this many ticks, with about 20-40 ticks/sec. */
     const int healTime = 300;
     /* Iterate while removing. */
-    vector<TileHealth>::iterator it = damaged.begin();
-    while (it != damaged.end()) {
-        if (tick - it -> lastUpdated > healTime) {
-            it = damaged.erase(it);
+    vector<TileHealth>::iterator healIter = damaged.begin();
+    while (healIter != damaged.end()) {
+        if (tick - healIter -> lastUpdated > healTime) {
+            healIter = damaged.erase(healIter);
         }
         else {
-            ++it;
+            ++healIter;
         }
     }
 

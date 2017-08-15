@@ -88,7 +88,7 @@ public:
 
     /* Change the map in whatever way needs doing. */
     virtual bool update(Map &map, Location place, 
-        std::vector<movable::Movable*> &movables, int tick);
+        std::vector<movable::Movable*> &movables, int tick) const;
 
     // Constructor, based on the tile type
     Tile(TileType tileType);
@@ -97,7 +97,7 @@ public:
     virtual ~Tile();
 
     /* Whether the tile will ever need to call its update function. */
-    virtual bool getNeedsUpdating() const;
+    virtual bool canUpdate(const Map &map, const Location &place) const;
 
 };
 
