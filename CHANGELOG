@@ -1,10 +1,8 @@
 Changes since last push:
- - Adjusted the amount of time for tiles to heal, and
-making it count down from the last time they were damaged, not the first
- - Added mudsliding-type movement to boulders
- - Changed boulder direction to be determined by which sprite is used (since directional boulders are likely to have directional sprites anyway)
- - changed the way sprites are chosen so that the above change doesn't
-make boulders randomly switch directions
+ - Added actual tiletypes and items for the new boulders
+ - Gave every tiletype a background tile, even if it's only the same as the
+foreground one
+ - Adjusted pickax strength and tile health
 
 Known "features":
  - The strenth of gravity is independent of the world.
@@ -14,6 +12,7 @@ Known "features":
  - Tiles have an opacity between 0 and 64, but right now it only matters whether it's zero or not.
  - If carried by a boulder with another boulder right behind you, the top
 boulder updates first and traps you.
+ - Dirt and mud look very similar
 
 Known bugs:
  - Collision detection misses one when falling into a two-wide gap at just the

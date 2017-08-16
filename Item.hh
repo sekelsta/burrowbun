@@ -28,14 +28,18 @@ enum class ItemType {
     GRAY_BRICK = 17,
     DARK_BRICK = 18,
     SAND = 19,
-    PICKAXE = 20,
+    MUD = 20,
+    CLOUD = 21,
+    BOULDER = 22,
+    GLACIER = 23,
+    PICKAXE = 24,
     FIRST_BLOCK = DIRT,
     LAST_BLOCK = PICKAXE,
-    LAST_PURE_BLOCK = SAND,
+    LAST_PURE_BLOCK = GLACIER,
 
     // Other things
-    MAPLE_LEAF = 21,
-    HEALTH_POTION = 22,
+    MAPLE_LEAF = 25,
+    HEALTH_POTION = 26,
 
     FIRST_ITEM = DIRT,
     LAST_ITEM = HEALTH_POTION

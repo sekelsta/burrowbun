@@ -1,7 +1,7 @@
 {
     "sprite": {
         "rows": 16,
-        "cols": 4,
+        "cols": 8,
         "row": 0,
         "col": 0,
         "width": 16,
@@ -11,6 +11,6 @@
     "isSolid": true,
     "isPlatform": false,
     "overlapDamage": 0,
-    "maxHealth": 10,
+    "maxHealth": 19,
     "opacity": 64
 }

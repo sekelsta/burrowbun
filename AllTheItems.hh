@@ -67,7 +67,8 @@ public:
 // Because everything deserves a namespace
 namespace ItemMaker {
     /* Turn an ItemType into the corresponding TileType. Requires that the
-    itemTypes and TileTypes are listed in the same order in the enum class. */
+    itemTypes and TileTypes are listed in the same order in the 
+    enum class. */
     TileType itemToTile(ItemType itemType);
 
     /* Turn a TileType into the corresponding ItemType. */

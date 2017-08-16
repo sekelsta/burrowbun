@@ -74,6 +74,10 @@ Player::Player() : Entity("entities/bunny.json"), inventory(10, 6), trash(1, 1) 
     inventory.pickup(ItemMaker::makeItem(ItemType::RED_BRICK));
     inventory.pickup(ItemMaker::makeItem(ItemType::GRAY_BRICK));
     inventory.pickup(ItemMaker::makeItem(ItemType::DARK_BRICK));
+    inventory.pickup(ItemMaker::makeItem(ItemType::MUD));
+    inventory.pickup(ItemMaker::makeItem(ItemType::CLOUD));
+    inventory.pickup(ItemMaker::makeItem(ItemType::BOULDER));
+    inventory.pickup(ItemMaker::makeItem(ItemType::GLACIER));
     inventory.pickup(ItemMaker::makeItem(ItemType::PICKAXE));
 
     isInventoryOpen = false;

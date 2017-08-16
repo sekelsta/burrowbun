@@ -103,6 +103,18 @@ std::string Item::getJsonFilename(ItemType type) {
         case ItemType::SAND:
             filename = "sand";
             break;
+        case ItemType::MUD:
+            filename = "mud";
+            break;
+        case ItemType::CLOUD:
+            filename = "cloud";
+            break;
+        case ItemType::BOULDER:
+            filename = "boulder";
+            break;
+        case ItemType::GLACIER:
+            filename = "glacier";
+            break;
         case ItemType::MAPLE_LEAF:
             filename = "maple_leaf";
             break;

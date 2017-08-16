@@ -6,14 +6,14 @@
         "col": 0,
         "width": 16,
         "height": 16,
-        "name": "sand.png"
+        "name": "mud.png"
     },
     "isSolid": true,
     "isPlatform": false,
     "overlapDamage": 10,
     "maxHealth": 9,
     "opacity": 64,
-    "moveTicks": 100,
+    "moveTicks": 10,
 	"fallTicks": 2,
     "tilesDestroyed": [0],
     "tilesCrushed": [0],
@@ -22,6 +22,6 @@
     "isMoving": false,
     "movesTogether": false,
     "isFloating": false,
-    "isSliding": false,
+    "isSliding": true,
     "carriesMovables": false
 }

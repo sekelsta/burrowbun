@@ -2,6 +2,7 @@
 #define TILE_HH
 
 #include <vector>
+#include <string>
 #include "Sprite.hh"
 #include "Movable.hh"
 
@@ -32,12 +33,16 @@ enum class TileType : short {
     GRAY_BRICK,
     DARK_BRICK,
     SAND,
+    MUD,
+    CLOUD,
+    BOULDER,
+    GLACIER,
     FIRST_TILE = EMPTY,
     FIRST_ITEMED_TILE = DIRT, // First tile with an equivalent item
-    LAST_TILE = SAND,
+    LAST_TILE = GLACIER,
     LAST_PURE_TILE = DARK_BRICK, // Last tile that's not a subclass
     FIRST_BOULDER = SAND,
-    LAST_BOULDER = SAND
+    LAST_BOULDER = GLACIER
 };
 
 /* A class to make tiles based on their type, and store their infos. */
@@ -61,6 +66,10 @@ class Tile {
     /* How much health the tile has determines how many hits it can take from
     a pickax before it breaks. */
     int maxHealth;
+
+protected:
+    /* Return the filename of the json file for that tiletype. */
+    static std::string getFilename(TileType tileType);
 
 public:
     // The name of this type of tile

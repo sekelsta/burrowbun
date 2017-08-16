@@ -207,21 +207,10 @@ bool Boulder::canUpdate(const Map &map, const Location &place,
 /* Constructor. */
 Boulder::Boulder(TileType type) : Tile(type) {
     /* The name of the file where the initial values are stored. */
-    std::string filename;
-    /* The name of the folder in which the files are stored. */
-    std::string prefix = "tiles/";
-    switch(type) {
-        case TileType::SAND :
-            filename = "sand.json";
-            break;
-        default :
-            /* We forgot a case aor something wierd is happening. */
-            assert(false);
-            break;
-    }
+    std::string filename = getFilename(type);
 
     /* Put data in a json. */
-    std::ifstream infile(prefix + filename);
+    std::ifstream infile(filename);
     json j = json::parse(infile);
 
     /* Set the boulder's values to the json values. (The tile-but-not-boulder

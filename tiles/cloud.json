@@ -1,17 +1,17 @@
 {
     "sprite": {
         "rows": 16,
-        "cols": 8,
+        "cols": 4,
         "row": 0,
         "col": 0,
         "width": 16,
         "height": 16,
-        "name": "sand.png"
+        "name": "cloud.png"
     },
-    "isSolid": true,
-    "isPlatform": false,
-    "overlapDamage": 10,
-    "maxHealth": 9,
+    "isSolid": false,
+    "isPlatform": true,
+    "overlapDamage": 0,
+    "maxHealth": 6,
     "opacity": 64,
     "moveTicks": 100,
 	"fallTicks": 2,
@@ -19,9 +19,9 @@
     "tilesCrushed": [0],
     "tilesDisplaced": [],
     "tilesSunk": [],
-    "isMoving": false,
-    "movesTogether": false,
-    "isFloating": false,
+    "isMoving": true,
+    "movesTogether": true,
+    "isFloating": true,
     "isSliding": false,
-    "carriesMovables": false
+    "carriesMovables": true
 }
