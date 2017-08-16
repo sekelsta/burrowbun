@@ -26,11 +26,11 @@ bool Boulder::fall(Map &map, const Location &place) const {
     TileType blocking = map.getTileType(place, 0, -1);
     /* If it can crush it, do so. */
     if (tilesCrushed.count(blocking)) {
-        map.moveDown(place);
+        map.moveTile(place, 0, -1);
         return true;
     }
     else if (tilesSunk.count(blocking)) {
-        map.displaceDown(place);
+        map.displaceTile(place, 0, -1);
         return true;
     }
 
@@ -38,24 +38,33 @@ bool Boulder::fall(Map &map, const Location &place) const {
 }
 
 /* Try to move one tile. Return true on success. */
-bool Boulder::move(Map &map, const Location &place,
-        std::vector<movable::Movable*> &movables) const {
-    /* If it doesn't moves sideways at all ever, then it doesn't move.*/
+bool Boulder::move(Map &map, const Location &place, int direction,
+        std::vector<movable::Movable*> &movables) {
+    /* If it has no preference for direction, it should move sideways if
+    that will let it fall. */
     if (direction == 0) {
-        return false;
+        if (!isSliding) {
+            return false;
+        }
+
+        /* If it slides, pick a random direction (-1 or 1) to try to go. */
+        int newDirection = (rand() % 2) * 2 - 1;
+        assert(newDirection == -1 || newDirection == 1);
+        move(map, place, newDirection, movables);
+        return true;
     }
 
    /* Otherwise if it moves as a unit, this isn't the right function. */
     if (movesTogether) {
-        return moveTogether(map, place, movables);
+        return moveTogether(map, place, direction, movables);
     }
 
     TileType blocking = map.getTileType(place, direction, 0);
     if (tilesDestroyed.count(blocking)) {
-        map.moveSideways(place, direction);
+        map.moveTile(place, direction, 0);
     }
     else if (tilesDisplaced.count(blocking)) {
-        map.displaceSideways(place, direction);
+        map.displaceTile(place, direction, 0);
     }
     else {
         return false;
@@ -71,13 +80,13 @@ bool Boulder::move(Map &map, const Location &place,
         boulderRect.y = place.y * map.getTileHeight();
         boulderRect.w = map.getTileWidth();
         boulderRect.h = BOULDER_CARRY_HEIGHT * map.getTileHeight();
-        carryMovables(map, boulderRect, movables);
+        carryMovables(map, boulderRect, direction, movables);
    }
 
     return true;
 }
 
-bool Boulder::moveTogether(Map &map, const Location &place, 
+bool Boulder::moveTogether(Map &map, const Location &place, int direction,
         std::vector<movable::Movable*> &movables) const {
     /* Make sure we're the end of a row and no other places in the row
     are in the list of things to update. If the row stretched across the
@@ -121,11 +130,11 @@ bool Boulder::moveTogether(Map &map, const Location &place,
             Location toMove = place;
             toMove.x += unmoved;
             if (tilesDestroyed.count(ahead)) {
-                map.moveSideways(toMove, forwards - unmoved);
+                map.moveTile(toMove, forwards - unmoved, 0);
                 unmoved = forwards + direction;
             }
             else if (tilesDisplaced.count(ahead)) {
-                map.displaceSideways(toMove, forwards - unmoved);
+                map.displaceTile(toMove, forwards - unmoved, 0);
                 unmoved = forwards + direction;
             }
             else {
@@ -150,14 +159,14 @@ bool Boulder::moveTogether(Map &map, const Location &place,
         /* Doesn't matter that boulderRect.x could be negative. */
         boulderRect.x = std::min(place.x, place.x + forwards);
         boulderRect.x *= map.getTileWidth();
-        carryMovables(map, boulderRect, movables);
+        carryMovables(map, boulderRect, direction, movables);
     }
 
     return unmoved;
 }
 
 void Boulder::carryMovables(const Map &map, const Rect &boulderRect, 
-        std::vector<movable::Movable*> &movables) const {
+        int direction, std::vector<movable::Movable*> &movables) const {
     Rect movableRect;
     movableRect.worldWidth = boulderRect.worldWidth;
     for (unsigned int i = 0; i < movables.size(); i++) {
@@ -169,6 +178,30 @@ void Boulder::carryMovables(const Map &map, const Rect &boulderRect,
             movables[i] -> boulderSpeed += direction * map.getTileWidth();
         }
     } 
+}
+
+bool Boulder::canUpdate(const Map &map, const Location &place, 
+        int direction) const {
+    TileType below = map.getTileType(place, 0, -1);
+    if ((!isFloating) 
+            && (tilesCrushed.count(below) || tilesSunk.count(below))) {
+        return true;
+    }
+    if (direction == 0) {
+        if (!isSliding) {
+            return false;
+        }
+        /* Check if it can go in either direction. */
+        return canUpdate(map, place, 1) || canUpdate(map, place, -1);;
+    }
+    TileType ahead = map.getTileType(place, direction, 0);
+    if (!movesTogether 
+            && (tilesDestroyed.count(ahead) || tilesDisplaced.count(ahead))) {
+        return true;
+    }
+    TileType behind = map.getTileType(place, -1 * direction, 0);
+    return movesTogether && behind != type;
+
 }
 
 /* Constructor. */
@@ -199,17 +232,31 @@ Boulder::Boulder(TileType type) : Tile(type) {
     tilesCrushed = vectorConvert(j["tilesCrushed"].get<std::vector<int>>());
     tilesDisplaced = vectorConvert(j["tilesDisplaced"].get<std::vector<int>>());
     tilesSunk = vectorConvert(j["tilesSunk"].get<std::vector<int>>());
-    direction = j["direction"];
+    isMoving = j["isMoving"];
     isFloating = j["isFloating"];
+    isSliding = j["isSliding"];
     movesTogether = j["movesTogether"];
     carriesMovables = j["carriesMovables"];
+}
+
+void Boulder::setDirection(Map &map, const Location &place, int direction)
+         const {
+    assert(direction == 1 || direction == -1);
+    /* Convert direction to 0 or 1. */
+    direction = (direction + 1) / 2;
+    Location spritePlace;
+    SpaceInfo::fromSpritePlace(spritePlace, map.getSprite(place));
+    /* If direction = 1, spritePlace.y should be at least sprite.cols / 4. */
+    spritePlace.x %= sprite.cols / 4;
+    spritePlace.x += direction * (sprite.cols / 4);
+    map.setSprite(place, SpaceInfo::toSpritePlace(spritePlace)); 
 }
 
 /* Look at the map and move, bringing movables along if required. 
 Return false if it didn't move and should therefore be removed from any
 lists of boulders to try to move. */
 bool Boulder::update(Map &map, Location place, 
-        std::vector<movable::Movable*> &movables, int tick) const {
+        std::vector<movable::Movable*> &movables, int tick) {
     /* If it can fall, it should. */
     if (fallTicks != 0 && (tick % fallTicks == 0) && !isFloating) {
         if (fall(map, place)) {
@@ -217,28 +264,28 @@ bool Boulder::update(Map &map, Location place,
         }
     }
 
+    int direction = getDirection(map, place);
+
     /* If it hasn't fallen this update, and wants to move sideways, it should 
     do that. */
     if (moveTicks != 0 && (tick % moveTicks == 0)) {
-        return move(map, place, movables);
+        return move(map, place, direction, movables);
     }
     return true;
 }
 
-bool Boulder::canUpdate(const Map &map, const Location &place) const {
-    TileType below = map.getTileType(place, 0, -1);
-    if ((!isFloating) 
-            && (tilesCrushed.count(below) || tilesSunk.count(below))) {
-        return true;
-    }
-    if (direction == 0) {
-        return false;
-    }
-    TileType ahead = map.getTileType(place, direction, 0);
-    if (!movesTogether 
-            && (tilesDestroyed.count(ahead) || tilesDisplaced.count(ahead))) {
-        return true;
-    }
-    TileType behind = map.getTileType(place, -1 * direction, 0);
-    return movesTogether && behind != type;
+bool Boulder::canUpdate(const Map &map, const Location &place) {
+    int direction = getDirection(map, place);
+    return canUpdate(map, place, direction);
 }
+
+/* Figure out the direction to go from the tile sprite. */
+int Boulder::getDirection(const Map &map, const Location &place) const {
+    if (!isMoving) {
+        return 0; 
+    }
+    Location spritePlace;
+    SpaceInfo::fromSpritePlace(spritePlace, map.getSprite(place));
+    return (spritePlace.x < sprite.cols / 4) ? -1 : 1;
+}
+

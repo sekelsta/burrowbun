@@ -126,8 +126,13 @@ class Map {
     Location getSpawn() const;
 
     // Return which part of the spritesheet should be used
+    uint8_t getSprite(const Location &place) const;
+    uint8_t getSprite(int x, int y, MapLayer layer) const;
     uint8_t getForegroundSprite(int x, int y) const;
     uint8_t getBackgroundSprite(int x, int y) const;
+
+    void setSprite(const Location &place, uint8_t newSprite);
+    void setSprite(int x, int y, MapLayer layer, uint8_t newSprite);
 
     // Return the light at a square, setting it if necessary. 
     Light getLight(int x, int y);
@@ -190,20 +195,13 @@ class Map {
     map coordinates. */
     Location getMapCoords(int x, int y, MapLayer layer);
 
-    /* Move a tile one down. If it was just above the bottom of the map, 
-    it ceases to exist. It there's a tile in the way, it will be destroyed. */
-    void moveDown(const Location &place);
+    /* Move a tile x in the +x direction and y in the +y directoin. If there's 
+    a tile at the destination, it will be destroyed. */
+    void moveTile(const Location &place, int x, int y);
 
-    /* Switch this tile with the one below it. */
-    void displaceDown(const Location &place);
-
-    /* Move a tile dist in the +x direction. If there's a tile in the way,
-    it will be destroyed. */
-    void moveSideways(const Location &place, int dist);
-
-    /* Move a tile dist in the +x direction. If there's a tile there, they
-    switch places. */
-    void displaceSideways(const Location &place, int dist);
+    /* Move a tile x in the +x direction and y in the +y direction. If there's 
+    a tile there, they switch places. */
+    void displaceTile(const Location &place, int x, int y);
 };
 
 #endif

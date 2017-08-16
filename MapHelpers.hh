@@ -94,18 +94,26 @@ struct SpaceInfo {
     uint8_t foregroundSprite;
     uint8_t backgroundSprite;
 
-    static inline void fromSpritePlace(Location &place, Uint8 spritePlace) {
-        place.x = spritePlace % 16;
-        place.y = spritePlace / 16;
+    static inline void fromSpritePlace(Location &place, uint8_t spritePlace) {
+        place.x = spritePlace / 16;
+        place.y = spritePlace % 16;
     }
 
-    static inline Uint8 toSpritePlace(const Location &place) {
+    static inline uint8_t toSpritePlace(const Location &place) {
         return toSpritePlace(place.x, place.y);
     }
 
-    static inline Uint8 toSpritePlace(int x, int y) {
-        return 16 * y + x;
+    static inline uint8_t toSpritePlace(int x, int y) {
+        return 16 * x + y;
     } 
+
+    static inline int getX(uint8_t spritePlace) {
+        return spritePlace / 16;
+    }
+
+    static inline int getY(uint8_t spritePlace) {
+        return spritePlace % 16;
+    }
 };
 
 

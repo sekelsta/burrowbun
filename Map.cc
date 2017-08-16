@@ -225,16 +225,23 @@ light, and recheck if they need to run their own update functions. */
 void Map::updateNear(int x, int y) {
     // Update the sprites and tiles
     /* Value that takes into account x-wrapping of the map. */
-    int newx;
+    Location fore;
+    Location back;
+    fore.layer = MapLayer::FOREGROUND;
+    back.layer = MapLayer::BACKGROUND;
     for (int i = -1; i < 2; i++) {
-        newx = wrapX(x + i);
+        fore.x = wrapX(x + i);
+        back.x = wrapX(x + i);
         for (int j = -1; j < 2; j++) {
-            if (isOnMap(newx, y + j)) {
+            if (isOnMap(wrapX(x + i), y + j)) {
+                fore.y = y + j;
+                back.y = y + j;
                 /* Update the tiles. */
-                addToUpdate(newx, y + j, MapLayer::FOREGROUND);
-                addToUpdate(newx, y + j, MapLayer::BACKGROUND);
+                addToUpdate(fore);
+                addToUpdate(back);
                 /* Update the sprites. */
-                chooseSprite(newx, y + j);
+                setSprite(fore, getTile(fore) -> updateSprite(*this, fore));
+                setSprite(back, getTile(back) -> updateSprite(*this, back));
             }
         }
     }
@@ -243,7 +250,7 @@ void Map::updateNear(int x, int y) {
     // The range to update lighting, in each direction
     int range = 8;
     for (int i = -1 * range; i < range + 1; i++) {
-        newx = wrapX(x + i);
+        int newx = wrapX(x + i);
         for (int j = -1 * range; j < range + 1; j++) {
             if (isOnMap(newx, y + j)) {
                 findPointer(newx, y + j) -> isLightUpdated = false;
@@ -401,12 +408,38 @@ Location Map::getSpawn() const {
 }
 
 // Return the part of the spritesheet that should be used
+uint8_t Map::getSprite(const Location &place) const {
+    return getSprite(place.x, place.y, place.layer);
+}
+
+uint8_t Map::getSprite(int x, int y, MapLayer layer) const {
+    if (layer == MapLayer::FOREGROUND) {
+        return getForegroundSprite(x, y);
+    }
+    assert(layer == MapLayer::BACKGROUND);
+    return getBackgroundSprite(x, y);
+}
+
 uint8_t Map::getForegroundSprite(int x, int y) const {
     return findPointer(x, y) -> foregroundSprite;
 }
 
 uint8_t Map::getBackgroundSprite(int x, int y) const {
     return findPointer(x, y) -> backgroundSprite;
+}
+
+void Map::setSprite(const Location &place, uint8_t newSprite) {
+    setSprite(place.x, place.y, place.layer, newSprite);
+}
+
+void Map::setSprite(int x, int y, MapLayer layer, uint8_t newSprite) {
+    if (layer == MapLayer::FOREGROUND) {
+        findPointer(x, y) -> foregroundSprite = newSprite;
+    }
+    else {
+        assert(layer == MapLayer::BACKGROUND);
+        findPointer(x, y) -> backgroundSprite = newSprite;
+    }
 }
 
 // Return lighting
@@ -516,6 +549,7 @@ bool Map::placeTile(Location place, TileType type) {
     }
 
     setTile(place, type);
+    chooseSprite(place.x, place.y);
     // TODO: change this when I add furniture
 
     return true;
@@ -573,7 +607,7 @@ void Map::update(vector<movable::Movable*> &movables) {
 
     /* Heal tiles that have been damaged for a while. */
     /* Tiles stay damaged for this many ticks, with about 20-40 ticks/sec. */
-    const int healTime = 300;
+    const int healTime = 3000;
     /* Iterate while removing. */
     vector<TileHealth>::iterator healIter = damaged.begin();
     while (healIter != damaged.end()) {
@@ -602,6 +636,7 @@ bool Map::damage(Location place, int amount) {
     for (unsigned int i = 0; i < damaged.size(); i++) {
         if (damaged[i].place == place) {
             damaged[i].health -= amount;
+            damaged[i].lastUpdated = tick;
             index = i;
         }
     }
@@ -682,52 +717,36 @@ Location Map::getMapCoords(int x, int y, MapLayer layer) {
     return place;
 }
 
-/* Move a tile one down. If it was just above the bottom, it ceases to exist. */
-void Map::moveDown(const Location &place) {
+void Map::moveTile(const Location &place, int x, int y) {
+    assert(x != 0 || y != 0);
+    int newX = wrapX(place.x + x);
     /* If it's just above the bottom, it vanishes. */
-    if (!isOnMap(place.x, place.y - 1)) {
+    if (!isOnMap(newX, place.y + y)) {
         setTile(place, TileType::EMPTY);
         return;
     }
 
-    /* Otherwise, kill the tile below and move down. */
-    kill(place.x, place.y - 1, place.layer);
-    setTile(place.x, place.y - 1, place.layer, getTile(place) -> type);
+    kill(newX, place.y + y, place.layer);
+    TileType val = getTileType(place, 0, 0);
+    uint8_t spritePlace = getSprite(place);
+    setSprite(newX, place.y + y, place.layer, spritePlace);
+    setTile(newX, place.y + y, place.layer, val);
     setTile(place, TileType::EMPTY);
 }
 
-/* Switch this tile with the one below it. If there is no tile below it, it 
-does nothing. */
-void Map::displaceDown(const Location &place) {
+void Map::displaceTile(const Location &place, int x, int y) {
+    assert(x != 0 || y != 0);
+    int newX = wrapX(place.x + x);
     /* Check if the place below is actually on the map. */
-    if (!isOnMap(place.x, place.y - 1)) {
+    if (!isOnMap(newX, place.y + y)) {
         return;
     }
 
-    /* And displace. */
-    TileType temp = getTile(place) -> type;
-    setTile(place, getTile(place.x, place.y - 1, place.layer) -> type);
-    setTile(place.x, place.y - 1, place.layer, temp);
-}
-
-/* Move a tile dist in the +x direction. If there's a tile in the way,
-it will be destroyed. Any tiles along the path are ignored. */
-void Map::moveSideways(const Location &place, int dist) {
-    assert(dist != 0);
-    int newX = wrapX(place.x + dist);
-    kill(newX, place.y, place.layer);
-    TileType val = getTileType(place, 0, 0);
-    setTile(newX, place.y, place.layer, val);
-    setTile(place, TileType::EMPTY);
-}
-
-/* Move a tile dist in the +x direction. If there's a tile there, they
-switch places. */
-void Map::displaceSideways(const Location &place, int dist) {
-    assert(dist != 0);
-    int newX = wrapX(place.x + dist);
-    TileType destination = getTileType(place, dist, 0);
-    setTile(newX, place.y, place.layer, getTile(place) -> type);
+    TileType destination = getTileType(place, x, y);
+    uint8_t spritePlace = getSprite(newX, place.y + y, place.layer);
+    setSprite(newX, place.y + y, place.layer, getSprite(place));
+    setSprite(place, spritePlace);
+    setTile(newX, place.y + y, place.layer, getTile(place) -> type);
     setTile(place, destination);
 }
 

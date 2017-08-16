@@ -84,11 +84,16 @@ public:
     int getMaxHealth() const;
 
     /* Which sprite on the spritesheet to use. */
-    uint8_t getSpritePlace(const Map &map, const Location &place) const;
+    virtual uint8_t getSpritePlace(const Map &map, const Location &place)
+             const;
+
+    /* What sprite to change to. */
+    virtual uint8_t updateSprite(const Map &map, const Location &place)
+            const;
 
     /* Change the map in whatever way needs doing. */
     virtual bool update(Map &map, Location place, 
-        std::vector<movable::Movable*> &movables, int tick) const;
+        std::vector<movable::Movable*> &movables, int tick);
 
     // Constructor, based on the tile type
     Tile(TileType tileType);
@@ -97,7 +102,7 @@ public:
     virtual ~Tile();
 
     /* Whether the tile will ever need to call its update function. */
-    virtual bool canUpdate(const Map &map, const Location &place) const;
+    virtual bool canUpdate(const Map &map, const Location &place);
 
 };
 

@@ -746,8 +746,8 @@ void WindowHandler::renderMap(Map &m, const SDL_Rect &camera) {
             // the bottom. Here j == 0 at the top of the screen.
             // We're not using convertRect because that doesn't align them
             // with the tile grid.
-            rectTo -> y = ((camera.h + camera.y) % TILE_HEIGHT) - TILE_HEIGHT;
-            rectTo -> y += j * TILE_HEIGHT;
+            rectTo -> y = (camera.h + camera.y) % TILE_HEIGHT;
+            rectTo -> y += (j - 1) * TILE_HEIGHT;
 
             // Render the tile
             int xTile = (xMapStart + i) % mapWidth;

@@ -1,5 +1,10 @@
 Changes since last push:
- - Boulders can now move together and carry movables
+ - Adjusted the amount of time for tiles to heal, and
+making it count down from the last time they were damaged, not the first
+ - Added mudsliding-type movement to boulders
+ - Changed boulder direction to be determined by which sprite is used (since directional boulders are likely to have directional sprites anyway)
+ - changed the way sprites are chosen so that the above change doesn't
+make boulders randomly switch directions
 
 Known "features":
  - The strenth of gravity is independent of the world.
@@ -10,6 +15,10 @@ Known "features":
  - If carried by a boulder with another boulder right behind you, the top
 boulder updates first and traps you.
 
+Known bugs:
+ - Collision detection misses one when falling into a two-wide gap at just the
+right angle
+
 To do:
  - load and unload textures
  - rewrite almost all world generation code to use noise
@@ -18,3 +27,4 @@ To do:
  - Store data for UI and sprites in a file instead of the source code
  - save and load the player
  - Make all public Map functions accept any x value
+ - Have the map not change the boulder's sprite

@@ -47,9 +47,15 @@ uint8_t Tile::getSpritePlace(const Map &map, const Location &place) const {
     return SpaceInfo::toSpritePlace(x, y);
 }
 
+uint8_t Tile::updateSprite(const Map &map, const Location &place) const {
+    int y = map.bordering(place);
+    int x = SpaceInfo::getX(map.getSprite(place));
+    return SpaceInfo::toSpritePlace(x, y);
+}
+
 /* Change the map in whatever way needs doing. */
 bool Tile::update(Map &map, Location place, 
-        vector<movable::Movable*> &movables, int tick) const {
+        vector<movable::Movable*> &movables, int tick) {
     return false;
 }
 
@@ -143,6 +149,6 @@ Tile::Tile(TileType tileType)
 Tile::~Tile() {}
 
 /* Whether the tile will ever need to call its update function. */
-bool Tile::canUpdate(const Map &map, const Location &place) const {
+bool Tile::canUpdate(const Map &map, const Location &place) {
     return false;
 }
