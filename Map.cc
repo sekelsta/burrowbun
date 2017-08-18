@@ -1,5 +1,5 @@
 #include <iostream>
-#include <fstream> // To read and write files
+#include <fstream>
 #include <cassert>
 #include <ctime> // To seed the random number generator
 #include <cstdlib> // For randomness
@@ -11,22 +11,8 @@
 
 using namespace std;
 
-// Private methods
-
-// Really small helper functions that don't directly change tiles
-
-// Returns a pointer to the SpaceInfo at x, y
-SpaceInfo *Map::findPointer(int x, int y) const {
-    assert (0 <= x);
-    assert (x < width);
-    assert (0 <= y);
-    assert (y < height);
-    return tiles + (y * width + x);
-}
-
-// Make a new Tile * or one of its child classes
 Tile *Map::newTile(TileType val) {
-    Tile *tile = NULL;
+    Tile *tile = nullptr;
     /* If it's a boulder, make a boulder. */
     if ((unsigned int)TileType::FIRST_BOULDER <= (unsigned int)val
             && (unsigned int)val <= (unsigned int)TileType::LAST_BOULDER) {
@@ -45,12 +31,10 @@ Tile *Map::newTile(TileType val) {
     return tile;
 }
 
-// Find a Tile object of type val. If it does not exist, create it. If 
-// multiple exist, return the first one found.
 Tile *Map::getTile(TileType val) {
     /* Return the tile if it exists. */
     if (pointers.size() > (unsigned int)val
-            && pointers[(unsigned int)val] != NULL) {
+            && pointers[(unsigned int)val] != nullptr) {
         return pointers[(unsigned int)val];
     }
     /* Otherwise make a new tile (or appropriate tile subclass) and add it to 
@@ -62,7 +46,7 @@ Tile *Map::getTile(TileType val) {
     if (pointers.size() <= (unsigned int)val) {
         pointers.resize((unsigned int)val + 1);
         /* Make sure it did get filled with zeros. */
-        assert(pointers.back() == NULL);
+        assert(pointers.back() == nullptr);
     }
     /* Now stick in our tile. */
     pointers[(unsigned int)val] = tile;
@@ -82,8 +66,6 @@ void Map::chooseSprite(int x, int y) {
     findPointer(x, y) -> backgroundSprite = spritePlace;
 }
 
-/* Return true if there's a nonempty tile of the same layer at or next to 
-this place. */
 bool Map::isBesideTile(int x, int y, MapLayer layer) {
     /* Check at this place. */
     if (getTile(x, y, layer) -> type != TileType::EMPTY) {
@@ -93,8 +75,8 @@ bool Map::isBesideTile(int x, int y, MapLayer layer) {
     /* Check each tile next to it. */
     for (int i = -1; i < 2; i++) {
         for (int j = -1; j < 2; j++) {
-            // Don't check the status of tiles off the edge of the map, 
-            // or if it's part of a diagonal line through the center tile
+            /* Don't check the status of tiles off the edge of the map, 
+            or if it's part of a diagonal line through the center tile. */
             if (isOnMap(x + i, y + j) && i != j && i != -1 * j
                     && getTile(x+i, y+j, layer) -> type != TileType::EMPTY) {
                 return true;
@@ -106,25 +88,13 @@ bool Map::isBesideTile(int x, int y, MapLayer layer) {
 
 }
 
-/* Return true if neither the foreground nor background is opaque. Accept
-out-of-bounds x coordintes and loop them so they are in bounds. */
 inline bool Map::isSky(int x, int y) {
     x = wrapX(x);
     return (getForeground(x, y) -> getOpacity() == 0
         && getBackground(x, y) -> getOpacity() == 0);
 }
 
-/* Return the square of the distance between i, j and x, y. */
-int Map::distance(int i, int j, int x, int y) {
-    return (((i - x) * (i - x)) + ((j - y) * (j - y)));
-}
-
-/* Compute the square of the distance to the nearest sky tile that is a source 
-   of light (doesn't have an opaque foreground or background). If the distance 
-   is more than maxDist, return maxDist. */
 int Map::skyDistance(int x, int y, int maxDist) {
-    // TODO: remove
-    //if (isSky(x, y) || getForeground(x, y) -> getOpacity() == 0) {
     if (isSky(x, y)) {
         return 0;
     }
@@ -141,7 +111,6 @@ int Map::skyDistance(int x, int y, int maxDist) {
     return smallest;
 }
 
-/* Calculate how well-lit the tile is. */
 void Map::setLight(int x, int y) {
     // TODO: actually make this depend on the light source
     SpaceInfo *place = findPointer(x, y);
@@ -149,81 +118,14 @@ void Map::setLight(int x, int y) {
     place -> light.g = 0;
     place -> light.b = 0;
     int dist = skyDistance(x, y, 25);
-    // make sure skyIntensity is between 0 and 255
+    /* Make sure skyIntensity is between 0 and 255. */
     double lightIntensity = min(1.0, exp((1 - dist) / 8.0));
     place -> light.skyIntensity = 255 * max(0.0, lightIntensity);
-    // And now the values are correct
+
     place -> isLightUpdated = true;
 }
 
-/* Return true if this is a plce on the map. */
-bool Map::isOnMap(int x, int y) const {
-    return (x >= 0 && y >= 0 && x < width && y < height);
-}
-
-/* Add a placeto the list of places to be updated, if the tile there will ever
-need to be updated. */
-void Map::addToUpdate(int x, int y, MapLayer layer) {
-    /* Time to add it to the list. */
-    Location place;
-    place.x = x;
-    place.y = y;
-    place.layer = layer;
-    addToUpdate(place);
-}
-
-void Map::addToUpdate(const Location &place) {
-    /* Ignore it if it isn't a type of tile that needs to be updated. */
-    if (getTile(place) -> canUpdate(*this, place)) {
-        toUpdate.insert(place);
-    }
-}
-
-void Map::removeFromUpdate(int x, int y, MapLayer layer) {
-    Location place;
-    place.x = x;
-    place.y = y;
-    place.layer = layer;
-    removeFromUpdate(place);
-}
-
-void Map::removeFromUpdate(const Location &place) {
-    toUpdate.erase(place);
-}
-
-bool Map::updateContains(const Location &place) const {
-    return toUpdate.count(place);
-}
-
-int Map::bordering(const Location &place) const {
-    // The value at getSpritePlace.y should be between 0 and 15.
-    // In fact, it should be the binary number that you get if
-    // you start at the top and go counterclockwise, treating
-    // a non-air tile to that side as 0 and an air tile to that 
-    // side as 1.
-    int col = 0;
-    if (place.y != height - 1 
-            && getTileType(place, 0, 1) == TileType::EMPTY) {
-        col += 1;
-    }
-    /* WrapX is called so it matches up with the tile on the other side
-    of the map, wich it's next to when it wraps around. */
-    if (getTileType(place, 1, 0) == TileType::EMPTY) {
-        col += 2;
-    }
-    if (place.y != 0 && getTileType(place, 0, -1) == TileType::EMPTY) {
-        col += 4;
-    }
-    if (getTileType(place, -1, 0) == TileType::EMPTY) {
-        col += 8;
-    }
-    return col;
-}
-
-/* Tell all the tiles nearby to have the right sprite and the right amount of 
-light, and recheck if they need to run their own update functions. */
 void Map::updateNear(int x, int y) {
-    // Update the sprites and tiles
     /* Value that takes into account x-wrapping of the map. */
     Location fore;
     Location back;
@@ -246,8 +148,7 @@ void Map::updateNear(int x, int y) {
         }
     }
 
-    // Update the lighting
-    // The range to update lighting, in each direction
+    /* Update the lighting. */
     int range = 8;
     for (int i = -1 * range; i < range + 1; i++) {
         int newx = wrapX(x + i);
@@ -260,10 +161,26 @@ void Map::updateNear(int x, int y) {
 }
 
 
+int Map::bordering(const Location &place) const {
+    int col = 0;
+    if (place.y != height - 1 
+            && getTileType(place, 0, 1) == TileType::EMPTY) {
+        col += 1;
+    }
+    /* WrapX is called so it matches up with the tile on the other side
+    of the map, wich it's next to when it wraps around. */
+    if (getTileType(place, 1, 0) == TileType::EMPTY) {
+        col += 2;
+    }
+    if (place.y != 0 && getTileType(place, 0, -1) == TileType::EMPTY) {
+        col += 4;
+    }
+    if (getTileType(place, -1, 0) == TileType::EMPTY) {
+        col += 8;
+    }
+    return col;
+}
 
-// Public methods
-
-/* Read a file containing a map layer. */
 void Map::loadLayer(MapLayer layer, ifstream &infile) {
     int index = 0;
     int count, tile;
@@ -280,16 +197,13 @@ void Map::loadLayer(MapLayer layer, ifstream &infile) {
                 assert(layer == MapLayer::BACKGROUND);
                 tiles[index].background = current;
             }
-            index++;
+            ++index;
         }
     }
     assert(getForeground(0, 0) -> type == tiles[0].foreground);
-
-   
 }
 
-
-// Constructor, based on a world file that exists
+// Constructor
 Map::Map(string filename, int tileWidth, int tileHeight) 
         : TILE_WIDTH(tileWidth), TILE_HEIGHT(tileHeight) {
     /* It's the 0th tick. */
@@ -301,13 +215,14 @@ Map::Map(string filename, int tileWidth, int tileHeight)
         getTile((TileType)i);
     }
 
-    // Check that the file could be opened
+    /* Check that the file could be opened. */
     // TODO: use exceptions like a proper person
     if (!infile) {
         cerr << "Can't open " << filename << "\n";
     }
 
-    // Check that the header is #Map
+    /* Check that the header is #Map, just in case we were given an entirely
+    wrong file. */
     string header;
     infile >> header;
     if (header != "#Map") {
@@ -326,16 +241,10 @@ Map::Map(string filename, int tileWidth, int tileHeight)
         cerr << "have changed.\n";
     }
 
-    // Read the height and width
+    /* Read in the things. */
     infile >> width >> height;
-
-    // Create an array of tiles
     tiles = new SpaceInfo[width * height];
-
-    // Read the spawn point
     infile >> spawn.x >> spawn.y;
-
-    // Read the seed
     infile >> seed;
 
     infile >> header;
@@ -360,8 +269,8 @@ Map::Map(string filename, int tileWidth, int tileHeight)
             if (getForeground(i, j) -> type != TileType::EMPTY) {
                 chooseSprite(i, j);
             }
-            // Tell the spaces they should figure out how well-lit they are 
-            // before they get rendered
+            /* Tell the spaces they should figure out how well-lit they are 
+            before they get rendered. */
             findPointer(i, j) -> isLightUpdated = false;
             /* Add the appropriate tiles to our list of tiles to update. */
             addToUpdate(i, j, MapLayer::FOREGROUND);
@@ -370,93 +279,21 @@ Map::Map(string filename, int tileWidth, int tileHeight)
     }
 }
 
-// Destructor
-Map::~Map() {
-    // Delete the map
-    delete[] tiles;
-    // Delete each tile object
-    while (pointers.empty() == false) {
-        delete pointers.back();
-        pointers.pop_back();
-    }
-}
-
-
-// Return the height of the map, in number of tiles
-int Map::getHeight() const {
-    return height;
-}
-
-// Return the width of the map, in number of tiles
-int Map::getWidth() const {
-    return width;
-}
-
-// Return the height, in pixels, of each tile
-int Map::getTileHeight() const {
-    return TILE_HEIGHT;
-}
-
-// Return the height, in pixels, of each tile
-int Map::getTileWidth() const {
-    return TILE_WIDTH;
-}
-
-// Return the default spawn point
-Location Map::getSpawn() const {
-    return spawn;
-}
-
-// Return the part of the spritesheet that should be used
-uint8_t Map::getSprite(const Location &place) const {
-    return getSprite(place.x, place.y, place.layer);
-}
-
-uint8_t Map::getSprite(int x, int y, MapLayer layer) const {
-    if (layer == MapLayer::FOREGROUND) {
-        return getForegroundSprite(x, y);
-    }
-    assert(layer == MapLayer::BACKGROUND);
-    return getBackgroundSprite(x, y);
-}
-
-uint8_t Map::getForegroundSprite(int x, int y) const {
-    return findPointer(x, y) -> foregroundSprite;
-}
-
-uint8_t Map::getBackgroundSprite(int x, int y) const {
-    return findPointer(x, y) -> backgroundSprite;
-}
-
-void Map::setSprite(const Location &place, uint8_t newSprite) {
-    setSprite(place.x, place.y, place.layer, newSprite);
-}
-
-void Map::setSprite(int x, int y, MapLayer layer, uint8_t newSprite) {
-    if (layer == MapLayer::FOREGROUND) {
-        findPointer(x, y) -> foregroundSprite = newSprite;
-    }
-    else {
-        assert(layer == MapLayer::BACKGROUND);
-        findPointer(x, y) -> backgroundSprite = newSprite;
-    }
-}
-
-// Return lighting
+/* Return the lighting of a tile. */
 Light Map::getLight(int x, int y) {
-    // Set the light to the correct value, if necessary
+    /* Set the light to the correct value, if necessary. */
     if (!findPointer(x, y) -> isLightUpdated) {
         setLight(x, y);
     }
 
     Light light;
-    // Combine the value from blocks with the value from the sky, taking into
-    // account that the color of light the sky makes
+    /* Combine the value from blocks with the value from the sky, taking into
+    account that the color of light the sky makes. */
     light.useSky(findPointer(x, y) -> light, getSkyColor(x, y));
     return light;
 }
 
-// Returns the color the sun or moon is shining
+/* Returns the color the sun or moon is shining. */
 Light Map::getSkyColor(int x, int y) const {
     Light light;
     light.r = 255;
@@ -466,38 +303,6 @@ Light Map::getSkyColor(int x, int y) const {
     return light;
 }
 
-/* Returns the tile at x, y, layer. */
-Tile *Map::getTile(Location place) {
-    return getTile(place.x, place.y, place.layer);
-}
-
-/* Returns the tile at x, y, layer. */
-Tile *Map::getTile(int x, int y, MapLayer layer) {
-    if (layer == MapLayer::FOREGROUND) {
-        return getTile(findPointer(x, y) -> foreground);
-    }
-    else if (layer == MapLayer::BACKGROUND) {
-        return getTile(findPointer(x, y) -> background);
-    }
-    else {
-        return NULL;
-    }
-}
-
-// Returns the foreground tile at x, y
-// 0, 0 is the bottom right
-Tile *Map::getForeground(int x, int y) {
-    return getTile(findPointer(x, y) -> foreground);
-}
-
-// Returns the background tile at x, y
-// 0, 0 is the bottom right
-Tile *Map::getBackground(int x, int y) {
-    return getTile(findPointer(x, y) -> background);
-}
-
-/* Get the type of the tile at place.x + x, place.y + y, place.layer. 
-If the tile isn't on the map, returns EMPTY. */
 TileType Map::getTileType(const Location &place, int x, int y) const {
     int newX = wrapX(place.x + x);
     if (!isOnMap(newX, place.y + y)) {
@@ -512,7 +317,6 @@ TileType Map::getTileType(const Location &place, int x, int y) const {
     }
 }
 
-/* Sets the tile at x, y, layer equal to val. */
 void Map::setTile(int x, int y, MapLayer layer, TileType val) {
     if (layer == MapLayer::FOREGROUND) {
         findPointer(x, y) -> foreground = val;
@@ -528,11 +332,6 @@ void Map::setTile(int x, int y, MapLayer layer, TileType val) {
     /* If we made it this far we changed something, so the amount of light
     reaching nearby tiles may have changed. */
     updateNear(x, y);
-}
-
-/* Sets the tile at x, y, layer equal to val. */
-void Map::setTile(const Location &place, TileType val) {
-    setTile(place.x, place.y, place.layer, val);
 }
 
 bool Map::placeTile(Location place, TileType type) {
@@ -555,35 +354,15 @@ bool Map::placeTile(Location place, TileType type) {
     return true;
 }
 
-// Gets the map's list of the tile pointers it uses
 vector<Tile *> Map::getPointers() const {
     return pointers;
 }
 
-// Gets a reference to the list of pointers the map uses
+// TODO: rethink
 vector<Tile *> &Map::getPointersRef() {
     return pointers;
 }
 
-// Write the map to a file
-void Map::save(const string &filename) {
-    // Saves in .bmp file format in black and white
-    ofstream outfile;
-    outfile.open(filename);
-
-    // Write an informative header
-    outfile << "P2\n# Map\n" << width << " " << height << "\n255\n";
-    // Write tile values
-    for (int j = height - 1; j >= 0; j--) {
-        for (int i = 0; i < width; i++) {
-            outfile << (int)(getForeground(i, j) -> type) << " ";
-        }
-        outfile << "\n";
-    }
-    outfile.close();
-}
-
-/* Update the map. */
 void Map::update(vector<movable::Movable*> &movables) {
     /* Make sure we're updating tiles that need to be updated. */
     set<Location>::iterator removeIter = toUpdate.begin();
@@ -623,7 +402,6 @@ void Map::update(vector<movable::Movable*> &movables) {
     tick++;
 }
 
-/* Damage the tile. Return false if there was no tile there to damage. */
 bool Map::damage(Location place, int amount) {
     /* If there's no tile here, just return false. */
     if (getTile(place) -> type == TileType::EMPTY) {
@@ -659,7 +437,6 @@ bool Map::damage(Location place, int amount) {
     return true;
 }
 
-/* Destroy a tile if it has no health left. */
 bool Map::destroy(const TileHealth &health) {
     if (health.health <= 0) {
         kill(health.place);
@@ -668,30 +445,14 @@ bool Map::destroy(const TileHealth &health) {
     return health.health <= 0;
 }
 
-/* Destroy a tile and (TODO) drop itself as an item. */
 void Map::kill(int x, int y, MapLayer layer) {
+    // TODO: drop itself as an item
     setTile(x, y, layer, TileType::EMPTY);
 }
 void Map::kill(const Location &place) {
     kill(place.x, place.y, place.layer);
 }
 
-/* Take an invalid x location and add or subtract the width until
-0 <= x < width. */
-int Map::wrapX(int x) const {
-    /* Fix if x is too large. */
-    x %= getWidth();
-
-    /* Fix if x is too small. */
-    while (x < 0) {
-        x += getWidth();
-    }
-
-    return x;
-}
-
-/* Take in world coordinates and a layer and convert to a location in 
-map coordinates. */
 Location Map::getMapCoords(int x, int y, MapLayer layer) {
     /* Make sure x isn't negative. */
     x += getWidth() * getTileWidth();

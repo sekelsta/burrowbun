@@ -1,8 +1,12 @@
 Changes since last push:
- - Added actual tiletypes and items for the new boulders
- - Gave every tiletype a background tile, even if it's only the same as the
-foreground one
- - Adjusted pickax strength and tile health
+For Action, Item, Light, Map, Stat, and main.cc:
+ - Changed style (/* */ comments instead of // usually, and no repeated comments
+in both the .hh and .cc files)
+ - Inlined short functions
+ - Replaced NULL with nullptr
+Still need to do:
+Collider, Entity, EventHandler, Hotbar, Inventory, MapHelpers, Movable, Player,
+Rect, Sprite, Tile, UIHelpers, WindowHandler, World
 
 Known "features":
  - The strenth of gravity is independent of the world.
@@ -12,11 +16,14 @@ Known "features":
  - Tiles have an opacity between 0 and 64, but right now it only matters whether it's zero or not.
  - If carried by a boulder with another boulder right behind you, the top
 boulder updates first and traps you.
- - Dirt and mud look very similar
+ - Dirt and mud look very similar, and mud looks identical to humus
 
 Known bugs:
  - Collision detection misses one when falling into a two-wide gap at just the
 right angle
+ - Riding on clouds sometimes has the cloud go forwards one update before
+the player
+ - Selecting a hotbar slot acts wierdly sometimes (when there's lots of mud?)
 
 To do:
  - load and unload textures
@@ -26,4 +33,8 @@ To do:
  - Store data for UI and sprites in a file instead of the source code
  - save and load the player
  - Make all public Map functions accept any x value
- - Have the map not change the boulder's sprite
+ - Use exception handling with all file io
+ - remove Map.getForeground() and Map.getBackground()
+ - write Map::Map()
+ - Get rid of the world class and replace it with a bunch of standalone 
+functions

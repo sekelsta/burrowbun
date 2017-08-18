@@ -4,33 +4,32 @@
 #include <vector>
 #include <set>
 #include <string>
-#include <random> // For the fancy randomness like a normal distribution
+#include <random>
 #include "Tile.hh"
 #include "MapHelpers.hh"
 
-// A class for a map for a sandbox game
+/* A class for a map. Holds an array of SpaceInfos, which store the foreground
+and background tiles, among other things. */
 class Map {
-    // Fields:
-
     /* How many ticks since the map was loaded. */
     unsigned int tick;
 
-    // The array to hold the map info
-    // This is a 2d array squished into 1d
+    /* The array to hold the map info. This is a 2d array squished into 1d. */
     SpaceInfo *tiles;
 
     /* A list of Tiles. They contain memory that must be manually garbage
-    collected becuase of the SDL textures. */
+    collected because of the SDL textures. */
     std::vector<Tile *> pointers;
 
-    // The height and width of the map, in number of tiles
+    /* The height and width of the map, in number of tiles. */
     int height, width;
 
-    // The height and width of the tiles, in pixels
+    /* The height and width of the tiles, in pixels. */
     const int TILE_WIDTH;
     const int TILE_HEIGHT;
 
-    // Default spawn point
+    /* Default spawn point. It may be possible for players to set their own
+    spawn points later. */
     Location spawn;
 
     /* The tiles whose update function should be called. */
@@ -39,138 +38,236 @@ class Map {
     /* Tiles that have been damaged. */
     std::vector<TileHealth> damaged;
 
-    // Have a random number generator
+    /* Have a random number generator. */
     std::default_random_engine generator;
-    // The seed that was used to generate the map
+ 
+   /* The seed that was used to generate the map. */
     int seed;
 
-    // Private methods
+    /* Return a pointer to the SpaceInfo* at x, y. */
+    inline SpaceInfo *findPointer(int x, int y) const {
+        assert (0 <= x);
+        assert (x < width);
+        assert (0 <= y);
+        assert (y < height);
+        return tiles + (y * width + x);
+    }
 
-    // Really small helper functions that don't directly change tiles
-
-    // Return a pointer to the SpaceInfo* at x, y
-    SpaceInfo *findPointer(int x, int y) const;
-
-    /* Make a Tile object, add it to the list of pointers, and return 
-       a pointer to it. */
+    /* Make a Tile object (or one of its subclasses), add it to the list of 
+    pointers, and return a pointer to it. */
     Tile *newTile(TileType val);
 
-    // Find a Tile object of type val. If it does not exist, create it. If
-    // multiple exist, return the first one.
+    /* Find a Tile object of type val. If it does not exist, create it. If
+    multiple exist, return the first one. */
     Tile *getTile(TileType val);
 
     /* Pick the sprite to use for a tile based on the ones next to it. */
     void chooseSprite(int x, int y);
 
-    /* Return true if the spot is empty of foreground tiles but at least 
-    one tile next to it isn't. */
+    /* Return true if there's a non-empty tile of the same maplayer here or 
+    next to here. */
     bool isBesideTile(int x, int y, MapLayer layer);
 
-    /* Return true if neither the foreground nor background are opaque. */
+    /* Return true if neither the foreground nor background are opaque. 
+    Accept oput-of-bounds x coordinates and loop them so they are in bounds. */
     bool isSky(int x, int y);
 
     /* Return the square of the distance between i, j and x, y. */
-    int distance(int i, int j, int x, int y);
+    inline int distance(int i, int j, int x, int y) const {
+        return (((i - x) * (i - x)) + ((j - y) * (j - y)));
+    }
 
-    /* Compute the taxicab distance to the nearest sky block that is a source 
-       of light (doesn't have and opaque foreground or background). If more 
-       than maxDist, return maxDist. */
+    /* Compute the square of the taxicab distance to the nearest sky block 
+    that is a source of light (doesn't have and opaque foreground or 
+    background). If more than maxDist, return maxDist. */
     int skyDistance(int x, int y, int maxDist);
 
-    /* Set the light of a tile. */
+    /* Calculate how well-lit a tile is and set its light level. */
     void setLight(int x, int y);
 
     /* Set the tiles around a place to show the right sprite and have the
-    right amount of light. */
+    right amount of light, and recheck if they need to run their own update
+    functions. */
     void updateNear(int x, int y);
 
     public:
 
     /* Add a place to the list of places to be updated, if the tile there
     will need to be updated. */
-    void addToUpdate(int x, int y, MapLayer layer);
-    void addToUpdate(const Location &place);
+    inline void addToUpdate(const Location &place) {
+        /* Ignore it if it won't need to be updated. */
+        if (getTile(place) -> canUpdate(*this, place)) {
+            toUpdate.insert(place);
+        }
+    }
 
-    void removeFromUpdate(int x, int y, MapLayer layer);
-    void removeFromUpdate(const Location &place);
+    inline void addToUpdate(int x, int y, MapLayer layer) {
+        Location place;
+        place.x = x;
+        place.y = y;
+        place.layer = layer;
+        addToUpdate(place);
+    }
 
-    bool updateContains(const Location &place) const;
+    inline void removeFromUpdate(const Location &place) {
+        toUpdate.erase(place);
+    }
 
-    /* Return a number from 0-15 depending on which tiles border this one. */
+    inline void removeFromUpdate(int x, int y, MapLayer layer) {
+        Location place;
+        place.x = x;
+        place.y = y;
+        place.layer = layer;
+        removeFromUpdate(place);
+    }
+
+    inline bool updateContains(const Location &place) const {
+        return toUpdate.count(place);
+    }
+
+    /* Return a number from 0-15 depending on which tiles border this one. 
+    (In fact, in binary it returns the number you get if you start at the left
+    side and go counterclockwise around, reading an empty tile as a 0. )*/
     int bordering(const Location &place) const;
 
     /* Return true if this is a place that exists on the map. */
-    bool isOnMap(int x, int y) const;
+    inline bool isOnMap(int x, int y) const {
+        return (x >= 0 && y >= 0 && x < width && y < height);
+    }
 
+    /* Read the foreground or background layer in from the savefile. */
     void loadLayer(MapLayer layer, std::ifstream &infile);
 
-    // Constructor, constructs a map by loading a file
+    /* Constructor, from a savefile. */
     Map(std::string filename, int tileWidth, int tileHeight);
 
-    // Destructor
-    ~Map();
+    /* Destructor */
+    inline ~Map() {
+        /* Delete the map. */
+        delete[] tiles;
+        /* Delete each tile object. */
+        while (pointers.empty() == false) {
+            delete pointers.back();
+            pointers.pop_back();
+        }
+    }
 
-    // Return the height of the map, in number of tiles
-    int getHeight() const;
+    /* Return the height of the map, in number of tiles. */
+    inline int getHeight() const {
+        return height;
+    }
 
-    // Return the width of the map, in number of tiles
-    int getWidth() const;
+    /* Return the width of the map, in number of tiles. */
+    inline int getWidth() const {
+        return width;
+    }
 
-    // Return the height, in pixels of each tile
-    int getTileHeight() const;
+    /* Return the height, in pixels, of each tile. */
+    inline int getTileHeight() const {
+        return TILE_HEIGHT;
+    }
 
-    // Retrun the width, in pixels, of each tile
-    int getTileWidth() const;
+    /* Return the width, in pixels, of each tile. */
+    inline int getTileWidth() const {
+        return TILE_WIDTH;
+    }
 
-    // Return the default spawn point
-    Location getSpawn() const;
+    /* Return the default spawn point. */
+    inline Location getSpawn() const {
+        return spawn;
+    }
 
-    // Return which part of the spritesheet should be used
-    uint8_t getSprite(const Location &place) const;
-    uint8_t getSprite(int x, int y, MapLayer layer) const;
-    uint8_t getForegroundSprite(int x, int y) const;
-    uint8_t getBackgroundSprite(int x, int y) const;
+    /* Return which part of the spritesheet should be used. */
+    inline uint8_t getForegroundSprite(int x, int y) const {
+        return findPointer(x, y) -> foregroundSprite;
+    }
 
-    void setSprite(const Location &place, uint8_t newSprite);
-    void setSprite(int x, int y, MapLayer layer, uint8_t newSprite);
+    inline uint8_t getBackgroundSprite(int x, int y) const {
+        return findPointer(x, y) -> backgroundSprite;
+    }
 
-    // Return the light at a square, setting it if necessary. 
+    inline uint8_t getSprite(int x, int y, MapLayer layer) const {
+        if (layer == MapLayer::FOREGROUND) {
+            return getForegroundSprite(x, y);
+        }
+        assert(layer == MapLayer::BACKGROUND);
+        return getBackgroundSprite(x, y);
+    }
+
+    inline uint8_t getSprite(const Location &place) const {
+        return getSprite(place.x, place.y, place.layer);
+    }
+
+    /* Set which part of the spritesheet should be used. */
+    inline void setSprite(int x, int y, MapLayer layer, uint8_t newSprite) {
+        if (layer == MapLayer::FOREGROUND) {
+            findPointer(x, y) -> foregroundSprite = newSprite;
+        }
+        else {
+            assert(layer == MapLayer::BACKGROUND);
+            findPointer(x, y) -> backgroundSprite = newSprite;
+        }
+    }
+
+    inline void setSprite(const Location &place, uint8_t newSprite) {
+        setSprite(place.x, place.y, place.layer, newSprite);
+    }
+
+    /* Return the light at a square, setting it if necessary. */
     Light getLight(int x, int y);
 
-    // Return the color the sun / moon is shining
+    /* Return the color the sun / moon is shining. */
     Light getSkyColor(int x, int y) const;
 
     /* Return the pointer the the tile at this location. */
-    Tile *getTile(Location place);
-    Tile *getTile(int x, int y, MapLayer layer);
+    inline Tile *getTile(int x, int y, MapLayer layer) {
+        if (layer == MapLayer::FOREGROUND) {
+            return getTile(findPointer(x, y) -> foreground);
+        }
+        else if (layer == MapLayer::BACKGROUND) {
+            return getTile(findPointer(x, y) -> background);
+        }
+        else {
+            return NULL;
+        }
+    }
 
-    // Returns the foreground tile pointer at x, y
-    // 0, 0 is the bottom right
-    Tile *getForeground(int x, int y);
+    inline Tile *getTile(Location place) {
+        return getTile(place.x, place.y, place.layer);
+    }
 
-    // Returns the background tile pointer at x, y
-    // 0, 0 is the bottom right
-    Tile *getBackground(int x, int y);
+    /* Returns the foreground tile pointer at x, y.
+    0, 0 is the bottom right. */
+    inline Tile *getForeground(int x, int y) {
+        return getTile(findPointer(x, y) -> foreground);
+    }
 
-    /* Get the type of the tile at place.x + x, place.y + y, place.layer. */
+    /* Returns the background tile pointer at x, y.
+    0, 0 is the bottom right. */
+    inline Tile *getBackground(int x, int y) {
+        return getTile(findPointer(x, y) -> background);
+    }
+
+    /* Get the type of the tile at place.x + x, place.y + y, place.layer. 
+    If the tile isn't on the map, return TileType::EMPTY. */
     TileType getTileType(const Location &place, int x, int y) const;
 
     /* Set the tile at x, y, layer equal to val. */
+    inline void setTile(const Location &place, TileType val) {
+        setTile(place.x, place.y, place.layer, val);
+    }
+
     void setTile(int x, int y, MapLayer layer, TileType val);
-    void setTile(const Location &place, TileType val);
 
     /* Place a tile in the correct layer. Return whether it was successful. */
     bool placeTile(Location place, TileType type);
 
-    // Gets the map's list of the tile pointers it uses
+    /* Gets the map's list of the tile pointers it uses. */
     std::vector<Tile *> getPointers() const;
 
-    // Gets a reference to the map's list of the tile pointers it uses
-    // This should only be used to set the tile textures
+    /* Gets a reference to the map's list of the tile pointers it uses
+    This should only be used to set the tile textures. */
     std::vector<Tile *> &getPointersRef();
-
-    // Write the map to a file
-    void save(const std::string &filename);
 
     /* Update the map. */
     void update(std::vector<movable::Movable*> &movables);
@@ -189,7 +286,17 @@ class Map {
 
     /* Take an invalid x location and add or subtract width until
     0 <= x < width. */
-    int wrapX(int x) const;
+    inline int wrapX(int x) const {
+        /* Fix if x is too large. */
+        x %= getWidth();
+
+        /* Fix if x is too small. */
+        while (x < 0) {
+            x += getWidth();
+        }
+
+        return x;
+    }
 
     /* Take in world coordinates and a layer and convert to a location in 
     map coordinates. */
@@ -200,7 +307,7 @@ class Map {
     void moveTile(const Location &place, int x, int y);
 
     /* Move a tile x in the +x direction and y in the +y direction. If there's 
-    a tile there, they switch places. */
+    a tile there, they swit places. */
     void displaceTile(const Location &place, int x, int y);
 };
 

@@ -27,14 +27,6 @@ Item::Item(ItemType type) {
     useTime = j["useTime"];
 }
 
-// Destructor must be virtual
-Item::~Item() {};
-
-// Access functions
-ItemType Item::getType() {
-    return itemType;
-}
-
 /* Get json filename from itemtype. */
 std::string Item::getJsonFilename(ItemType type) {
     string filename;

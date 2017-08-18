@@ -24,7 +24,7 @@ protected:
 
 public:
     // Virtual destructor
-    virtual ~Action();
+    inline virtual ~Action() {};
 
     // What sprite should be displayed in the hotbar
     Sprite sprite;
@@ -33,13 +33,22 @@ public:
     bool isItem;
 
     // Constructor
-    Action();
+    inline Action() {
+        /* TODO: get magic numbers from somewhere else. These are inventory
+        square width and height. */
+        sprite.width = 32;
+        sprite.height = 32;
+        useTime = 1;
+    };
 
-    // What it does when used
-    virtual void use(InputType type, int x, int y, Player &player, Map &map);
+    /* Do the action, or use the item or skill. */
+    inline virtual void 
+            use(InputType type, int x, int y, Player &player, Map &map) {}
 
     // Access function
-    int getUseTime() const;
+    inline int getUseTime() const {
+        return useTime;
+    }
 };
 
 

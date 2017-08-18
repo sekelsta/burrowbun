@@ -8,7 +8,7 @@ NOISE_FLAGS = -I/usr/include/libnoise -L/usr/lib -lnoise
 all : main
 
 main : main.o Map.o World.o Tile.o WindowHandler.o EventHandler.o Movable.o \
-        Player.o Collider.o Hotbar.o Entity.o Inventory.o Item.o Action.o \
+        Player.o Collider.o Hotbar.o Entity.o Inventory.o Item.o \
         Sprite.o AllTheItems.o Boulder.o MapHelpers.o Light.o Stat.o \
         UIHelpers.o
 	$(CC) $(CXXFLAGS) $^ -o $@ $(LDFLAGS) $(NOISE_FLAGS) $(LINKER_FLAGS)
@@ -63,11 +63,8 @@ Inventory.o : Inventory.cc Inventory.hh Light.hh UIHelpers.hh Sprite.hh \
 Item.o : Item.cc Item.hh Sprite.hh Inventory.hh Action.hh
 	$(CC) $(CXXFLAGS) $^ -c $(LDFLAGS)
 
-Action.o : Action.cc Action.hh Sprite.hh Inventory.hh
-	$(CC) $(CXXFLAGS) $^ -c $(LDFLAGS)
-
 AllTheItems.o : AllTheItems.cc AllTheItems.hh Item.hh Action.hh Player.hh \
-        Entity.hh Movable.hh Stat.hh UIHelpers.hh
+        Entity.hh Movable.hh Stat.hh UIHelpers.hh Map.hh
 	$(CC) $(CXXFLAGS) $^ -c $(LDFLAGS)
 
 Sprite.o : Sprite.cc Sprite.hh
