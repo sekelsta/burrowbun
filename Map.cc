@@ -181,6 +181,60 @@ int Map::bordering(const Location &place) const {
     return col;
 }
 
+void Map::saveLayer(MapLayer layer, ofstream &outfile) const {
+    // For keeping track of a lot of the same tile in a row
+    int count = 0;
+    TileType current, last;
+
+    assert(height != 0);
+    assert(width != 0);
+
+    // Treat the array as the 1D array it is.
+    for (int index = 0; index < height * width; index++) {
+        /* Get a tiletype from the correct layer. */
+        if (layer == MapLayer::FOREGROUND) {
+            current = tiles[index].foreground;
+        }
+        else {
+            assert(layer == MapLayer::BACKGROUND);
+            current = tiles[index].background;
+        }
+        if(index != 0 && current != last) {
+            outfile << count << " ";
+            outfile << (int)last << " ";
+            count = 1;
+        }
+        else {
+            count ++;
+        }
+        last = current;
+    }
+
+    // Write the last set of numbers
+    outfile << count << " " << (int)last << " ";
+}
+
+void Map::save(std::string filename) const {
+    // Saves in .bmp file format in black and white
+    std::ofstream outfile;
+    outfile.open(filename);
+
+    // Write an informative header
+    outfile << "#Map\n" << MAJOR << " " << MINOR << " " << PATCH << "\n";
+    outfile << width << " " << height << "\n";
+    outfile << spawn.x << " " << spawn.y << "\n";
+    outfile << seed << "\n";
+    // Write tile values
+    outfile << "#Foreground\n";
+    saveLayer(MapLayer::FOREGROUND, outfile);
+
+    /* Time for the background. */
+    outfile << "\n#Background\n";
+    saveLayer(MapLayer::BACKGROUND, outfile);
+
+    outfile.close();
+}
+
 void Map::loadLayer(MapLayer layer, ifstream &infile) {
     int index = 0;
     int count, tile;
@@ -204,8 +258,8 @@ void Map::loadLayer(MapLayer layer, ifstream &infile) {
 }
 
 // Constructor
-Map::Map(string filename, int tileWidth, int tileHeight) 
-        : TILE_WIDTH(tileWidth), TILE_HEIGHT(tileHeight) {
+Map::Map(string filename, int tileWidth, int tileHeight) : 
+        TILE_WIDTH(tileWidth), TILE_HEIGHT(tileHeight) {
     /* It's the 0th tick. */
     tick = 0;
     ifstream infile(filename);

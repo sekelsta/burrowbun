@@ -1,12 +1,6 @@
 Changes since last push:
-For Action, Item, Light, Map, Stat, and main.cc:
- - Changed style (/* */ comments instead of // usually, and no repeated comments
-in both the .hh and .cc files)
- - Inlined short functions
- - Replaced NULL with nullptr
-Still need to do:
-Collider, Entity, EventHandler, Hotbar, Inventory, MapHelpers, Movable, Player,
-Rect, Sprite, Tile, UIHelpers, WindowHandler, World
+ - Replaced World with Mapgen
+ - Temporarily removed most of the wrold generation functions
 
 Known "features":
  - The strenth of gravity is independent of the world.
@@ -24,6 +18,9 @@ right angle
  - Riding on clouds sometimes has the cloud go forwards one update before
 the player
  - Selecting a hotbar slot acts wierdly sometimes (when there's lots of mud?)
+ - When the window is bigger than the map, crossing x = 0 causes an assertion
+error.
+
 
 To do:
  - load and unload textures
@@ -38,3 +35,12 @@ To do:
  - write Map::Map()
  - Get rid of the world class and replace it with a bunch of standalone 
 functions
+Still need to do:
+Collider, Entity, EventHandler, Hotbar, Inventory, MapHelpers, Movable, Player,
+Rect, Sprite, Tile, UIHelpers, WindowHandler, World
+ - Change style (/* */ comments instead of // usually, and no repeated comments
+in both the .hh and .cc files)
+ - Inline short functions
+ - Replace NULL with nullptr
+
+

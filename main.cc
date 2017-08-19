@@ -2,7 +2,7 @@
 #include <cassert>
 #include "Tile.hh"
 #include "Map.hh"
-#include "World.hh"
+#include "Mapgen.hh"
 #include "WindowHandler.hh"
 #include "EventHandler.hh"
 #include "Movable.hh"
@@ -10,6 +10,10 @@
 #include "Player.hh"
 #include "Collider.hh"
 #include "Hotbar.hh"
+
+/* TODO: make unneeded and remove. */
+#define TILE_WIDTH 16
+#define TILE_HEIGHT 16
 
 using namespace std;
 
@@ -25,12 +29,9 @@ int main(int argc, char **argv) {
     int screenWidth = 800;
     int screenHeight = 600;
 
-    const int TILE_WIDTH = 16;
-    const int TILE_HEIGHT = 16;
-
     /* Create and start a world. */
-    World world = World(WorldType::EARTH);
-    world.save("world.world");
+    Mapgen mapgen;
+    mapgen.generate("world.world", WorldType::SMOLTEST);
     Map map = Map("world.world", TILE_WIDTH, TILE_HEIGHT);
 
     /* Construct a WindowHandler. */

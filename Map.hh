@@ -4,13 +4,21 @@
 #include <vector>
 #include <set>
 #include <string>
-#include <random>
 #include "Tile.hh"
 #include "MapHelpers.hh"
 
 /* A class for a map. Holds an array of SpaceInfos, which store the foreground
 and background tiles, among other things. */
 class Map {
+    /* Mapgen is basically an extra-fancy constructor. */
+    friend class Mapgen;
+
+    const int TILE_WIDTH;
+    const int TILE_HEIGHT;
+
+    /* The seed it was created with. */
+    int seed;
+
     /* How many ticks since the map was loaded. */
     unsigned int tick;
 
@@ -24,10 +32,6 @@ class Map {
     /* The height and width of the map, in number of tiles. */
     int height, width;
 
-    /* The height and width of the tiles, in pixels. */
-    const int TILE_WIDTH;
-    const int TILE_HEIGHT;
-
     /* Default spawn point. It may be possible for players to set their own
     spawn points later. */
     Location spawn;
@@ -37,12 +41,6 @@ class Map {
 
     /* Tiles that have been damaged. */
     std::vector<TileHealth> damaged;
-
-    /* Have a random number generator. */
-    std::default_random_engine generator;
- 
-   /* The seed that was used to generate the map. */
-    int seed;
 
     /* Return a pointer to the SpaceInfo* at x, y. */
     inline SpaceInfo *findPointer(int x, int y) const {
@@ -135,12 +133,25 @@ class Map {
         return (x >= 0 && y >= 0 && x < width && y < height);
     }
 
+    /* Save the foreground or background layer to a file. */
+    void saveLayer(MapLayer layer, std::ofstream &outfile) const;
+
+    /* Save the map to a file. */
+    void save(std::string filename) const;
+
     /* Read the foreground or background layer in from the savefile. */
     void loadLayer(MapLayer layer, std::ifstream &infile);
 
     /* Constructor, from a savefile. */
     Map(std::string filename, int tileWidth, int tileHeight);
 
+private:
+    // Constructor. Resulting map cannot be played but can be saved.
+    inline Map() : TILE_WIDTH(0), TILE_HEIGHT(0) {
+        tiles = nullptr;
+    }
+
+public:
     /* Destructor */
     inline ~Map() {
         /* Delete the map. */

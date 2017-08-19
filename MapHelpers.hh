@@ -94,6 +94,15 @@ struct SpaceInfo {
     uint8_t foregroundSprite;
     uint8_t backgroundSprite;
 
+    // Constructor
+    SpaceInfo() {
+        foreground = TileType::EMPTY;
+        background = TileType::EMPTY;
+        isLightUpdated = false;
+        foregroundSprite = 0;
+        backgroundSprite = 0;
+    }
+
     static inline void fromSpritePlace(Location &place, uint8_t spritePlace) {
         place.x = spritePlace / 16;
         place.y = spritePlace % 16;
