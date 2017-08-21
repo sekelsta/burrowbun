@@ -232,6 +232,13 @@ void Map::save(std::string filename) const {
     outfile << "\n#Background\n";
     saveLayer(MapLayer::BACKGROUND, outfile);
 
+    /* All the other data. */
+    outfile << "\n#Other\n";
+    for (int i = 0; i < width * height; i++) {
+        outfile << tiles[i].foregroundSprite << " ";
+        outfile << tiles[i].backgroundSprite << " ";
+    }
+
     outfile.close();
 }
 
@@ -316,16 +323,21 @@ Map::Map(string filename, int tileWidth, int tileHeight) :
 
     loadLayer(MapLayer::BACKGROUND, infile);
 
+    /* Load the other data. */
+    infile >> header;
+    if (header != "#Other") {
+        cerr << "Couldn't load tile information! ";
+        cerr << "May have improperly loaded background. \n";
+    }
+
+    for (int i = 0; i < width * height; i++) {
+        infile >> tiles[i].foregroundSprite;
+        infile >> tiles[i].backgroundSprite;
+    }
+
     /* Iterate over the entire map. */
     for (int i = 0; i < width; i++) {
         for (int j = 0; j < height; j++) {
-            /* Set special sprites for all the tiles that need them. */
-            if (getForeground(i, j) -> type != TileType::EMPTY) {
-                chooseSprite(i, j);
-            }
-            /* Tell the spaces they should figure out how well-lit they are 
-            before they get rendered. */
-            findPointer(i, j) -> isLightUpdated = false;
             /* Add the appropriate tiles to our list of tiles to update. */
             addToUpdate(i, j, MapLayer::FOREGROUND);
             addToUpdate(i, j, MapLayer::BACKGROUND);
@@ -550,6 +562,10 @@ Location Map::getMapCoords(int x, int y, MapLayer layer) {
 }
 
 void Map::moveTile(const Location &place, int x, int y) {
+    assert(place.x >= 0);
+    assert(place.x < width);
+    assert(place.y >=0);
+    assert(place.y < height);
     assert(x != 0 || y != 0);
     int newX = wrapX(place.x + x);
     /* If it's just above the bottom, it vanishes. */

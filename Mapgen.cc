@@ -5,12 +5,11 @@
 #include <cstdlib> // For randomness
 #include <cmath> // Because pi and exponentiation
 #include <algorithm> // For max and min
-#include <noise.h> // Finding this requires having libnoise installed and may
-// require looking in non-standard places.
 #include "Mapgen.hh"
 #include "version.hh"
 
 using namespace std;
+using namespace noise;
 
 void Mapgen::generateSmolTest() {
     /* Set height and width, and use them to make a tile array. */
@@ -25,6 +24,11 @@ void Mapgen::generateSmolTest() {
             map.setTile(i, j, MapLayer::FOREGROUND, TileType::MUDSTONE);
         }
     }
+}
+
+double Mapgen::getCylinderValue(int x, int y, model::Cylinder &cylinder) 
+        const {
+    return cylinder.GetValue(x * 360.0 / map.width, y);
 }
 
 void Mapgen::generate(std::string filename, WorldType worldType) {

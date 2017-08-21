@@ -1,5 +1,7 @@
 Changes since last push:
- - Added ability to save a map to a color image.
+ - Added saving of spriteplace(boulder direction)
+ - Fixed some assertion errors clouds made at the edge of the world.
+ - Added  Mapgen::getCylinderValue()
 
 Known "features":
  - The strenth of gravity is independent of the world.

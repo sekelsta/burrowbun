@@ -93,6 +93,10 @@ class Map {
     /* Add a place to the list of places to be updated, if the tile there
     will need to be updated. */
     inline void addToUpdate(const Location &place) {
+        assert(0 <= place.x);
+        assert(place.x < width);
+        assert(0 <= place.y);
+        assert(place.y < height);
         /* Ignore it if it won't need to be updated. */
         if (getTile(place) -> canUpdate(*this, place)) {
             toUpdate.insert(place);

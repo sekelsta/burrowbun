@@ -114,7 +114,7 @@ bool Boulder::moveTogether(Map &map, const Location &place, int direction,
     }
     else if (distToLast != 0) {
         /* Make sure the last cloud is in the update list and return false. */
-        map.addToUpdate(place.x + distToLast, place.y, place.layer);
+        map.addToUpdate(map.wrapX(place.x + distToLast), place.y, place.layer);
         return false;
     }
 
@@ -128,7 +128,7 @@ bool Boulder::moveTogether(Map &map, const Location &place, int direction,
         forwards += direction;
         if (ahead != type) {
             Location toMove = place;
-            toMove.x += unmoved;
+            toMove.x = map.wrapX(toMove.x + unmoved);
             if (tilesDestroyed.count(ahead)) {
                 map.moveTile(toMove, forwards - unmoved, 0);
                 unmoved = forwards + direction;
@@ -141,7 +141,7 @@ bool Boulder::moveTogether(Map &map, const Location &place, int direction,
                 /* Our group of clouds is stuck behind a block but there's more
                 clouds ahead. Make sure the last of those ones is being 
                 updated. */
-                map.addToUpdate(place.x + forwards + direction, 
+                map.addToUpdate(map.wrapX(place.x + forwards + direction), 
                         place.y, place.layer);
                 return unmoved;
             }

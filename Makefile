@@ -17,7 +17,7 @@ main.o : main.cc Mapgen.hh Tile.hh Map.hh WindowHandler.hh EventHandler.hh \
         Collider.hh Hotbar.hh Movable.hh Player.hh Light.hh MapHelpers.hh \
         Sprite.hh UIHelpers.hh Entity.hh Inventory.hh Player.hh \
         Item.hh Action.hh AllTheItems.hh Stat.hh
-	$(CC) $(CXXFLAGS) $^ -c $(LDFLAGS) $(LINKER_FLAGS)
+	$(CC) $(CXXFLAGS) $^ -c $(LDFLAGS) $(NOISE_FLAGS) $(LINKER_FLAGS)
 
 Map.o : Map.cc Map.hh Tile.hh MapHelpers.hh Light.hh Movable.hh Sprite.hh
 	$(CC) $(CXXFLAGS) $^ -c $(LDFLAGS)

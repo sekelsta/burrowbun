@@ -29,10 +29,12 @@ int main(int argc, char **argv) {
     int screenWidth = 800;
     int screenHeight = 600;
 
+    const string filename = "world.world";
+
     /* Create and start a world. */
     Mapgen mapgen;
-    mapgen.generate("world.world", WorldType::SMOLTEST);
-    Map map = Map("world.world", TILE_WIDTH, TILE_HEIGHT);
+    //mapgen.generate(filename, WorldType::SMOLTEST);
+    Map map = Map(filename, TILE_WIDTH, TILE_HEIGHT);
 
     /* Construct a WindowHandler. */
     bool enableDarkness = true;
@@ -134,6 +136,7 @@ int main(int argc, char **argv) {
             SDL_Delay(TICKS_PER_FRAME - frameTicks);
         }
     }
+    map.save(filename);
     window.close();
     return 0;
 }
