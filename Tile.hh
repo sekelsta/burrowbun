@@ -5,6 +5,7 @@
 #include <string>
 #include "Sprite.hh"
 #include "Movable.hh"
+#include "Light.hh"
 
 /* Forward declare! */
 class Map;
@@ -80,6 +81,9 @@ public:
     // whether each side is next to air, and the cols are the different 
     // variations.
     Sprite sprite;
+
+    /* What color should represent it in images. */
+    Light color;
 
     // Variables for how it interacts with the players
     bool getIsPlatform() const;

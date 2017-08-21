@@ -8,6 +8,12 @@
         "height": 16,
         "name": "sand.png"
     },
+    "color": {
+        "r": 227,
+        "g": 169,
+        "b": 93,
+        "a": 0
+    },
     "isSolid": true,
     "isPlatform": false,
     "overlapDamage": 10,

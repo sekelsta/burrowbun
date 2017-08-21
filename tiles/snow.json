@@ -8,6 +8,12 @@
         "height": 16,
         "name": "snow.png"
     },
+    "color": {
+        "r": 231,
+        "g": 234,
+        "b": 239,
+        "a": 0
+    },
     "isSolid": true,
     "isPlatform": false,
     "overlapDamage": 0,

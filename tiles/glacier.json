@@ -8,6 +8,12 @@
         "height": 16,
         "name": "glacier.png"
     },
+    "color": {
+        "r": 149,
+        "g": 166,
+        "b": 200,
+        "a": 0
+    },
     "isSolid": true,
     "isPlatform": false,
     "overlapDamage": 10,

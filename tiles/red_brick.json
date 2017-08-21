@@ -8,6 +8,12 @@
         "height": 16,
         "name": "red_brick.png"
     },
+    "color": {
+        "r": 170,
+        "g": 42,
+        "b": 13,
+        "a": 0
+    },
     "isSolid": true,
     "isPlatform": false,
     "overlapDamage": 0,

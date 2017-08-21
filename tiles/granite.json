@@ -8,6 +8,12 @@
         "height": 16,
         "name": "granite.png"
     },
+    "color": {
+        "r": 131,
+        "g": 111,
+        "b": 101,
+        "a": 0
+    },
     "isSolid": true,
     "isPlatform": false,
     "overlapDamage": 0,

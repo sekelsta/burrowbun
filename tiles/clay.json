@@ -8,6 +8,12 @@
         "height": 16,
         "name": "clay.png"
     },
+    "color": {
+        "r": 150,
+        "g": 68,
+        "b": 18,
+        "a": 0
+    },
     "isSolid": true,
     "isPlatform": false,
     "overlapDamage": 0,

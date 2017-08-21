@@ -8,6 +8,12 @@
         "height": 16,
         "name": "cloud.png"
     },
+    "color": {
+        "r": 245,
+        "g": 250,
+        "b": 255,
+        "a": 0
+    },
     "isSolid": false,
     "isPlatform": true,
     "overlapDamage": 0,

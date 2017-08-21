@@ -8,6 +8,12 @@
         "height": 16,
         "name": "limestone.png"
     },
+    "color": {
+        "r": 236,
+        "g": 226,
+        "b": 194,
+        "a": 0
+    },
     "isSolid": true,
     "isPlatform": false,
     "overlapDamage": 0,

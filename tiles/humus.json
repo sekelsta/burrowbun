@@ -8,6 +8,12 @@
         "height": 16,
         "name": "humus.png"
     },
+    "color": {
+        "r": 118,
+        "g": 82,
+        "b": 4,
+        "a": 0
+    },
     "isSolid": true,
     "isPlatform": false,
     "overlapDamage": 0,

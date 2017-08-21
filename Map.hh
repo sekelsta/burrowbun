@@ -145,6 +145,9 @@ class Map {
     /* Constructor, from a savefile. */
     Map(std::string filename, int tileWidth, int tileHeight);
 
+    /* Save the specified layer to a PPM file. */
+    void savePPM(MapLayer layer, std::string filename);
+
 private:
     // Constructor. Resulting map cannot be played but can be saved.
     inline Map() : TILE_WIDTH(0), TILE_HEIGHT(0) {

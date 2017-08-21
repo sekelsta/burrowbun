@@ -3,7 +3,7 @@
 
 /* Keep track of the version. */
 #define MAJOR 0
-#define MINOR 1
-#define PATCH 3
+#define MINOR 2
+#define PATCH 0
 
 #endif

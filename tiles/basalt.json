@@ -8,6 +8,12 @@
         "height": 16,
         "name": "basalt.png"
     },
+    "color": {
+        "r": 7,
+        "g": 6,
+        "b": 5,
+        "a": 0
+    },
     "isSolid": true,
     "isPlatform": false,
     "overlapDamage": 0,

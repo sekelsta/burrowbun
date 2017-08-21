@@ -8,6 +8,12 @@
         "height": 16,
         "name": "sandstone.png"
     },
+    "color": {
+        "r": 215,
+        "g": 195,
+        "b": 115,
+        "a": 0
+    },
     "isSolid": true,
     "isPlatform": false,
     "overlapDamage": 0,

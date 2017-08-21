@@ -8,6 +8,12 @@
         "height": 16,
         "name": "peridotite.png"
     },
+    "color": {
+        "r": 67,
+        "g": 141,
+        "b": 62,
+        "a": 0
+    },
     "isSolid": true,
     "isPlatform": false,
     "overlapDamage": 0,

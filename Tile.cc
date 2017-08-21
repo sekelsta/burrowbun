@@ -156,6 +156,7 @@ Tile::Tile(TileType tileType)
     json j = json::parse(infile);
     /* Set each of this tile's non-const values equal to the json's values. */
     sprite = j["sprite"].get<Sprite>();
+    color = j["color"].get<Light>();
     isSolid = j["isSolid"];
     isPlatform = j["isPlatform"];
     overlapDamage = j["overlapDamage"];

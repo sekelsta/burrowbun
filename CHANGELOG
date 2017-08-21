@@ -1,6 +1,5 @@
 Changes since last push:
- - Replaced World with Mapgen
- - Temporarily removed most of the wrold generation functions
+ - Added ability to save a map to a color image.
 
 Known "features":
  - The strenth of gravity is independent of the world.

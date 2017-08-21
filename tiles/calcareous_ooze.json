@@ -8,6 +8,12 @@
         "height": 16,
         "name": "calcareous_ooze.png"
     },
+    "color": {
+        "r": 224,
+        "g": 203,
+        "b": 156,
+        "a": 0
+    },
     "isSolid": true,
     "isPlatform": false,
     "overlapDamage": 0,

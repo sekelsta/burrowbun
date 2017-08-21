@@ -333,6 +333,23 @@ Map::Map(string filename, int tileWidth, int tileHeight) :
     }
 }
 
+void Map::savePPM(MapLayer layer, std::string filename) {
+    ofstream outfile(filename);
+    /* Header saying we'll use ASCII, along with the height, width,
+    and maximum value. */
+    outfile << "P3\n" << width << " " << height << "\n255\n";
+    for (int j = height - 1; j >= 0; j--) {
+        for (int i = 0; i < width; i++) {
+            Tile *tile = getTile(i, j, layer);
+            /* Output red, green, and blue values for each tile. */
+            outfile << (int)(tile -> color.r) << " ";
+            outfile << (int)(tile -> color.g) << " ";
+            outfile << (int)(tile -> color.b) << " ";
+        }
+        outfile << "\n";
+    } 
+}
+
 /* Return the lighting of a tile. */
 Light Map::getLight(int x, int y) {
     /* Set the light to the correct value, if necessary. */

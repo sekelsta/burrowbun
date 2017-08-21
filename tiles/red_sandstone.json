@@ -8,6 +8,12 @@
         "height": 16,
         "name": "red_sandstone.png"
     },
+    "color": {
+        "r": 230,
+        "g": 97,
+        "b": 24,
+        "a": 0
+    },
     "isSolid": true,
     "isPlatform": false,
     "overlapDamage": 0,

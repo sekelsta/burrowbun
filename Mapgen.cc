@@ -52,6 +52,8 @@ void Mapgen::generate(std::string filename, WorldType worldType) {
     player doesn't die of fall damage every time they respawn. */
     map.spawn.y = map.height / 2;
     map.save(filename);
+    /* TODO: remove when done testing. */
+    map.savePPM(MapLayer::FOREGROUND, filename + ".ppm");
 }
 
 

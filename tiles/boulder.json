@@ -8,6 +8,12 @@
         "height": 16,
         "name": "boulder.png"
     },
+    "color": {
+        "r": 58,
+        "g": 43,
+        "b": 26, 
+        "a": 0
+    },
     "isSolid": true,
     "isPlatform": false,
     "overlapDamage": 10,

@@ -8,6 +8,12 @@
         "height": 16,
         "name": "lumber.png"
     },
+    "color": {
+        "r": 159,
+        "g": 132,
+        "b": 77,
+        "a": 0
+    },
     "isSolid": true,
     "isPlatform": false,
     "overlapDamage": 0,

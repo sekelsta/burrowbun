@@ -8,6 +8,12 @@
         "height": 16,
         "name": "dark_brick.png"
     },
+    "color": {
+        "r": 48,
+        "g": 48,
+        "b": 48,
+        "a": 0
+    },
     "isSolid": true,
     "isPlatform": false,
     "overlapDamage": 0,

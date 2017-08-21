@@ -8,6 +8,12 @@
         "height": 16,
         "name": "ice.png"
     },
+    "color": {
+        "r": 193,
+        "g": 217,
+        "b": 234,
+        "a": 0
+    },
     "isSolid": true,
     "isPlatform": false,
     "overlapDamage": 0,

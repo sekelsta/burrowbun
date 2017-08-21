@@ -8,6 +8,12 @@
         "height": 16,
         "name": "stone.png"
     },
+    "color": {
+        "r": 82,
+        "g": 74,
+        "b": 64,
+        "a": 0
+    },
     "isSolid": true,
     "isPlatform": false,
     "overlapDamage": 0,

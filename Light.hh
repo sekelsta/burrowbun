@@ -1,16 +1,15 @@
 #ifndef LIGHT_HH
 #define LIGHT_HH
 
-#include <SDL2/SDL.h>
 #include <algorithm>
 #include "json.hpp"
 
 /* A struct to store the color (rgb) and intensity of light. */
 struct Light {
-    Uint8 r;
-    Uint8 g;
-    Uint8 b;
-    Uint8 skyIntensity;
+    uint8_t r;
+    uint8_t g;
+    uint8_t b;
+    uint8_t skyIntensity;
 
     /* Sets this light equal to the sum of two other lights. */
     inline void sum(const Light &one, const Light &two) {
@@ -31,7 +30,7 @@ struct Light {
     /* Sets a new intensity and multiplies each value of rgb by it. Should only
     be used just after r, g, and b have been set to their max for the given
     light color. */
-    inline void setIntensity(Uint8 intensity) {
+    inline void setIntensity(uint8_t intensity) {
         skyIntensity = intensity;
         r = r * intensity / 255;
         g = g * intensity / 255;

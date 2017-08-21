@@ -8,6 +8,12 @@
         "height": 16,
         "name": "platform.png"
     },
+    "color": {
+        "r": 87,
+        "g": 64,
+        "b": 36,
+        "a": 0
+    },
     "isSolid": false,
     "isPlatform": true,
     "overlapDamage": 0,

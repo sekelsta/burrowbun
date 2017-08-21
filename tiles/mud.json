@@ -8,6 +8,12 @@
         "height": 16,
         "name": "mud.png"
     },
+    "color": {
+        "r": 64,
+        "g": 43,
+        "b": 22,
+        "a": 0
+    },
     "isSolid": true,
     "isPlatform": false,
     "overlapDamage": 10,
