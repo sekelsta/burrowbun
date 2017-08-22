@@ -12,6 +12,8 @@ Entity::Entity(std::string filename) : movable::Movable(filename) {
     health = j["health"].get<Stat>();
     fullness = j["fullness"].get<Stat>();
     mana = j["mana"].get<Stat>();
+    invincibilityTime = j["invincibilityTime"];
+    invincibilityLeft = 0;
     assert(sprite.name != "");
 }
 
@@ -23,9 +25,15 @@ Entity::~Entity() {}
 // Recieve a certain amount of raw damage and wounds, before taking defense
 // into account
 void Entity::takeDamage(int normal, int wounds) {
+    if (invincibilityLeft >= 0) {
+        return;
+    }
     // TODO: use defense
     health.addFull(-1 * normal);
     health.addPart(-1 * wounds);
+    if (normal > 0 || wounds > 0) {
+        invincibilityLeft = invincibilityTime;
+    }
     // TODO: maybe not here, but die if no health
 }
 
@@ -45,6 +53,7 @@ void Entity::update() {
     health.update();
     fullness.update();
     mana.update();
+    invincibilityLeft--;
 }
 
 /* Make an entity from a json. */

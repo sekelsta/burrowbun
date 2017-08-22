@@ -18,6 +18,10 @@ public:
     Stat fullness;
     Stat mana;
 
+    /* Number of ticks of invincibility after taking damage. */
+    int invincibilityTime;
+    int invincibilityLeft;
+
     /* Farthest it can fall before taking fall damage (in pixels), 
     -1 for infinity. */
     int maxFallDistance;

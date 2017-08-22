@@ -168,7 +168,7 @@ int Map::bordering(const Location &place) const {
         col += 1;
     }
     /* WrapX is called so it matches up with the tile on the other side
-    of the map, wich it's next to when it wraps around. */
+    of the map, which it's next to when it wraps around. */
     if (getTileType(place, 1, 0) == TileType::EMPTY) {
         col += 2;
     }
@@ -338,9 +338,9 @@ Map::Map(string filename, int tileWidth, int tileHeight) :
     /* Iterate over the entire map. */
     for (int i = 0; i < width; i++) {
         for (int j = 0; j < height; j++) {
-            /* Add the appropriate tiles to our list of tiles to update. */
-            addToUpdate(i, j, MapLayer::FOREGROUND);
-            addToUpdate(i, j, MapLayer::BACKGROUND);
+            /* Add the appropriate tiles to our list of tiles to update,
+            and also make extra sure they have the right sprite. */
+            updateNear(i, j);
         }
     }
 }

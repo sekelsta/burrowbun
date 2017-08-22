@@ -58,6 +58,7 @@
         "timeRegen": 0.0001,
         "baseRegenTicks": 60
     },
+	"invincibilityTime": 100,
     "tileReachUp": 6,
     "tileReachDown": 4,
     "tileReachSideways": 5
