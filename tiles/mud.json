@@ -16,7 +16,16 @@
     },
     "isSolid": true,
     "isPlatform": false,
-    "overlapDamage": 10,
+    "overlapDamage": {
+        "minDamage": 1,
+        "maxDamage": 10,
+        "balance": 0.5,
+        "criticalChance": 0,
+        "criticalAmount": 1,
+        "minWounds": 0,
+        "maxWounds": 0,
+        "type": 2
+    },
     "maxHealth": 9,
     "opacity": 64,
     "moveTicks": 10,

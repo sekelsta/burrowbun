@@ -10,19 +10,19 @@ all : main
 main : main.o Map.o Mapgen.o Tile.o WindowHandler.o EventHandler.o Movable.o \
         Player.o Collider.o Hotbar.o Entity.o Inventory.o Item.o \
         Sprite.o AllTheItems.o Boulder.o MapHelpers.o Light.o Stat.o \
-        UIHelpers.o
+        UIHelpers.o Damage.o
 	$(CC) $(CXXFLAGS) $^ -o $@ $(LDFLAGS) $(NOISE_FLAGS) $(LINKER_FLAGS)
 
 main.o : main.cc Mapgen.hh Tile.hh Map.hh WindowHandler.hh EventHandler.hh \
         Collider.hh Hotbar.hh Movable.hh Player.hh Light.hh MapHelpers.hh \
         Sprite.hh UIHelpers.hh Entity.hh Inventory.hh Player.hh \
-        Item.hh Action.hh AllTheItems.hh Stat.hh
+        Item.hh Action.hh AllTheItems.hh Stat.hh Damage.hh
 	$(CC) $(CXXFLAGS) $^ -c $(LDFLAGS) $(NOISE_FLAGS) $(LINKER_FLAGS)
 
 Map.o : Map.cc Map.hh Tile.hh MapHelpers.hh Light.hh Movable.hh Sprite.hh
 	$(CC) $(CXXFLAGS) $^ -c $(LDFLAGS)
 
-Tile.o : Tile.cc Tile.hh Map.hh Sprite.hh Movable.hh json.hpp
+Tile.o : Tile.cc Tile.hh Map.hh Sprite.hh Movable.hh Damage.hh
 	$(CC) $(CXXFLAGS) $^ -c $(LDFLAGS)
 
 WindowHandler.o : WindowHandler.cc WindowHandler.hh Tile.hh Map.hh Movable.hh \
@@ -35,12 +35,12 @@ EventHandler.o : EventHandler.cc EventHandler.hh WindowHandler.hh Player.hh \
         Action.hh Item.hh
 	$(CC) $(CXXFLAGS) $^ -c $(LDFLAGS) $(LINKER_FLAGS)
 
-Movable.o : Movable.cc Movable.hh
+Movable.o : Movable.cc Movable.hh Damage.hh
 	$(CC) $(CXXFLAGS) $^ -c $(LDFLAGS) $(LINKER_FLAGS)
 
 Player.o : Player.cc Player.hh Movable.hh Hotbar.hh UIHelpers.hh \
         Light.hh Entity.hh Inventory.hh Action.hh Item.hh AllTheItems.hh \
-        Stat.hh
+        Stat.hh Damage.hh
 	$(CC) $(CXXFLAGS) $^ -c $(LDFLAGS)
 
 Collider.o : Collider.cc Collider.hh Tile.hh Map.hh Movable.hh Sprite.hh \
@@ -53,7 +53,7 @@ Mapgen.o : Mapgen.cc Mapgen.hh Tile.hh MapHelpers.hh Sprite.hh Movable.hh
 Hotbar.o : Hotbar.cc Hotbar.hh Sprite.hh UIHelpers.hh Action.hh Item.hh
 	$(CC) $(CXXFLAGS) $^ -c $(LDFLAGS)
 
-Entity.o : Entity.cc Entity.hh Movable.hh UIHelpers.hh Stat.hh
+Entity.o : Entity.cc Entity.hh Movable.hh UIHelpers.hh Stat.hh Damage.hh
 	$(CC) $(CXXFLAGS) $^ -c $(LDFLAGS)
 
 Inventory.o : Inventory.cc Inventory.hh Light.hh UIHelpers.hh Sprite.hh \
@@ -84,6 +84,9 @@ Stat.o : Stat.cc Stat.hh
 	$(CC) $(CXXFLAGS) $^ -c $(LDFLAGS)
 
 UIHelpers.o : UIHelpers.cc UIHelpers.hh
+	$(CC) $(CXXFLAGS) $^ -c $(LDFLAGS)
+
+Damage.o: Damage.cc Damage.hh
 	$(CC) $(CXXFLAGS) $^ -c $(LDFLAGS)
 
 tests : collider_tests.o

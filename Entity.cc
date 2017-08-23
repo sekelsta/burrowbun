@@ -24,16 +24,33 @@ Entity::~Entity() {}
 
 // Recieve a certain amount of raw damage and wounds, before taking defense
 // into account
-void Entity::takeDamage(int normal, int wounds) {
+void Entity::takeDamage(const Damage &damage) {
+    /* Do nothing when applicable. */
     if (invincibilityLeft >= 0) {
         return;
     }
-    // TODO: use defense
-    health.addFull(-1 * normal);
-    health.addPart(-1 * wounds);
-    if (normal > 0 || wounds > 0) {
-        invincibilityLeft = invincibilityTime;
+    if (damage.maxDamage == 0) {
+        return;
     }
+
+    /* Not allowed to take 0 damage. */
+    assert(damage.minDamage >= 1);
+
+    double baseDamage = damage.getBaseDamage();
+    assert(baseDamage >= 1);
+    if ((double)(rand() % 100) < 100.0 * damage.criticalChance) {
+        baseDamage *= damage.criticalAmount;
+    }
+
+    // TODO: use defense
+    health.addFull(-1 * (int)baseDamage);
+    if (damage.maxWounds > 0) {
+        double woundRate = (double)(rand() % (int)(damage.maxWounds * 100));
+        woundRate /= 100.0;
+        woundRate += damage.minWounds;
+        health.addPart(-1 * (int)(baseDamage * woundRate));
+    }
+    invincibilityLeft = invincibilityTime;
     // TODO: maybe not here, but die if no health
 }
 
@@ -42,9 +59,17 @@ void Entity::takeFallDamage() {
     // pixelsFallen will only be non-zero when we need to calculate fall damage
     if (pixelsFallen > maxFallDistance && maxFallDistance != -1) {
         int effectiveDistance = (pixelsFallen - maxFallDistance);
-        int damage = effectiveDistance * effectiveDistance / 256 / 8;
-        damage += effectiveDistance / 8;
-        takeDamage(damage, 0);
+        Damage damage;
+        damage.minDamage = effectiveDistance * effectiveDistance / 256 / 8;
+        damage.maxDamage = damage.minDamage;
+        damage.maxDamage += effectiveDistance / 8;
+        damage.balance = 0.5;
+        damage.minWounds = 0;
+        damage.maxWounds = 0;
+        damage.criticalChance = 0;
+        damage.criticalAmount = 1;
+        damage.type = DamageType::BLUDGEONING;
+        takeDamage(damage);
     }
 }
 

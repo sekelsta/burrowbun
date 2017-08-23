@@ -1,7 +1,9 @@
 Changes since last push:
- - Added saving of spriteplace(boulder direction)
- - Fixed some assertion errors clouds made at the edge of the world.
- - Added  Mapgen::getCylinderValue()
+ - Added a period of invincibility after taking danage
+ - fixed map not loading the right tile sprites sometimes
+(Did I git add CHANGELOG? those were for last commit)
+
+ - Added randomness to damage
 
 Known "features":
  - The strenth of gravity is independent of the world.

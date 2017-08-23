@@ -121,7 +121,7 @@ void Movable::accelerate(double gravity) {
 }
 
 /* Take damage. Does nothing. */
-void Movable::takeDamage(int normal, int wounds) {}
+void Movable::takeDamage(const Damage &damage) {}
 
 /* Take fall damage. Does nothing. */
 void Movable::takeFallDamage() {}

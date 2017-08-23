@@ -6,6 +6,7 @@
 #include "Movable.hh"
 #include "Stat.hh"
 #include "json.hpp"
+#include "Damage.hh"
 
 /* A class for monsters, NPCs, and players to inherit from.
 If any features are added later that should reset fall damage, they should
@@ -33,7 +34,7 @@ public:
     // Virtual destructor
     virtual ~Entity();
 
-    virtual void takeDamage(int normal, int wounds);
+    virtual void takeDamage(const Damage &damage);
 
     // Calculate fall damage
     virtual void takeFallDamage();

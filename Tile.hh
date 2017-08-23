@@ -6,6 +6,7 @@
 #include "Sprite.hh"
 #include "Movable.hh"
 #include "Light.hh"
+#include "Damage.hh"
 
 /* Forward declare! */
 class Map;
@@ -57,7 +58,7 @@ class Tile {
     /* Whether players can pass through the tile. */
     bool isSolid;
     /* How much damage the player takes from sharing space with this tile. */
-    int overlapDamage;
+    Damage overlapDamage;
 
     // Display-related variables
     /* Tiles with 0 opacity are completely permeable to light. */

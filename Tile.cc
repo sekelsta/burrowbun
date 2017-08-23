@@ -119,7 +119,7 @@ int Tile::getMaxHealth() const {
 /* Deal damage to whatever is overlapping this, and stop it if this tile is 
 solid. */
 void Tile::dealOverlapDamage(movable::Movable &movable) const {
-    movable.takeDamage(overlapDamage, 0);
+    movable.takeDamage(overlapDamage);
 }
 
 uint8_t Tile::getSpritePlace(const Map &map, const Location &place) const {
@@ -159,7 +159,7 @@ Tile::Tile(TileType tileType)
     color = j["color"].get<Light>();
     isSolid = j["isSolid"];
     isPlatform = j["isPlatform"];
-    overlapDamage = j["overlapDamage"];
+    overlapDamage = j["overlapDamage"].get<Damage>();
     maxHealth = j["maxHealth"];
     opacity = j["opacity"];
 }
