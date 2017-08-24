@@ -33,6 +33,7 @@ int main(int argc, char **argv) {
 
     /* Create and start a world. */
     Mapgen mapgen;
+    mapgen.generate(filename, WorldType::SMOLTEST);
     //mapgen.generate(filename, WorldType::SMOLTEST);
     Map map = Map(filename, TILE_WIDTH, TILE_HEIGHT);
 
@@ -43,6 +44,7 @@ int main(int argc, char **argv) {
 
     /* Start SDL and open the window. */
     if (!window.init()) {
+        cerr << "Could not open a window!\n";
         exit(1);
     }
 

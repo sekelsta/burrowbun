@@ -1,9 +1,6 @@
 Changes since last push:
- - Added a period of invincibility after taking danage
- - fixed map not loading the right tile sprites sometimes
-(Did I git add CHANGELOG? those were for last commit)
-
- - Added randomness to damage
+ - fixed a bug where the hotbar slot continued to select itself
+ - fixed fall damage so it wouldn't make assertion errors
 
 Known "features":
  - The strenth of gravity is independent of the world.

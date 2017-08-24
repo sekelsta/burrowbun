@@ -109,8 +109,8 @@ bool Hotbar::update(Action *mouse) {
                 /* And again the sprite needs to change. */
                 isSpriteUpdated = false;
             }
-
-            // And something changed so make sure we update the sprite
+            /* Now we've used this click. */
+            clickBoxes[i].wasClicked = false;
         }
     }
     return answer;

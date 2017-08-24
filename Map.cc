@@ -185,6 +185,9 @@ void Map::saveLayer(MapLayer layer, ofstream &outfile) const {
     // For keeping track of a lot of the same tile in a row
     int count = 0;
     TileType current, last;
+    /* Just to get rid of the "may be uninitialized" compile warning.
+    (It can't be uninitialized because of the assertions.) */
+    last = TileType::EMPTY;
 
     assert(height != 0);
     assert(width != 0);

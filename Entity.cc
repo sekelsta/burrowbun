@@ -61,6 +61,7 @@ void Entity::takeFallDamage() {
         int effectiveDistance = (pixelsFallen - maxFallDistance);
         Damage damage;
         damage.minDamage = effectiveDistance * effectiveDistance / 256 / 8;
+        damage.minDamage = std::max(damage.minDamage, 1);
         damage.maxDamage = damage.minDamage;
         damage.maxDamage += effectiveDistance / 8;
         damage.balance = 0.5;
