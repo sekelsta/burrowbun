@@ -59,7 +59,7 @@ void WindowHandler::setRenderColorToLight(const Light &color) {
 }
 
 // Render the texture to a 2d grid with width columns and height rows
-void WindowHandler::renderGrid(const SpriteRect &sprite, int width, int height) {
+void WindowHandler::renderGrid(const Sprite &sprite, int width, int height) {
     // Where to render to
     SDL_Rect rectTo;
     rectTo.x = 0;
@@ -108,22 +108,22 @@ void WindowHandler::renderStatBar(StatBar &bar) {
     rect.w = bar.totalWidth + 2 * borderWidth;
     rect.y -= borderWidth;
     rect.h += 2 * borderWidth;
-    SDL_RenderCopy(renderer, statBarOverlay.texture, NULL, &rect); 
+    statBarOverlay.texture -> render(renderer, NULL, &rect); 
 }
 
 // Render each texture from textures onto to, using the spacing variables
 // from hotbar. The texture to is expected to have the correct width and
 // height, and the vector is expected to have length 12. 
 SDL_Texture *WindowHandler::renderHotbarPart(const Hotbar &hotbar,
-        vector<SpriteRect> textures, SDL_Texture *texture) const {
+        vector<Sprite> textures, SDL_Texture *texture) const {
     assert(textures.size() == 12);
     // Make a texture if necessary
     if (texture == NULL) {
         // Create texture to draw to
         // Get the width and height of the textures to render
         // This function assumes they are all the same
-        int width = hotbar.frame.width;
-        int height = hotbar.frame.height;
+        int width = hotbar.frame.rect.w;
+        int height = hotbar.frame.rect.h;
         int totalWidth = 12 * width + 12 * hotbar.smallGap;
         totalWidth += 2 * hotbar.largeGap;
         Uint32 pixelFormat = SDL_PIXELFORMAT_ARGB8888;
@@ -145,8 +145,8 @@ SDL_Texture *WindowHandler::renderHotbarPart(const Hotbar &hotbar,
 
     // Actually render
     SDL_Rect rectTo;
-    rectTo.w = hotbar.frame.width;
-    rectTo.h = hotbar.frame.height;
+    rectTo.w = hotbar.frame.rect.w;
+    rectTo.h = hotbar.frame.rect.h;
     SDL_Rect refRect = rectTo;
     // For each slot
     for (int i = 0; i < 12; i++) {
@@ -173,42 +173,41 @@ void WindowHandler::updateHotbarSprite(Hotbar &hotbar) {
     // Make the texture to render the sprite of the hotbar to
     // Hardcoding 12 because I don't expect to change my mind (12 is the
     // number of F keys).
-    int width = 12 * hotbar.frame.width + 12 * hotbar.smallGap;
+    int width = 12 * hotbar.frame.rect.w + 12 * hotbar.smallGap;
     width += 2 * hotbar.largeGap + hotbar.offsetRight;
-    int height = hotbar.frame.height + hotbar.offsetDown;
-    hotbar.sprite.width = width;
-    hotbar.sprite.height = height;
+    int height = hotbar.frame.rect.w + hotbar.offsetDown;
+    hotbar.sprite.rect.w = width;
+    hotbar.sprite.rect.h = height;
     Uint32 pixelFormat = SDL_PIXELFORMAT_ARGB8888;
     // Actually create the texture
-    SDL_Texture *all = NULL;
+    Texture *all;
     if (hotbar.sprite.texture == NULL) {
-        all = SDL_CreateTexture(renderer, pixelFormat,
-                SDL_TEXTUREACCESS_TARGET, width, height);
-        textures.push_back(all);
+        all = new Texture(renderer, pixelFormat, SDL_TEXTUREACCESS_TARGET, 
+                width, height);
         // Set the sprite thing in the hotbar to the texture we just made
-        hotbar.sprite.texture = all;
+        hotbar.sprite.texture.reset(all);
     }
     else {
-        all = hotbar.sprite.texture;
+        all = hotbar.sprite.texture.get();
     }
 
 
     // Fill a vector with frame images to render
     // The frame to put around each sprite
-    vector<SpriteRect> frontFrames;
-    vector<SpriteRect> backFrames;
+    vector<Sprite> frontFrames;
+    vector<Sprite> backFrames;
     // The image of the item in the slot
-    vector<SpriteRect> frontSprites;
-    vector<SpriteRect> backSprites;
+    vector<Sprite> frontSprites;
+    vector<Sprite> backSprites;
     for (int i = 0; i < 12; i++) {
-        frontFrames.push_back(SpriteRect(hotbar.frame));
-        backFrames.push_back(SpriteRect(hotbar.frame));
+        frontFrames.push_back(hotbar.frame);
+        backFrames.push_back(hotbar.frame);
         // Use the other version if that key is selected
         if (hotbar.selected == i) {
-            frontFrames[i].rect.y += hotbar.frame.height;
+            frontFrames[i].rect.y += hotbar.frame.rect.h;
         }
         else if (hotbar.selected == i + 12) {
-            backFrames[i].rect.y += hotbar.frame.height;
+            backFrames[i].rect.y += hotbar.frame.rect.h;
         }
 
         // Add the Action sprites to their lists of textures, if there is one 
@@ -217,18 +216,18 @@ void WindowHandler::updateHotbarSprite(Hotbar &hotbar) {
             // Add a sprite to the front row
             // Load the sprite if it doesn't have one
             loadAction(*hotbar.actions[i]);
-            frontSprites.push_back(SpriteRect(hotbar.actions[i] -> sprite));
+            frontSprites.push_back(hotbar.actions[i] -> sprite);
         }
         else {
-            frontSprites.push_back(SpriteRect());
+            frontSprites.push_back(Sprite());
         }
         if (hotbar.actions[i + 12] != NULL) {
             // Load the sprite if necessary
             loadAction(*hotbar.actions[i + 12]);
-            backSprites.push_back(SpriteRect(hotbar.actions[i + 12] -> sprite));
+            backSprites.push_back(hotbar.actions[i + 12] -> sprite);
         }
         else {
-            backSprites.push_back(SpriteRect());
+            backSprites.push_back(Sprite());
         }
     }
     SDL_Texture *front = renderHotbarPart(hotbar, frontSprites, NULL);
@@ -242,9 +241,9 @@ void WindowHandler::updateHotbarSprite(Hotbar &hotbar) {
         back = temp;
     }
 
-    SDL_SetRenderTarget(renderer, all);
+    all -> SetRenderTarget(renderer);
     // Tell SDL to do transparency when it renders
-    SDL_SetTextureBlendMode(all, SDL_BLENDMODE_BLEND);
+    all -> SetTextureBlendMode(SDL_BLENDMODE_BLEND);
     // Set draw color to transparent so the texture has a transparent 
     // background
     SDL_SetRenderDrawColor(renderer, 0, 0, 0 ,0);
@@ -280,33 +279,26 @@ void WindowHandler::renderInventory(Inventory &inventory) {
 
     // The rectangle to draw to
     SDL_Rect rectTo;
-    rectTo.w = inventory.sprite.width;
-    rectTo.h = inventory.sprite.height;
+    rectTo.w = inventory.sprite.rect.w;
+    rectTo.h = inventory.sprite.rect.h;
     rectTo.x = inventory.x;
     rectTo.y = inventory.y;
 
     // And actually render
-    SDL_RenderCopy(renderer, inventory.sprite.texture, NULL, &rectTo);
+    inventory.sprite.render(renderer, &rectTo);
 }
 
 
 /* Load the spritesheet used by all inventories. */
-bool WindowHandler::loadInventory() {
+void WindowHandler::loadInventory() {
+    // TODO: fix having hard-coded sprite info. 
     // Inventory::squareSprite is a static member
-    // Hard-code sprite info? not sure if this is the best way.
-    Inventory::squareSprite.texture = NULL;
     Inventory::squareSprite.name = "inventory.png";
-    Inventory::squareSprite.width = 32;
-    Inventory::squareSprite.height = 32;
-    Inventory::squareSprite.rows = 1;
-    Inventory::squareSprite.cols = 2;
+    Inventory::squareSprite.rect.w = 32;
+    Inventory::squareSprite.rect.h = 32;
 
     // And actually load it
-    bool success = loadTexture(UI_PATH + Inventory::squareSprite.name);
-    if (success) {
-        Inventory::squareSprite.texture = textures.back();
-    }
-    return success;
+    Inventory::squareSprite.loadTexture(UI_PATH, renderer);
 }
 
 /* Draw the whole inventory onto a single sprite. */
@@ -314,52 +306,45 @@ void WindowHandler::updateInventorySprite(Inventory &inventory) {
     // Here seems like as good a place as any to tell the inventory to figure
     // out where it cares about being clicked
     inventory.updateClickBoxes();
-    // Unload the current inventory sprite, if there is one
-    unloadTexture(inventory.sprite.texture);
-    inventory.sprite.texture = NULL;
     // Create a texture to draw it on
-    Uint32 pixelFormat;
-    SDL_QueryTexture(Inventory::squareSprite.texture, &pixelFormat, 
-        NULL, NULL, NULL);
-    int width = Inventory::squareSprite.width * inventory.getWidth();
-    int height = Inventory::squareSprite.height * inventory.getHeight();
-    SDL_Texture *texture = SDL_CreateTexture(renderer, pixelFormat, 
-        SDL_TEXTUREACCESS_TARGET, width, height);
-    textures.push_back(texture);
+    Uint32 pixelFormat = Inventory::squareSprite.texture -> getFormat();
+    int width = Inventory::squareSprite.rect.w * inventory.getWidth();
+    int height = Inventory::squareSprite.rect.h * inventory.getHeight();
+    Texture *texture = new Texture(renderer, pixelFormat, 
+            SDL_TEXTUREACCESS_TARGET, width, height);
 
     // Store the size of the texture
-    inventory.sprite.width = width;
-    inventory.sprite.height = height;
+    inventory.sprite.rect.w = width;
+    inventory.sprite.rect.h = height;
 
     // Tell the renderer to draw to the texture
-    SDL_SetRenderTarget(renderer, texture);
-    SDL_SetTextureBlendMode(texture, SDL_BLENDMODE_BLEND);
+    texture -> SetRenderTarget(renderer);
+    texture -> SetTextureBlendMode(SDL_BLENDMODE_BLEND);
 
     // Now loop through each square twice, once to draw the background and
     // once to draw the frame.
     // Draw the background
-    Light color = inventory.squareColor;
-    SDL_SetTextureColorMod(Inventory::squareSprite.texture, color.r, color.g, 
-        color.b);
+    Inventory::squareSprite.texture->SetTextureColorMod(inventory.squareColor);
     // Set the rect in the correct part of the spritesheet
-    Inventory::squareSprite.row = 0;
-    Inventory::squareSprite.col = 0;
-    SpriteRect backgroundSquare = SpriteRect(Inventory::squareSprite);
+    Inventory::squareSprite.rect.x = 0;
+    Inventory::squareSprite.rect.y = 0;
 
     // And actually render
     // Render the background
-    renderGrid(backgroundSquare, inventory.getWidth(), inventory.getHeight());
+    renderGrid(Inventory::squareSprite, inventory.getWidth(), 
+            inventory.getHeight());
 
     // Set render draw color to white
-    SDL_SetTextureColorMod(Inventory::squareSprite.texture, 0xFF, 0xFF, 0xFF);
+    Inventory::squareSprite.texture -> SetTextureColorMod({0xFF, 0xFF, 0xFF, 
+            0x00});
 
     // Render the items
     // Create a rectangle to draw them to
     SDL_Rect rectTo;
     rectTo.x = 0;
     rectTo.y = 0;
-    rectTo.w = Inventory::squareSprite.width;
-    rectTo.h = Inventory::squareSprite.height;
+    rectTo.w = Inventory::squareSprite.rect.w;
+    rectTo.h = Inventory::squareSprite.rect.h;
     // Rectangle that sits in each square, to refer to when the item isn't
     // the same size as the square
     SDL_Rect refRect = rectTo;
@@ -374,11 +359,11 @@ void WindowHandler::updateInventorySprite(Inventory &inventory) {
                 // Remember, loadAction does nothing if it already has a sprite
                 loadAction(*item);
                 // Center rectTo inside refRect
-                rectTo.w = item -> sprite.width;
-                rectTo.h = item -> sprite.height;
+                rectTo.w = item -> sprite.rect.w;
+                rectTo.h = item -> sprite.rect.h;
                 rectTo.x = refRect.x + (refRect.w - rectTo.w) / 2;
                 rectTo.y = refRect.y + (refRect.h - rectTo.h) / 2;
-                SpriteRect(item -> sprite).render(renderer, &rectTo);
+                item -> sprite.render(renderer, &rectTo);
             }
             refRect.x += refRect.w;
         }
@@ -388,15 +373,15 @@ void WindowHandler::updateInventorySprite(Inventory &inventory) {
 
     // Now render the frames
     // Make a spriteRect for the frame
-    Inventory::squareSprite.row = 0;
-    Inventory::squareSprite.col = 1;
-    SpriteRect frame = SpriteRect(Inventory::squareSprite);
+    Inventory::squareSprite.rect.y = 0;
+    Inventory::squareSprite.rect.x = Inventory::squareSprite.rect.w;
+    Sprite frame = Inventory::squareSprite;
 
     // Actually render
     renderGrid(frame, inventory.getWidth(), inventory.getHeight());
 
     // Done rendering stuff. Give the inventory it's new sprite.
-    inventory.sprite.texture = texture;
+    inventory.sprite.texture.reset(texture);
     // And now the sprite is updated
     inventory.isSpriteUpdated = true;
 }
@@ -413,13 +398,13 @@ void WindowHandler::renderUI(Player &player) {
 
     // Create a rect to render to
     SDL_Rect rectTo;
-    rectTo.w = player.hotbar.sprite.width;
-    rectTo.h = player.hotbar.sprite.height;
+    rectTo.w = player.hotbar.sprite.rect.w;
+    rectTo.h = player.hotbar.sprite.rect.h;
 
     // Render
     rectTo.x = player.hotbar.xStart;
     rectTo.y = player.hotbar.yStart;
-    SDL_RenderCopy(renderer, player.hotbar.sprite.texture, NULL, &rectTo);
+    player.hotbar.sprite.render(renderer, &rectTo);
 
     // Render the stat bars
     player.healthBar.y = screenHeight - player.healthBar.distFromBottom;
@@ -436,15 +421,9 @@ void WindowHandler::renderUI(Player &player) {
         renderInventory(player.inventory);
         renderInventory(player.trash);
     }
-    // Otherwise make sure its sprite is cleaned up
-    else if (player.inventory.sprite.texture != NULL) {
-        unloadTexture(player.inventory.sprite.texture);
-        player.inventory.sprite.texture = NULL;
-        player.inventory.isSpriteUpdated = false;
-        unloadTexture(player.trash.sprite.texture);
-        player.trash.sprite.texture = NULL;
-        player.trash.isSpriteUpdated = false;
-    }
+
+    /* TODO: Note to self: when adding chests, make sure to not have infinite
+    inventory textures for each one that has ever been opened. */
 
     // Render the item held by the mouse, if any
     if (player.mouseSlot != NULL) {
@@ -456,16 +435,13 @@ void WindowHandler::renderUI(Player &player) {
         SDL_GetMouseState(&x, &y);
         // Make a rect to render to
         SDL_Rect rect;
-        rect.w = player.mouseSlot -> sprite.width;
-        rect.h = player.mouseSlot -> sprite.height;
+        rect.w = player.mouseSlot -> sprite.rect.w;
+        rect.h = player.mouseSlot -> sprite.rect.h;
         // Put it on the center of the mouse
         rect.x = x - (rect.w / 2);
         rect.y = y - (rect.h / 2);
         // Render
-        SpriteRect spriteRect(player.mouseSlot -> sprite);
-        spriteRect.render(renderer, &rect);
-
-        
+        player.mouseSlot -> sprite.render(renderer, &rect);
     }
 }
 
@@ -568,144 +544,39 @@ bool WindowHandler::init() {
     return success;
 }
 
-// Load all the pictures, return true if successful
-bool WindowHandler::loadMedia(vector<Tile *> &pointers, 
+// Load all the pictures
+void WindowHandler::loadMedia(vector<Tile *> &pointers, 
         vector<movable::Movable *> &movables, Hotbar &hotbar) {
-    bool success = true;
-
     // Load the overlay for the player's stats
-    success = loadTexture(UI_PATH + statBarOverlay.name);
-    assert(textures.size() != 0);
-    statBarOverlay.texture = textures.back(); 
+    statBarOverlay.loadTexture(UI_PATH, renderer);
 
     // Load the textures for tiles
-    success = success && loadTiles(pointers);
+    for (unsigned i = 0; i < pointers.size(); i++) {
+        pointers[i] -> sprite.loadTexture(TILE_PATH, renderer);
+    }
 
     // And for the movables
-    success = success && loadMovables(movables);
+    for (unsigned int i = 0; i < movables.size(); i++) {
+        movables[i] -> sprite.loadTexture(MOVABLE_PATH, renderer);
+    }
 
     // And load the hotbar
-    // movables[0] is the player and therefore has a hotbar
-    success = success && loadHotbar(hotbar);
-
-    // Load inventory background sprite
-    success = success && loadInventory();
-
-    return success;
-}
-
-// Load an image onto a surface and convert it to match the screen
-bool WindowHandler::loadTexture(const string &name) {
-    bool success = true;
-    // Declare variables and load a surface
-    SDL_Surface *surface = IMG_Load(name.c_str());
-    SDL_Texture *texture = NULL;
-    if (surface == NULL) {
-        cerr << "Unable to load image " << name << endl;
-        cerr << "SDLError: " << SDL_GetError() << endl;
-        assert(false);
-    }
-    // Make a texture
-    else {
-        // Convert the surface to a texture
-        texture = SDL_CreateTextureFromSurface(renderer, surface);
-        if (texture == NULL) {
-            cerr << "Failed to create texture from " <<  name << endl;
-            cerr << "SDL Error: " << SDL_GetError() << endl;
-        }
-
-        // Get rid of the surface
-        SDL_FreeSurface(surface);
-    }
-
-    // Add it to the list of textures so it can be deallocated later
-    textures.push_back(texture);
-    assert(textures.size() != 0);
-    if (textures.back() == NULL) {
-        success = false;
-    }
-
-
-    return success;
-}
-
-// Unload a texture. After calling this, make sure to set all pointers to the
-// texture to NULL. Returns whether it succeeded at destroying the texture.
-bool WindowHandler::unloadTexture(SDL_Texture *texture) {
-    // Loop through textures until it is found
-    bool success = false;
-    for (unsigned int i = 0; i < textures.size(); i++) {
-        if (textures[i] == texture) {
-            // Free the texture if we havn't already and if it isn't null
-            if (!success && !texture) {
-                SDL_DestroyTexture(texture);
-                success = true;
-            }
-            // And now we definately have destroyed the texture, so set this
-            // pointer to null
-            textures[i] = NULL;
-        }
-    }
-    return success;
-}
-
-// Load a texture for each tile
-bool WindowHandler::loadTiles(vector<Tile *> &pointers) {
-    bool success = true;
-    for (unsigned i = 0; i < pointers.size(); i++) {
-        string name = TILE_PATH + pointers[i] -> sprite.name;
-        /* Sprites that have no name shouldn't be rendered. */
-        if (name != TILE_PATH) {
-            success = success && loadTexture(name);
-
-            // Set the tile's texture to the loaded texture
-            assert(pointers[i] -> sprite.texture == NULL);
-            pointers[i] -> sprite.texture = textures.back();
-        }
-    }
-
-    return success;
-}
-
-// Load a texture for each movable
-bool WindowHandler::loadMovables(vector<movable::Movable *> &movables) {
-    bool success = true;
-    for (unsigned int i = 0; i < movables.size(); i++) {
-        string name = MOVABLE_PATH + movables[i] -> sprite.name;
-        success = success && loadTexture(name);
-
-        movables[i] -> sprite.texture = textures.back();
-    }
-
-    return success;
-}
-
-// Load textures for the hotbar
-bool WindowHandler::loadHotbar(Hotbar &hotbar) {
-    bool success = true;
-
-    string name = UI_PATH + hotbar.frame.name;
-    success = loadTexture(name);
-    hotbar.frame.texture = textures.back();
-
+    hotbar.frame.loadTexture(UI_PATH, renderer);
     // Update the hotbar sprite
     updateHotbarSprite(hotbar);
 
-    return success;
+    // Load inventory background sprite
+    loadInventory();
 }
 
 // Load an item sprite
 // Assumes the item has no sprite to start with
-bool WindowHandler::loadAction(Action &action) {
+void WindowHandler::loadAction(Action &action) {
     // Ignore if there's already a sprite loaded
-    if (action.sprite.texture != NULL) {
-        return false;
+    if (action.sprite.hasTexture()) {
+        return;
     }
-    bool success = loadTexture(ICON_PATH + action.sprite.name);
-    if (success) {
-        action.sprite.texture = textures.back();
-    }
-    return success;
+    action.sprite.loadTexture(ICON_PATH, renderer);
 }
 
 // Render everything the map holds information about
@@ -720,11 +591,9 @@ void WindowHandler::renderMap(Map &m, const SDL_Rect &camera) {
     assert(camera.y >= 0);
 
     // Rectangle to draw to
-    SDL_Rect *rectTo;
-    // Rectangle to draw from, to pick part of a spritesheet
-    SDL_Rect rectFrom;
-    rectFrom.w = TILE_WIDTH;
-    rectFrom.h = TILE_HEIGHT;
+    SDL_Rect rectTo;
+    rectTo.w = TILE_WIDTH;
+    rectTo.h = TILE_HEIGHT;
 
     // Iterate through every tile at least partially within the camera
     int width = ceil((float)camera.w / (float)TILE_WIDTH) + 1;
@@ -734,20 +603,17 @@ void WindowHandler::renderMap(Map &m, const SDL_Rect &camera) {
     int yMapStart = (camera.y + camera.h) / TILE_HEIGHT;
     /* Location to hold which sprite on the sheet to render. */
     Location spritePlace; 
+    assert(width != 0);
+    assert(height != 0);
     for (int i = 0; i < width; i++) {
-        int xRectTo = i * TILE_WIDTH - (camera.x % TILE_WIDTH);
+        rectTo.x = i * TILE_WIDTH - (camera.x % TILE_WIDTH);
         for (int j = 0; j < height; j++) {
-            // Set the rectangle to the correct one in the vector2D
-            rectTo = &tileRects[i][j];
-
-            rectTo -> x = xRectTo;
-
             // Remember that screen y == 0 at the top but world y == 0 at 
             // the bottom. Here j == 0 at the top of the screen.
             // We're not using convertRect because that doesn't align them
             // with the tile grid.
-            rectTo -> y = (camera.h + camera.y) % TILE_HEIGHT;
-            rectTo -> y += (j - 1) * TILE_HEIGHT;
+            rectTo.y = (camera.h + camera.y) % TILE_HEIGHT;
+            rectTo.y += (j - 1) * TILE_HEIGHT;
 
             // Render the tile
             int xTile = (xMapStart + i) % mapWidth;
@@ -759,33 +625,29 @@ void WindowHandler::renderMap(Map &m, const SDL_Rect &camera) {
                 break;
             }
 
-            SDL_Texture *backTexture 
-                    = m.getBackground(xTile, yTile) -> sprite.texture;
-            SDL_Texture *foreTexture 
-                    = m.getForeground(xTile, yTile) -> sprite.texture;
-            if (backTexture != NULL || foreTexture != NULL) {
+            Sprite backSprite 
+                    = m.getBackground(xTile, yTile) -> sprite;
+            Sprite foreSprite
+                    = m.getForeground(xTile, yTile) -> sprite;
+            if (backSprite.hasTexture() || foreSprite.hasTexture()) {
                 // Modulate the color due to lighting
                 Light light = m.getLight(xTile, yTile);
-                // Only add darkness if darkness is enabled
-                if(enableDarkness) {
-                    SDL_SetTextureColorMod(backTexture, 
-                            light.r, light.g, light.b);
-                    SDL_SetTextureColorMod(foreTexture, 
-                            light.r, light.g, light.b);
-                }
-                if (backTexture != NULL) {
+                if (backSprite.hasTexture()) {
+                    /* Use darkness. */
+                    backSprite.texture -> SetTextureColorMod(light); 
                     uint8_t background = m.getBackgroundSprite(xTile, yTile);
                     SpaceInfo::fromSpritePlace(spritePlace, background);
-                    rectFrom.x = spritePlace.x * TILE_WIDTH;
-                    rectFrom.y = spritePlace.y * TILE_HEIGHT;
-                    SDL_RenderCopy(renderer, backTexture, &rectFrom, rectTo);
+                    backSprite.rect.x = spritePlace.x * TILE_WIDTH;
+                    backSprite.rect.y = spritePlace.y * TILE_HEIGHT;
+                    backSprite.render(renderer, &rectTo);
                 }
-                if (foreTexture != NULL) {
+                if (foreSprite.hasTexture()) {
+                    foreSprite.texture -> SetTextureColorMod(light); 
                     uint8_t foreground = m.getForegroundSprite(xTile, yTile);
                     SpaceInfo::fromSpritePlace(spritePlace, foreground);
-                    rectFrom.x = spritePlace.x * TILE_WIDTH;
-                    rectFrom.y = spritePlace.y * TILE_HEIGHT;
-                    SDL_RenderCopy(renderer, foreTexture, &rectFrom, rectTo);
+                    foreSprite.rect.x = spritePlace.x * TILE_WIDTH;
+                    foreSprite.rect.y = spritePlace.y * TILE_HEIGHT;
+                    foreSprite.render(renderer, &rectTo);
                 }
             }
         }
@@ -800,8 +662,8 @@ void WindowHandler::renderMovables(const vector<movable::Movable *> &movables) {
     // Find where the player and camera are
     int x = movables[0] -> x;
     int y = movables[0] -> y;
-    int w = movables[0] -> sprite.width;
-    int h = movables[0] -> sprite.height;
+    int w = movables[0] -> sprite.rect.w;
+    int h = movables[0] -> sprite.rect.h;
     SDL_Rect camera = findCamera(x, y, w, h);
     SDL_Rect rectTo;
 
@@ -809,8 +671,8 @@ void WindowHandler::renderMovables(const vector<movable::Movable *> &movables) {
     for (unsigned int i = 0; i < movables.size(); i++) {
         rectTo.x = movables[i] -> x;
         rectTo.y = movables[i] -> y;
-        rectTo.w = movables[i] -> sprite.width;
-        rectTo.h = movables[i] -> sprite.height;
+        rectTo.w = movables[i] -> sprite.rect.w;
+        rectTo.h = movables[i] -> sprite.rect.h;
 
         // Convert the rectangle to screen coordinates
         rectTo = convertRect(rectTo, camera);
@@ -822,7 +684,7 @@ void WindowHandler::renderMovables(const vector<movable::Movable *> &movables) {
 
         // Draw!
         // TODO: check whether it's actually anywhere near the screen
-        SDL_RenderCopy(renderer, movables[i] -> sprite.texture, NULL, &rectTo);
+        movables[i] -> sprite.render(renderer, &rectTo);
     }
 
 }
@@ -831,8 +693,8 @@ void WindowHandler::renderMovables(const vector<movable::Movable *> &movables) {
 void WindowHandler::update(Map &map, 
         const vector<movable::Movable *> &movables, Player &player) {
     // Tell the player where on the screen it was drawn
-    int w = player.sprite.width;
-    int h = player.sprite.height;
+    int w = player.sprite.rect.w;
+    int h = player.sprite.rect.h;
     SDL_Rect camera = findCamera(player.x, player.y, w, h);
     SDL_Rect playerRect = { player.x, player.y, w, h };
     playerRect = convertRect(playerRect, camera);
@@ -856,8 +718,8 @@ void WindowHandler::update(Map &map,
         // movables[0] should be the player
         int x = movables[0] -> x;
         int y = movables[0] -> y;
-        int w = movables[0] -> sprite.width;
-        int h = movables[0] -> sprite.height;
+        int w = movables[0] -> sprite.rect.w;
+        int h = movables[0] -> sprite.rect.h;
         SDL_Rect camera = findCamera(x, y, w, h);
         renderMap(map, camera);
 
@@ -874,14 +736,7 @@ void WindowHandler::update(Map &map,
 
 // Close the window, clean up, and exit SDL
 void WindowHandler::close() {
-    // Deallocate any textures
-    for(unsigned i = 0; i < textures.size(); i++) {
-        // If I were being a good programmer I'd make the pointers
-        // point to NULL
-        SDL_DestroyTexture(textures[i]);
-    }
-
-    // Destroy window
+    /* Destroy window and renderer. */
     SDL_DestroyRenderer(renderer);
     renderer = NULL;
     SDL_DestroyWindow(window);

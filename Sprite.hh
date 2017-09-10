@@ -1,34 +1,62 @@
 #ifndef SPRITE_HH
 #define SPRITE_HH
 
+#include <SDL2/SDL.h>
 #include <string>
+#include <memory>
+#include "Texture.hh"
 #include "json.hpp"
 
 // Forward declare
 struct SDL_Texture;
+class SDL_Renderer;
 
 struct Sprite {
-    // The name of the sprite image. This may be a spritesheet.
+    /* The name of the sprite image. This may be a spritesheet. */
     std::string name;
-    SDL_Texture *texture;
+    std::shared_ptr<Texture> texture;
 
-    // The width and height of the sprite
-    int width;
-    int height;
+    /* Rectangle of where to render from. */
+    SDL_Rect rect;
 
-    // If this is a spritesheet, the number of rows and columns
-    int rows;
-    int cols;
+    inline int getWidth() const {
+        return texture -> getWidth();
+    }
 
-    // When referring to specific square, it's row and column (0 indexed)
-    int row;
-    int col;
+    /* Returns the number of columns spriteWidth apart this spritesheet can 
+    hold. */
+    inline int getCols() const {
+        return getWidth() / rect.w;
+    }
 
-    // The constructor
+    inline int getHeight() const {
+        return texture -> getHeight();
+    }
+
+    /* Returns the number of rows of spriteHeight this spritesheet can hold. */
+    inline int getRows() const {
+        return getHeight() / rect.h;
+    }
+
+    inline bool hasTexture() const {
+        return (bool)texture;
+    }
+
+    /* The constructor. */
     Sprite();
 
     /* Assignment operator. */
     Sprite &operator=(const Sprite &sprite);
+
+    /* Load an SDL texture. */
+    void loadTexture(std::string prefix, SDL_Renderer *renderer);
+
+    /* Render itself. */
+    inline void render(SDL_Renderer *renderer, const SDL_Rect *rectTo) const {
+        if (hasTexture()) {
+            texture -> render(renderer, &rect, rectTo);
+        }
+    }
 };
 
 /* Get a sprite from a json. */

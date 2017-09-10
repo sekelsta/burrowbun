@@ -26,8 +26,8 @@ Tile *Map::newTile(TileType val) {
     }
 
     /* Set values that aren't set by the constructor. */
-    tile -> sprite.width = TILE_WIDTH;
-    tile -> sprite.height = TILE_HEIGHT;
+    tile -> sprite.rect.w = TILE_WIDTH;
+    tile -> sprite.rect.h = TILE_HEIGHT;
     return tile;
 }
 

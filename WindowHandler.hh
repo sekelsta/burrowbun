@@ -32,38 +32,6 @@ struct StatBar;
 #define UI_PATH "content/"
 #define ICON_PATH "content/Icons/"
 
-// A struct to hold an SDL_Texture pointer and an SDL_Rect
-struct SpriteRect {
-    // Fields
-    SDL_Texture *texture;
-    SDL_Rect rect;
-
-    // Constructor from sprite
-    SpriteRect(const Sprite &sprite) {
-        texture = sprite.texture;
-        rect.w = sprite.width;
-        rect.h = sprite.height;
-        rect.x = rect.w * sprite.col;
-        rect.y = rect.h * sprite.row;
-    }
-
-    // Constructor from no arguements
-    SpriteRect() {
-        texture = NULL;
-        rect.x = 0;
-        rect.y = 0;
-        rect.w = 0;
-        rect.h = 0;
-    }
-
-    // render itself
-    void render(SDL_Renderer *renderer, const SDL_Rect *rectTo) const {
-        if (texture != NULL) {
-            SDL_RenderCopy(renderer, texture, &rect, rectTo);
-        }
-    }
-};
-
 // A class to open a window and display things to it
 class WindowHandler {
     // Fields
@@ -94,9 +62,6 @@ class WindowHandler {
     // Create a renderer to show textures
     SDL_Renderer *renderer;
 
-    // A list of all textures that have been loaded
-    std::vector<SDL_Texture *> textures;
-
     // A 2D vector of SLD rects for rendering the map
     std::vector<std::vector<SDL_Rect>> tileRects;
 
@@ -115,9 +80,9 @@ class WindowHandler {
     // Set render draw color to light color
     void setRenderColorToLight(const Light &color);
 
-    // Render the texture from the SpriteRect to a 2d grid with width columns
+    // Render the texture from the Sprite to a 2d grid with width columns
     // and height rows
-    void renderGrid(const SpriteRect &sprite, int width, int height);
+    void renderGrid(const Sprite &sprite, int width, int height);
 
     // Render a StatBar
     void renderStatBar(StatBar &bar);
@@ -126,7 +91,7 @@ class WindowHandler {
     // variables from hotbar. The texture to is expected to have the correct 
     // width and height, and the vector is expected to have length 12.
     SDL_Texture *renderHotbarPart(const Hotbar &hotbar, 
-        std::vector<SpriteRect> textures, SDL_Texture *texture) const;
+        std::vector<Sprite> textures, SDL_Texture *texture) const;
 
     // Draw the entire hotbar sprite to a texture. This only needs to be called
     // when the hotbar is first made, or when anything about it changes.
@@ -136,7 +101,7 @@ class WindowHandler {
     void renderInventory(Inventory &inventory);
 
     // Load the images used by all inventories
-    bool loadInventory();
+    void loadInventory();
 
     /* Draw the whole inventory onto a single sprite. */
     void updateInventorySprite(Inventory &inventory);
@@ -157,27 +122,11 @@ public:
     bool init();
 
     // Load the images
-    bool loadMedia(std::vector<Tile *> &pointers, 
+    void loadMedia(std::vector<Tile *> &pointers, 
         std::vector<movable::Movable *> &movables, Hotbar &hotbar);
 
-    // Load a texture, return true on success
-    bool loadTexture(const std::string &name);
-
-    // Unload a texture. After calling this function, make sure to set all
-    // pointers to the texture to NULL.
-    bool unloadTexture(SDL_Texture *texture);
-
-    // Load a texture for each tile
-    bool loadTiles(std::vector<Tile *> &pointers);
-
-    // Load a texture for each movable
-    bool loadMovables(std::vector<movable::Movable *> &movables);
-
-    // Load textures for the hotbar
-    bool loadHotbar(Hotbar &hotbar);
-
     // Load an item or skill sprite
-    bool loadAction(Action &action);
+    void loadAction(Action &action);
 
     // Render everything the map holds information about
     // x and y are the coordinates of the center of the camera, in pixels,

@@ -1,11 +1,11 @@
 {
     "sprite": {
-        "rows": 4,
-        "cols": 4,
-        "row": 0,
-        "col": 3,
-        "width": 16,
-        "height": 16,
+        "rect": {
+            "x": 48,
+            "y": 0,
+            "w": 16,
+            "h": 16
+        },
         "name": "blocks_0.png"
     },
 	"bonusReach": 0,

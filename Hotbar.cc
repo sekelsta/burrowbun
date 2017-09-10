@@ -19,17 +19,15 @@ Hotbar::Hotbar(void) {
 
     frame.name = "frame.png";
     // How big are the squares in the hotbar
-    frame.width = 32;
-    frame.height = 32;
-    frame.rows = 1;
-    frame.cols = 2;
-    frame.row = 0;
-    frame.col = 0;
+    frame.rect.w = 32;
+    frame.rect.h = 32;
+    frame.rect.x = 0;
+    frame.rect.y = 0;
 
     sprite.name = "";
-    sprite.width = 12 * frame.width + 12 * smallGap + 2 * largeGap 
+    sprite.rect.w = 12 * frame.rect.w + 12 * smallGap + 2 * largeGap 
         + offsetRight;
-    sprite.height = frame.height + offsetDown;
+    sprite.rect.h = frame.rect.h + offsetDown;
 
     frame.texture = NULL;
     sprite.texture = NULL;
@@ -48,11 +46,11 @@ Hotbar::Hotbar(void) {
             int index = 4 * i + j;
             clickBoxes[index].x = x;
             clickBoxes[index].y = yStart + offsetDown;
-            clickBoxes[index].w = frame.width;
-            clickBoxes[index].h = frame.height;
+            clickBoxes[index].w = frame.rect.w;
+            clickBoxes[index].h = frame.rect.w;
             clickBoxes[index].wasClicked = false;
             clickBoxes[index].containsMouse = false;
-            x += frame.width + smallGap;
+            x += frame.rect.w + smallGap;
         }
         x += largeGap;
     }

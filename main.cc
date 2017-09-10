@@ -61,9 +61,7 @@ int main(int argc, char **argv) {
     player.y = map.getSpawn().y * TILE_HEIGHT;
 
     /* Load any pictures. */
-    if (!window.loadMedia(map.getPointersRef(), movables, player.hotbar)) {
-        exit(1);
-    }
+    window.loadMedia(map.getPointersRef(), movables, player.hotbar);
 
     Collider collider(TILE_WIDTH, TILE_HEIGHT);
 

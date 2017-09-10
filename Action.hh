@@ -36,8 +36,8 @@ public:
     inline Action() {
         /* TODO: get magic numbers from somewhere else. These are inventory
         square width and height. */
-        sprite.width = 32;
-        sprite.height = 32;
+        sprite.rect.w = 32;
+        sprite.rect.h = 32;
         useTime = 1;
     };
 

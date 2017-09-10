@@ -1,11 +1,11 @@
 {
     "sprite": {
-        "rows": 8,
-        "cols": 8,
-        "row": 4,
-        "col": 1,
-        "width": 32,
-        "height": 32,
+        "rect": {
+            "x": 32,
+            "y": 128,
+            "w": 32,
+            "h": 32
+        },
         "name": "potions.png"
     },
 	"healthGained": 50,

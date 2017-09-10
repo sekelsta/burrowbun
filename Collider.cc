@@ -239,10 +239,10 @@ void Collider::collide(Map &map, movable::Movable &movable) {
     /* Set the starting location and the width and height. */
     from.x = movable.x;
     from.y = movable.y;
-    from.w = movable.sprite.width;
-    to.w = movable.sprite.width;
-    from.h = movable.sprite.height;
-    to.h = movable.sprite.height;
+    from.w = movable.sprite.rect.w;
+    to.w = movable.sprite.rect.w;
+    from.h = movable.sprite.rect.h;
+    to.h = movable.sprite.rect.h;
 
     assert(0 <= from.x);
     assert(0 <= from.y);
@@ -256,8 +256,8 @@ void Collider::collide(Map &map, movable::Movable &movable) {
     // Collide with tiles
     /* width and height are how many tiles away to check for collisions
     with tiles that it was already colliding with. */
-    int width = movable.sprite.width / TILE_WIDTH + 2;
-    int height = movable.sprite.height / TILE_HEIGHT + 2;
+    int width = movable.sprite.rect.w / TILE_WIDTH + 2;
+    int height = movable.sprite.rect.h / TILE_HEIGHT + 2;
     int xVelocity = movable.getVelocity().x;
     int yVelocity = movable.getVelocity().y;
     int startX = from.x / TILE_WIDTH;
@@ -459,8 +459,8 @@ void Collider::update(Map &map, vector<movable::Movable *> &movables) {
             movable::Movable hypothetical;
             hypothetical.x = movables[i] -> x;
             hypothetical.y = movables[i] -> y;
-            hypothetical.sprite.width = movables[i] -> sprite.width;
-            hypothetical.sprite.height = movables[i] -> sprite.height;
+            hypothetical.sprite.rect.w = movables[i] -> sprite.rect.w;
+            hypothetical.sprite.rect.h = movables[i] -> sprite.rect.h;
             // See if it can go up one tile or less without colliding
             int oldY = hypothetical.y;
             // The amount to move by to go up one tile or less, assuming 

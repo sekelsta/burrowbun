@@ -1,4 +1,5 @@
 #include <fstream>
+#include <SDL2/SDL_image.h>
 #include "Sprite.hh"
 #include "json.hpp"
 
@@ -10,13 +11,10 @@ using namespace std;
 Sprite::Sprite() {
     // Initialize all the values
     name = "";
-    texture = NULL;
-    width = 0;
-    height = 0;
-    rows = 0;
-    cols = 0;
-    row = 0;
-    col = 0;
+    rect.x = 0;
+    rect.y = 0;
+    rect.w = 0;
+    rect.h = 0;
 }
 
 /* Assignment operator. */
@@ -27,26 +25,26 @@ Sprite &Sprite::operator=(const Sprite &sprite) {
     }
     name = sprite.name;
     texture = sprite.texture;
-    width = sprite.width;
-    height = sprite.height;
-    rows = sprite.rows;
-    cols = sprite.cols;
-    row = sprite.row;
-    col = sprite.col;
+    rect = sprite.rect;
 
     return *this;
+}
+
+void Sprite::loadTexture(std::string prefix, SDL_Renderer *renderer) {
+    if (name != "") {
+        texture.reset(new Texture(prefix + name, renderer));
+    }
 }
 
 /* Get a sprite out of a json. */
 void from_json(const json &j, Sprite &sprite) {
     /* Set each of this tile's non-const values equal to the json's values. */
     sprite.name = j["name"];
-    sprite.rows = j["rows"];
-    sprite.cols = j["cols"];
-    sprite.row = j["row"];
-    sprite.col = j["col"];
-    sprite.width = j["width"];
-    sprite.height = j["height"];
-    sprite.texture = NULL; 
+    /* It's an SDL_Rect so I can't write a from_json for it. */
+    sprite.rect.w = j["rect"]["w"];
+    sprite.rect.h = j["rect"]["h"];
+    sprite.rect.x = j["rect"]["x"];
+    sprite.rect.y = j["rect"]["y"];
+    
 }
 

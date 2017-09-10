@@ -35,7 +35,7 @@ Player::Player() : Entity("entities/bunny.json"), inventory(10, 6), trash(1, 1) 
     // Set the location of the inventory
     inventory.x = hotbar.xStart;
     // The position of the bottom of the hotbar
-    inventory.y = hotbar.yStart + hotbar.frame.height + hotbar.offsetDown;
+    inventory.y = hotbar.yStart + hotbar.frame.rect.h + hotbar.offsetDown;
     // The size of the gap between the hotbar and the inventory
     inventory.y += 16;
     trash.x = inventory.x;

@@ -1,11 +1,11 @@
 {
     "sprite": {
-        "rows": 1,
-        "cols": 1,
-        "row": 0,
-        "col": 0,
-        "width": 38,
-        "height": 32,
+        "rect": {
+            "x": 0,
+            "y": 0,
+            "w": 38,
+            "h": 32
+        },
         "name": "bunny.png"
     },
     "drag": {

@@ -10,7 +10,7 @@ all : main
 main : main.o Map.o Mapgen.o Tile.o WindowHandler.o EventHandler.o Movable.o \
         Player.o Collider.o Hotbar.o Entity.o Inventory.o Item.o \
         Sprite.o AllTheItems.o Boulder.o MapHelpers.o Light.o Stat.o \
-        UIHelpers.o Damage.o
+        UIHelpers.o Damage.o Texture.o
 	$(CC) $(CXXFLAGS) $^ -o $@ $(LDFLAGS) $(NOISE_FLAGS) $(LINKER_FLAGS)
 
 main.o : main.cc Mapgen.hh Tile.hh Map.hh WindowHandler.hh EventHandler.hh \
@@ -67,7 +67,7 @@ AllTheItems.o : AllTheItems.cc AllTheItems.hh Item.hh Action.hh Player.hh \
         Entity.hh Movable.hh Stat.hh UIHelpers.hh Map.hh
 	$(CC) $(CXXFLAGS) $^ -c $(LDFLAGS)
 
-Sprite.o : Sprite.cc Sprite.hh
+Sprite.o : Sprite.cc Sprite.hh Texture.hh
 	$(CC) $(CXXFLAGS) $^ -c $(LDFLAGS)
 
 Boulder.o : Boulder.cc Boulder.hh Map.hh Tile.hh MapHelpers.hh Sprite.hh \
@@ -87,6 +87,9 @@ UIHelpers.o : UIHelpers.cc UIHelpers.hh
 	$(CC) $(CXXFLAGS) $^ -c $(LDFLAGS)
 
 Damage.o: Damage.cc Damage.hh
+	$(CC) $(CXXFLAGS) $^ -c $(LDFLAGS)
+
+Texture.o: Texture.cc Texture.hh
 	$(CC) $(CXXFLAGS) $^ -c $(LDFLAGS)
 
 tests : collider_tests.o

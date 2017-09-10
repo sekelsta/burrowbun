@@ -172,8 +172,8 @@ void Boulder::carryMovables(const Map &map, const Rect &boulderRect,
     for (unsigned int i = 0; i < movables.size(); i++) {
         movableRect.x = movables[i] -> x;
         movableRect.y = movables[i] -> y;
-        movableRect.w = movables[i] -> sprite.width;
-        movableRect.h = movables[i] -> sprite.height;
+        movableRect.w = movables[i] -> sprite.rect.w;
+        movableRect.h = movables[i] -> sprite.rect.h;
         if (boulderRect.intersects(movableRect)) {
             movables[i] -> boulderSpeed += direction * map.getTileWidth();
         }
@@ -236,8 +236,8 @@ void Boulder::setDirection(Map &map, const Location &place, int direction)
     Location spritePlace;
     SpaceInfo::fromSpritePlace(spritePlace, map.getSprite(place));
     /* If direction = 1, spritePlace.y should be at least sprite.cols / 4. */
-    spritePlace.x %= sprite.cols / 4;
-    spritePlace.x += direction * (sprite.cols / 4);
+    spritePlace.x %= sprite.getCols() / 4;
+    spritePlace.x += direction * (sprite.getCols() / 4);
     map.setSprite(place, SpaceInfo::toSpritePlace(spritePlace)); 
 }
 
@@ -275,6 +275,6 @@ int Boulder::getDirection(const Map &map, const Location &place) const {
     }
     Location spritePlace;
     SpaceInfo::fromSpritePlace(spritePlace, map.getSprite(place));
-    return (spritePlace.x < sprite.cols / 4) ? -1 : 1;
+    return (spritePlace.x < sprite.getCols() / 4) ? -1 : 1;
 }
 

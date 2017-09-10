@@ -137,18 +137,18 @@ void Inventory::updateClickBoxes() {
     int newY = y;
     for (int row = 0; row < getHeight(); row++) {
         for (int col = 0; col < getWidth(); col++) {
-            clickBoxes[row][col].w = Inventory::squareSprite.width;
-            clickBoxes[row][col].h = Inventory::squareSprite.height;
+            clickBoxes[row][col].w = Inventory::squareSprite.rect.w;
+            clickBoxes[row][col].h = Inventory::squareSprite.rect.h;
             clickBoxes[row][col].x = newX;
             clickBoxes[row][col].y = newY;
             // Also initialize the click info
             clickBoxes[row][col].wasClicked = false;
             clickBoxes[row][col].containsMouse = false;
  
-            newX += Inventory::squareSprite.width;
+            newX += Inventory::squareSprite.rect.w;
         }
         newX = x;
-        newY += Inventory::squareSprite.height;
+        newY += Inventory::squareSprite.rect.h;
     }
 }
 
