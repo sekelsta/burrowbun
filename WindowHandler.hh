@@ -91,9 +91,6 @@ class WindowHandler {
     // Render the inventory to the screen
     void renderInventory(Inventory &inventory);
 
-    // Load the images used by all inventories
-    void loadInventory();
-
     /* Draw the whole inventory onto a single sprite. */
     void updateInventorySprite(Inventory &inventory);
 
@@ -119,9 +116,6 @@ public:
     void setMinimized(bool minimized);
     void resize(int width, int height);
     void setMapSize(int tilesWide, int tilesHigh);
-
-    // Load the images
-    void loadMedia(Hotbar &hotbar);
 
     // Render everything the map holds information about
     // x and y are the coordinates of the center of the camera, in pixels,

@@ -1,6 +1,10 @@
 #include <cassert>
 #include <iostream>
 #include "Inventory.hh"
+#include "filepaths.hh"
+
+/* Initialize static variable. */
+Sprite Inventory::squareSprite;
 
 // Constructor
 Inventory::Inventory(int cols, int rows) {
@@ -27,6 +31,16 @@ Inventory::Inventory(int cols, int rows) {
     squareColor.r = 128;
     squareColor.g = 128;
     squareColor.b = 255;
+
+    // TODO: fix having hard-coded sprite info. 
+    // Inventory::squareSprite is a static member
+    Inventory::squareSprite.name = "inventory.png";
+    Inventory::squareSprite.rect.w = 32;
+    Inventory::squareSprite.rect.h = 32;
+
+    // And actually load it
+    Inventory::squareSprite.loadTexture(UI_SPRITE_PATH);
+
 }
 
 /* Copy constructor. Don't use, it just asserts false. If I ever think of a 

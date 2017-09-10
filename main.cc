@@ -21,9 +21,6 @@ using namespace std;
 const int SCREEN_FPS = 60;
 const int TICKS_PER_FRAME = 1000 / SCREEN_FPS;
 
-/* Define the static class member. */
-Sprite Inventory::squareSprite;
-
 int main(int argc, char **argv) {
     /* Declare variables for rendering a window. */
     int screenWidth = 800;
@@ -53,9 +50,6 @@ int main(int argc, char **argv) {
     /* Set the player's position to the spawnpoint. */
     player.x = map.getSpawn().x * TILE_WIDTH;
     player.y = map.getSpawn().y * TILE_HEIGHT;
-
-    /* Load any pictures. */
-    window.loadMedia(player.hotbar);
 
     Collider collider(TILE_WIDTH, TILE_HEIGHT);
 

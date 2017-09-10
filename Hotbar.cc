@@ -1,5 +1,6 @@
 #include <iostream>
 #include "Hotbar.hh"
+#include "filepaths.hh"
 
 // The number of slots in the hotbar
 
@@ -61,6 +62,8 @@ Hotbar::Hotbar(void) {
         actions[i] = NULL;
     }
 
+    /* Load the frame's texture. */
+    frame.loadTexture(UI_SPRITE_PATH);
 }
 
 // Toggle which row is on top

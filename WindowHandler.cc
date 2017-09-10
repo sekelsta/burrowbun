@@ -285,19 +285,6 @@ void WindowHandler::renderInventory(Inventory &inventory) {
     inventory.sprite.render(&rectTo);
 }
 
-
-/* Load the spritesheet used by all inventories. */
-void WindowHandler::loadInventory() {
-    // TODO: fix having hard-coded sprite info. 
-    // Inventory::squareSprite is a static member
-    Inventory::squareSprite.name = "inventory.png";
-    Inventory::squareSprite.rect.w = 32;
-    Inventory::squareSprite.rect.h = 32;
-
-    // And actually load it
-    Inventory::squareSprite.loadTexture(UI_SPRITE_PATH);
-}
-
 /* Draw the whole inventory onto a single sprite. */
 void WindowHandler::updateInventorySprite(Inventory &inventory) {
     // Here seems like as good a place as any to tell the inventory to figure
@@ -448,11 +435,12 @@ WindowHandler::WindowHandler(int screenWidth, int screenHeight,
     // Set the 2D vector of rects for the tiles
     resize(screenWidth, screenHeight);
 
-    // Not sure if this belongs here, but set the name of file to get the
-    // texture for statBarOverlay from
-    statBarOverlay.name = "stat_bar_overlay.png";
-
     init();
+
+    /* Info for what to render over the statbar rectangles. TODO: move
+    elsewhere. */
+    statBarOverlay.name = "stat_bar_overlay.png";
+    statBarOverlay.loadTexture(UI_SPRITE_PATH);
 }
 
 void WindowHandler::setMinimized(bool minimized) {
@@ -535,20 +523,6 @@ void WindowHandler::init() {
     }
     // Assume the window is not minimized
     isMinimized = false;
-}
-
-// Load all the pictures
-void WindowHandler::loadMedia(Hotbar &hotbar) {
-    // Load the overlay for the player's stats
-    statBarOverlay.loadTexture(UI_SPRITE_PATH);
-
-    // And load the hotbar
-    hotbar.frame.loadTexture(UI_SPRITE_PATH);
-    // Update the hotbar sprite
-    updateHotbarSprite(hotbar);
-
-    // Load inventory background sprite
-    loadInventory();
 }
 
 // Render everything the map holds information about
@@ -642,7 +616,6 @@ void WindowHandler::renderMovables(const vector<movable::Movable *> &movables) {
         rectTo.y = movables[i] -> y;
         rectTo.w = movables[i] -> sprite.rect.w;
         rectTo.h = movables[i] -> sprite.rect.h;
-
         // Convert the rectangle to screen coordinates
         rectTo = convertRect(rectTo, camera);
 

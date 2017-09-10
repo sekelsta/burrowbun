@@ -1,6 +1,6 @@
 Changes since last push:
  - Fixed placing tiles by making the renderer global
- - Made items load themselves
+ - Made objects load themselves
 
 Known "features":
  - The strenth of gravity is independent of the world.
