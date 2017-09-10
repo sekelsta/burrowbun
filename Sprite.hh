@@ -9,7 +9,6 @@
 
 // Forward declare
 struct SDL_Texture;
-class SDL_Renderer;
 
 struct Sprite {
     /* The name of the sprite image. This may be a spritesheet. */
@@ -20,6 +19,7 @@ struct Sprite {
     SDL_Rect rect;
 
     inline int getWidth() const {
+        assert(hasTexture());
         return texture -> getWidth();
     }
 
@@ -30,6 +30,7 @@ struct Sprite {
     }
 
     inline int getHeight() const {
+        assert(hasTexture());
         return texture -> getHeight();
     }
 
@@ -49,12 +50,12 @@ struct Sprite {
     Sprite &operator=(const Sprite &sprite);
 
     /* Load an SDL texture. */
-    void loadTexture(std::string prefix, SDL_Renderer *renderer);
+    void loadTexture(std::string prefix);
 
     /* Render itself. */
-    inline void render(SDL_Renderer *renderer, const SDL_Rect *rectTo) const {
+    inline void render(const SDL_Rect *rectTo) const {
         if (hasTexture()) {
-            texture -> render(renderer, &rect, rectTo);
+            texture -> render(&rect, rectTo);
         }
     }
 };

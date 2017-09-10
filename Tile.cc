@@ -6,6 +6,7 @@
 #include "Map.hh"
 #include "Movable.hh"
 #include "json.hpp"
+#include "filepaths.hh"
 
 // For convenience
 using json = nlohmann::json;
@@ -123,8 +124,16 @@ void Tile::dealOverlapDamage(movable::Movable &movable) const {
 }
 
 uint8_t Tile::getSpritePlace(const Map &map, const Location &place) const {
-    int y = map.bordering(place);
-    int x = rand() % sprite.getCols() / 2;
+    int x;
+    int y;
+    /* Some (empty) tiles have no sprite. */
+    if (!sprite.hasTexture()) {
+        x = 0;
+        y = 0;
+        return SpaceInfo::toSpritePlace(x, y);
+    }
+    y = map.bordering(place);
+    x = rand() % sprite.getCols() / 2;
     /* On the sprite, the equivalent background tile is moved over by
     sprite.cols / 2. */
     if (place.layer == MapLayer::BACKGROUND) {
@@ -162,6 +171,8 @@ Tile::Tile(TileType tileType)
     overlapDamage = j["overlapDamage"].get<Damage>();
     maxHealth = j["maxHealth"];
     opacity = j["opacity"];
+    sprite.loadTexture(TILE_SPRITE_PATH);
+    assert(sprite.hasTexture() || sprite.name == "");
 }
 
 /* Virtual destructor. */

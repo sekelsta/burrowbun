@@ -30,9 +30,9 @@ Sprite &Sprite::operator=(const Sprite &sprite) {
     return *this;
 }
 
-void Sprite::loadTexture(std::string prefix, SDL_Renderer *renderer) {
+void Sprite::loadTexture(std::string prefix) {
     if (name != "") {
-        texture.reset(new Texture(prefix + name, renderer));
+        texture.reset(new Texture(prefix + name));
     }
 }
 

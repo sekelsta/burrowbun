@@ -31,22 +31,16 @@ int main(int argc, char **argv) {
 
     const string filename = "world.world";
 
-    /* Create and start a world. */
+    /* Construct a WindowHandler. Also starts SDL and opens the window. */
+    WindowHandler window(screenWidth, screenHeight, TILE_WIDTH, TILE_HEIGHT);
+
+    /* Create a world. */
     Mapgen mapgen;
     mapgen.generate(filename, WorldType::SMOLTEST);
-    //mapgen.generate(filename, WorldType::SMOLTEST);
+
+    /* Load a map. */
     Map map = Map(filename, TILE_WIDTH, TILE_HEIGHT);
-
-    /* Construct a WindowHandler. */
-    bool enableDarkness = true;
-    WindowHandler window(screenWidth, screenHeight, map.getWidth(), 
-                    map.getHeight(), TILE_WIDTH, TILE_HEIGHT, enableDarkness);
-
-    /* Start SDL and open the window. */
-    if (!window.init()) {
-        cerr << "Could not open a window!\n";
-        exit(1);
-    }
+    window.setMapSize(map.getWidth(), map.getHeight());
 
     SDL_Event event;
     EventHandler eventHandler;
@@ -61,7 +55,7 @@ int main(int argc, char **argv) {
     player.y = map.getSpawn().y * TILE_HEIGHT;
 
     /* Load any pictures. */
-    window.loadMedia(map.getPointersRef(), movables, player.hotbar);
+    window.loadMedia(player.hotbar);
 
     Collider collider(TILE_WIDTH, TILE_HEIGHT);
 
@@ -137,7 +131,6 @@ int main(int argc, char **argv) {
         }
     }
     map.save(filename);
-    window.close();
     return 0;
 }
 

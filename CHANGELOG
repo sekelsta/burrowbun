@@ -1,8 +1,6 @@
 Changes since last push:
- - Added a Texture class wrapper for SDL_Texture
- - General refactoring of everything to do with sprites
- - Broke placing tiles: they need to have the sprite loaded right away, but
-they don't have a renderer to do that
+ - Fixed placing tiles by making the renderer global
+ - Made items load themselves
 
 Known "features":
  - The strenth of gravity is independent of the world.

@@ -3,6 +3,7 @@
 #include <vector>
 #include "Item.hh"
 #include "json.hpp"
+#include "filepaths.hh"
 
 /* For convenience. */
 using json = nlohmann::json;
@@ -25,6 +26,7 @@ Item::Item(ItemType type) {
     isItem = j["isItem"];
     maxStack = j["maxStack"];
     useTime = j["useTime"];
+    sprite.loadTexture(ICON_SPRITE_PATH);
 }
 
 /* Get json filename from itemtype. */

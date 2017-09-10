@@ -444,11 +444,6 @@ vector<Tile *> Map::getPointers() const {
     return pointers;
 }
 
-// TODO: rethink
-vector<Tile *> &Map::getPointersRef() {
-    return pointers;
-}
-
 void Map::update(vector<movable::Movable*> &movables) {
     /* Make sure we're updating tiles that need to be updated. */
     set<Location>::iterator removeIter = toUpdate.begin();

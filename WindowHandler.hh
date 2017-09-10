@@ -11,9 +11,11 @@ the only thing screen coordinates are used for. */
 #include <string>
 #include <SDL2/SDL.h>
 
+#include "Renderer.hh"
 #include "Sprite.hh"
 #include "Movable.hh"
 #include "UIHelpers.hh"
+#include "filepaths.hh"
 
 // Forawrd declare
 struct Light;
@@ -25,12 +27,6 @@ class Inventory;
 class Action;
 struct MouseBox;
 struct StatBar;
-
-// The path to image files
-#define TILE_PATH "content/Blocks/"
-#define MOVABLE_PATH "content/"
-#define UI_PATH "content/"
-#define ICON_PATH "content/Icons/"
 
 // A class to open a window and display things to it
 class WindowHandler {
@@ -47,9 +43,6 @@ class WindowHandler {
     int worldWidth;
     int worldHeight;
 
-    // Whether to use the tile's light when rendering
-    bool enableDarkness;
-
     // Whether the window is minimized
     bool isMinimized;
 
@@ -57,10 +50,8 @@ class WindowHandler {
     SDL_Window *window;
 
     // That window's surface
+    /* This field isn't actually ever used. */
     SDL_Surface *screenSurface;
-
-    // Create a renderer to show textures
-    SDL_Renderer *renderer;
 
     // A 2D vector of SLD rects for rendering the map
     std::vector<std::vector<SDL_Rect>> tileRects;
@@ -109,24 +100,28 @@ class WindowHandler {
     // Render everything UI
     void renderUI(Player &player);
 
+    // Clean up and close SDL
+    void close();
+
+    // Start up SDL and open the window
+    void init();
 public:
     // Constructor
-    WindowHandler(int screenWidth, int screenHeight, int mapWidth, 
-        int mapHeight, int tileWidth, int tileHeight, bool dark);
+    WindowHandler(int screenWidth, int screenHeight, int tileWidth, 
+            int tileHeight);
+
+    // Destructor
+    inline ~WindowHandler() {
+        close();
+    }
 
     // Access functions
     void setMinimized(bool minimized);
     void resize(int width, int height);
-
-    // Start up SDL and open the window
-    bool init();
+    void setMapSize(int tilesWide, int tilesHigh);
 
     // Load the images
-    void loadMedia(std::vector<Tile *> &pointers, 
-        std::vector<movable::Movable *> &movables, Hotbar &hotbar);
-
-    // Load an item or skill sprite
-    void loadAction(Action &action);
+    void loadMedia(Hotbar &hotbar);
 
     // Render everything the map holds information about
     // x and y are the coordinates of the center of the camera, in pixels,
@@ -139,12 +134,6 @@ public:
     // Update the screen
     void update(Map &m, const std::vector<movable::Movable *> &movables, 
         Player &player);
-
-    // Unload media to switch maps, currently done by close()
-    void unloadMedia(std::vector<Tile *> &pointers);
-
-    // Clean up and close SDL
-    void close();
 };
 
 #endif

@@ -32,7 +32,7 @@ public:
     // Whether it's an item
     bool isItem;
 
-    // Constructor
+    /* Constructor. Note: inherited classes will have to set the sprite. */
     inline Action() {
         /* TODO: get magic numbers from somewhere else. These are inventory
         square width and height. */

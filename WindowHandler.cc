@@ -55,7 +55,7 @@ SDL_Rect WindowHandler::convertRect(SDL_Rect rect, SDL_Rect camera) {
 
 // Set the renderer draw color to a Light color
 void WindowHandler::setRenderColorToLight(const Light &color) {
-    SDL_SetRenderDrawColor(renderer, color.r, color.g, color.b, 0xFF);
+    SDL_SetRenderDrawColor(Renderer::renderer, color.r, color.g, color.b, 0xFF);
 }
 
 // Render the texture to a 2d grid with width columns and height rows
@@ -68,7 +68,7 @@ void WindowHandler::renderGrid(const Sprite &sprite, int width, int height) {
     rectTo.h = sprite.rect.h;
     for (int i = 0; i < width; i++) {
         for (int j = 0; j < height; j++) {
-            sprite.render(renderer, &rectTo);
+            sprite.render(&rectTo);
             rectTo.y += rectTo.h;
         }
         rectTo.x += rectTo.w;
@@ -86,20 +86,20 @@ void WindowHandler::renderStatBar(StatBar &bar) {
     rect.x = bar.x;
     rect.w = bar.full;
     setRenderColorToLight(bar.fullColor);
-    SDL_RenderFillRect(renderer, &rect);
+    SDL_RenderFillRect(Renderer::renderer, &rect);
 
     // Draw the part that can regenerate ("part")
     rect.x += bar.full;
     rect.w = bar.part - bar.full;
     assert(rect.w >= 0);
     setRenderColorToLight(bar.partColor);
-    SDL_RenderFillRect(renderer, &rect);
+    SDL_RenderFillRect(Renderer::renderer, &rect);
 
     // Draw the empty part of the bar
     rect.x += rect.w;
     rect.w = bar.totalWidth - bar.part;
     setRenderColorToLight(bar.emptyColor);
-    SDL_RenderFillRect(renderer, &rect);
+    SDL_RenderFillRect(Renderer::renderer, &rect);
 
     // And draw the overlay on top
     // The magic numbers come from the width of the stat bar border
@@ -108,7 +108,7 @@ void WindowHandler::renderStatBar(StatBar &bar) {
     rect.w = bar.totalWidth + 2 * borderWidth;
     rect.y -= borderWidth;
     rect.h += 2 * borderWidth;
-    statBarOverlay.texture -> render(renderer, NULL, &rect); 
+    statBarOverlay.texture -> render(NULL, &rect); 
 }
 
 // Render each texture from textures onto to, using the spacing variables
@@ -127,21 +127,21 @@ SDL_Texture *WindowHandler::renderHotbarPart(const Hotbar &hotbar,
         int totalWidth = 12 * width + 12 * hotbar.smallGap;
         totalWidth += 2 * hotbar.largeGap;
         Uint32 pixelFormat = SDL_PIXELFORMAT_ARGB8888;
-        texture = SDL_CreateTexture(renderer, pixelFormat, 
+        texture = SDL_CreateTexture(Renderer::renderer, pixelFormat, 
         SDL_TEXTUREACCESS_TARGET, totalWidth, height);
         // Make the new texture have a transparent background
-        SDL_SetRenderTarget(renderer, texture);
+        SDL_SetRenderTarget(Renderer::renderer, texture);
         SDL_SetTextureBlendMode(texture, SDL_BLENDMODE_BLEND);
-        SDL_SetRenderDrawColor(renderer, 0, 0, 0 ,0);
-        SDL_RenderClear(renderer);
+        SDL_SetRenderDrawColor(Renderer::renderer, 0, 0, 0 ,0);
+        SDL_RenderClear(Renderer::renderer);
     }
 
     // Set render settings
-    SDL_SetRenderTarget(renderer, texture);
+    SDL_SetRenderTarget(Renderer::renderer, texture);
     SDL_SetTextureBlendMode(texture, SDL_BLENDMODE_BLEND);
 
     // Set the draw color to white so it draws whatever it's drawing normally
-    SDL_SetRenderDrawColor(renderer, 0xFF, 0xFF, 0xFF, 0xFF);
+    SDL_SetRenderDrawColor(Renderer::renderer, 0xFF, 0xFF, 0xFF, 0xFF);
 
     // Actually render
     SDL_Rect rectTo;
@@ -159,7 +159,7 @@ SDL_Texture *WindowHandler::renderHotbarPart(const Hotbar &hotbar,
         rectTo.h = textures[i].rect.h;
         rectTo.x = refRect.x + (refRect.w - rectTo.w) / 2;
         rectTo.y = refRect.y + (refRect.h - rectTo.h) / 2;
-        textures[i].render(renderer, &rectTo);
+        textures[i].render(&rectTo);
     }
 
     return texture;
@@ -182,8 +182,7 @@ void WindowHandler::updateHotbarSprite(Hotbar &hotbar) {
     // Actually create the texture
     Texture *all;
     if (hotbar.sprite.texture == NULL) {
-        all = new Texture(renderer, pixelFormat, SDL_TEXTUREACCESS_TARGET, 
-                width, height);
+        all = new Texture(pixelFormat, SDL_TEXTUREACCESS_TARGET, width, height);
         // Set the sprite thing in the hotbar to the texture we just made
         hotbar.sprite.texture.reset(all);
     }
@@ -215,7 +214,6 @@ void WindowHandler::updateHotbarSprite(Hotbar &hotbar) {
         if (hotbar.actions[i] != NULL) {
             // Add a sprite to the front row
             // Load the sprite if it doesn't have one
-            loadAction(*hotbar.actions[i]);
             frontSprites.push_back(hotbar.actions[i] -> sprite);
         }
         else {
@@ -223,7 +221,6 @@ void WindowHandler::updateHotbarSprite(Hotbar &hotbar) {
         }
         if (hotbar.actions[i + 12] != NULL) {
             // Load the sprite if necessary
-            loadAction(*hotbar.actions[i + 12]);
             backSprites.push_back(hotbar.actions[i + 12] -> sprite);
         }
         else {
@@ -241,16 +238,16 @@ void WindowHandler::updateHotbarSprite(Hotbar &hotbar) {
         back = temp;
     }
 
-    all -> SetRenderTarget(renderer);
+    all -> SetRenderTarget();
     // Tell SDL to do transparency when it renders
     all -> SetTextureBlendMode(SDL_BLENDMODE_BLEND);
     // Set draw color to transparent so the texture has a transparent 
     // background
-    SDL_SetRenderDrawColor(renderer, 0, 0, 0 ,0);
-    SDL_RenderClear(renderer);
+    SDL_SetRenderDrawColor(Renderer::renderer, 0, 0, 0 ,0);
+    SDL_RenderClear(Renderer::renderer);
 
     // Actually render the sprite onto the texture
-    SDL_SetRenderDrawColor(renderer, 0xFF, 0xFF, 0xFF, 0xFF);
+    SDL_SetRenderDrawColor(Renderer::renderer, 0xFF, 0xFF, 0xFF, 0xFF);
     // TODO: make the back layer slightly transparent
     SDL_Rect rectTo;
     rectTo.x = 0;
@@ -258,11 +255,11 @@ void WindowHandler::updateHotbarSprite(Hotbar &hotbar) {
     rectTo.w = width - hotbar.offsetRight;
     rectTo.h = height - hotbar.offsetDown;
     // Render the back layer
-    SDL_RenderCopy(renderer, back, NULL, &rectTo);
+    SDL_RenderCopy(Renderer::renderer, back, NULL, &rectTo);
     // Render the front layer
     rectTo.x = hotbar.offsetRight;
     rectTo.y = hotbar.offsetDown;
-    SDL_RenderCopy(renderer, front, NULL, &rectTo);
+    SDL_RenderCopy(Renderer::renderer, front, NULL, &rectTo);
 
     // Not leak memory
     SDL_DestroyTexture(front);
@@ -275,7 +272,7 @@ void WindowHandler::renderInventory(Inventory &inventory) {
         updateInventorySprite(inventory);
     }
     // Just in case, make sure the renderer is rendering to the screen
-    SDL_SetRenderTarget(renderer, NULL);
+    SDL_SetRenderTarget(Renderer::renderer, NULL);
 
     // The rectangle to draw to
     SDL_Rect rectTo;
@@ -285,7 +282,7 @@ void WindowHandler::renderInventory(Inventory &inventory) {
     rectTo.y = inventory.y;
 
     // And actually render
-    inventory.sprite.render(renderer, &rectTo);
+    inventory.sprite.render(&rectTo);
 }
 
 
@@ -298,7 +295,7 @@ void WindowHandler::loadInventory() {
     Inventory::squareSprite.rect.h = 32;
 
     // And actually load it
-    Inventory::squareSprite.loadTexture(UI_PATH, renderer);
+    Inventory::squareSprite.loadTexture(UI_SPRITE_PATH);
 }
 
 /* Draw the whole inventory onto a single sprite. */
@@ -310,7 +307,7 @@ void WindowHandler::updateInventorySprite(Inventory &inventory) {
     Uint32 pixelFormat = Inventory::squareSprite.texture -> getFormat();
     int width = Inventory::squareSprite.rect.w * inventory.getWidth();
     int height = Inventory::squareSprite.rect.h * inventory.getHeight();
-    Texture *texture = new Texture(renderer, pixelFormat, 
+    Texture *texture = new Texture(pixelFormat, 
             SDL_TEXTUREACCESS_TARGET, width, height);
 
     // Store the size of the texture
@@ -318,7 +315,7 @@ void WindowHandler::updateInventorySprite(Inventory &inventory) {
     inventory.sprite.rect.h = height;
 
     // Tell the renderer to draw to the texture
-    texture -> SetRenderTarget(renderer);
+    texture -> SetRenderTarget();
     texture -> SetTextureBlendMode(SDL_BLENDMODE_BLEND);
 
     // Now loop through each square twice, once to draw the background and
@@ -355,15 +352,12 @@ void WindowHandler::updateInventorySprite(Inventory &inventory) {
             // exists
             Item *item = inventory.getItem(row, col);
             if (item != NULL) {
-                // Load the sprite if necessary
-                // Remember, loadAction does nothing if it already has a sprite
-                loadAction(*item);
                 // Center rectTo inside refRect
                 rectTo.w = item -> sprite.rect.w;
                 rectTo.h = item -> sprite.rect.h;
                 rectTo.x = refRect.x + (refRect.w - rectTo.w) / 2;
                 rectTo.y = refRect.y + (refRect.h - rectTo.h) / 2;
-                item -> sprite.render(renderer, &rectTo);
+                item -> sprite.render(&rectTo);
             }
             refRect.x += refRect.w;
         }
@@ -394,7 +388,7 @@ void WindowHandler::renderUI(Player &player) {
     }
 
     // Make sure the renderer isn't rendering to a texture
-    SDL_SetRenderTarget(renderer, NULL);
+    SDL_SetRenderTarget(Renderer::renderer, NULL);
 
     // Create a rect to render to
     SDL_Rect rectTo;
@@ -404,7 +398,7 @@ void WindowHandler::renderUI(Player &player) {
     // Render
     rectTo.x = player.hotbar.xStart;
     rectTo.y = player.hotbar.yStart;
-    player.hotbar.sprite.render(renderer, &rectTo);
+    player.hotbar.sprite.render(&rectTo);
 
     // Render the stat bars
     player.healthBar.y = screenHeight - player.healthBar.distFromBottom;
@@ -427,8 +421,6 @@ void WindowHandler::renderUI(Player &player) {
 
     // Render the item held by the mouse, if any
     if (player.mouseSlot != NULL) {
-        // Load the action sprite if it issn't already
-        loadAction(*player.mouseSlot);
         // Find the mouse
         int x;
         int y;
@@ -441,20 +433,17 @@ void WindowHandler::renderUI(Player &player) {
         rect.x = x - (rect.w / 2);
         rect.y = y - (rect.h / 2);
         // Render
-        player.mouseSlot -> sprite.render(renderer, &rect);
+        player.mouseSlot -> sprite.render(&rect);
     }
 }
 
 // Constructor
 WindowHandler::WindowHandler(int screenWidth, int screenHeight, 
-        int mapWidth, int mapHeight, int tileWidth, int tileHeight, bool dark) 
+        int tileWidth, int tileHeight) 
     : screenWidth(screenWidth), screenHeight(screenHeight), 
-        TILE_WIDTH(tileWidth), TILE_HEIGHT(tileHeight), 
-        worldWidth(TILE_WIDTH * mapWidth),
-        worldHeight(TILE_HEIGHT * mapHeight), enableDarkness(dark) {
+        TILE_WIDTH(tileWidth), TILE_HEIGHT(tileHeight) {
     window = NULL;
     screenSurface = NULL;
-    renderer = NULL;
 
     // Set the 2D vector of rects for the tiles
     resize(screenWidth, screenHeight);
@@ -462,6 +451,8 @@ WindowHandler::WindowHandler(int screenWidth, int screenHeight,
     // Not sure if this belongs here, but set the name of file to get the
     // texture for statBarOverlay from
     statBarOverlay.name = "stat_bar_overlay.png";
+
+    init();
 }
 
 void WindowHandler::setMinimized(bool minimized) {
@@ -486,15 +477,19 @@ void WindowHandler::resize(int width, int height) {
     }
 }
 
-// Start up the window
-bool WindowHandler::init() {
-    bool success = true;
+void WindowHandler::setMapSize(int tilesWide, int tilesHigh) {
+    worldWidth = tilesWide * TILE_WIDTH;
+    worldHeight = tilesHigh * TILE_HEIGHT;
+}
 
+// Start up the window
+void WindowHandler::init() {
     // Initialize SDL
     if (SDL_Init(SDL_INIT_VIDEO) < 0) {
-        cerr << "SDL could not initialize. SDL_Error: ";
-        cerr << SDL_GetError() << endl;
-        success = false;
+        /* Yarr if I ever see a char[] again I will eat it. */
+        string message = (string)"SDL could not initialize. SDL_Error: " 
+                + SDL_GetError() + "\n";
+        throw message;
     }
     else {
         // Create window
@@ -502,81 +497,58 @@ bool WindowHandler::init() {
                     SDL_WINDOWPOS_UNDEFINED, screenWidth, screenHeight,
                     SDL_WINDOW_SHOWN | SDL_WINDOW_RESIZABLE);
         if (window == NULL) {
-            cerr << "Window could not be created. SDL_Error: ";
-            cerr << SDL_GetError() << endl;
-            success = false;
+            string message = (string)"Window could not be created. SDL_Error: " 
+                    + SDL_GetError() + "\n";
+            throw message;
         }
         else {
             // Create a renderer for the window
-            renderer = SDL_CreateRenderer(window, -1, 
+            Renderer::renderer = SDL_CreateRenderer(window, -1, 
                                             SDL_RENDERER_ACCELERATED);
 
             // Fall back to a software renderer if necessary
-            if (renderer == NULL) {
+            if (Renderer::renderer == NULL) {
                 cerr << "Hardware-accelerated renderer could not be created. ";
                 cerr << "SDL Error: " << endl << SDL_GetError() << endl;
                 cerr << "Falling back to software renderer." << endl;
-                renderer = SDL_CreateRenderer(window, -1, 
+                Renderer::renderer = SDL_CreateRenderer(window, -1, 
                                             SDL_RENDERER_SOFTWARE);
             }
-            if (renderer == NULL) {
-                cerr << "Software-accelerated renderer could not be created. ";
-                cerr << "SDL Error: " << endl << SDL_GetError() << endl;
-                success = false;
+            if (Renderer::renderer == NULL) {
+                string message = (string)"Software-accelerated renderer could "
+                        + "not be created. SDL_Error: " + SDL_GetError() + "\n";
+                throw message;
             }
             else {
                 // Initialize renderer draw color
-                SDL_SetRenderDrawColor(renderer, 0xFF, 0xFF, 0xFF, 0xFF);
+                SDL_SetRenderDrawColor(Renderer::renderer, 0xFF, 0xFF, 0xFF, 0xFF);
 
                 // Initialize PNG loading
                 int imgFlags = IMG_INIT_PNG;
                 if (!(IMG_Init(imgFlags) & imgFlags)) {
-                    cerr << "SDL_image could not initialize. SDL_image Error: ";
-                    cerr << endl << IMG_GetError() << endl;
-                    success = false;
+                    string message = (string)"SDL_image could not initialize. "
+                            + "SDL_image Error: " + IMG_GetError() + "\n";
+                    throw message;
                 }
             }
         }
     }
     // Assume the window is not minimized
     isMinimized = false;
-
-    return success;
 }
 
 // Load all the pictures
-void WindowHandler::loadMedia(vector<Tile *> &pointers, 
-        vector<movable::Movable *> &movables, Hotbar &hotbar) {
+void WindowHandler::loadMedia(Hotbar &hotbar) {
     // Load the overlay for the player's stats
-    statBarOverlay.loadTexture(UI_PATH, renderer);
-
-    // Load the textures for tiles
-    for (unsigned i = 0; i < pointers.size(); i++) {
-        pointers[i] -> sprite.loadTexture(TILE_PATH, renderer);
-    }
-
-    // And for the movables
-    for (unsigned int i = 0; i < movables.size(); i++) {
-        movables[i] -> sprite.loadTexture(MOVABLE_PATH, renderer);
-    }
+    statBarOverlay.loadTexture(UI_SPRITE_PATH);
 
     // And load the hotbar
-    hotbar.frame.loadTexture(UI_PATH, renderer);
+    hotbar.frame.loadTexture(UI_SPRITE_PATH);
     // Update the hotbar sprite
     updateHotbarSprite(hotbar);
 
     // Load inventory background sprite
     loadInventory();
-}
-
-// Load an item sprite
-// Assumes the item has no sprite to start with
-void WindowHandler::loadAction(Action &action) {
-    // Ignore if there's already a sprite loaded
-    if (action.sprite.hasTexture()) {
-        return;
-    }
-    action.sprite.loadTexture(ICON_PATH, renderer);
 }
 
 // Render everything the map holds information about
@@ -585,7 +557,7 @@ void WindowHandler::loadAction(Action &action) {
 // If either value puts the camera past the end of the map, it will be fixed
 void WindowHandler::renderMap(Map &m, const SDL_Rect &camera) {
     // Make sure the renerer draw color is set to white
-    SDL_SetRenderDrawColor(renderer, 0xFF, 0xFF, 0xFF, 0xFF);
+    SDL_SetRenderDrawColor(Renderer::renderer, 0xFF, 0xFF, 0xFF, 0xFF);
 
     assert(camera.x >= 0);
     assert(camera.y >= 0);
@@ -598,8 +570,7 @@ void WindowHandler::renderMap(Map &m, const SDL_Rect &camera) {
     // Iterate through every tile at least partially within the camera
     int width = ceil((float)camera.w / (float)TILE_WIDTH) + 1;
     int height = ceil((float)camera.h / (float)TILE_HEIGHT) + 1;
-    int mapWidth = worldWidth / TILE_WIDTH;
-    int xMapStart = ((camera.x / TILE_WIDTH) + mapWidth) % mapWidth;
+    int xMapStart = ((camera.x / TILE_WIDTH) + m.getWidth()) % m.getWidth();
     int yMapStart = (camera.y + camera.h) / TILE_HEIGHT;
     /* Location to hold which sprite on the sheet to render. */
     Location spritePlace; 
@@ -616,19 +587,17 @@ void WindowHandler::renderMap(Map &m, const SDL_Rect &camera) {
             rectTo.y += (j - 1) * TILE_HEIGHT;
 
             // Render the tile
-            int xTile = (xMapStart + i) % mapWidth;
+            int xTile = (xMapStart + i) % m.getWidth();
             int yTile = yMapStart - j;
             // But only if it's a tile that exists on the map
             assert (0 <= xTile);
-            assert (xTile < mapWidth);
+            assert (xTile < m.getWidth());
             if (!m.isOnMap(xTile, yTile)) {
                 break;
             }
 
-            Sprite backSprite 
-                    = m.getBackground(xTile, yTile) -> sprite;
-            Sprite foreSprite
-                    = m.getForeground(xTile, yTile) -> sprite;
+            Sprite backSprite = m.getBackground(xTile, yTile) -> sprite;
+            Sprite foreSprite = m.getForeground(xTile, yTile) -> sprite;
             if (backSprite.hasTexture() || foreSprite.hasTexture()) {
                 // Modulate the color due to lighting
                 Light light = m.getLight(xTile, yTile);
@@ -639,7 +608,7 @@ void WindowHandler::renderMap(Map &m, const SDL_Rect &camera) {
                     SpaceInfo::fromSpritePlace(spritePlace, background);
                     backSprite.rect.x = spritePlace.x * TILE_WIDTH;
                     backSprite.rect.y = spritePlace.y * TILE_HEIGHT;
-                    backSprite.render(renderer, &rectTo);
+                    backSprite.render(&rectTo);
                 }
                 if (foreSprite.hasTexture()) {
                     foreSprite.texture -> SetTextureColorMod(light); 
@@ -647,7 +616,7 @@ void WindowHandler::renderMap(Map &m, const SDL_Rect &camera) {
                     SpaceInfo::fromSpritePlace(spritePlace, foreground);
                     foreSprite.rect.x = spritePlace.x * TILE_WIDTH;
                     foreSprite.rect.y = spritePlace.y * TILE_HEIGHT;
-                    foreSprite.render(renderer, &rectTo);
+                    foreSprite.render(&rectTo);
                 }
             }
         }
@@ -657,7 +626,7 @@ void WindowHandler::renderMap(Map &m, const SDL_Rect &camera) {
 // Render any movables (the player, monsters NPCs, dropped items)
 void WindowHandler::renderMovables(const vector<movable::Movable *> &movables) {
     // Make sure the renerer draw color is set to white
-    SDL_SetRenderDrawColor(renderer, 0xFF, 0xFF, 0xFF, 0xFF);
+    SDL_SetRenderDrawColor(Renderer::renderer, 0xFF, 0xFF, 0xFF, 0xFF);
 
     // Find where the player and camera are
     int x = movables[0] -> x;
@@ -684,7 +653,7 @@ void WindowHandler::renderMovables(const vector<movable::Movable *> &movables) {
 
         // Draw!
         // TODO: check whether it's actually anywhere near the screen
-        movables[i] -> sprite.render(renderer, &rectTo);
+        movables[i] -> sprite.render(&rectTo);
     }
 
 }
@@ -702,14 +671,14 @@ void WindowHandler::update(Map &map,
     player.screenY = playerRect.y + playerRect.h;
 
     // Make sure the renderer isn't rendering to a texture
-    SDL_SetRenderTarget(renderer, NULL);
+    SDL_SetRenderTarget(Renderer::renderer, NULL);
     // Clear the screen
-    SDL_RenderClear(renderer);
+    SDL_RenderClear(Renderer::renderer);
 
     // Put a black rectangle in the background
     SDL_Rect fillRect = { 0, 0, screenWidth, screenHeight };
-    SDL_SetRenderDrawColor(renderer, 0x00, 0x99, 0xFF, 0xFF);
-    SDL_RenderFillRect(renderer, &fillRect);
+    SDL_SetRenderDrawColor(Renderer::renderer, 0x00, 0x99, 0xFF, 0xFF);
+    SDL_RenderFillRect(Renderer::renderer, &fillRect);
 
     // Only draw stuff if it isn't minimized
     if (!isMinimized) {
@@ -730,15 +699,15 @@ void WindowHandler::update(Map &map,
         renderUI(player);
 
         // Update the screen
-        SDL_RenderPresent(renderer);
+        SDL_RenderPresent(Renderer::renderer);
     }
 }
 
 // Close the window, clean up, and exit SDL
 void WindowHandler::close() {
     /* Destroy window and renderer. */
-    SDL_DestroyRenderer(renderer);
-    renderer = NULL;
+    SDL_DestroyRenderer(Renderer::renderer);
+    Renderer::renderer = NULL;
     SDL_DestroyWindow(window);
     window = NULL;
 

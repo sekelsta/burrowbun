@@ -3,6 +3,7 @@
 #include <fstream>
 #include "Movable.hh"
 #include <iostream>
+#include "filepaths.hh"
 
 using namespace std;
 using json = nlohmann::json;
@@ -39,6 +40,7 @@ Movable::Movable() {
     // The amount to accelerate by when trying to move
     dAccel.x = 0;
     dAccel.y = 0;
+    sprite.loadTexture(MOVABLE_SPRITE_PATH);
 }
 
 /* Constructor from json file. */
@@ -49,6 +51,7 @@ Movable::Movable(std::string filename) {
     json j = json::parse(infile);
     *this = j.get<Movable>();
     assert(sprite.name != "");
+    sprite.loadTexture(MOVABLE_SPRITE_PATH);
 }
 
 // Virtual destructor

@@ -283,10 +283,6 @@ public:
     /* Gets the map's list of the tile pointers it uses. */
     std::vector<Tile *> getPointers() const;
 
-    /* Gets a reference to the map's list of the tile pointers it uses
-    This should only be used to set the tile textures. */
-    std::vector<Tile *> &getPointersRef();
-
     /* Update the map. */
     void update(std::vector<movable::Movable*> &movables);
 
