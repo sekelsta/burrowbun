@@ -57,6 +57,11 @@ struct Sprite {
         if (hasTexture()) {
             texture -> render(&rect, rectTo);
         }
+        else {
+            /* It should be loaded before being rendered, and the only way it
+            can be loaded properly without having a sprite is if name == "". */
+            assert(name == "");
+        }
     }
 };
 

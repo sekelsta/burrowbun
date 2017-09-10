@@ -108,7 +108,7 @@ void WindowHandler::renderStatBar(StatBar &bar) {
     rect.w = bar.totalWidth + 2 * borderWidth;
     rect.y -= borderWidth;
     rect.h += 2 * borderWidth;
-    statBarOverlay.texture -> render(NULL, &rect); 
+    bar.overlay.render(&rect); 
 }
 
 // Render each texture from textures onto to, using the spacing variables
@@ -436,11 +436,6 @@ WindowHandler::WindowHandler(int screenWidth, int screenHeight,
     resize(screenWidth, screenHeight);
 
     init();
-
-    /* Info for what to render over the statbar rectangles. TODO: move
-    elsewhere. */
-    statBarOverlay.name = "stat_bar_overlay.png";
-    statBarOverlay.loadTexture(UI_SPRITE_PATH);
 }
 
 void WindowHandler::setMinimized(bool minimized) {

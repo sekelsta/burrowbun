@@ -56,9 +56,6 @@ class WindowHandler {
     // A 2D vector of SLD rects for rendering the map
     std::vector<std::vector<SDL_Rect>> tileRects;
 
-    // Store the texture to draw over the player's stat bars
-    Sprite statBarOverlay; // TODO: make this a static member of StatBar
-
     // Private methods
 
     // Return a rectangle in world coordinates, for a player at x, y

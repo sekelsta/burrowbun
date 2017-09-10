@@ -21,6 +21,15 @@
             "g": 0,
             "b": 0,
             "a": 0
+        },
+        "overlay": {
+            "name": "stat_bar_overlay.png",
+            "rect": {
+                "x": 0,
+                "y": 0,
+                "w": 192,
+                "h": 10
+            }
         }
     },
     "fullnessBar": {
@@ -45,8 +54,16 @@
             "g": 0,
             "b": 0,
             "a": 0
+        },
+        "overlay": {
+            "name": "stat_bar_overlay.png",
+            "rect": {
+                "x": 0,
+                "y": 0,
+                "w": 192,
+                "h": 10
+            }
         }
-
     },
     "manaBar": {
         "totalWidth": 190,
@@ -70,6 +87,15 @@
             "g": 0,
             "b": 0,
             "a": 0
+        },
+        "overlay": {
+            "name": "stat_bar_overlay.png",
+            "rect": {
+                "x": 0,
+                "y": 0,
+                "w": 192,
+                "h": 10
+            }
         }
     }
 }

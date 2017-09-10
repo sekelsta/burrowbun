@@ -1,4 +1,5 @@
 #include "UIHelpers.hh"
+#include "filepaths.hh"
 
 /* Get a statbar from a json. */
 void from_json(const nlohmann::json &j, StatBar &bar) {
@@ -11,6 +12,11 @@ void from_json(const nlohmann::json &j, StatBar &bar) {
     bar.fullColor = j["fullColor"].get<Light>();
     bar.partColor = j["partColor"].get<Light>();
     bar.emptyColor = j["emptyColor"].get<Light>();
+
+    bar.overlay = j["overlay"].get<Sprite>();
+
+    /* And now's as good a time as any to load the sprite. */
+    bar.overlay.loadTexture(UI_SPRITE_PATH);
 }
 
 

@@ -5,6 +5,7 @@
 #include <SDL2/SDL.h>
 #include "Light.hh"
 #include "Stat.hh"
+#include "Sprite.hh"
 
 /* A struct with a rectangle and bools. The rectangle is in screen
 coordinates, and the bools are for whether the mouse is in the box and 
@@ -65,6 +66,9 @@ struct StatBar {
     Light partColor;
     Light emptyColor;
 
+    /* The sprite to go over the color. */
+    Sprite overlay;
+
 private:
     // Translate from portion of max health to portion of bar filled
     int convert(double newValue, double maxStat) {
@@ -78,12 +82,6 @@ private:
     }
 
 public:
-    // Constructor
-    StatBar() {
-        part = 0;
-        full = 0;
-    }
-
     // Set the amount of the stat
     void setFull(double newValue, double maxStat) {
         assert(0 <= newValue);
