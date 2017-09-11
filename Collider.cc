@@ -302,7 +302,7 @@ void Collider::collide(Map &map, movable::Movable &movable) {
         to.x = from.x + dx;
         to.y = from.y + dy;
         /* Collide with the bottom and top of the map. */
-        to.collideEdge(movable, worldHeight);
+        movable.isCollidingDown = to.collideEdge(worldHeight);
 
         int newX = from.x;
         int newY = from.y;
@@ -375,7 +375,7 @@ void Collider::collide(Map &map, movable::Movable &movable) {
             to.x = from.x + dx;
             to.y = from.y + dy;
             /* But still collide with the top and bottom of the map. */
-            to.collideEdge(movable, worldHeight);
+            movable.isCollidingDown = to.collideEdge(worldHeight);
 
            if (!anyInevitable && !usedCorner) {
                 // This actually happens surprisingly rarely

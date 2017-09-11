@@ -14,17 +14,19 @@
 #include "Sprite.hh"
 #include "Inventory.hh"
 #include "Action.hh"
+#include "Rect.hh"
 
 using namespace std;
 
 // Return a rectangle in world coordinates for a player at x, y
 // w and h are the width and height of the player sprite
-SDL_Rect WindowHandler::findCamera(int x, int y, int w, int h) {
-    SDL_Rect camera;
+Rect WindowHandler::findCamera(int x, int y, int w, int h) {
+    Rect camera;
     camera.x = x - screenWidth / 2;
     camera.y = y - screenHeight / 2;
     camera.w = screenWidth;
     camera.h = screenHeight;
+    camera.worldWidth = worldWidth;
 
     // Make the camera center be the center of the player
     camera.x += w / 2;
@@ -44,20 +46,6 @@ SDL_Rect WindowHandler::findCamera(int x, int y, int w, int h) {
     return camera;
 }
 
-// Convert a rectangle from world coordinates to screen coordinates
-SDL_Rect WindowHandler::convertRect(SDL_Rect rect, SDL_Rect camera) {
-    int xScreen = (rect.x - camera.x + worldWidth) % worldWidth;
-    int yScreen = camera.y + camera.h - rect.y - rect.h;
-    SDL_Rect screenRect = { xScreen, yScreen, rect.w, rect.h };
-
-    return screenRect;
-}
-
-// Set the renderer draw color to a Light color
-void WindowHandler::setRenderColorToLight(const Light &color) {
-    SDL_SetRenderDrawColor(Renderer::renderer, color.r, color.g, color.b, 0xFF);
-}
-
 // Render the texture to a 2d grid with width columns and height rows
 void WindowHandler::renderGrid(const Sprite &sprite, int width, int height) {
     // Where to render to
@@ -74,41 +62,6 @@ void WindowHandler::renderGrid(const Sprite &sprite, int width, int height) {
         rectTo.x += rectTo.w;
         rectTo.y = 0;
     }
-}
-
-// Render a StatBar
-void WindowHandler::renderStatBar(StatBar &bar) {
-    SDL_Rect rect;
-    rect.y = bar.y;
-    rect.h = bar.h;
-
-    // Draw the part that's full
-    rect.x = bar.x;
-    rect.w = bar.full;
-    setRenderColorToLight(bar.fullColor);
-    SDL_RenderFillRect(Renderer::renderer, &rect);
-
-    // Draw the part that can regenerate ("part")
-    rect.x += bar.full;
-    rect.w = bar.part - bar.full;
-    assert(rect.w >= 0);
-    setRenderColorToLight(bar.partColor);
-    SDL_RenderFillRect(Renderer::renderer, &rect);
-
-    // Draw the empty part of the bar
-    rect.x += rect.w;
-    rect.w = bar.totalWidth - bar.part;
-    setRenderColorToLight(bar.emptyColor);
-    SDL_RenderFillRect(Renderer::renderer, &rect);
-
-    // And draw the overlay on top
-    // The magic numbers come from the width of the stat bar border
-    int borderWidth = 1;
-    rect.x = bar.x - borderWidth;
-    rect.w = bar.totalWidth + 2 * borderWidth;
-    rect.y -= borderWidth;
-    rect.h += 2 * borderWidth;
-    bar.overlay.render(&rect); 
 }
 
 // Render each texture from textures onto to, using the spacing variables
@@ -141,7 +94,7 @@ SDL_Texture *WindowHandler::renderHotbarPart(const Hotbar &hotbar,
     SDL_SetTextureBlendMode(texture, SDL_BLENDMODE_BLEND);
 
     // Set the draw color to white so it draws whatever it's drawing normally
-    SDL_SetRenderDrawColor(Renderer::renderer, 0xFF, 0xFF, 0xFF, 0xFF);
+    Renderer::setColorWhite();
 
     // Actually render
     SDL_Rect rectTo;
@@ -247,7 +200,7 @@ void WindowHandler::updateHotbarSprite(Hotbar &hotbar) {
     SDL_RenderClear(Renderer::renderer);
 
     // Actually render the sprite onto the texture
-    SDL_SetRenderDrawColor(Renderer::renderer, 0xFF, 0xFF, 0xFF, 0xFF);
+    Renderer::setColorWhite();
     // TODO: make the back layer slightly transparent
     SDL_Rect rectTo;
     rectTo.x = 0;
@@ -367,7 +320,6 @@ void WindowHandler::updateInventorySprite(Inventory &inventory) {
     inventory.isSpriteUpdated = true;
 }
 
-// Currently this just renders the hotbar
 void WindowHandler::renderUI(Player &player) {
     // Re-render the hotbar sprite if necessary
     if (!player.hotbar.isSpriteUpdated) {
@@ -393,9 +345,9 @@ void WindowHandler::renderUI(Player &player) {
     player.manaBar.y = screenHeight - player.manaBar.distFromBottom;
 
     // And actually draw them
-    renderStatBar(player.healthBar);
-    renderStatBar(player.fullnessBar);
-    renderStatBar(player.manaBar);
+    player.healthBar.render();
+    player.fullnessBar.render();
+    player.manaBar.render();
 
     // Render the inventory, if necessary
     if (player.isInventoryOpen) {
@@ -504,7 +456,7 @@ void WindowHandler::init() {
             }
             else {
                 // Initialize renderer draw color
-                SDL_SetRenderDrawColor(Renderer::renderer, 0xFF, 0xFF, 0xFF, 0xFF);
+                Renderer::setColorWhite();
 
                 // Initialize PNG loading
                 int imgFlags = IMG_INIT_PNG;
@@ -524,9 +476,9 @@ void WindowHandler::init() {
 // x and y are the center of view of the camera, in pixels, 
 // where y = 0 at the bottom
 // If either value puts the camera past the end of the map, it will be fixed
-void WindowHandler::renderMap(Map &m, const SDL_Rect &camera) {
+void WindowHandler::renderMap(Map &m, const Rect &camera) {
     // Make sure the renerer draw color is set to white
-    SDL_SetRenderDrawColor(Renderer::renderer, 0xFF, 0xFF, 0xFF, 0xFF);
+    Renderer::setColorWhite();
 
     assert(camera.x >= 0);
     assert(camera.y >= 0);
@@ -592,51 +544,20 @@ void WindowHandler::renderMap(Map &m, const SDL_Rect &camera) {
     }
 }
 
-// Render any movables (the player, monsters NPCs, dropped items)
-void WindowHandler::renderMovables(const vector<movable::Movable *> &movables) {
-    // Make sure the renerer draw color is set to white
-    SDL_SetRenderDrawColor(Renderer::renderer, 0xFF, 0xFF, 0xFF, 0xFF);
-
-    // Find where the player and camera are
-    int x = movables[0] -> x;
-    int y = movables[0] -> y;
-    int w = movables[0] -> sprite.rect.w;
-    int h = movables[0] -> sprite.rect.h;
-    SDL_Rect camera = findCamera(x, y, w, h);
-    SDL_Rect rectTo;
-
-    // Render things
-    for (unsigned int i = 0; i < movables.size(); i++) {
-        rectTo.x = movables[i] -> x;
-        rectTo.y = movables[i] -> y;
-        rectTo.w = movables[i] -> sprite.rect.w;
-        rectTo.h = movables[i] -> sprite.rect.h;
-        // Convert the rectangle to screen coordinates
-        rectTo = convertRect(rectTo, camera);
-
-        assert(i != 0 || rectTo.x >= 0);
-        assert(i != 0 || rectTo.y >= 0);
-        assert(i != 0 || rectTo.x < camera.w);
-        assert(i != 0 || rectTo.y < camera.h);
-
-        // Draw!
-        // TODO: check whether it's actually anywhere near the screen
-        movables[i] -> sprite.render(&rectTo);
-    }
-
-}
-
 // Update the screen
 void WindowHandler::update(Map &map, 
         const vector<movable::Movable *> &movables, Player &player) {
-    // Tell the player where on the screen it was drawn
+    /* Find the camera. */
     int w = player.sprite.rect.w;
     int h = player.sprite.rect.h;
-    SDL_Rect camera = findCamera(player.x, player.y, w, h);
+    Rect camera = findCamera(player.x, player.y, w, h);
+    /* Tell the player where on the screen they are. This is only used by
+    EventHandler. TODO: remove. */
     SDL_Rect playerRect = { player.x, player.y, w, h };
-    playerRect = convertRect(playerRect, camera);
+    player.convertRect(playerRect, camera);
     player.screenX = playerRect.x;
     player.screenY = playerRect.y + playerRect.h;
+
 
     // Make sure the renderer isn't rendering to a texture
     SDL_SetRenderTarget(Renderer::renderer, NULL);
@@ -650,18 +571,12 @@ void WindowHandler::update(Map &map,
 
     // Only draw stuff if it isn't minimized
     if (!isMinimized) {
-
-        // Put stuff on it
-        // movables[0] should be the player
-        int x = movables[0] -> x;
-        int y = movables[0] -> y;
-        int w = movables[0] -> sprite.rect.w;
-        int h = movables[0] -> sprite.rect.h;
-        SDL_Rect camera = findCamera(x, y, w, h);
         renderMap(map, camera);
 
         // Draw any movables
-        renderMovables(movables);
+        for (unsigned int i = 0; i < movables.size(); i++) {
+            movables[i] -> render(camera);
+        }
 
         // Draw the UI
         renderUI(player);

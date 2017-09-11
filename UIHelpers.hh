@@ -105,6 +105,9 @@ public:
         setPart(stat.part, stat.maxStat);
         assert(full <= part);
     }
+
+    /* Render itself. */
+    void render();
 };
 
 /* Get a statbar from a json. */

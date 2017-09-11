@@ -1,5 +1,8 @@
+#ifndef RECT_HH
+#define RECT_HH
+
 #include <cassert>
-#include "Movable.hh"
+#include <algorithm>
 
 /* Rectangle, capable of seeing if another intersects it taking into account
     the world wrapping around the x direction. */
@@ -62,14 +65,16 @@ public:
         return intersectsX(that) && intersectsY(that);
     }
 
-    /* Collide with the top or bottom of the map. */
-    inline void collideEdge(movable::Movable &movable, int worldHeight) {
-        if (y <= 0) {
-            movable.isCollidingDown = true;
-            y = 0;
-        }
+    /* Collide with the top or bottom of the map. Return true if there was a
+    collision with the bottom. */
+    inline bool collideEdge(int worldHeight) {
         y = std::min(y, worldHeight - h - 1);
+        if (y <= 0) {
+            y = 0;
+            return true;
+        }
+        return false;
     }
 };
 
-
+#endif

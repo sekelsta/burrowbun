@@ -35,7 +35,7 @@ EventHandler.o : EventHandler.cc EventHandler.hh WindowHandler.hh Player.hh \
         Action.hh Item.hh
 	$(CC) $(CXXFLAGS) $^ -c $(LDFLAGS) $(LINKER_FLAGS)
 
-Movable.o : Movable.cc Movable.hh Damage.hh
+Movable.o : Movable.cc Movable.hh Damage.hh Rect.hh
 	$(CC) $(CXXFLAGS) $^ -c $(LDFLAGS) $(LINKER_FLAGS)
 
 Player.o : Player.cc Player.hh Movable.hh Hotbar.hh UIHelpers.hh \

@@ -60,20 +60,11 @@ class WindowHandler {
 
     // Return a rectangle in world coordinates, for a player at x, y
     // w and h are the width and height of the player sprite.
-    SDL_Rect findCamera(int x, int y, int w, int h);
-
-    // Convert a rectangle from world coordinates to screen coordinates
-    SDL_Rect convertRect(SDL_Rect rect, SDL_Rect camera);
-
-    // Set render draw color to light color
-    void setRenderColorToLight(const Light &color);
+    Rect findCamera(int x, int y, int w, int h);
 
     // Render the texture from the Sprite to a 2d grid with width columns
     // and height rows
     void renderGrid(const Sprite &sprite, int width, int height);
-
-    // Render a StatBar
-    void renderStatBar(StatBar &bar);
 
     // Create a texture and render all the textures to it, using the spacing 
     // variables from hotbar. The texture to is expected to have the correct 
@@ -117,10 +108,7 @@ public:
     // Render everything the map holds information about
     // x and y are the coordinates of the center of the camera, in pixels,
     // where y = 0 is at the bottom
-    void renderMap(Map &m, const SDL_Rect &camera);
-
-    // Render movables (the player, monsters, NPCs, dropped items)
-    void renderMovables(const std::vector<movable::Movable *> &movables);
+    void renderMap(Map &m, const Rect &camera);
 
     // Update the screen
     void update(Map &m, const std::vector<movable::Movable *> &movables, 

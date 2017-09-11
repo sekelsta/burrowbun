@@ -4,6 +4,7 @@
 #include "Movable.hh"
 #include <iostream>
 #include "filepaths.hh"
+#include "Renderer.hh"
 
 using namespace std;
 using json = nlohmann::json;
@@ -128,6 +129,33 @@ void Movable::takeDamage(const Damage &damage) {}
 
 /* Take fall damage. Does nothing. */
 void Movable::takeFallDamage() {}
+
+/* Convert a rectangle from world coordinates to screen coordinates. */
+void Movable::convertRect(SDL_Rect &rect, const Rect &camera) {
+    rect.x = (rect.x - camera.x + camera.worldWidth) % camera.worldWidth;
+    rect.y = camera.y + camera.h - rect.y - rect.h;
+}
+
+
+/* Render itself. */
+void Movable::render(const Rect &camera) const {
+    // Make sure the renderer draw color is set to white
+    Renderer::setColorWhite();
+
+    SDL_Rect rectTo;
+
+    // Render things
+    rectTo.x = x;
+    rectTo.y = y;
+    rectTo.w = sprite.rect.w;
+    rectTo.h = sprite.rect.h;
+    // Convert the rectangle to screen coordinates
+    convertRect(rectTo, camera);
+
+    // Draw!
+    // TODO: check whether it's actually anywhere near the screen
+    sprite.render(&rectTo);
+}
 
 /* Get a movable from a json file. */
 void from_json(const json &j, Movable &movable) {

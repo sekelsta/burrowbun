@@ -6,6 +6,7 @@
 #include "Sprite.hh"
 #include "json.hpp"
 #include "Damage.hh"
+#include "Rect.hh"
 
 namespace movable {
 
@@ -87,6 +88,14 @@ public:
 
     /* Take fall damage. Also does nothing unless the movables is an entity. */
     virtual void takeFallDamage();
+
+    /* Convert a rectangle from world coordinates to screen coordinates. */
+    static void convertRect(SDL_Rect &rect, const Rect &camera);
+
+
+    /* Render itself to the screen, given an SDL_Rect that tells it where the
+    screen is in the world. */
+    virtual void render(const Rect &camera) const;
 };
 
 /* Get a movable from a json file. */
