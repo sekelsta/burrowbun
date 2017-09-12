@@ -36,6 +36,8 @@ void StatBar::render() {
     rect.h += 2 * borderWidth;
     overlay.render(&rect);
 
+    /* Leave the renderer on white. */
+    Renderer::setColorWhite();
 }
 
 /* Get a statbar from a json. */

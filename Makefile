@@ -5,6 +5,37 @@ CXXFLAGS = -std=c++14 -Wall -D_GLIBCXX_DEBUG -D_LIBCXX_DEBUG_PEDANTIC -Og -g
 LINKER_FLAGS = -lSDL2 -lSDL2_image
 NOISE_FLAGS = -I/usr/include/libnoise -L/usr/lib -lnoise
 
+# Defining variables that say which files all the headers include
+Action.hh.d = Action.hh $(Sprite.hh.d)
+AllTheItems.hh.d = AllTheItems.hh $(Item.hh.d) $(Tile.hh.d) $(MapHelpers.hh.d)
+Animation.hh.d = Animation.hh $(Sprite.hh.d)
+Boulder.hh.d = Boulder.hh $(Tile.hh.d)
+Collider.hh.d = Collider.hh $(Tile.hh.d) $(Map.hh.d) $(Movable.hh.d) \
+        $(Rect.hh.d)
+Damage.hh.d = Damage.hh
+Entity.hh.d = Entity.hh $(Movable.hh.d) $(Stat.hh.d) $(Damage.hh.d)
+EventHandler.hh.d = EventHandler.hh
+Hotbar.hh.d = Hotbar.hh $(Sprite.hh.d) $(UIHelpers.hh.d) $(Action.hh.d)
+Inventory.hh.d = Inventory.hh $(Sprite.hh.d) $(UIHelpers.hh.d) \
+        $(Light.hh.d) $(Item.hh.d)
+Item.hh.d = Item.hh $(Action.hh.d)
+Light.hh.d = Light.hh
+Mapgen.hh.d = Mapgen.hh $(Tile.hh.d) $(MapHelpers.hh.d) $(Map.hh.d)
+MapHelpers.hh.d = MapHelpers.hh $(Tile.hh.d) $(Light.hh.d)
+Map.hh.d = Map.hh $(Tile.hh.d) $(MapHelpers.hh.d)
+Movable.hh.d = Movable.hh $(Sprite.hh.d) $(Damage.hh.d) $(Rect.hh.d)
+Player.hh.d = Player.hh $(Entity.hh.d) $(Hotbar.hh.d) $(Inventory.hh.d) \
+        $(UIHelpers.hh.d)
+Rect.hh.d = Rect.hh
+Renderer.hh.d = Renderer.hh $(Light.hh.d)
+Sprite.hh.d = Sprite.hh $(Texture.hh.d)
+Stat.hh.d = Stat.hh
+Texture.hh.d = Texture.hh $(Light.hh.d) $(Renderer.hh.d)
+Tile.hh.d = Tile.hh $(Sprite.hh.d) $(Movable.hh.d) $(Light.hh.d) $(Damage.hh.d)
+UIHelpers.hh.d = UIHelpers.hh $(Light.hh.d) $(Stat.hh.d) $(Sprite.hh.d)
+WindowHandler.hh.d = WindowHandler.hh $(Sprite.hh.d) $(Renderer.hh.d) \
+        $(Movable.hh.d) $(UIHelpers.hh.d)
+
 all : main
 
 main : main.o Map.o Mapgen.o Tile.o WindowHandler.o EventHandler.o Movable.o \
@@ -13,86 +44,82 @@ main : main.o Map.o Mapgen.o Tile.o WindowHandler.o EventHandler.o Movable.o \
         UIHelpers.o Damage.o Texture.o Renderer.o
 	$(CC) $(CXXFLAGS) $^ -o $@ $(LDFLAGS) $(NOISE_FLAGS) $(LINKER_FLAGS)
 
-main.o : main.cc Mapgen.hh Tile.hh Map.hh WindowHandler.hh EventHandler.hh \
-        Collider.hh Hotbar.hh Movable.hh Player.hh Light.hh MapHelpers.hh \
-        Sprite.hh UIHelpers.hh Entity.hh Inventory.hh Player.hh \
-        Item.hh Action.hh AllTheItems.hh Stat.hh Damage.hh
+main.o : main.cc Action.hh AllTheItems.cc Animation.hh Boulder.hh Collider.hh \
+        Damage.hh Entity.hh EventHandler.hh filepaths.hh Hotbar.hh \
+        Inventory.hh Item.hh Light.hh Mapgen.hh MapHelpers.hh Map.hh \
+        Movable.hh Player.hh Rect.hh Renderer.hh Sprite.hh Stat.hh Texture.hh \
+        Tile.hh UIHelpers.hh version.hh WindowHandler.hh
 	$(CC) $(CXXFLAGS) $^ -c $(LDFLAGS) $(NOISE_FLAGS) $(LINKER_FLAGS)
 
-Map.o : Map.cc Map.hh Tile.hh MapHelpers.hh Light.hh Movable.hh Sprite.hh
+Map.o : Map.cc $(Map.hh.d) $(Boulder.hh.d) version.hh
 	$(CC) $(CXXFLAGS) $^ -c $(LDFLAGS)
 
-Tile.o : Tile.cc Tile.hh Map.hh Sprite.hh Movable.hh Damage.hh
+Tile.o : Tile.cc $(Tile.hh.d) $(Map.hh.d) $(Movable.hh.d) filepaths.hh
 	$(CC) $(CXXFLAGS) $^ -c $(LDFLAGS)
 
-WindowHandler.o : WindowHandler.cc WindowHandler.hh Tile.hh Map.hh Movable.hh \
-        Light.hh MapHelpers.hh Hotbar.hh Sprite.hh Inventory.hh Action.hh \
-        Item.hh Entity.hh Player.hh UIHelpers.hh Renderer.hh
+WindowHandler.o : WindowHandler.cc $(WindowHandler.hh.d) $(Light.hh.d) \
+        $(Tile.hh.d) $(Map.hh.d) $(Hotbar.hh.d) $(Player.hh.d) \
+        $(UIHelpers.hh.d) $(Sprite.hh.d) $(Inventory.hh.d) $(Action.hh.d) \
+        $(Rect.hh.d)
 	$(CC) $(CXXFLAGS) $^ -c $(LDFLAGS) $(LINKER_FLAGS)
 
-EventHandler.o : EventHandler.cc EventHandler.hh WindowHandler.hh Player.hh \
-        Movable.hh Hotbar.hh UIHelpers.hh Entity.hh Inventory.hh \
-        Action.hh Item.hh
+EventHandler.o : EventHandler.cc $(EventHandler.hh.d) $(WindowHandler.hh.d) \
+        $(Player.hh.d) $(Hotbar.hh.d) $(UIHelpers.hh.d)
 	$(CC) $(CXXFLAGS) $^ -c $(LDFLAGS) $(LINKER_FLAGS)
 
-Movable.o : Movable.cc Movable.hh Damage.hh Rect.hh
+Movable.o : Movable.cc $(Movable.hh.d) filepaths.hh $(Renderer.hh.d)
 	$(CC) $(CXXFLAGS) $^ -c $(LDFLAGS) $(LINKER_FLAGS)
 
-Player.o : Player.cc Player.hh Movable.hh Hotbar.hh UIHelpers.hh \
-        Light.hh Entity.hh Inventory.hh Action.hh Item.hh AllTheItems.hh \
-        Stat.hh Damage.hh
+Player.o : Player.cc $(Player.hh.d) $(Item.hh.d) $(AllTheItems.hh.d) 
 	$(CC) $(CXXFLAGS) $^ -c $(LDFLAGS)
 
-Collider.o : Collider.cc Collider.hh Tile.hh Map.hh Movable.hh Sprite.hh \
-        Rect.hh
+Collider.o : Collider.cc $(Collider.hh.d)
 	$(CC) $(CXXFLAGS) $^ -c $(LDFLAGS)
 
-Mapgen.o : Mapgen.cc Mapgen.hh Tile.hh MapHelpers.hh Sprite.hh Movable.hh
+Mapgen.o : Mapgen.cc $(Mapgen.hh.d) version.hh
 	$(CC) $(CXXFLAGS) $^ -c $(LDFLAGS) $(NOISE_FLAGS)
 
-Hotbar.o : Hotbar.cc Hotbar.hh Sprite.hh UIHelpers.hh Action.hh Item.hh
+Hotbar.o : Hotbar.cc $(Hotbar.hh.d)
 	$(CC) $(CXXFLAGS) $^ -c $(LDFLAGS)
 
-Entity.o : Entity.cc Entity.hh Movable.hh UIHelpers.hh Stat.hh Damage.hh
+Entity.o : Entity.cc $(Entity.hh.d)
 	$(CC) $(CXXFLAGS) $^ -c $(LDFLAGS)
 
-Inventory.o : Inventory.cc Inventory.hh Light.hh UIHelpers.hh Sprite.hh \
-        Action.hh Item.hh
+Inventory.o : Inventory.cc $(Inventory.hh.d) filepaths.hh
 	$(CC) $(CXXFLAGS) $^ -c $(LDFLAGS)
 
-Item.o : Item.cc Item.hh Sprite.hh Inventory.hh Action.hh
+Item.o : Item.cc $(Item.hh.d) filepaths.hh
 	$(CC) $(CXXFLAGS) $^ -c $(LDFLAGS)
 
-AllTheItems.o : AllTheItems.cc AllTheItems.hh Item.hh Action.hh Player.hh \
-        Entity.hh Movable.hh Stat.hh UIHelpers.hh Map.hh
+AllTheItems.o : AllTheItems.cc $(AllTheItems.hh.d) $(Player.hh.d) $(Map.hh.d)
 	$(CC) $(CXXFLAGS) $^ -c $(LDFLAGS)
 
-Sprite.o : Sprite.cc Sprite.hh Texture.hh Renderer.hh
+Sprite.o : Sprite.cc $(Sprite.hh.d)
 	$(CC) $(CXXFLAGS) $^ -c $(LDFLAGS)
 
-Boulder.o : Boulder.cc Boulder.hh Map.hh Tile.hh MapHelpers.hh Sprite.hh \
-        Rect.hh
+Boulder.o : Boulder.cc $(Boulder.hh.d) $(Map.hh.d) $(Tile.hh.d) \
+        $(MapHelpers.hh.d) $(Rect.hh.d)
 	$(CC) $(CXXFLAGS) $^ -c $(LDFLAGS)
 
-MapHelpers.o : MapHelpers.cc MapHelpers.hh
+MapHelpers.o : MapHelpers.cc $(MapHelpers.hh.d)
 	$(CC) $(CXXFLAGS) $^ -c $(LDFLAGS)
 
-Light.o : Light.cc Light.hh
+Light.o : Light.cc $(Light.hh.d)
 	$(CC) $(CXXFLAGS) $^ -c $(LDFLAGS)
 
-Stat.o : Stat.cc Stat.hh
+Stat.o : Stat.cc $(Stat.hh.d)
 	$(CC) $(CXXFLAGS) $^ -c $(LDFLAGS)
 
-UIHelpers.o : UIHelpers.cc UIHelpers.hh
+UIHelpers.o : UIHelpers.cc $(UIHelpers.hh.d) filepaths.hh $(Renderer.hh.d)
 	$(CC) $(CXXFLAGS) $^ -c $(LDFLAGS)
 
-Damage.o: Damage.cc Damage.hh
+Damage.o: Damage.cc $(Damage.hh.d)
 	$(CC) $(CXXFLAGS) $^ -c $(LDFLAGS)
 
-Texture.o: Texture.cc Texture.hh Renderer.hh
+Texture.o: Texture.cc $(Texture.hh.d)
 	$(CC) $(CXXFLAGS) $^ -c $(LDFLAGS)
 
-Renderer.o: Renderer.cc Renderer.hh
+Renderer.o: Renderer.cc $(Renderer.hh.d)
 	$(CC) $(CXXFLAGS) $^ -c $(LDFLAGS)
 
 tests : collider_tests.o

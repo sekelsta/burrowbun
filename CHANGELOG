@@ -1,5 +1,8 @@
 Changes since last push:
- - All objects now own their own sprite and load themselves
+ - Movables and statbars now render themselves.
+ - Textures now automatically avoid loading again from the same file.
+ - fixed Makefile
+ - Addded animation class
 
 Known "features":
  - The strenth of gravity is independent of the world.
@@ -18,7 +21,7 @@ right angle
 the player
  - When the window is bigger than the map, crossing x = 0 causes an assertion
 error.
-
+ - Some statbars render the wrong color
 
 To do:
  - load and unload textures
