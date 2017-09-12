@@ -12,7 +12,7 @@ public:
 
     /* Set the render draw color to a light, but with full alpha. */
     inline static void setColor(const Light &color) {
-        SDL_SetRenderDrawColor(renderer, color.r, color.b, color.g, 0xFF);
+        SDL_SetRenderDrawColor(renderer, color.r, color.g, color.b, 0xFF);
     }
 
     /* Set the render draw color to white. */
