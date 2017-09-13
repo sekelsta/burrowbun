@@ -13,21 +13,42 @@ using namespace noise;
 
 void Mapgen::generateSmolTest() {
     /* Set height and width, and use them to make a tile array. */
-    map.height = 50;
-    map.width = 50;
+    map.setHeight(512);
+    map.setWidth(1024);
+    map.biomes.resize(map.biomesWide * map.biomesHigh);
     assert(map.tiles == nullptr);
     map.tiles = new SpaceInfo[map.width * map.height];
+    cylinderScale.SetXScale((map.width / 2.0) / M_PI);
+    cylinderScale.SetZScale(cylinderScale.GetXScale());
 
-    /* Make the bottom solid. */
+    /* Make a Perlin noise module for temperature, humidity, and magicalness,
+    for use in determining biome. */
+    module::Perlin baseTemperature;
+    baseTemperature.SetOctaveCount(3);
+    baseTemperature.SetPersistence(0.3);
+    baseTemperature.SetSeed(rand());
+    module::ScalePoint scaledTemperature;
+    scaledTemperature.SetScale(0.01);
+    scaledTemperature.SetSourceModule(0, baseTemperature);
+    // TODO: same for humidity, magicalness
+
+    /* Just for testing, make a map based entirely on temperature. */
     for (int i = 0; i < map.width; i++) {
-        for (int j = 0; j < 20; j++) {
-            map.setTile(i, j, MapLayer::FOREGROUND, TileType::MUDSTONE);
+        for (int j = 0; j < map.height; j++) {
+            double temp = getCylinderValue(i, j, scaledTemperature);
+            temp++;
+            temp = std::min(2.0, std::max(temp, 0.0));
+            temp *= (int)TileType::LAST_TILE;
+            temp /= 2;
+            TileType tiletype = (TileType)temp;
+            map.setTile(i, j, MapLayer::FOREGROUND, tiletype);
         }
     }
+
 }
 
-double Mapgen::getCylinderValue(int x, int y, model::Cylinder &cylinder) 
-        const {
+double Mapgen::getCylinderValue(int x, int y, const module::Module &values) {
+    cylinderScale.SetSourceModule(0, values);
     return cylinder.GetValue(x * 360.0 / map.width, y);
 }
 
@@ -36,6 +57,10 @@ void Mapgen::generate(std::string filename, WorldType worldType) {
     map.seed = time(NULL);
     srand(map.seed);
     generator.seed(map.seed);
+
+    /* Set the cylinder to get it's values from the scaled module. Of course,
+    the scaled module will need to get its values from somewhere, too. */
+    cylinder.SetModule(cylinderScale);
 
     /* Run the appropriate function. */
     switch(worldType) {

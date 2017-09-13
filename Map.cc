@@ -235,6 +235,13 @@ void Map::save(std::string filename) const {
     outfile << "\n#Background\n";
     saveLayer(MapLayer::BACKGROUND, outfile);
 
+    /* Biome information. */
+    outfile << "\n#Biomes\n";
+    assert(biomes.size() == (unsigned int)(biomesWide * biomesHigh));
+    for (int i = 0; i < biomesWide * biomesHigh; i++) {
+        outfile << (int)biomes[i].biome << " ";
+    }
+
     /* All the other data. */
     outfile << "\n#Other\n";
     for (int i = 0; i < width * height; i++) {
@@ -307,7 +314,10 @@ Map::Map(string filename, int tileWidth, int tileHeight) :
 
     /* Read in the things. */
     infile >> width >> height;
+    setWidth(width);
+    setHeight(height);
     tiles = new SpaceInfo[width * height];
+    biomes.resize(biomesWide * biomesHigh);
     infile >> spawn.x >> spawn.y;
     infile >> seed;
 
@@ -326,11 +336,25 @@ Map::Map(string filename, int tileWidth, int tileHeight) :
 
     loadLayer(MapLayer::BACKGROUND, infile);
 
+    /* Load biome informaion. */
+    infile >> header;
+    if (header != "#Biomes") {
+        cerr << "Couldn't load biome information! ";
+        cerr << "May have improperly loaded background. \n";
+    }
+
+    /* The biome information doesn't have any sort of compression. */
+    int biomeInt;
+    for (int i = 0; i < biomesWide * biomesHigh; i++) {
+        infile >> biomeInt;
+        biomes[i].biome = (BiomeType)biomeInt;
+    }
+
     /* Load the other data. */
     infile >> header;
     if (header != "#Other") {
         cerr << "Couldn't load tile information! ";
-        cerr << "May have improperly loaded background. \n";
+        cerr << "May have improperly loaded biomes. \n";
     }
 
     for (int i = 0; i < width * height; i++) {

@@ -7,6 +7,10 @@
 #include "Tile.hh"
 #include "MapHelpers.hh"
 
+/* In the biome information stored, each piee refers to a square this size of
+tiles. */
+#define BIOME_SIZE 64
+
 /* A class for a map. Holds an array of SpaceInfos, which store the foreground
 and background tiles, among other things. */
 class Map {
@@ -25,12 +29,18 @@ class Map {
     /* The array to hold the map info. This is a 2d array squished into 1d. */
     SpaceInfo *tiles;
 
+    /* The array to hold the biome info. */
+    std::vector<BiomeInfo> biomes;
+
     /* A list of Tiles. They contain memory that must be manually garbage
     collected because of the SDL textures. */
     std::vector<Tile *> pointers;
 
     /* The height and width of the map, in number of tiles. */
     int height, width;
+
+    /* The height and width of the biome array. */
+    int biomesHigh, biomesWide;
 
     /* Default spawn point. It may be possible for players to set their own
     spawn points later. */
@@ -88,8 +98,34 @@ class Map {
     functions. */
     void updateNear(int x, int y);
 
-    public:
+    /* Private setter function since only friend class Mapgen should be using
+    it. */
+    inline void setHeight(int newHeight) {
+        height = newHeight;
+        biomesHigh = height / BIOME_SIZE + 1;
+    }
+    inline void setWidth(int newWidth) {
+        width = newWidth;
+        biomesWide = width / BIOME_SIZE + 1;
+    }
 
+    /* Get the biomeInfo of an x and y. */
+    inline BiomeInfo *getBiome(int x, int y) {
+        int index = biomesWide * (x / BIOME_SIZE) + (y / BIOME_SIZE);
+        return &biomes[index];
+    }
+
+    /* Set the biomeInfo at x, y of the biomes vector (which is different than
+    the tiles array by a factor of BIOME_SIZE) to a different biomeInfo. This 
+    uses BIOME_SIZE spacing because any function calling this shouldn't really
+    be setting the biome for a single x, y coordinate on the map, as that would
+    also set all nearby tiles. */
+    inline void setBiome(int x, int y, const BiomeInfo &info) {
+        int index = biomesWide * (x / BIOME_SIZE) + (y / BIOME_SIZE);
+        biomes[index] = info;
+    }
+
+    public:
     /* Add a place to the list of places to be updated, if the tile there
     will need to be updated. */
     inline void addToUpdate(const Location &place) {
@@ -154,7 +190,7 @@ class Map {
 
 private:
     // Constructor. Resulting map cannot be played but can be saved.
-    inline Map() : TILE_WIDTH(0), TILE_HEIGHT(0) {
+    inline Map() : TILE_WIDTH(1), TILE_HEIGHT(1) {
         tiles = nullptr;
     }
 

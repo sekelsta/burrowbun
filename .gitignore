@@ -6,3 +6,4 @@ map.bmp
 *.swp
 *.world
 catch.hpp
+*.world.ppm

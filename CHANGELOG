@@ -1,5 +1,6 @@
 Changes since last push:
- - Fixed bug where statbars were rendering wierldy (had switched blue and green)
+ - Map now stores, saves, and loads biome information
+ - Map generator now chooses tiles based on perlin noise (though badly)
 
 Known "features":
  - The strenth of gravity is independent of the world.
@@ -21,7 +22,6 @@ error.
 
 To do:
  - load and unload textures
- - rewrite almost all world generation code to use noise
  - stacking items, throwing / picking up items
  - Trees!
  - Store data for UI and sprites in a file instead of the source code

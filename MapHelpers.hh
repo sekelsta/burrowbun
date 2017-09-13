@@ -58,6 +58,7 @@ enum class BiomeType {
     BOG,
     SKY,
     UNDERGROUND,
+
     // Might not be implemented for a good long while:
     COASTAL,
     REEF,
@@ -72,6 +73,11 @@ enum class Surroundings {
     NONE,
     EVIL,
     REANIMATING
+};
+
+/* A struct to store information about the biome. */
+struct BiomeInfo {
+    BiomeType biome;
 };
 
 /* A struct that holds information about a specific tile location on the map.

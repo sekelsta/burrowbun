@@ -20,13 +20,19 @@ class Mapgen {
     /* The map to generate. */
     Map map;
 
+    /* A cylinder to make noise models seamless at the edge. */
+    noise::model::Cylinder cylinder;
+
+    /* A module to scale it so the cylinder one looks normal. */
+    noise::module::ScalePoint cylinderScale;
+
     /* Generate a tiny world good for testing world generation. */
     void generateSmolTest();
 
     /* Get the value on a cylinder from a noise module. This squishes all x
     values into the unit circle without affecting y values, so scale 
     adjustments may be needed. */
-    double getCylinderValue(int x, int y, noise::model::Cylinder&) const;
+    double getCylinderValue(int x, int y, const noise::module::Module &values);
 
 public:
     /* Take a reference to a newly created map, and fill it with stuff. */
