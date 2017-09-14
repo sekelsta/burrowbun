@@ -44,22 +44,24 @@ enum class WorldType {
 
 /* A class to talk about nonglobal (only part of the world) biomes.*/
 enum class BiomeType {
-    ARCTIC_TUNDRA,
-    ALPINE_TUNDRA,
+    TUNDRA,
     TAIGA,
-    ALPINE_FOREST,
     GRASSLAND,
-    WOODLAND, // Temperate forest
-    DEEP_WOODS,
-    JUNGLE, // Either tropical rainforest or monsoon forest?
+    WOODLAND, // Temperate deciduous forest
+    JUNGLE, // Tropical rainforest
     SAVANNAH,
+    SCRUB,
     DESERT,
-    SWAMP,
-    BOG,
-    SKY,
-    UNDERGROUND,
 
-    // Might not be implemented for a good long while:
+    /* Wishlist: */
+    ALPINE_TUNDRA,
+    ALPINE_FOREST,
+    SKY,
+
+    SWAMP,
+    MARSH,
+    PEAT_SWAMP,
+    BOG,
     COASTAL,
     REEF,
     PELAGIC,

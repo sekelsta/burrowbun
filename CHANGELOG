@@ -1,6 +1,7 @@
 Changes since last push:
  - Map now stores, saves, and loads biome information
- - Map generator now chooses tiles based on perlin noise (though badly)
+ - Map generator now chooses tiles based on perlin noise, using a translation
+into biomes from a json file.
 
 Known "features":
  - The strenth of gravity is independent of the world.

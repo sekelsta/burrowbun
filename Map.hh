@@ -9,7 +9,7 @@
 
 /* In the biome information stored, each piee refers to a square this size of
 tiles. */
-#define BIOME_SIZE 64
+#define BIOME_SIZE 32
 
 /* A class for a map. Holds an array of SpaceInfos, which store the foreground
 and background tiles, among other things. */
@@ -111,7 +111,11 @@ class Map {
 
     /* Get the biomeInfo of an x and y. */
     inline BiomeInfo *getBiome(int x, int y) {
-        int index = biomesWide * (x / BIOME_SIZE) + (y / BIOME_SIZE);
+        assert(0 <= x);
+        assert(0 <= y);
+        assert(x < biomesWide * BIOME_SIZE);
+        assert(y < biomesHigh * BIOME_SIZE);
+        int index = biomesWide * (y / BIOME_SIZE) + (x / BIOME_SIZE); 
         return &biomes[index];
     }
 
@@ -121,7 +125,11 @@ class Map {
     be setting the biome for a single x, y coordinate on the map, as that would
     also set all nearby tiles. */
     inline void setBiome(int x, int y, const BiomeInfo &info) {
-        int index = biomesWide * (x / BIOME_SIZE) + (y / BIOME_SIZE);
+        assert(0 <= x);
+        assert(0 <= y);
+        assert(x < biomesWide);
+        assert(y < biomesHigh);
+        int index = biomesWide * y + x;
         biomes[index] = info;
     }
 
