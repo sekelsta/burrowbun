@@ -129,7 +129,7 @@ collider_tests.o : collider_tests.cc Collider.hh
 	$(CC) $(CXXFLAGS) $^ -c $(LDFLAGS) $(LINKER_FLAGS)
 
 clean :
-	rm -f *.o *.gch *~ *.world
+	rm -f *.o *.gch *~
 
 .PHONY : all clean
 

@@ -30,7 +30,7 @@ class Mapgen {
     std::vector<std::vector<int>> biomeData;
 
     /* Generate a tiny world good for testing world generation. */
-    void generateSmolTest();
+    void generateEarth();
 
     /* Get the value on a cylinder from a noise module. This squishes all x
     values into the unit circle without affecting y values, so scale 

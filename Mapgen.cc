@@ -12,7 +12,7 @@ using namespace std;
 using namespace noise;
 using json = nlohmann::json;
 
-void Mapgen::generateSmolTest() {
+void Mapgen::generateEarth() {
     /* Set height and width, and use them to make a tile array. */
     map.setHeight(2048);
     map.setWidth(4096);
@@ -179,9 +179,9 @@ void Mapgen::generate(std::string filename, WorldType worldType) {
         case WorldType::TEST : 
             break;
         case WorldType::SMOLTEST :
-            generateSmolTest();
             break;
         case WorldType::EARTH :
+            generateEarth();
             break;
         default :
             cerr << "Maybe I'll implement that later." << endl;

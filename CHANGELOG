@@ -1,7 +1,6 @@
 Changes since last push:
- - Map now stores, saves, and loads biome information
- - Map generator now chooses tiles based on perlin noise, using a translation
-into biomes from a json file.
+ - Actually fixed the jumping problem
+ - ?
 
 Known "features":
  - The strenth of gravity is independent of the world.
@@ -20,6 +19,8 @@ right angle
 the player
  - When the window is bigger than the map, crossing x = 0 causes an assertion
 error.
+ - The player can't jump when holding down the (right?) move key and colliding
+with a wall.
 
 To do:
  - load and unload textures

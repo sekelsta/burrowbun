@@ -33,7 +33,7 @@ int main(int argc, char **argv) {
 
     /* Create a world. */
     Mapgen mapgen;
-    mapgen.generate(filename, WorldType::SMOLTEST);
+    mapgen.generate(filename, WorldType::EARTH);
 
     /* Load a map. */
     Map map = Map(filename, TILE_WIDTH, TILE_HEIGHT);
