@@ -1,6 +1,5 @@
 Changes since last push:
- - Actually fixed the jumping problem
- - ?
+ - Added simple compression to biome info in the savefile. 
 
 Known "features":
  - The strenth of gravity is independent of the world.

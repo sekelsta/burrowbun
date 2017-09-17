@@ -238,9 +238,30 @@ void Map::save(std::string filename) const {
     /* Biome information. */
     outfile << "\n#Biomes\n";
     assert(biomes.size() == (unsigned int)(biomesWide * biomesHigh));
+    assert(biomesWide != 0);
+    assert(biomesHigh != 0);
+
+    int count = 0;
+    BiomeType current;
+    /* Some random value so I don't get uninitialized value compile warnings.
+    Because of the if statement, it won't be uninitialized if it's used, as 
+    long as the map has nonzero size (which is asserted).
+    */
+    BiomeType last = BiomeType::GRASSLAND;
     for (int i = 0; i < biomesWide * biomesHigh; i++) {
-        outfile << (int)biomes[i].biome << " ";
+        current = biomes[i].biome;
+        if (i != 0 && current != last) {
+            outfile << count << " " << (int)last << " ";
+            count = 1;
+        }
+        else {
+            count++;
+        }
+        last = current;
     }
+
+    /* One last set of biome values. */
+    outfile << count << " " << (int)last << " ";
 
     /* All the other data. */
     outfile << "\n#Other\n";
@@ -343,11 +364,18 @@ Map::Map(string filename, int tileWidth, int tileHeight) :
         cerr << "May have improperly loaded background. \n";
     }
 
-    /* The biome information doesn't have any sort of compression. */
+    /* The biome information has the same simple compression as the foreground
+    and background. */
     int biomeInt;
-    for (int i = 0; i < biomesWide * biomesHigh; i++) {
-        infile >> biomeInt;
-        biomes[i].biome = (BiomeType)biomeInt;
+    int count;
+    int index = 0;
+    while (index < biomesWide * biomesHigh) {
+        infile >> count >> biomeInt;
+        for (int i = 0; i < count; i++) {
+            assert(index < biomesWide * biomesHigh);
+            biomes[index].biome = (BiomeType)biomeInt;
+            index++;
+        }
     }
 
     /* Load the other data. */
