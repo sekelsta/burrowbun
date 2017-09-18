@@ -1,5 +1,7 @@
 Changes since last push:
  - Added simple compression to biome info in the savefile. 
+ - Added caves to map generation.
+ - Added a surface which caves tend to not intersect
 
 Known "features":
  - The strenth of gravity is independent of the world.
@@ -20,6 +22,9 @@ the player
 error.
  - The player can't jump when holding down the (right?) move key and colliding
 with a wall.
+ - All map rendering vanishes when the player goes too high
+ - When colliding with the bottom of the map, position is set but velocity isn't
+
 
 To do:
  - load and unload textures

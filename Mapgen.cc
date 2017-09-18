@@ -25,7 +25,7 @@ void Mapgen::generateEarth() {
     /* Some constants to use in the perlin moise. */
     const int octaves = 2;
     const double persistence = 0.2;
-    const double scale = 0.04;
+    const double scale = 0.0014;
 
     /* Make a Perlin noise module for temperature, humidity, and magicalness,
     for use in determining biome. */
@@ -36,6 +36,10 @@ void Mapgen::generateEarth() {
     module::ScalePoint scaledTemperature;
     scaledTemperature.SetScale(scale);
     scaledTemperature.SetSourceModule(0, baseTemperature);
+    module::Turbulence finalTemperature;
+    finalTemperature.SetSourceModule(0, scaledTemperature);
+    finalTemperature.SetFrequency(scale);
+    
 
     /* Same, but for humidity. */
     module::Perlin baseHumidity;
@@ -45,30 +49,57 @@ void Mapgen::generateEarth() {
     module::ScalePoint scaledHumidity;
     scaledHumidity.SetScale(scale);
     scaledHumidity.SetSourceModule(0, baseHumidity);
+    module::Turbulence finalHumidity;
+    finalHumidity.SetSourceModule(0, scaledHumidity);
+    finalHumidity.SetFrequency(scale);
 
     const int nsamples = 10000;
     vector<double> tempPercentiles;
     vector<double> humidityPercentiles;
-    /* Seven items long because that's what getBaseBiome() requires. */
-    for (int i = 0; i < 7; i++) {
-        double percentile = (i + 1) / 8.0;
-        tempPercentiles.push_back(getPercentile(percentile, scaledTemperature,
+    for (unsigned int i = 0; i < biomeData.size() - 1; i++) {
+        double percentile = (i + 1) / (double)biomeData.size();
+        tempPercentiles.push_back(getPercentile(percentile, finalTemperature,
             nsamples));
-        humidityPercentiles.push_back(getPercentile(percentile, scaledHumidity,
+        humidityPercentiles.push_back(getPercentile(percentile, finalHumidity,
             nsamples));
     }
 
-    /* Use a crude calculation to get some of the biomes (just for testing). */
+    /* Use the temperature and humidity to get the actual biomes. */
     for (int i = 0; i < map.biomesWide; i++) {
         for (int j = 0; j < map.biomesHigh; j++) {
-            double temperature = getCylinderValue(i, j, scaledTemperature);
-            double humidity = getCylinderValue(i, j, scaledHumidity);
+            int x = i * BIOME_SIZE;
+            int y = j * BIOME_SIZE;
+            double temperature = getCylinderValue(x, y, finalTemperature);
+            double humidity = getCylinderValue(x, y, finalHumidity);
             BiomeInfo info;
             info.biome = getBaseBiome(temperature, humidity, tempPercentiles,
                 humidityPercentiles);
             map.setBiome(i, j, info);
         }
     }
+
+    /* Now that biomes are set, make a cave system. */
+    module::RidgedMulti baseCaves;
+    baseCaves.SetSeed(rand());
+    module::Turbulence turbulentCaves;
+    turbulentCaves.SetSourceModule(0, baseCaves);
+    module::ScalePoint finalCaves;
+    finalCaves.SetSourceModule(0, turbulentCaves);
+    finalCaves.SetScale(0.005);
+    double caveBoundary = getPercentile(0.75, finalCaves, 10000);
+
+    /* A perlin noise to use for getting the surface. */
+    module::Perlin baseSurface;
+    baseSurface.SetSeed(rand());
+    module::Turbulence turbulentSurface;
+    turbulentSurface.SetSourceModule(0, baseSurface);
+    module::ScalePoint finalSurface;
+    finalSurface.SetSourceModule(0, turbulentSurface);
+    const double hillScale = 0.001;
+    const double steepness = 150000.0 * hillScale;
+    finalSurface.SetScale(hillScale);
+    int baseHeight = map.height * 4.0 / 5.0;
+
 
     /* Just for testing, base the foreground tile on biome. */
     for (int i = 0; i < map.width; i++) {
@@ -100,9 +131,22 @@ void Mapgen::generateEarth() {
                 tileType = TileType::SNOW;
             }
             map.setTile(i, j, MapLayer::FOREGROUND, tileType);
+
+            /* Find the sky and make it empty. */
+            double surface = getCylinderValue(i, j, finalSurface);
+            surface += (j - baseHeight) / steepness;
+            if (surface > 0) {
+                map.setTile(i, j, MapLayer::FOREGROUND, TileType::EMPTY);
+            }
+ 
+            /* Set the caves to be empty. */
+            double cave = getCylinderValue(i, j, finalCaves);
+            if (cave > caveBoundary 
+                    && surface - cave < -2) {
+                map.setTile(i, j, MapLayer::FOREGROUND, TileType::EMPTY);
+            }
         }
     }
-
 }
 
 double Mapgen::getCylinderValue(int x, int y, const module::Module &values) {
@@ -141,8 +185,8 @@ double Mapgen::getPercentile(double percentile, module::Module &values,
 
 BiomeType Mapgen::getBaseBiome(double temperature, double humidity, 
         vector<double> tempPercentiles, vector<double> humidityPercentiles) {
-    assert(tempPercentiles.size() == 7);
-    assert(humidityPercentiles.size() == 7);
+    assert(tempPercentiles.size() == biomeData.size() - 1);
+    assert(humidityPercentiles.size() == biomeData.size() - 1);
 
     /* Find which percentile it's in, and use our biomeData vector to figure
     out what biome that means. */
@@ -191,7 +235,7 @@ void Mapgen::generate(std::string filename, WorldType worldType) {
     /* I should be careful to make sure there are never cloud cities or 
     floating islands or whatever directly above the spawn point, so the
     player doesn't die of fall damage every time they respawn. */
-    map.spawn.y = map.height / 2;
+    map.spawn.y = map.height * 0.9;
     map.save(filename);
     /* TODO: remove when done testing. */
     map.savePPM(MapLayer::FOREGROUND, filename + ".ppm");
