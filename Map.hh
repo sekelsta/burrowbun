@@ -69,6 +69,9 @@ class Map {
     multiple exist, return the first one. */
     Tile *getTile(TileType val);
 
+    /* Call chooseSprite on every tile on the map. */
+    void randomizeSprites();
+
     /* Pick the sprite to use for a tile based on the ones next to it. */
     void chooseSprite(int x, int y);
 

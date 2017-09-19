@@ -29,8 +29,14 @@ class Mapgen {
     /* A 2D vector saying which percentiles map to which biomes. */
     std::vector<std::vector<int>> biomeData;
 
-    /* Generate a tiny world good for testing world generation. */
+    /* Set the map size to x, y. */
+    void setSize(int x, int y);
+
+    /* Generate a complex world. */
     void generateEarth();
+
+    /* Generate a tiny world good for testing world generation. */
+    void generateTest();
 
     /* Get the value on a cylinder from a noise module. This squishes all x
     values into the unit circle without affecting y values, so scale 

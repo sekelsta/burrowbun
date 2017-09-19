@@ -1,5 +1,6 @@
 Changes since last push:
- - The bunny now uses an animation
+ - Now generates a map that has the different tiles use their different sprite
+variations, and saves them as ints so the savefile is actually human readable
 
 Known "features":
  - The strenth of gravity is independent of the world.
@@ -18,8 +19,7 @@ right angle
 the player
  - When the window is bigger than the map, crossing x = 0 causes an assertion
 error.
- - The player can't jump when holding down the (right?) move key and colliding
-with a wall.
+ - The player can't jump when colliding with a wall.
  - All map rendering vanishes when the player goes too high
  - When colliding with the bottom of the map, position is set but velocity isn't
 

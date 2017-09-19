@@ -12,16 +12,19 @@ using namespace std;
 using namespace noise;
 using json = nlohmann::json;
 
-void Mapgen::generateEarth() {
-    /* Set height and width, and use them to make a tile array. */
-    map.setHeight(2048);
-    map.setWidth(4096);
+void Mapgen::setSize(int x, int y) {
+    map.setHeight(y);
+    map.setWidth(x);
     map.biomes.resize(map.biomesWide * map.biomesHigh);
     assert(map.tiles == nullptr);
     map.tiles = new SpaceInfo[map.width * map.height];
     cylinderScale.SetXScale((map.width / 2.0) / M_PI);
     cylinderScale.SetZScale(cylinderScale.GetXScale());
+}
 
+void Mapgen::generateEarth() {
+    /* Set height and width, and use them to make a tile array. */
+    setSize(4096, 2048);
     /* Some constants to use in the perlin moise. */
     const int octaves = 2;
     const double persistence = 0.2;
@@ -151,6 +154,21 @@ void Mapgen::generateEarth() {
             }
         }
     }
+
+    /* When done setting non-boulders and before setting boulders, have
+    all the tiles use a random sprite. */
+    map.randomizeSprites();
+}
+
+void Mapgen::generateTest() {
+    setSize(128, 64);
+    for (int i = 0; i < map.width; i++) {
+        for (int j = 0; j < map.height / 2; j++) {
+            map.setTile(i, j, MapLayer::FOREGROUND, TileType::SANDSTONE);
+        }
+    }
+
+    map.randomizeSprites();
 }
 
 double Mapgen::getCylinderValue(int x, int y, const module::Module &values) {
@@ -225,6 +243,7 @@ void Mapgen::generate(std::string filename, WorldType worldType) {
     /* Run the appropriate function. */
     switch(worldType) {
         case WorldType::TEST : 
+            generateTest();
             break;
         case WorldType::SMOLTEST :
             break;

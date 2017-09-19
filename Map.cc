@@ -25,9 +25,6 @@ Tile *Map::newTile(TileType val) {
         assert((unsigned int)val <= (unsigned int)TileType::LAST_PURE_TILE);
     }
 
-    /* Set values that aren't set by the constructor. */
-    tile -> sprite.rect.w = TILE_WIDTH;
-    tile -> sprite.rect.h = TILE_HEIGHT;
     return tile;
 }
 
@@ -54,6 +51,14 @@ Tile *Map::getTile(TileType val) {
     return tile;
 }
 
+void Map::randomizeSprites() {
+    for (int i = 0; i < width; i++) {
+        for (int j = 0; j < height; j++) {
+            chooseSprite(i, j);
+        }
+    }
+}
+
 void Map::chooseSprite(int x, int y) {
     Location place;
     place.x = x;
@@ -61,6 +66,7 @@ void Map::chooseSprite(int x, int y) {
     place.layer = MapLayer::FOREGROUND;
     uint8_t spritePlace = getTile(place) -> getSpritePlace(*this, place);
     findPointer(x, y) -> foregroundSprite = spritePlace;
+    assert(findPointer(x, y) -> foregroundSprite == spritePlace);
     place.layer = MapLayer::BACKGROUND;
     spritePlace = getTile(place) -> getSpritePlace(*this, place);
     findPointer(x, y) -> backgroundSprite = spritePlace;
@@ -266,8 +272,8 @@ void Map::save(std::string filename) const {
     /* All the other data. */
     outfile << "\n#Other\n";
     for (int i = 0; i < width * height; i++) {
-        outfile << tiles[i].foregroundSprite << " ";
-        outfile << tiles[i].backgroundSprite << " ";
+        outfile << (int)tiles[i].foregroundSprite << " ";
+        outfile << (int)tiles[i].backgroundSprite << " ";
     }
 
     outfile.close();
@@ -386,8 +392,11 @@ Map::Map(string filename, int tileWidth, int tileHeight) :
     }
 
     for (int i = 0; i < width * height; i++) {
-        infile >> tiles[i].foregroundSprite;
-        infile >> tiles[i].backgroundSprite;
+        int spritePlace;
+        infile >> spritePlace;
+        tiles[i].foregroundSprite = (uint8_t)spritePlace;
+        infile >> spritePlace;
+        tiles[i].backgroundSprite = (uint8_t)spritePlace;
     }
 
     /* Iterate over the entire map. */
