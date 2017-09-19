@@ -7,6 +7,7 @@
 #include "Stat.hh"
 #include "json.hpp"
 #include "Damage.hh"
+#include "Animation.hh"
 
 /* A class for monsters, NPCs, and players to inherit from.
 If any features are added later that should reset fall damage, they should
@@ -27,6 +28,13 @@ public:
     -1 for infinity. */
     int maxFallDistance;
 
+    /* Which direction it's facing. */
+    bool isFacingRight;
+
+    /* Sitting sprites. */
+    std::vector<Sprite> sprites;
+    std::vector<Animation> run;
+
     // Constructor
     Entity(std::string filename); 
     Entity();
@@ -41,6 +49,9 @@ public:
 
     /* Do the things! */
     virtual void update();
+
+    /* Render the correct sprite / animation. */
+    virtual void render(const Rect &camera);
 };
 
 void from_json(const nlohmann::json &j, Entity &entity);

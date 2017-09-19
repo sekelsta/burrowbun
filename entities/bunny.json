@@ -8,6 +8,102 @@
         },
         "name": "bunny.png"
     },
+    "sprites": [{
+            "rect": {
+                "x": 0,
+                "y": 64,
+                "w": 38,
+                "h": 32
+            },
+            "name": "bunny.png"
+        },
+        {
+            "rect": {
+                "x": 38,
+                "y": 64,
+                "w": 38,
+                "h": 32
+            },
+            "name": "bunny.png"
+        }],
+    "run_left": {
+        "delay": 5,
+        "frames": [{
+            "rect": {
+                "x": 0,
+                "y": 0,
+                "w": 48,
+                "h": 32
+            },
+            "name": "bunny.png"
+        },
+        {
+            "rect": {
+                "x": 48,
+                "y": 0,
+                "w": 48,
+                "h": 32
+            },
+            "name": "bunny.png"
+        },
+        {
+            "rect": {
+                "x":96,
+                "y": 0,
+                "w": 48,
+                "h": 32
+            },
+            "name": "bunny.png"
+        },
+        {
+            "rect": {
+                "x": 144,
+                "y": 0,
+                "w": 48,
+                "h": 32
+            },
+            "name": "bunny.png"
+        }]
+    }, 
+    "run_right": {
+            "delay": 5,
+            "frames": [{
+            "rect": {
+                "x": 0,
+                "y": 32,
+                "w": 48,
+                "h": 32
+            },
+            "name": "bunny.png"
+        },
+        {
+            "rect": {
+                "x": 48,
+                "y": 32,
+                "w": 48,
+                "h": 32
+            },
+            "name": "bunny.png"
+        },
+        {
+            "rect": {
+                "x":96,
+                "y": 32,
+                "w": 48,
+                "h": 32
+            },
+            "name": "bunny.png"
+        },
+        {
+            "rect": {
+                "x": 144,
+                "y": 32,
+                "w": 48,
+                "h": 32
+            },
+            "name": "bunny.png"
+        }]
+    },
     "drag": {
         "x": 0.3,
         "y": 0.9166
@@ -42,7 +138,7 @@
         "maxStat": 100,
         "full": 100,
         "part": 100,
-        "linearRegen": -0.0007,
+        "linearRegen": -0.00017,
         "percentRegen": 0.0,
         "quadraticRegen": 0.0,
         "timeRegen": 0.0,

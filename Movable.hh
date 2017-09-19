@@ -95,7 +95,7 @@ public:
 
     /* Render itself to the screen, given an SDL_Rect that tells it where the
     screen is in the world. */
-    virtual void render(const Rect &camera) const;
+    virtual void render(const Rect &camera);
 };
 
 /* Get a movable from a json file. */

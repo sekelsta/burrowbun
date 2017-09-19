@@ -138,7 +138,7 @@ void Movable::convertRect(SDL_Rect &rect, const Rect &camera) {
 
 
 /* Render itself. */
-void Movable::render(const Rect &camera) const {
+void Movable::render(const Rect &camera) {
     // Make sure the renderer draw color is set to white
     Renderer::setColorWhite();
 

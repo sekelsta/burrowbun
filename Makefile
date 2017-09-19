@@ -13,7 +13,8 @@ Boulder.hh.d = Boulder.hh $(Tile.hh.d)
 Collider.hh.d = Collider.hh $(Tile.hh.d) $(Map.hh.d) $(Movable.hh.d) \
         $(Rect.hh.d)
 Damage.hh.d = Damage.hh
-Entity.hh.d = Entity.hh $(Movable.hh.d) $(Stat.hh.d) $(Damage.hh.d)
+Entity.hh.d = Entity.hh $(Movable.hh.d) $(Stat.hh.d) $(Damage.hh.d) \
+        $(Animation.hh.d)
 EventHandler.hh.d = EventHandler.hh
 Hotbar.hh.d = Hotbar.hh $(Sprite.hh.d) $(UIHelpers.hh.d) $(Action.hh.d)
 Inventory.hh.d = Inventory.hh $(Sprite.hh.d) $(UIHelpers.hh.d) \

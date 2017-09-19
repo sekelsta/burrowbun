@@ -1,4 +1,5 @@
 #include "Entity.hh"
+#include "filepaths.hh"
 
 using json = nlohmann::json;
 
@@ -15,6 +16,13 @@ Entity::Entity(std::string filename) : movable::Movable(filename) {
     invincibilityTime = j["invincibilityTime"];
     invincibilityLeft = 0;
     assert(sprite.name != "");
+    isFacingRight = true;
+    sprites = j["sprites"].get<std::vector<Sprite>>();
+    for (unsigned int i = 0; i < sprites.size(); i++) {
+        sprites[i].loadTexture(MOVABLE_SPRITE_PATH);
+    }
+    run.emplace_back(j["run_left"], MOVABLE_SPRITE_PATH);
+    run.emplace_back(j["run_right"], MOVABLE_SPRITE_PATH);
 }
 
 Entity::Entity() {};
@@ -80,6 +88,43 @@ void Entity::update() {
     fullness.update();
     mana.update();
     invincibilityLeft--;
+    /* Check if we need to be facing a certain way. */
+    if (getVelocity().x > 0.0001) {
+        isFacingRight = true;
+    }
+    else if (getVelocity().x < -0.0001) {
+        isFacingRight = false;
+    }
+}
+
+void Entity::render(const Rect &camera) {
+    /* TODO: this is copypasta code */
+    // Make sure the renderer draw color is set to white
+    Renderer::setColorWhite();
+
+    SDL_Rect rectTo;
+
+
+    /* So as not to use == with a double. */
+    if (abs(getVelocity().x) < 0.0001) {
+        rectTo.x = x;
+        rectTo.y = y;
+        rectTo.w = sprites[isFacingRight].rect.w;
+        rectTo.h = sprites[isFacingRight].rect.h;
+        // Convert the rectangle to screen coordinates
+        convertRect(rectTo, camera);
+
+        // Draw!
+        // TODO: check whether it's actually anywhere near the screen
+        sprites[isFacingRight].render(&rectTo);
+        return;
+    }
+    /* Otherwise we use the run sprite. */
+    rectTo = run[isFacingRight].getRect();
+    rectTo.x = x;
+    rectTo.y = y;
+    convertRect(rectTo, camera);
+    run[isFacingRight].render(rectTo);
 }
 
 /* Make an entity from a json. */

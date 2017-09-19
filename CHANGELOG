@@ -1,7 +1,5 @@
 Changes since last push:
- - Added simple compression to biome info in the savefile. 
- - Added caves to map generation.
- - Added a surface which caves tend to not intersect
+ - The bunny now uses an animation
 
 Known "features":
  - The strenth of gravity is independent of the world.

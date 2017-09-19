@@ -96,9 +96,13 @@ void Mapgen::generateEarth() {
     module::ScalePoint finalSurface;
     finalSurface.SetSourceModule(0, turbulentSurface);
     const double hillScale = 0.001;
-    const double steepness = 150000.0 * hillScale;
+    const double heightScale = hillScale * 10000.0;
+    finalSurface.SetYScale(heightScale);
+    const double steepness = 50000.0 * hillScale;
     finalSurface.SetScale(hillScale);
     int baseHeight = map.height * 4.0 / 5.0;
+    double caveLimit = getPercentile(0.125, finalSurface, 10000);
+    caveLimit -= getPercentile(0.875, finalCaves, 10000);
 
 
     /* Just for testing, base the foreground tile on biome. */
@@ -142,7 +146,7 @@ void Mapgen::generateEarth() {
             /* Set the caves to be empty. */
             double cave = getCylinderValue(i, j, finalCaves);
             if (cave > caveBoundary 
-                    && surface - cave < -2) {
+                    && surface - cave < caveLimit) {
                 map.setTile(i, j, MapLayer::FOREGROUND, TileType::EMPTY);
             }
         }
