@@ -15,8 +15,9 @@ struct Location;
 // A class for keeping track of which tiles there are
 enum class TileType : short {
     EMPTY,
+    WATER,
     DIRT,
-    HUMUS,
+    TOPSOIL,
     CLAY,
     CALCAREOUS_OOZE,
     SNOW,

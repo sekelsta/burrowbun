@@ -58,6 +58,24 @@ class Mapgen {
     BiomeType getBaseBiome(double temperature, double humidity, 
         std::vector<double> tempPercentiles, 
         std::vector<double> humidityPercentiles);
+
+    /* Helper function for settleWater. Returns x - direction if there's no 
+    place it can fall. */
+    int findFall(int direction, int x, int y, MapLayer layer);
+
+    /* Helper function for settleWater, moves a water tile downwards and maybe
+    sideways. */
+    void moveWater(int x, int y);
+
+    /* Puts a layer filldepth thick of water at the top of the map. */
+    void fillWater(int fillDepth);
+
+    /* Takes a map, and makes all water on it flow as far as it can go. */
+    void settleWater();
+
+    /* Takes a map, and removes the top removeDepth layers of water
+    not protected by an overhang. */
+    void removeWater(int removeDepth);
 public:
     /* Take a reference to a newly created map, and fill it with stuff. */
     void generate(std::string filename, WorldType worldType);

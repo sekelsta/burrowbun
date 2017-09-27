@@ -23,11 +23,14 @@ std::string Tile::getFilename(TileType tileType) {
         case TileType::EMPTY : 
             filename = "empty.json";
             break;
+        case TileType::WATER :
+            filename = "water.json";
+            break;
         case TileType::DIRT :
             filename = "dirt.json";
             break;
-        case TileType::HUMUS :
-            filename = "humus.json";
+        case TileType::TOPSOIL :
+            filename = "topsoil.json";
             break;
         case TileType::CLAY :
             filename = "clay.json";

@@ -8,7 +8,7 @@
 enum class ItemType {
     /* NONE is just a nullptr instead of an actual object. */
     DIRT,
-    HUMUS,
+    TOPSOIL,
     CLAY,
     CALCAREOUS_OOZE,
     SNOW,

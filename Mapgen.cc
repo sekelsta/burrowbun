@@ -99,8 +99,6 @@ void Mapgen::generateEarth() {
     module::ScalePoint finalSurface;
     finalSurface.SetSourceModule(0, turbulentSurface);
     const double hillScale = 0.001;
-    const double heightScale = hillScale * 10000.0;
-    finalSurface.SetYScale(heightScale);
     const double steepness = 50000.0 * hillScale;
     finalSurface.SetScale(hillScale);
     int baseHeight = map.height * 4.0 / 5.0;
@@ -154,6 +152,10 @@ void Mapgen::generateEarth() {
             }
         }
     }
+
+    /* Put water on the surface. */
+    fillWater(map.height * 0.05);
+    settleWater();
 
     /* When done setting non-boulders and before setting boulders, have
     all the tiles use a random sprite. */
@@ -225,6 +227,121 @@ BiomeType Mapgen::getBaseBiome(double temperature, double humidity,
 
     return (BiomeType)biomeData[t][h];
 }
+
+int Mapgen::findFall(int direction, int x, int y, MapLayer layer) {
+    assert(direction == 1 || direction == -1);
+    /* Can't move down if already the bottom. */
+    assert(y > 0);
+    int current = x;
+    while (current != map.wrapX(x - direction)) {
+        /* Check if it can go down. */
+        if (map.getTile(current, y-1, layer) -> type == TileType::EMPTY) {
+            break;
+        }
+        TileType inTheWay = map.getTile(current, y, layer) -> type;
+        if (inTheWay != TileType::EMPTY && current != x) {
+            /* Skip to the end of the loop to indicate failure,
+            so I can use break to indicate success. */
+            current = map.wrapX(x - direction);
+            continue;
+        }
+        current += direction;
+        current = map.wrapX(current);
+    }
+    return current;
+}
+
+void Mapgen::moveWater(int x, int y) {
+    /* Make sure the tile being moved is actually water. */
+    assert(map.getTile(x, y, MapLayer::FOREGROUND) -> type == TileType::WATER);
+
+    /* First try moving it in the -x direction to move it down,
+    then in the +x. */
+    int fall = findFall(-1, x, y, MapLayer::FOREGROUND);
+    /* If the while loop ended with current != i + 1, then
+    current is where the water should be moved. Otherwise, try 
+    the other direction. */
+    if (fall == map.wrapX(x + 1)) {
+        fall = findFall(1, x, y, MapLayer::FOREGROUND);
+        /* If it can't fall that way either, move on. */
+        if (fall == map.wrapX(x - 1)) {
+            return;
+        }
+    }
+
+    /* Otherwise, move the tile. */
+    TileType below = map.getTile(fall, y - 1, MapLayer::FOREGROUND) -> type;
+    assert(below == TileType::EMPTY);
+    int lowest = y - 1;
+    /* See how far down it can be moved. */
+    while (below == TileType::EMPTY && lowest > 0) {
+        below = map.getTile(fall, lowest - 1, MapLayer::FOREGROUND) -> type;
+        if (below != TileType::EMPTY) {
+            break;
+        }
+        lowest--;
+    }
+    Location place;
+    place.x = x;
+    place.y = y;
+    place.layer = MapLayer::FOREGROUND;
+    map.moveTile(place, fall - x, lowest - y);
+    /* Try to move the water again. */
+    moveWater(fall, lowest);
+
+    /* And this water block may have been in the way of the water block to the
+    left of it falling, so let's try moving that again. */
+    assert(map.getTile(x, y, MapLayer::FOREGROUND) -> type == TileType::EMPTY);
+    if (map.getTile(x-1, y, MapLayer::FOREGROUND) -> type == TileType::WATER) {
+        moveWater(map.wrapX(x - 1), y);
+    }
+}
+
+void Mapgen::fillWater(int fillDepth) {
+    /* First, place the water on top and let it fall. */
+    for (int i = 0; i < map.width; i++) {
+        for (int j = map.height - fillDepth; j < map.height; j++) {
+            map.setTile(i, j, MapLayer::FOREGROUND,
+                    TileType::WATER);
+        }
+    }
+}
+
+void Mapgen::settleWater() {
+    /* Make it flow sideways. First iterate over the top layer, trying to
+    move each one down a level if it can, then the next layer, and so on. */
+    /* j > 0 not j >= 0 because we're looking at the level below. */
+    for (int j = 1; j < map.height; j++) {
+        for (int i = 0; i < map.width; i++) {
+            if (map.getTile(i, j, MapLayer::FOREGROUND) -> type 
+                    == TileType::WATER) {
+                moveWater(i, j);
+            }
+        }
+    }
+}
+
+void Mapgen::removeWater(int removeDepth) {
+    /* Remove the top removeDepth layers from each puddle. */
+    for (int i = 0; i < map.width; i++) {
+        int toRemove = removeDepth;
+        int j = map.height - 1;
+        while (toRemove > 0 && j >= 0) {
+            TileType tile = map.getTile(i, j, MapLayer::FOREGROUND) -> type;
+            /* If there's water there, remove it. */
+            if (tile == TileType::WATER) {
+                map.setTile(i, j, MapLayer::FOREGROUND, TileType::EMPTY);
+                toRemove--;
+            }
+            /* If there's a solid tile, stop. */
+            else if (tile != TileType::EMPTY) {
+                break;
+            }
+            j--;
+        }
+    }
+}
+
 void Mapgen::generate(std::string filename, WorldType worldType) {
     /* Seed the random number generators. */
     map.seed = time(NULL);

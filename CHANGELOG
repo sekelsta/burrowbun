@@ -1,6 +1,8 @@
 Changes since last push:
- - Now generates a map that has the different tiles use their different sprite
-variations, and saves them as ints so the savefile is actually human readable
+ - Fixed the thing where movables collide with the bottom wierdly
+ - Changed humus to topsoil in preparation for humus being a grass, not a block
+ - Added water as a tiletype
+ - Puts water on the map and lets it flow
 
 Known "features":
  - The strenth of gravity is independent of the world.

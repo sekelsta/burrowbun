@@ -40,8 +40,8 @@ std::string Item::getJsonFilename(ItemType type) {
         case ItemType::DIRT:
             filename = "dirt";
             break;
-        case ItemType::HUMUS:
-            filename = "humus";
+        case ItemType::TOPSOIL:
+            filename = "topsoil";
             break;
         case ItemType::CLAY:
             filename = "clay";

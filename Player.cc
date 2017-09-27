@@ -55,7 +55,7 @@ Player::Player() : Entity("entities/bunny.json"), inventory(10, 6), trash(1, 1) 
     // Have starting items
     inventory.pickup(ItemMaker::makeItem(ItemType::HEALTH_POTION));
     inventory.pickup(ItemMaker::makeItem(ItemType::DIRT));
-    inventory.pickup(ItemMaker::makeItem(ItemType::HUMUS));
+    inventory.pickup(ItemMaker::makeItem(ItemType::TOPSOIL));
     inventory.pickup(ItemMaker::makeItem(ItemType::SAND));
     inventory.pickup(ItemMaker::makeItem(ItemType::CLAY));
     inventory.pickup(ItemMaker::makeItem(ItemType::CALCAREOUS_OOZE));

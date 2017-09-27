@@ -303,6 +303,13 @@ void Collider::collide(Map &map, movable::Movable &movable) {
         to.y = from.y + dy;
         /* Collide with the bottom and top of the map. */
         movable.isCollidingDown = to.collideEdge(worldHeight);
+        /* If there was a collision with the bottom or top of the map,
+        set velocity to 0. */
+        if (movable.isCollidingDown) {
+            movable::Point velocity = movable.getVelocity();
+            velocity.y = 0;
+            movable.setVelocity(velocity);
+        }
 
         int newX = from.x;
         int newY = from.y;

@@ -1,0 +1,31 @@
+{
+    "sprite": {
+        "rect": {
+            "x": 0,
+            "y": 0,
+            "w": 16,
+            "h": 16
+        },
+        "name": ""
+    },
+    "color": {
+        "r": 0,
+        "g": 128,
+        "b": 255,
+        "a": 0
+    },
+    "isSolid": false,
+    "isPlatform": false,
+    "overlapDamage": {
+        "minDamage": 0,
+        "maxDamage": 0,
+        "balance": 0,
+        "criticalChance": 0,
+        "criticalAmount": 1,
+        "minWounds": 0,
+        "maxWounds": 0,
+        "type": 2
+    },
+    "maxHealth": 1,
+    "opacity": 0
+}

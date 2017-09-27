@@ -286,6 +286,7 @@ public:
 
     /* Return the pointer the the tile at this location. */
     inline Tile *getTile(int x, int y, MapLayer layer) {
+        x = wrapX(x);
         if (layer == MapLayer::FOREGROUND) {
             return getTile(findPointer(x, y) -> foreground);
         }
@@ -368,7 +369,7 @@ public:
     void moveTile(const Location &place, int x, int y);
 
     /* Move a tile x in the +x direction and y in the +y direction. If there's 
-    a tile there, they swit places. */
+    a tile there, they switch places. */
     void displaceTile(const Location &place, int x, int y);
 };
 
