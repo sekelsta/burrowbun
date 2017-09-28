@@ -105,6 +105,22 @@ void Mapgen::generateEarth() {
     double caveLimit = getPercentile(0.125, finalSurface, 10000);
     caveLimit -= getPercentile(0.875, finalCaves, 10000);
 
+    /* Wetness as in whether there is actually water there right now. */
+    module::Perlin baseWetness;
+    baseWetness.SetSeed(rand());
+    module::Turbulence turbulentWetness;
+    turbulentWetness.SetSourceModule(0, baseWetness);
+    module::ScalePoint scaledWetness;
+    scaledWetness.SetSourceModule(0, turbulentWetness);
+    scaledWetness.SetScale(0.01);
+    module::ScaleBias biasedWetness;
+    biasedWetness.SetSourceModule(0, scaledWetness);
+    biasedWetness.SetScale(1.5);
+    module::Add finalWetness;
+    finalWetness.SetSourceModule(0, biasedWetness);
+    finalWetness.SetSourceModule(1, finalHumidity);
+
+    double waterLimit = getPercentile(0.85, finalWetness, 10000);
 
     /* Just for testing, base the foreground tile on biome. */
     for (int i = 0; i < map.width; i++) {
@@ -135,26 +151,33 @@ void Mapgen::generateEarth() {
             else if (biome == BiomeType::TUNDRA) {
                 tileType = TileType::SNOW;
             }
-            map.setTile(i, j, MapLayer::FOREGROUND, tileType);
 
             /* Find the sky and make it empty. */
             double surface = getCylinderValue(i, j, finalSurface);
             surface += (j - baseHeight) / steepness;
             if (surface > 0) {
-                map.setTile(i, j, MapLayer::FOREGROUND, TileType::EMPTY);
+                tileType = TileType::EMPTY;
             }
  
             /* Set the caves to be empty. */
             double cave = getCylinderValue(i, j, finalCaves);
             if (cave > caveBoundary 
                     && surface - cave < caveLimit) {
-                map.setTile(i, j, MapLayer::FOREGROUND, TileType::EMPTY);
+                tileType = TileType::EMPTY;
             }
+
+            /* Add water instead of air to moist areas. */
+            if (tileType == TileType::EMPTY 
+                    && getCylinderValue(i, j, finalWetness) > waterLimit) {
+                tileType = TileType::WATER;
+            }
+
+            map.setTile(i, j, MapLayer::FOREGROUND, tileType);
         }
     }
 
     /* Put water on the surface. */
-    fillWater(map.height * 0.05);
+    map.savePPM(MapLayer::FOREGROUND, "wunsettled.world.ppm");
     settleWater();
 
     /* When done setting non-boulders and before setting boulders, have
@@ -254,6 +277,11 @@ int Mapgen::findFall(int direction, int x, int y, MapLayer layer) {
 void Mapgen::moveWater(int x, int y) {
     /* Make sure the tile being moved is actually water. */
     assert(map.getTile(x, y, MapLayer::FOREGROUND) -> type == TileType::WATER);
+
+    /* If this is the bottom layer, it can't fall. */
+    if (y == 0) {
+        return;
+    }
 
     /* First try moving it in the -x direction to move it down,
     then in the +x. */

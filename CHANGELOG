@@ -1,8 +1,5 @@
 Changes since last push:
- - Fixed the thing where movables collide with the bottom wierdly
- - Changed humus to topsoil in preparation for humus being a grass, not a block
- - Added water as a tiletype
- - Puts water on the map and lets it flow
+ - Water is now added in amounts according to biome, and also underground
 
 Known "features":
  - The strenth of gravity is independent of the world.
