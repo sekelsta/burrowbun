@@ -126,7 +126,7 @@ void Tile::dealOverlapDamage(movable::Movable &movable) const {
     movable.takeDamage(overlapDamage);
 }
 
-uint8_t Tile::getSpritePlace(const Map &map, const Location &place) const {
+uint8_t Tile::getSpritePlace(Map &map, const Location &place) const {
     int x;
     int y;
     /* Some (empty) tiles have no sprite. */
@@ -146,7 +146,7 @@ uint8_t Tile::getSpritePlace(const Map &map, const Location &place) const {
     return SpaceInfo::toSpritePlace(x, y);
 }
 
-uint8_t Tile::updateSprite(const Map &map, const Location &place) const {
+uint8_t Tile::updateSprite(Map &map, const Location &place) const {
     int y = map.bordering(place);
     int x = SpaceInfo::getX(map.getSprite(place));
     return SpaceInfo::toSpritePlace(x, y);
@@ -174,6 +174,8 @@ Tile::Tile(TileType tileType)
     overlapDamage = j["overlapDamage"].get<Damage>();
     maxHealth = j["maxHealth"];
     opacity = j["opacity"];
+    int edgeInt = j["edgeType"];
+    edgeType = (EdgeType)edgeInt;
     sprite.loadTexture(TILE_SPRITE_PATH);
     assert(sprite.hasTexture() || sprite.name == "");
 }

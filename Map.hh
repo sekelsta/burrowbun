@@ -177,7 +177,7 @@ class Map {
     /* Return a number from 0-15 depending on which tiles border this one. 
     (In fact, in binary it returns the number you get if you start at the left
     side and go counterclockwise around, reading an empty tile as a 0. )*/
-    int bordering(const Location &place) const;
+    int bordering(const Location &place);
 
     /* Return true if this is a place that exists on the map. */
     inline bool isOnMap(int x, int y) const {

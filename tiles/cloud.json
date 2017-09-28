@@ -28,6 +28,7 @@
     },
     "maxHealth": 6,
     "opacity": 64,
+    "edgeType": 1,
     "moveTicks": 100,
 	"fallTicks": 2,
     "tilesDestroyed": [0],

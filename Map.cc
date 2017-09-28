@@ -167,22 +167,31 @@ void Map::updateNear(int x, int y) {
 }
 
 
-int Map::bordering(const Location &place) const {
+int Map::bordering(const Location &place) {
+    EdgeType thisEdge = getTile(place) -> edgeType;
+    /* TODO: when rendering of liquids is added, see if this is actually what
+    I want to happen. */
+    if (thisEdge == EdgeType::LIQUID) {
+        return 0;
+    }
+
     int col = 0;
-    // TODO: fix so empty isn't the only tiletype things border
     if (place.y != height - 1 
-            && getTileType(place, 0, 1) == TileType::EMPTY) {
+            && getTile(place.x, place.y+1, place.layer) -> edgeType 
+            != thisEdge) {
         col += 1;
     }
     /* WrapX is called so it matches up with the tile on the other side
     of the map, which it's next to when it wraps around. */
-    if (getTileType(place, 1, 0) == TileType::EMPTY) {
+    if (getTile(place.x+1, place.y, place.layer) -> edgeType != thisEdge) {
         col += 2;
     }
-    if (place.y != 0 && getTileType(place, 0, -1) == TileType::EMPTY) {
+    if (place.y != 0 
+            && getTile(place.x, place.y-1, place.layer) -> edgeType 
+            != thisEdge) {
         col += 4;
     }
-    if (getTileType(place, -1, 0) == TileType::EMPTY) {
+    if (getTile(place.x-1, place.y, place.layer) -> edgeType != thisEdge) {
         col += 8;
     }
     return col;

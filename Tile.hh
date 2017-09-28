@@ -48,6 +48,14 @@ enum class TileType : short {
     LAST_BOULDER = GLACIER
 };
 
+/* When looking at the tiles next to them in picking a sprite, tiles with
+the same edgetype count as next to them. */
+enum class EdgeType {
+    LIQUID,
+    SOLID,
+    PLATFORM
+};
+
 /* A class to make tiles based on their type, and store their infos. */
 // Maybe since maps are filled with pointers to the same tile, everything
 // should be constant?
@@ -87,6 +95,10 @@ public:
     /* What color should represent it in images. */
     Light color;
 
+    /* How it should decide which tiles count as next to it for the purpose of
+    picking a sprite. */
+    EdgeType edgeType;
+
     // Variables for how it interacts with the players
     bool getIsPlatform() const;
     bool getIsSolid() const;
@@ -99,11 +111,11 @@ public:
     int getMaxHealth() const;
 
     /* Which sprite on the spritesheet to use. */
-    virtual uint8_t getSpritePlace(const Map &map, const Location &place)
+    virtual uint8_t getSpritePlace(Map &map, const Location &place)
              const;
 
     /* What sprite to change to. */
-    virtual uint8_t updateSprite(const Map &map, const Location &place)
+    virtual uint8_t updateSprite(Map &map, const Location &place)
             const;
 
     /* Change the map in whatever way needs doing. */

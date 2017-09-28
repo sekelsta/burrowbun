@@ -27,5 +27,6 @@
         "type": 2
     },
     "maxHealth": 15,
-    "opacity": 64
+    "opacity": 64,
+    "edgeType": 1
 }
