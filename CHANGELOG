@@ -1,5 +1,6 @@
 Changes since last push:
- - Water is now added in amounts according to biome, and also underground
+ - Made water settling more efficient
+ - Drew a sprite for granite. Not great, but better than whiteness
 
 Known "features":
  - The strenth of gravity is independent of the world.

@@ -59,6 +59,10 @@ class Mapgen {
         std::vector<double> tempPercentiles, 
         std::vector<double> humidityPercentiles);
 
+    /* Move a tile on a map from x1, y1 to x2, y2 without updating the tiles 
+    around it. */
+    void moveTileFast(int x1, int y1, int x2, int y2, MapLayer layer);
+
     /* Helper function for settleWater. Returns x - direction if there's no 
     place it can fall. */
     int findFall(int direction, int x, int y, MapLayer layer);

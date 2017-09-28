@@ -286,16 +286,7 @@ public:
 
     /* Return the pointer the the tile at this location. */
     inline Tile *getTile(int x, int y, MapLayer layer) {
-        x = wrapX(x);
-        if (layer == MapLayer::FOREGROUND) {
-            return getTile(findPointer(x, y) -> foreground);
-        }
-        else if (layer == MapLayer::BACKGROUND) {
-            return getTile(findPointer(x, y) -> background);
-        }
-        else {
-            return NULL;
-        }
+        return getTile(getTileType(x, y, layer));
     }
 
     inline Tile *getTile(Location place) {
@@ -313,6 +304,13 @@ public:
     inline Tile *getBackground(int x, int y) {
         return getTile(findPointer(x, y) -> background);
     }
+
+    /* Get the type of the tile at x, y, layer. If it isn't on the map,
+    return TileType::EMPTY. */
+    TileType getTileType(int x, int y, MapLayer layer) const;
+    /* Sets the tiletype very fast (does not update the sprites of the tiles
+    around it). */
+    void setTileType(int x, int y, MapLayer layer, TileType type);
 
     /* Get the type of the tile at place.x + x, place.y + y, place.layer. 
     If the tile isn't on the map, return TileType::EMPTY. */

@@ -251,6 +251,13 @@ BiomeType Mapgen::getBaseBiome(double temperature, double humidity,
     return (BiomeType)biomeData[t][h];
 }
 
+void Mapgen::moveTileFast(int x1, int y1, int x2, int y2, MapLayer layer) {
+    x1 = map.wrapX(x1);
+    x2 = map.wrapX(x2);
+    map.setTileType(x2, y2, layer, map.getTileType(x1, y1, layer));
+    map.setTileType(x1, y1, layer, TileType::EMPTY);
+}
+
 int Mapgen::findFall(int direction, int x, int y, MapLayer layer) {
     assert(direction == 1 || direction == -1);
     /* Can't move down if already the bottom. */
@@ -258,10 +265,10 @@ int Mapgen::findFall(int direction, int x, int y, MapLayer layer) {
     int current = x;
     while (current != map.wrapX(x - direction)) {
         /* Check if it can go down. */
-        if (map.getTile(current, y-1, layer) -> type == TileType::EMPTY) {
+        if (map.getTileType(current, y-1, layer) == TileType::EMPTY) {
             break;
         }
-        TileType inTheWay = map.getTile(current, y, layer) -> type;
+        TileType inTheWay = map.getTileType(current, y, layer);
         if (inTheWay != TileType::EMPTY && current != x) {
             /* Skip to the end of the loop to indicate failure,
             so I can use break to indicate success. */
@@ -309,11 +316,7 @@ void Mapgen::moveWater(int x, int y) {
         }
         lowest--;
     }
-    Location place;
-    place.x = x;
-    place.y = y;
-    place.layer = MapLayer::FOREGROUND;
-    map.moveTile(place, fall - x, lowest - y);
+    moveTileFast(x, y, fall, lowest, MapLayer::FOREGROUND);
     /* Try to move the water again. */
     moveWater(fall, lowest);
 

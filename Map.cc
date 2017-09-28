@@ -169,6 +169,7 @@ void Map::updateNear(int x, int y) {
 
 int Map::bordering(const Location &place) const {
     int col = 0;
+    // TODO: fix so empty isn't the only tiletype things border
     if (place.y != height - 1 
             && getTileType(place, 0, 1) == TileType::EMPTY) {
         col += 1;
@@ -450,18 +451,32 @@ Light Map::getSkyColor(int x, int y) const {
     return light;
 }
 
-TileType Map::getTileType(const Location &place, int x, int y) const {
-    int newX = wrapX(place.x + x);
-    if (!isOnMap(newX, place.y + y)) {
+TileType Map::getTileType(int x, int y, MapLayer layer) const {
+    if (!isOnMap(x, y)) {
         return TileType::EMPTY;
     }
-    if (place.layer == MapLayer::FOREGROUND) {
-        return findPointer(newX, place.y + y) -> foreground;
+    if (layer == MapLayer::FOREGROUND) {
+        return findPointer(x, y) -> foreground;
     }
     else {
-        assert(place.layer == MapLayer::BACKGROUND);
-        return findPointer(newX, place.y + y) -> background;
+        assert(layer == MapLayer::BACKGROUND);
+        return findPointer(x, y) -> background;
     }
+} 
+
+void Map::setTileType(int x, int y, MapLayer layer, TileType type) {
+    if (layer == MapLayer::FOREGROUND) {
+        findPointer(x, y) -> foreground = type;
+    }
+    else {
+        assert(layer == MapLayer::BACKGROUND);
+        findPointer(x, y) -> background = type;
+    }
+}
+
+TileType Map::getTileType(const Location &place, int x, int y) const {
+    int newX = wrapX(place.x + x);
+    return getTileType(newX, place.y + y, place.layer);
 }
 
 void Map::setTile(int x, int y, MapLayer layer, TileType val) {

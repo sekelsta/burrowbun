@@ -1,7 +1,8 @@
 CC = g++
 # For debugging use -Og -g
-# For going fast use -O2 or -O3
+# For going fast use -O3
 CXXFLAGS = -std=c++14 -Wall -D_GLIBCXX_DEBUG -D_LIBCXX_DEBUG_PEDANTIC -Og -g
+#CXXFLAGS = -std=c++14 -Wall -O3
 LINKER_FLAGS = -lSDL2 -lSDL2_image
 NOISE_FLAGS = -I/usr/include/libnoise -L/usr/lib -lnoise
 
