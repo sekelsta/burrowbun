@@ -61,9 +61,13 @@ public:
         rect.y = y;
     }
 
+    /* Multiply the texture by this color. */
     inline void setColorMod(const Light &light) {
         color = light;
     }
+
+    /* Render the texture repeatedly to make a grid. */
+    void renderGrid(int width, int height);
 };
 
 /* Get a sprite from a json. */

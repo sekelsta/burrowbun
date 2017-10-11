@@ -46,24 +46,6 @@ Rect WindowHandler::findCamera(int x, int y, int w, int h) {
     return camera;
 }
 
-// Render the texture to a 2d grid with width columns and height rows
-void WindowHandler::renderGrid(Sprite &sprite, int width, int height) {
-    // Where to render to
-    SDL_Rect rectTo;
-    rectTo.x = 0;
-    rectTo.y = 0;
-    rectTo.w = sprite.getWidth();
-    rectTo.h = sprite.getHeight();
-    for (int i = 0; i < width; i++) {
-        for (int j = 0; j < height; j++) {
-            sprite.render(rectTo);
-            rectTo.y += rectTo.h;
-        }
-        rectTo.x += rectTo.w;
-        rectTo.y = 0;
-    }
-}
-
 // Render each texture from textures onto to, using the spacing variables
 // from hotbar. The texture to is expected to have the correct width and
 // height, and the vector is expected to have length 12. 
@@ -219,98 +201,6 @@ void WindowHandler::updateHotbarSprite(Hotbar &hotbar) {
     SDL_DestroyTexture(back);
 }
 
-// Render the inventory to the screen
-void WindowHandler::renderInventory(Inventory &inventory) {
-    if (!inventory.isSpriteUpdated) {
-        updateInventorySprite(inventory);
-    }
-    // Just in case, make sure the renderer is rendering to the screen
-    SDL_SetRenderTarget(Renderer::renderer, NULL);
-
-    // The rectangle to draw to
-    SDL_Rect rectTo;
-    rectTo.w = inventory.sprite.getWidth();
-    assert(rectTo.w == inventory.squareSprite.getWidth() 
-            * inventory.getWidth());
-    rectTo.h = inventory.sprite.getHeight();
-    assert(rectTo.h == inventory.squareSprite.getHeight() 
-            * inventory.getHeight());
-    rectTo.x = inventory.x;
-    rectTo.y = inventory.y;
-
-    // And actually render
-    inventory.sprite.render(rectTo);
-}
-
-/* Draw the whole inventory onto a single sprite. */
-void WindowHandler::updateInventorySprite(Inventory &inventory) {
-    // Here seems like as good a place as any to tell the inventory to figure
-    // out where it cares about being clicked
-    inventory.updateClickBoxes();
-    // Create a texture to draw it on
-    Uint32 pixelFormat = inventory.squareSprite.texture -> getFormat();
-    int width = inventory.squareSprite.getWidth() * inventory.getWidth();
-    int height = inventory.squareSprite.getHeight() * inventory.getHeight();
-    Texture *texture = new Texture(pixelFormat, 
-            SDL_TEXTUREACCESS_TARGET, width, height);
-    inventory.sprite.texture.reset(texture);
-
-    // Store the size of the texture
-    inventory.sprite.rect.w = width;
-    inventory.sprite.rect.h = height;
-    inventory.sprite.rect.x = 0;
-    inventory.sprite.rect.y = 0;
-
-    // Tell the renderer to draw to the texture
-    texture -> SetRenderTarget();
-
-    // Now loop through each square twice, once to draw the background and
-    // once to draw the frame.
-    // Draw the background
-    renderGrid(inventory.squareSprite, inventory.getWidth(), 
-            inventory.getHeight());
-
-    // Render the items
-    // Create a rectangle to draw them to
-    SDL_Rect rectTo;
-    rectTo.x = 0;
-    rectTo.y = 0;
-    rectTo.w = inventory.squareSprite.getWidth();
-    rectTo.h = inventory.squareSprite.getHeight();
-    // Rectangle that sits in each square, to refer to when the item isn't
-    // the same size as the square
-    SDL_Rect refRect = rectTo;
-    // Loop through and render each item
-    for (int row = 0; row < inventory.getHeight(); row++) {
-        for (int col = 0; col < inventory.getWidth(); col++) {
-            // Create a spriterect from the item and render it, if the item
-            // exists
-            Item *item = inventory.getItem(row, col);
-            if (item != NULL) {
-                // Center rectTo inside refRect
-                rectTo.w = item -> sprite.getWidth();
-                rectTo.h = item -> sprite.getHeight();
-                rectTo.x = refRect.x + (refRect.w - rectTo.w) / 2;
-                rectTo.y = refRect.y + (refRect.h - rectTo.h) / 2;
-                item -> sprite.render(rectTo);
-            }
-            refRect.x += refRect.w;
-        }
-        refRect.x = 0;
-        refRect.y += refRect.h;
-    }
-
-    // Now render the frames
-    renderGrid(inventory.frameSprite, inventory.getWidth(), 
-            inventory.getHeight());
-
-    // And now the sprite is updated
-    inventory.isSpriteUpdated = true;
-
-    /* Make sure the render target is set to render to the window again. */
-    SDL_SetRenderTarget(Renderer::renderer, NULL);
-}
-
 void WindowHandler::renderUI(Player &player) {
     // Re-render the hotbar sprite if necessary
     if (!player.hotbar.isSpriteUpdated) {
@@ -342,8 +232,8 @@ void WindowHandler::renderUI(Player &player) {
 
     // Render the inventory, if necessary
     if (player.isInventoryOpen) {
-        renderInventory(player.inventory);
-        renderInventory(player.trash);
+        player.inventory.render();
+        player.trash.render();
     }
 
     /* TODO: Note to self: when adding chests, make sure to not have infinite

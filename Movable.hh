@@ -23,7 +23,15 @@ void from_json(const nlohmann::json &j, Point &point);
     not including tiles. Monsters, NPCs, the player, and dropped items should
     all be subclasses. */
 class Movable {
+
+    // Sprite
+    Sprite sprite;
+
 public:
+    /* Allow from_json access to private variables, since it is basically a
+    factory function. */
+    friend void from_json(const nlohmann::json &j, Movable &movable);
+
     // Movement-related fields
     // Drag is a number between 0 and 1 which the velocity is multiplied by
     Point drag, velocity, accel, dAccel;
@@ -56,9 +64,6 @@ public:
 
     // Location
     int x, y;
-
-    // Sprite
-    Sprite sprite;
 
     /* How fast are all the boulders trying to move it this update. */
     int boulderSpeed;

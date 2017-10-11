@@ -3,6 +3,55 @@
 #include "Inventory.hh"
 #include "filepaths.hh"
 
+void Inventory::updateSprite() {
+    // Tell the renderer to draw to the texture
+    sprite.texture -> SetRenderTarget();
+
+    // Now loop through each square twice, once to draw the background and
+    // once to draw the frame.
+    // Draw the background
+    squareSprite.renderGrid(getWidth(), getHeight());
+
+    // Render the items
+    // Create a rectangle to draw them to
+    SDL_Rect rectTo;
+    rectTo.x = 0;
+    rectTo.y = 0;
+    rectTo.w = squareSprite.getWidth();
+    rectTo.h = squareSprite.getHeight();
+    // Rectangle that sits in each square, to refer to when the item isn't
+    // the same size as the square
+    SDL_Rect refRect = rectTo;
+    // Loop through and render each item
+    for (int row = 0; row < getHeight(); row++) {
+        for (int col = 0; col < getWidth(); col++) {
+            // Create a spriterect from the item and render it, if the item
+            // exists
+            Item *item = getItem(row, col);
+            if (item != NULL) {
+                // Center rectTo inside refRect
+                rectTo.w = item -> sprite.getWidth();
+                rectTo.h = item -> sprite.getHeight();
+                rectTo.x = refRect.x + (refRect.w - rectTo.w) / 2;
+                rectTo.y = refRect.y + (refRect.h - rectTo.h) / 2;
+                item -> sprite.render(rectTo);
+            }
+            refRect.x += refRect.w;
+        }
+        refRect.x = 0;
+        refRect.y += refRect.h;
+    }
+
+    // Now render the frames
+    frameSprite.renderGrid(getWidth(), getHeight());
+
+    // And now the sprite is updated
+    isSpriteUpdated = true;
+
+    /* Make sure the render target is set to render to the window again. */
+    SDL_SetRenderTarget(Renderer::renderer, NULL);
+}
+
 // Constructor
 Inventory::Inventory(int cols, int rows) {
     // Initialize the location
@@ -41,7 +90,19 @@ Inventory::Inventory(int cols, int rows) {
     squareSprite.loadTexture(UI_SPRITE_PATH);
     frameSprite.loadTexture(UI_SPRITE_PATH);
 
-    
+    /* Actually set the clickboxes to what they should be. */
+    updateClickBoxes();    
+
+    /* Make a texture of the right size. */
+    Uint32 pixelFormat = squareSprite.texture -> getFormat();
+    int width = squareSprite.getWidth() * getWidth();
+    int height = squareSprite.getHeight() * getHeight();
+    sprite.texture.reset(new Texture(pixelFormat,
+            SDL_TEXTUREACCESS_TARGET, width, height));
+    sprite.rect.w = width;
+    sprite.rect.h = height;
+    sprite.rect.x = 0;
+    sprite.rect.y = 0;
 }
 
 /* Copy constructor. Don't use, it just asserts false. If I ever think of a 
@@ -127,7 +188,6 @@ Item *Inventory::add(Item *item, int row, int col) {
 // Take an item and put it in the first empty slot of the inventory. Return 
 // the item if it doesn't fit or NULL if it does.
 Item *Inventory::pickup(Item *item) {
-    // TODO: attempt to stack items whenever possible
     // Loop through the inventory looking for a space
     for (int row = 0; row < getHeight(); row++) {
         for (int col = 0; col < getWidth(); col++) {
@@ -199,4 +259,23 @@ void Inventory::update(Action *&mouse) {
             }
         }
     }
+}
+
+void Inventory::render() {
+    if (!isSpriteUpdated) {
+        updateSprite();
+    }
+
+    /* Set the rect to draw to. */
+    SDL_Rect rectTo;
+    rectTo.w = sprite.getWidth();
+    assert(rectTo.w == squareSprite.getWidth() * getWidth());
+    rectTo.h = sprite.getHeight();
+    assert(rectTo.h == squareSprite.getHeight() * getHeight());
+    rectTo.x = x;
+    rectTo.y = y;
+
+    // And actually render
+    sprite.render(rectTo);
+
 }

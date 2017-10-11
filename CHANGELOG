@@ -1,7 +1,12 @@
 Changes since last push:
+was supposed to be in previous commit but forgot to add:
  - SpriteBase made the base class of Sprite and Animation
  - Sprite fields nearly made private. Only WindowHandler accesses them
 directly, and only to make and set a custon sprite
+ - Fixed an unintialized value from Movable::operator=
+ - Added font files and crediting for them
+new:
+inventory now renders itself
 
 Known "features":
  - The strenth of gravity is independent of the world.

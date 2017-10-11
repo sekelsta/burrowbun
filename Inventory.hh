@@ -12,6 +12,8 @@ class Inventory {
     // For storing the list of items
     std::vector<std::vector<Item*>> items;
 
+    /* Have an up-to-date sprite. */
+    void updateSprite();
 public:
     // Where the top left corner of the inventory is
     int x;
@@ -62,6 +64,9 @@ public:
 
     // Use mouse input
     void update(Action *&mouse);
+
+    /* Render itself. */
+    void render();
 };
 
 #endif

@@ -172,8 +172,8 @@ void Boulder::carryMovables(const Map &map, const Rect &boulderRect,
     for (unsigned int i = 0; i < movables.size(); i++) {
         movableRect.x = movables[i] -> x;
         movableRect.y = movables[i] -> y;
-        movableRect.w = movables[i] -> sprite.rect.w;
-        movableRect.h = movables[i] -> sprite.rect.h;
+        movableRect.w = movables[i] -> getWidth();
+        movableRect.h = movables[i] -> getHeight();
         if (boulderRect.intersects(movableRect)) {
             movables[i] -> boulderSpeed += direction * map.getTileWidth();
         }
