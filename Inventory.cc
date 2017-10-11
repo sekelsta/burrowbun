@@ -3,9 +3,6 @@
 #include "Inventory.hh"
 #include "filepaths.hh"
 
-/* Initialize static variable. */
-Sprite Inventory::squareSprite;
-
 // Constructor
 Inventory::Inventory(int cols, int rows) {
     // Initialize the location
@@ -23,24 +20,28 @@ Inventory::Inventory(int cols, int rows) {
         }
     }
 
-    // Set all texture pointers to null
-    sprite.texture = NULL;
+    /* Sprite starts off not updated. */
     isSpriteUpdated = false;
 
-    // Pick a background color
+    /* Pick a background color. */
+    Light squareColor;
     squareColor.r = 128;
     squareColor.g = 128;
     squareColor.b = 255;
 
     // TODO: fix having hard-coded sprite info. 
-    // Inventory::squareSprite is a static member
-    Inventory::squareSprite.name = "inventory.png";
-    Inventory::squareSprite.rect.w = 32;
-    Inventory::squareSprite.rect.h = 32;
+    /* x, y, w, h, name */
+    squareSprite = Sprite(0, 0, 32, 32, "inventory.png");
+    frameSprite = Sprite(32, 0, 32, 32, "inventory.png");
+
+    /* Assign the squareSprite a different color. */
+    squareSprite.setColorMod(squareColor);
 
     // And actually load it
-    Inventory::squareSprite.loadTexture(UI_SPRITE_PATH);
+    squareSprite.loadTexture(UI_SPRITE_PATH);
+    frameSprite.loadTexture(UI_SPRITE_PATH);
 
+    
 }
 
 /* Copy constructor. Don't use, it just asserts false. If I ever think of a 
@@ -151,18 +152,18 @@ void Inventory::updateClickBoxes() {
     int newY = y;
     for (int row = 0; row < getHeight(); row++) {
         for (int col = 0; col < getWidth(); col++) {
-            clickBoxes[row][col].w = Inventory::squareSprite.rect.w;
-            clickBoxes[row][col].h = Inventory::squareSprite.rect.h;
+            clickBoxes[row][col].w = Inventory::squareSprite.getWidth();
+            clickBoxes[row][col].h = Inventory::squareSprite.getHeight();
             clickBoxes[row][col].x = newX;
             clickBoxes[row][col].y = newY;
             // Also initialize the click info
             clickBoxes[row][col].wasClicked = false;
             clickBoxes[row][col].containsMouse = false;
  
-            newX += Inventory::squareSprite.rect.w;
+            newX += Inventory::squareSprite.getWidth();
         }
         newX = x;
-        newY += Inventory::squareSprite.rect.h;
+        newY += Inventory::squareSprite.getHeight();
     }
 }
 

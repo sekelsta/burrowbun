@@ -172,7 +172,7 @@ void Mapgen::generateEarth() {
                 tileType = TileType::WATER;
             }
 
-            map.setTile(i, j, MapLayer::FOREGROUND, tileType);
+            map.setTileType(i, j, MapLayer::FOREGROUND, tileType);
         }
     }
 
@@ -283,7 +283,7 @@ int Mapgen::findFall(int direction, int x, int y, MapLayer layer) {
 
 void Mapgen::moveWater(int x, int y) {
     /* Make sure the tile being moved is actually water. */
-    assert(map.getTile(x, y, MapLayer::FOREGROUND) -> type == TileType::WATER);
+    assert(map.getTileType(x, y, MapLayer::FOREGROUND) == TileType::WATER);
 
     /* If this is the bottom layer, it can't fall. */
     if (y == 0) {
@@ -305,12 +305,12 @@ void Mapgen::moveWater(int x, int y) {
     }
 
     /* Otherwise, move the tile. */
-    TileType below = map.getTile(fall, y - 1, MapLayer::FOREGROUND) -> type;
+    TileType below = map.getTileType(fall, y - 1, MapLayer::FOREGROUND);
     assert(below == TileType::EMPTY);
     int lowest = y - 1;
     /* See how far down it can be moved. */
     while (below == TileType::EMPTY && lowest > 0) {
-        below = map.getTile(fall, lowest - 1, MapLayer::FOREGROUND) -> type;
+        below = map.getTileType(fall, lowest - 1, MapLayer::FOREGROUND);
         if (below != TileType::EMPTY) {
             break;
         }
@@ -322,8 +322,8 @@ void Mapgen::moveWater(int x, int y) {
 
     /* And this water block may have been in the way of the water block to the
     left of it falling, so let's try moving that again. */
-    assert(map.getTile(x, y, MapLayer::FOREGROUND) -> type == TileType::EMPTY);
-    if (map.getTile(x-1, y, MapLayer::FOREGROUND) -> type == TileType::WATER) {
+    assert(map.getTileType(x, y, MapLayer::FOREGROUND) == TileType::EMPTY);
+    if (map.getTileType(x-1, y, MapLayer::FOREGROUND) == TileType::WATER) {
         moveWater(map.wrapX(x - 1), y);
     }
 }
@@ -332,8 +332,7 @@ void Mapgen::fillWater(int fillDepth) {
     /* First, place the water on top and let it fall. */
     for (int i = 0; i < map.width; i++) {
         for (int j = map.height - fillDepth; j < map.height; j++) {
-            map.setTile(i, j, MapLayer::FOREGROUND,
-                    TileType::WATER);
+            map.setTileType(i, j, MapLayer::FOREGROUND, TileType::WATER);
         }
     }
 }
@@ -344,8 +343,8 @@ void Mapgen::settleWater() {
     /* j > 0 not j >= 0 because we're looking at the level below. */
     for (int j = 1; j < map.height; j++) {
         for (int i = 0; i < map.width; i++) {
-            if (map.getTile(i, j, MapLayer::FOREGROUND) -> type 
-                    == TileType::WATER) {
+            if (map.getTileType(i, j, MapLayer::FOREGROUND)
+                     == TileType::WATER) {
                 moveWater(i, j);
             }
         }
@@ -358,10 +357,10 @@ void Mapgen::removeWater(int removeDepth) {
         int toRemove = removeDepth;
         int j = map.height - 1;
         while (toRemove > 0 && j >= 0) {
-            TileType tile = map.getTile(i, j, MapLayer::FOREGROUND) -> type;
+            TileType tile = map.getTileType(i, j, MapLayer::FOREGROUND);
             /* If there's water there, remove it. */
             if (tile == TileType::WATER) {
-                map.setTile(i, j, MapLayer::FOREGROUND, TileType::EMPTY);
+                map.setTileType(i, j, MapLayer::FOREGROUND, TileType::EMPTY);
                 toRemove--;
             }
             /* If there's a solid tile, stop. */

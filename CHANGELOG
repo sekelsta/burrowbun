@@ -1,5 +1,7 @@
 Changes since last push:
- - Now tiles don't treat water as a tiles they should share an edge with
+ - SpriteBase made the base class of Sprite and Animation
+ - Sprite fields nearly made private. Only WindowHandler accesses them
+directly, and only to make and set a custon sprite
 
 Known "features":
  - The strenth of gravity is independent of the world.

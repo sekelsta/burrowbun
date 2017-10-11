@@ -27,6 +27,7 @@
         "type": 2
     },
     "maxHealth": 20,
+    "allowsLight": false,
     "opacity": 64,
     "edgeType": 1,
     "moveTicks": 30,

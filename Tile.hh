@@ -11,6 +11,7 @@
 /* Forward declare! */
 class Map;
 struct Location;
+struct SDL_Rect;
 
 // A class for keeping track of which tiles there are
 enum class TileType : short {
@@ -107,7 +108,7 @@ public:
     /* For lighting. Tiles with 0 opacity are completely permeable to light.*/
     int getOpacity() const;
 
-    // Basically the number of hits with a pickax to break it
+    /* Basically the number of hits with a pickaxe to break it. */
     int getMaxHealth() const;
 
     /* Which sprite on the spritesheet to use. */
@@ -131,6 +132,8 @@ public:
     /* Whether the tile will ever need to call its update function. */
     virtual bool canUpdate(const Map &map, const Location &place);
 
+    virtual void render(uint8_t spritePlace, const Light &light, 
+        const SDL_Rect &rectTo);
 };
 
 #endif

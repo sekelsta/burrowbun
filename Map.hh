@@ -67,7 +67,7 @@ class Map {
 
     /* Find a Tile object of type val. If it does not exist, create it. If
     multiple exist, return the first one. */
-    Tile *getTile(TileType val);
+    Tile *getTile(TileType val) const;
 
     /* Call chooseSprite on every tile on the map. */
     void randomizeSprites();
@@ -203,6 +203,11 @@ private:
     // Constructor. Resulting map cannot be played but can be saved.
     inline Map() : TILE_WIDTH(1), TILE_HEIGHT(1) {
         tiles = nullptr;
+
+        /* Create a tile object for each type. */
+        for (int i = 0; i <= (int)TileType::LAST_TILE; i++) {
+            newTile((TileType)i);
+        }
     }
 
 public:

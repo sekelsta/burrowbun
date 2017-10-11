@@ -25,30 +25,22 @@ Tile *Map::newTile(TileType val) {
         assert((unsigned int)val <= (unsigned int)TileType::LAST_PURE_TILE);
     }
 
+    assert(tile != nullptr);
+
+    /* Add it to the pointers at index (int) val. */
+    if (pointers.size() <= (unsigned int)val) {
+        pointers.resize((unsigned int)val + 1);
+        assert(pointers.back() == nullptr);
+    }
+    pointers[(unsigned int)val] = tile;
+
     return tile;
 }
 
-Tile *Map::getTile(TileType val) {
+Tile *Map::getTile(TileType val) const {
     /* Return the tile if it exists. */
-    if (pointers.size() > (unsigned int)val
-            && pointers[(unsigned int)val] != nullptr) {
-        return pointers[(unsigned int)val];
-    }
-    /* Otherwise make a new tile (or appropriate tile subclass) and add it to 
-    the list of pointers. */
-    Tile *tile = newTile(val);
-
-    /* If the vector isn't big enough to hold this tile with its value as the
-    index, resize it so this is so annd fill the new part with zeros. */
-    if (pointers.size() <= (unsigned int)val) {
-        pointers.resize((unsigned int)val + 1);
-        /* Make sure it did get filled with zeros. */
-        assert(pointers.back() == nullptr);
-    }
-    /* Now stick in our tile. */
-    pointers[(unsigned int)val] = tile;
- 
-    return tile;
+    assert(pointers[(unsigned int)val] != nullptr);
+    return pointers[(unsigned int)val];
 }
 
 void Map::randomizeSprites() {
@@ -320,7 +312,7 @@ Map::Map(string filename, int tileWidth, int tileHeight) :
 
     /* Create a tile object for each type. */
     for (int i = 0; i <= (int)TileType::LAST_TILE; i++) {
-        getTile((TileType)i);
+        newTile((TileType)i);
     }
 
     /* Check that the file could be opened. */
@@ -410,11 +402,19 @@ Map::Map(string filename, int tileWidth, int tileHeight) :
     }
 
     /* Iterate over the entire map. */
+    Location fore;
+    Location back;
+    fore.layer = MapLayer::FOREGROUND;
+    back.layer = MapLayer::BACKGROUND;
     for (int i = 0; i < width; i++) {
+        fore.x = i;
+        back.x = i;
         for (int j = 0; j < height; j++) {
-            /* Add the appropriate tiles to our list of tiles to update,
-            and also make extra sure they have the right sprite. */
-            updateNear(i, j);
+            fore.y = j;
+            back.y = j;
+            /* Add the appropriate tiles to our list of tiles to update. */
+            addToUpdate(fore);
+            addToUpdate(back);
         }
     }
 }

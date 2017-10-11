@@ -47,16 +47,16 @@ Rect WindowHandler::findCamera(int x, int y, int w, int h) {
 }
 
 // Render the texture to a 2d grid with width columns and height rows
-void WindowHandler::renderGrid(const Sprite &sprite, int width, int height) {
+void WindowHandler::renderGrid(Sprite &sprite, int width, int height) {
     // Where to render to
     SDL_Rect rectTo;
     rectTo.x = 0;
     rectTo.y = 0;
-    rectTo.w = sprite.rect.w;
-    rectTo.h = sprite.rect.h;
+    rectTo.w = sprite.getWidth();
+    rectTo.h = sprite.getHeight();
     for (int i = 0; i < width; i++) {
         for (int j = 0; j < height; j++) {
-            sprite.render(&rectTo);
+            sprite.render(rectTo);
             rectTo.y += rectTo.h;
         }
         rectTo.x += rectTo.w;
@@ -75,8 +75,8 @@ SDL_Texture *WindowHandler::renderHotbarPart(const Hotbar &hotbar,
         // Create texture to draw to
         // Get the width and height of the textures to render
         // This function assumes they are all the same
-        int width = hotbar.frame.rect.w;
-        int height = hotbar.frame.rect.h;
+        int width = hotbar.frame.getWidth();
+        int height = hotbar.frame.getHeight();
         int totalWidth = 12 * width + 12 * hotbar.smallGap;
         totalWidth += 2 * hotbar.largeGap;
         Uint32 pixelFormat = SDL_PIXELFORMAT_ARGB8888;
@@ -98,8 +98,8 @@ SDL_Texture *WindowHandler::renderHotbarPart(const Hotbar &hotbar,
 
     // Actually render
     SDL_Rect rectTo;
-    rectTo.w = hotbar.frame.rect.w;
-    rectTo.h = hotbar.frame.rect.h;
+    rectTo.w = hotbar.frame.getWidth();
+    rectTo.h = hotbar.frame.getHeight();
     SDL_Rect refRect = rectTo;
     // For each slot
     for (int i = 0; i < 12; i++) {
@@ -108,11 +108,11 @@ SDL_Texture *WindowHandler::renderHotbarPart(const Hotbar &hotbar,
         refRect.x = hotbar.clickBoxes[i].x - hotbar.clickBoxes[0].x;
         refRect.y = hotbar.clickBoxes[i].y - hotbar.clickBoxes[0].y;
         // Put rectTo in the middle of refRect
-        rectTo.w = textures[i].rect.w;
-        rectTo.h = textures[i].rect.h;
+        rectTo.w = textures[i].getWidth();
+        rectTo.h = textures[i].getHeight();
         rectTo.x = refRect.x + (refRect.w - rectTo.w) / 2;
         rectTo.y = refRect.y + (refRect.h - rectTo.h) / 2;
-        textures[i].render(&rectTo);
+        textures[i].render(rectTo);
     }
 
     return texture;
@@ -126,9 +126,9 @@ void WindowHandler::updateHotbarSprite(Hotbar &hotbar) {
     // Make the texture to render the sprite of the hotbar to
     // Hardcoding 12 because I don't expect to change my mind (12 is the
     // number of F keys).
-    int width = 12 * hotbar.frame.rect.w + 12 * hotbar.smallGap;
+    int width = 12 * hotbar.frame.getWidth() + 12 * hotbar.smallGap;
     width += 2 * hotbar.largeGap + hotbar.offsetRight;
-    int height = hotbar.frame.rect.w + hotbar.offsetDown;
+    int height = hotbar.frame.getHeight() + hotbar.offsetDown;
     hotbar.sprite.rect.w = width;
     hotbar.sprite.rect.h = height;
     Uint32 pixelFormat = SDL_PIXELFORMAT_ARGB8888;
@@ -156,10 +156,10 @@ void WindowHandler::updateHotbarSprite(Hotbar &hotbar) {
         backFrames.push_back(hotbar.frame);
         // Use the other version if that key is selected
         if (hotbar.selected == i) {
-            frontFrames[i].rect.y += hotbar.frame.rect.h;
+            frontFrames[i].rect.y += hotbar.frame.getHeight();
         }
         else if (hotbar.selected == i + 12) {
-            backFrames[i].rect.y += hotbar.frame.rect.h;
+            backFrames[i].rect.y += hotbar.frame.getHeight();
         }
 
         // Add the Action sprites to their lists of textures, if there is one 
@@ -229,13 +229,17 @@ void WindowHandler::renderInventory(Inventory &inventory) {
 
     // The rectangle to draw to
     SDL_Rect rectTo;
-    rectTo.w = inventory.sprite.rect.w;
-    rectTo.h = inventory.sprite.rect.h;
+    rectTo.w = inventory.sprite.getWidth();
+    assert(rectTo.w == inventory.squareSprite.getWidth() 
+            * inventory.getWidth());
+    rectTo.h = inventory.sprite.getHeight();
+    assert(rectTo.h == inventory.squareSprite.getHeight() 
+            * inventory.getHeight());
     rectTo.x = inventory.x;
     rectTo.y = inventory.y;
 
     // And actually render
-    inventory.sprite.render(&rectTo);
+    inventory.sprite.render(rectTo);
 }
 
 /* Draw the whole inventory onto a single sprite. */
@@ -244,44 +248,35 @@ void WindowHandler::updateInventorySprite(Inventory &inventory) {
     // out where it cares about being clicked
     inventory.updateClickBoxes();
     // Create a texture to draw it on
-    Uint32 pixelFormat = Inventory::squareSprite.texture -> getFormat();
-    int width = Inventory::squareSprite.rect.w * inventory.getWidth();
-    int height = Inventory::squareSprite.rect.h * inventory.getHeight();
+    Uint32 pixelFormat = inventory.squareSprite.texture -> getFormat();
+    int width = inventory.squareSprite.getWidth() * inventory.getWidth();
+    int height = inventory.squareSprite.getHeight() * inventory.getHeight();
     Texture *texture = new Texture(pixelFormat, 
             SDL_TEXTUREACCESS_TARGET, width, height);
+    inventory.sprite.texture.reset(texture);
 
     // Store the size of the texture
     inventory.sprite.rect.w = width;
     inventory.sprite.rect.h = height;
+    inventory.sprite.rect.x = 0;
+    inventory.sprite.rect.y = 0;
 
     // Tell the renderer to draw to the texture
     texture -> SetRenderTarget();
-    texture -> SetTextureBlendMode(SDL_BLENDMODE_BLEND);
 
     // Now loop through each square twice, once to draw the background and
     // once to draw the frame.
     // Draw the background
-    Inventory::squareSprite.texture->SetTextureColorMod(inventory.squareColor);
-    // Set the rect in the correct part of the spritesheet
-    Inventory::squareSprite.rect.x = 0;
-    Inventory::squareSprite.rect.y = 0;
-
-    // And actually render
-    // Render the background
-    renderGrid(Inventory::squareSprite, inventory.getWidth(), 
+    renderGrid(inventory.squareSprite, inventory.getWidth(), 
             inventory.getHeight());
-
-    // Set render draw color to white
-    Inventory::squareSprite.texture -> SetTextureColorMod({0xFF, 0xFF, 0xFF, 
-            0x00});
 
     // Render the items
     // Create a rectangle to draw them to
     SDL_Rect rectTo;
     rectTo.x = 0;
     rectTo.y = 0;
-    rectTo.w = Inventory::squareSprite.rect.w;
-    rectTo.h = Inventory::squareSprite.rect.h;
+    rectTo.w = inventory.squareSprite.getWidth();
+    rectTo.h = inventory.squareSprite.getHeight();
     // Rectangle that sits in each square, to refer to when the item isn't
     // the same size as the square
     SDL_Rect refRect = rectTo;
@@ -293,11 +288,11 @@ void WindowHandler::updateInventorySprite(Inventory &inventory) {
             Item *item = inventory.getItem(row, col);
             if (item != NULL) {
                 // Center rectTo inside refRect
-                rectTo.w = item -> sprite.rect.w;
-                rectTo.h = item -> sprite.rect.h;
+                rectTo.w = item -> sprite.getWidth();
+                rectTo.h = item -> sprite.getHeight();
                 rectTo.x = refRect.x + (refRect.w - rectTo.w) / 2;
                 rectTo.y = refRect.y + (refRect.h - rectTo.h) / 2;
-                item -> sprite.render(&rectTo);
+                item -> sprite.render(rectTo);
             }
             refRect.x += refRect.w;
         }
@@ -306,18 +301,14 @@ void WindowHandler::updateInventorySprite(Inventory &inventory) {
     }
 
     // Now render the frames
-    // Make a spriteRect for the frame
-    Inventory::squareSprite.rect.y = 0;
-    Inventory::squareSprite.rect.x = Inventory::squareSprite.rect.w;
-    Sprite frame = Inventory::squareSprite;
+    renderGrid(inventory.frameSprite, inventory.getWidth(), 
+            inventory.getHeight());
 
-    // Actually render
-    renderGrid(frame, inventory.getWidth(), inventory.getHeight());
-
-    // Done rendering stuff. Give the inventory it's new sprite.
-    inventory.sprite.texture.reset(texture);
     // And now the sprite is updated
     inventory.isSpriteUpdated = true;
+
+    /* Make sure the render target is set to render to the window again. */
+    SDL_SetRenderTarget(Renderer::renderer, NULL);
 }
 
 void WindowHandler::renderUI(Player &player) {
@@ -331,13 +322,13 @@ void WindowHandler::renderUI(Player &player) {
 
     // Create a rect to render to
     SDL_Rect rectTo;
-    rectTo.w = player.hotbar.sprite.rect.w;
-    rectTo.h = player.hotbar.sprite.rect.h;
+    rectTo.w = player.hotbar.sprite.getWidth();
+    rectTo.h = player.hotbar.sprite.getHeight();
 
     // Render
     rectTo.x = player.hotbar.xStart;
     rectTo.y = player.hotbar.yStart;
-    player.hotbar.sprite.render(&rectTo);
+    player.hotbar.sprite.render(rectTo);
 
     // Render the stat bars
     player.healthBar.y = screenHeight - player.healthBar.distFromBottom;
@@ -366,13 +357,13 @@ void WindowHandler::renderUI(Player &player) {
         SDL_GetMouseState(&x, &y);
         // Make a rect to render to
         SDL_Rect rect;
-        rect.w = player.mouseSlot -> sprite.rect.w;
-        rect.h = player.mouseSlot -> sprite.rect.h;
+        rect.w = player.mouseSlot -> sprite.getWidth();
+        rect.h = player.mouseSlot -> sprite.getHeight();
         // Put it on the center of the mouse
         rect.x = x - (rect.w / 2);
         rect.y = y - (rect.h / 2);
         // Render
-        player.mouseSlot -> sprite.render(&rect);
+        player.mouseSlot -> sprite.render(rect);
     }
 }
 
@@ -493,8 +484,6 @@ void WindowHandler::renderMap(Map &m, const Rect &camera) {
     int height = ceil((float)camera.h / (float)TILE_HEIGHT) + 1;
     int xMapStart = ((camera.x / TILE_WIDTH) + m.getWidth()) % m.getWidth();
     int yMapStart = (camera.y + camera.h) / TILE_HEIGHT;
-    /* Location to hold which sprite on the sheet to render. */
-    Location spritePlace; 
     assert(width != 0);
     assert(height != 0);
     for (int i = 0; i < width; i++) {
@@ -517,29 +506,12 @@ void WindowHandler::renderMap(Map &m, const Rect &camera) {
                 break;
             }
 
-            Sprite backSprite = m.getBackground(xTile, yTile) -> sprite;
-            Sprite foreSprite = m.getForeground(xTile, yTile) -> sprite;
-            if (backSprite.hasTexture() || foreSprite.hasTexture()) {
-                // Modulate the color due to lighting
-                Light light = m.getLight(xTile, yTile);
-                if (backSprite.hasTexture()) {
-                    /* Use darkness. */
-                    backSprite.texture -> SetTextureColorMod(light); 
-                    uint8_t background = m.getBackgroundSprite(xTile, yTile);
-                    SpaceInfo::fromSpritePlace(spritePlace, background);
-                    backSprite.rect.x = spritePlace.x * TILE_WIDTH;
-                    backSprite.rect.y = spritePlace.y * TILE_HEIGHT;
-                    backSprite.render(&rectTo);
-                }
-                if (foreSprite.hasTexture()) {
-                    foreSprite.texture -> SetTextureColorMod(light); 
-                    uint8_t foreground = m.getForegroundSprite(xTile, yTile);
-                    SpaceInfo::fromSpritePlace(spritePlace, foreground);
-                    foreSprite.rect.x = spritePlace.x * TILE_WIDTH;
-                    foreSprite.rect.y = spritePlace.y * TILE_HEIGHT;
-                    foreSprite.render(&rectTo);
-                }
-            }
+            /* Modulate the color due to lighting. */
+            Light light = m.getLight(xTile, yTile);
+            uint8_t background = m.getBackgroundSprite(xTile, yTile);
+            uint8_t foreground = m.getForegroundSprite(xTile, yTile);
+            m.getBackground(xTile, yTile) -> render(background, light, rectTo);
+            m.getForeground(xTile, yTile) -> render(foreground, light, rectTo);
         }
     }
 }
@@ -548,8 +520,8 @@ void WindowHandler::renderMap(Map &m, const Rect &camera) {
 void WindowHandler::update(Map &map, 
         const vector<movable::Movable *> &movables, Player &player) {
     /* Find the camera. */
-    int w = player.sprite.rect.w;
-    int h = player.sprite.rect.h;
+    int w = player.getWidth();
+    int h = player.getHeight();
     Rect camera = findCamera(player.x, player.y, w, h);
     /* Tell the player where on the screen they are. This is only used by
     EventHandler. TODO: remove. */

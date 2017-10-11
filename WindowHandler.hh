@@ -64,7 +64,7 @@ class WindowHandler {
 
     // Render the texture from the Sprite to a 2d grid with width columns
     // and height rows
-    void renderGrid(const Sprite &sprite, int width, int height);
+    void renderGrid(Sprite &sprite, int width, int height);
 
     // Create a texture and render all the textures to it, using the spacing 
     // variables from hotbar. The texture to is expected to have the correct 

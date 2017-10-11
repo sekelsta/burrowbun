@@ -1,3 +1,6 @@
+#ifndef TEXTURE_HH
+#define TEXTURE_HH
+
 #include <SDL2/SDL.h>
 #include <string>
 #include <vector>
@@ -19,7 +22,7 @@ class Texture {
     SDL_Texture *texture;
 
     /* For keeping track of which textures have been loaded. */
-    std::vector<LoadedTexture> loaded;
+    static std::vector<LoadedTexture> loaded;
     
 public:
     /* Constructor from filename of the picture. */
@@ -33,9 +36,17 @@ public:
     ~Texture();
 
     /* Render itself. */
-    inline void render(const SDL_Rect *rectFrom, const SDL_Rect *rectTo) const {
+    inline void render(const SDL_Rect &rectFrom, const SDL_Rect &rectTo) const {
         if (texture) {
-            SDL_RenderCopy(Renderer::renderer, texture, rectFrom, rectTo);
+            assert(rectFrom.w != 0);
+            assert(rectFrom.h != 0);
+            assert(rectTo.w != 0);
+            assert(rectTo.h != 0);
+            assert(rectFrom.x >= 0);
+            assert(rectFrom.y >= 0);
+            /* rectTo can have x or y less than 0, that just means it'll
+            be rendered a bit off the screen. */
+            SDL_RenderCopy(Renderer::renderer, texture, &rectFrom, &rectTo);
         }
     }
 
@@ -78,3 +89,5 @@ public:
     }
 
 };
+
+#endif

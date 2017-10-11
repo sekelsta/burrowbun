@@ -7,6 +7,7 @@
 #include "Movable.hh"
 #include "json.hpp"
 #include "filepaths.hh"
+#include <SDL2/SDL.h>
 
 // For convenience
 using json = nlohmann::json;
@@ -116,6 +117,27 @@ int Tile::getOpacity() const {
     return opacity;
 }
 
+void Tile::render(uint8_t spritePlace, const Light &light, 
+        const SDL_Rect &rectTo) {
+    if (!sprite.hasTexture()) {
+        return;
+    }
+
+    /* Use darkness. */
+    sprite.setColorMod(light);
+    Location spriteLocation;
+    SpaceInfo::fromSpritePlace(spriteLocation, spritePlace);
+    assert(spriteLocation.x >= 0);
+    assert(spriteLocation.y >= 0);
+    assert(sprite.getWidth() > 0);
+    assert(sprite.getHeight() > 0);
+    sprite.move(spriteLocation.x * sprite.getWidth(), 
+            spriteLocation.y * sprite.getHeight());
+    sprite.render(rectTo);
+}
+
+
+
 int Tile::getMaxHealth() const {
     return maxHealth;
 }
@@ -177,7 +199,6 @@ Tile::Tile(TileType tileType)
     int edgeInt = j["edgeType"];
     edgeType = (EdgeType)edgeInt;
     sprite.loadTexture(TILE_SPRITE_PATH);
-    assert(sprite.hasTexture() || sprite.name == "");
 }
 
 /* Virtual destructor. */
@@ -187,3 +208,6 @@ Tile::~Tile() {}
 bool Tile::canUpdate(const Map &map, const Location &place) {
     return false;
 }
+
+void Tile::render(uint8_t spritePlace, const Light &light, 
+        const SDL_Rect &rectTo);

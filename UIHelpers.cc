@@ -34,7 +34,7 @@ void StatBar::render() {
     rect.w = totalWidth + 2 * borderWidth;
     rect.y -= borderWidth;
     rect.h += 2 * borderWidth;
-    overlay.render(&rect);
+    overlay.render(rect);
 
     /* Leave the renderer on white. */
     Renderer::setColorWhite();

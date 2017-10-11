@@ -3,6 +3,7 @@
 
 #include <cassert>
 #include <algorithm>
+#include "json.hpp"
 
 /* Rectangle, capable of seeing if another intersects it taking into account
     the world wrapping around the x direction. */
@@ -76,5 +77,12 @@ public:
         return false;
     }
 };
+
+inline void from_json(const nlohmann::json &j, Rect &rect) {
+    rect.x = j["x"];
+    rect.y = j["y"];
+    rect.w = j["w"];
+    rect.h = j["h"];
+}
 
 #endif

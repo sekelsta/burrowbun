@@ -1,15 +1,16 @@
 #ifndef ANIMATION_HH
 #define ANIMATION_HH
 
-#include "Sprite.hh"
+#include "SpriteBase.hh"
+#include "Rect.hh"
 #include <vector>
 #include <string>
 #include "json.hpp"
 
 /* A class to hold the information for an animation. */
-class Animation {
+class Animation: public SpriteBase {
     /* What frames to draw. */
-    std::vector<Sprite> frames;
+    std::vector<SDL_Rect> frames;
     /* Which frame to draw next. */
     int frame;
 
@@ -18,21 +19,11 @@ class Animation {
 
 public:
     /* Render itself. */
-    inline void render(SDL_Rect &rect) {
-        assert(frame < (int)frames.size() * delay);
-        /* Make sure the width and height are correct. */
-        assert(rect.w == frames[frame/ delay].rect.w);
-        assert(rect.h == frames[frame / delay].rect.h);
-        frames[frame / delay].render(&rect);
-        frame++;
-        frame %= frames.size() * delay;
-    }
+    virtual void render(const SDL_Rect &rect);
 
     /* No arguments constructor. */
     inline Animation() {
-        Sprite sprite;
-        sprite.name = "unloaded";
-        frames.push_back(sprite);
+        name = "unloaded";
         frame = 0;
         /* Attempting to render this animation will cause an assertionerror
         because it has no sprite loaded but the name is not "". */
@@ -41,16 +32,26 @@ public:
     inline Animation(const nlohmann::json &j, std::string prefix) {
         frame = 0;
         delay = j["delay"];
-        frames = j["frames"].get<std::vector<Sprite>>();
-        for (unsigned int i = 0; i < frames.size(); i++) {
-            frames[i].loadTexture(prefix);
+        name = j["name"];
+        std::vector<Rect> frameRects = j["frames"].get<std::vector<Rect>>();
+        for (unsigned int i = 0; i < frameRects.size(); i++) {
+            SDL_Rect sdlrect;
+            sdlrect.x = frameRects[i].x;
+            sdlrect.y = frameRects[i].y;
+            sdlrect.w = frameRects[i].w;
+            sdlrect.h = frameRects[i].h;
+            frames.push_back(sdlrect);
         }
+        loadTexture(prefix);
     }
+
+    virtual int getWidth() const;
+    virtual int getHeight() const;
 
     /* Return an SDL_Rect with the width and height of the next frame. */
     inline SDL_Rect getRect() const {
         assert(frame < (int)frames.size() * delay);
-        return frames[frame / delay].rect;
+        return frames[frame / delay];
     }
 };
 

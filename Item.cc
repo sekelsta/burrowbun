@@ -29,6 +29,11 @@ Item::Item(ItemType type) {
     sprite.loadTexture(ICON_SPRITE_PATH);
 }
 
+/* Non-pure-virtual use function. Does nothing. */
+void Item::use(InputType type, int x, int y, Player &player, Map &map) {}
+
+Item::~Item() {}
+
 /* Get json filename from itemtype. */
 std::string Item::getJsonFilename(ItemType type) {
     string filename;

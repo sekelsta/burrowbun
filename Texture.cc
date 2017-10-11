@@ -1,6 +1,9 @@
 #include "Texture.hh"
 #include <SDL2/SDL_image.h>
 
+/* Declare static variable. */
+std::vector<LoadedTexture> Texture::loaded;
+
 Texture::Texture(const std::string &name) {
     texture = nullptr;
     assert(Renderer::renderer != nullptr);
@@ -54,6 +57,16 @@ Texture::Texture(Uint32 pixelFormat, int access, int width, int height) {
     /* This won't be reloaded so there's no need to add it to the list. */
     texture = SDL_CreateTexture(Renderer::renderer, pixelFormat, access, 
             width, height);
+    /* Draw alpha to the texture while we're at it. */
+    SetTextureBlendMode(SDL_BLENDMODE_BLEND);
+    SetRenderTarget();
+    /* Set render draw color to alpha. */
+    Renderer::setColor({0x00, 0x00, 0x00, 0x00});
+    SDL_RenderClear(Renderer::renderer);
+    /* Set render color back to white. */
+    Renderer::setColorWhite();
+    /* And stop drawing to the texture. */
+    SDL_SetRenderTarget(Renderer::renderer, NULL);
 }
 
 Texture::~Texture() {

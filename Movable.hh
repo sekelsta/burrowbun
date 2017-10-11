@@ -69,6 +69,12 @@ public:
     /* Constructor from json. */
     Movable(std::string filename);
 
+    /* Copy constructor. */
+    Movable(const Movable &movable);
+
+    /* Operator= */
+    Movable &operator=(const Movable &movable);
+
     // Destructor
     virtual ~Movable();
 
@@ -92,10 +98,13 @@ public:
     /* Convert a rectangle from world coordinates to screen coordinates. */
     static void convertRect(SDL_Rect &rect, const Rect &camera);
 
-
     /* Render itself to the screen, given an SDL_Rect that tells it where the
     screen is in the world. */
     virtual void render(const Rect &camera);
+
+    /* Get height and width, defined by height and width of the sprite. */
+    virtual int getWidth() const;
+    virtual int getHeight() const;
 };
 
 /* Get a movable from a json file. */

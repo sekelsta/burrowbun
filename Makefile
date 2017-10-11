@@ -9,7 +9,7 @@ NOISE_FLAGS = -I/usr/include/libnoise -L/usr/lib -lnoise
 # Defining variables that say which files all the headers include
 Action.hh.d = Action.hh $(Sprite.hh.d)
 AllTheItems.hh.d = AllTheItems.hh $(Item.hh.d) $(Tile.hh.d) $(MapHelpers.hh.d)
-Animation.hh.d = Animation.hh $(Sprite.hh.d)
+Animation.hh.d = Animation.hh $(Sprite.hh.d) $(SpriteBase.hh.d) $(Rect.hh.d)
 Boulder.hh.d = Boulder.hh $(Tile.hh.d)
 Collider.hh.d = Collider.hh $(Tile.hh.d) $(Map.hh.d) $(Movable.hh.d) \
         $(Rect.hh.d)
@@ -30,7 +30,8 @@ Player.hh.d = Player.hh $(Entity.hh.d) $(Hotbar.hh.d) $(Inventory.hh.d) \
         $(UIHelpers.hh.d)
 Rect.hh.d = Rect.hh
 Renderer.hh.d = Renderer.hh $(Light.hh.d)
-Sprite.hh.d = Sprite.hh $(Texture.hh.d)
+Sprite.hh.d = Sprite.hh $(Texture.hh.d) $(SpriteBase.hh.d)
+SpriteBase.hh.d = SpriteBase.hh $(Texture.hh.d) $(Light.hh.d)
 Stat.hh.d = Stat.hh
 Texture.hh.d = Texture.hh $(Light.hh.d) $(Renderer.hh.d)
 Tile.hh.d = Tile.hh $(Sprite.hh.d) $(Movable.hh.d) $(Light.hh.d) $(Damage.hh.d)
@@ -43,7 +44,7 @@ all : main
 main : main.o Map.o Mapgen.o Tile.o WindowHandler.o EventHandler.o Movable.o \
         Player.o Collider.o Hotbar.o Entity.o Inventory.o Item.o \
         Sprite.o AllTheItems.o Boulder.o MapHelpers.o Light.o Stat.o \
-        UIHelpers.o Damage.o Texture.o Renderer.o
+        UIHelpers.o Damage.o Texture.o Renderer.o Animation.o SpriteBase.o
 	$(CC) $(CXXFLAGS) $^ -o $@ $(LDFLAGS) $(NOISE_FLAGS) $(LINKER_FLAGS)
 
 main.o : main.cc Action.hh AllTheItems.cc Animation.hh Boulder.hh Collider.hh \
@@ -52,6 +53,9 @@ main.o : main.cc Action.hh AllTheItems.cc Animation.hh Boulder.hh Collider.hh \
         Movable.hh Player.hh Rect.hh Renderer.hh Sprite.hh Stat.hh Texture.hh \
         Tile.hh UIHelpers.hh version.hh WindowHandler.hh
 	$(CC) $(CXXFLAGS) $^ -c $(LDFLAGS) $(NOISE_FLAGS) $(LINKER_FLAGS)
+
+Animation.o : Animation.cc $(Animation.hh.d)
+	$(CC) $(CXXFLAGS) $^ -c $(LDFLAGS)
 
 Map.o : Map.cc $(Map.hh.d) $(Boulder.hh.d) version.hh
 	$(CC) $(CXXFLAGS) $^ -c $(LDFLAGS)
@@ -97,6 +101,9 @@ AllTheItems.o : AllTheItems.cc $(AllTheItems.hh.d) $(Player.hh.d) $(Map.hh.d)
 	$(CC) $(CXXFLAGS) $^ -c $(LDFLAGS)
 
 Sprite.o : Sprite.cc $(Sprite.hh.d)
+	$(CC) $(CXXFLAGS) $^ -c $(LDFLAGS)
+
+SpriteBase.o : SpriteBase.cc $(SpriteBase.hh.d)
 	$(CC) $(CXXFLAGS) $^ -c $(LDFLAGS)
 
 Boulder.o : Boulder.cc $(Boulder.hh.d) $(Map.hh.d) $(Tile.hh.d) \

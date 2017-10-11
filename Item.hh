@@ -57,8 +57,11 @@ public:
     // Constructor
     Item(ItemType type);
 
+    /* Virtual use function. Does nothing. */
+    virtual void use(InputType type, int x, int y, Player &player, Map &map);
+
     /* Destructor must be virtual. */
-    inline virtual ~Item() {}
+    virtual ~Item();
 
     /* Access functions. */
     inline ItemType getType() {

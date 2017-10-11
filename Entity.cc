@@ -15,7 +15,6 @@ Entity::Entity(std::string filename) : movable::Movable(filename) {
     mana = j["mana"].get<Stat>();
     invincibilityTime = j["invincibilityTime"];
     invincibilityLeft = 0;
-    assert(sprite.name != "");
     isFacingRight = true;
     sprites = j["sprites"].get<std::vector<Sprite>>();
     for (unsigned int i = 0; i < sprites.size(); i++) {
@@ -103,28 +102,25 @@ void Entity::render(const Rect &camera) {
     Renderer::setColorWhite();
 
     SDL_Rect rectTo;
+    rectTo.x = x;
+    rectTo.y = y;
 
+    /* Which sprite to draw. */
+    SpriteBase *drawSprite = nullptr;
 
     /* So as not to use == with a double. */
     if (abs(getVelocity().x) < 0.0001) {
-        rectTo.x = x;
-        rectTo.y = y;
-        rectTo.w = sprites[isFacingRight].rect.w;
-        rectTo.h = sprites[isFacingRight].rect.h;
-        // Convert the rectangle to screen coordinates
-        convertRect(rectTo, camera);
-
-        // Draw!
-        // TODO: check whether it's actually anywhere near the screen
-        sprites[isFacingRight].render(&rectTo);
-        return;
+        drawSprite = &sprites[isFacingRight];
+    }
+    else {
+        drawSprite = &run[isFacingRight];
     }
     /* Otherwise we use the run sprite. */
-    rectTo = run[isFacingRight].getRect();
-    rectTo.x = x;
-    rectTo.y = y;
+    rectTo.w = drawSprite -> getWidth();
+    rectTo.h = drawSprite -> getHeight();
     convertRect(rectTo, camera);
-    run[isFacingRight].render(rectTo);
+    // TODO: check whether it's actually anywhere near the screen
+    drawSprite -> render(rectTo);
 }
 
 /* Make an entity from a json. */

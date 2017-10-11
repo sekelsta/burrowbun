@@ -51,8 +51,39 @@ Movable::Movable(std::string filename) {
     /* Put data in json. */
     json j = json::parse(infile);
     *this = j.get<Movable>();
-    assert(sprite.name != "");
     sprite.loadTexture(MOVABLE_SPRITE_PATH);
+}
+
+/* Copy constructor. */
+Movable::Movable(const Movable &movable) {
+    *this = movable;
+}
+
+Movable &Movable::operator=(const Movable &movable) {
+    /* Check for self-assignment. */
+    if (this == &movable) {
+        return *this;
+    }
+    drag = movable.drag;
+    velocity = movable.velocity;
+    accel = movable.accel;
+    dAccel = movable.dAccel;
+    isCollidingX  = movable.isCollidingX;
+    isCollidingDown = movable.isCollidingDown;
+    ticksCollidingDown = movable.ticksCollidingDown;
+    isSteppingUp = movable.isSteppingUp;
+    timeOffGround = movable.timeOffGround;
+    collidePlatforms = movable.collidePlatforms;
+    isDroppingDown = movable.isDroppingDown;
+    maxJumpTime = movable.maxJumpTime;
+    pixelsFallen = movable.pixelsFallen;
+    maxHeight = movable.maxHeight;
+    minVelocity = movable.minVelocity;
+    x = movable.x;
+    y = movable.y;
+    sprite = movable.sprite;
+    boulderSpeed = movable.boulderSpeed;
+    return *this;
 }
 
 // Virtual destructor
@@ -147,14 +178,22 @@ void Movable::render(const Rect &camera) {
     // Render things
     rectTo.x = x;
     rectTo.y = y;
-    rectTo.w = sprite.rect.w;
-    rectTo.h = sprite.rect.h;
+    rectTo.w = sprite.getWidth();
+    rectTo.h = sprite.getHeight();
     // Convert the rectangle to screen coordinates
     convertRect(rectTo, camera);
 
     // Draw!
     // TODO: check whether it's actually anywhere near the screen
-    sprite.render(&rectTo);
+    sprite.render(rectTo);
+}
+
+int Movable::getWidth() const {
+    return sprite.getWidth();
+}
+
+int Movable::getHeight() const {
+    return sprite.getHeight();
 }
 
 /* Get a movable from a json file. */

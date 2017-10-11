@@ -32,18 +32,9 @@ public:
     // Whether it's an item
     bool isItem;
 
-    /* Constructor. Note: inherited classes will have to set the sprite. */
-    inline Action() {
-        /* TODO: get magic numbers from somewhere else. These are inventory
-        square width and height. */
-        sprite.rect.w = 32;
-        sprite.rect.h = 32;
-        useTime = 1;
-    };
-
     /* Do the action, or use the item or skill. */
-    inline virtual void 
-            use(InputType type, int x, int y, Player &player, Map &map) {}
+    virtual void 
+            use(InputType type, int x, int y, Player &player, Map &map) = 0;
 
     // Access function
     inline int getUseTime() const {

@@ -22,10 +22,8 @@ public:
 
     /* The sprite of the square to use for the background, which other than
     the color is the same for all inventories. */
-    static Sprite squareSprite;
-
-    /* Color with which to modulate the background squares. */
-    Light squareColor;
+    Sprite squareSprite;
+    Sprite frameSprite;
 
     // The sprite of all the things, put together
     Sprite sprite;

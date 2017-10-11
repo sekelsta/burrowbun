@@ -5,63 +5,64 @@
 #include <string>
 #include <memory>
 #include "Texture.hh"
+#include "SpriteBase.hh"
 #include "json.hpp"
 
 // Forward declare
 struct SDL_Texture;
 
-struct Sprite {
-    /* The name of the sprite image. This may be a spritesheet. */
-    std::string name;
-    std::shared_ptr<Texture> texture;
-
+class Sprite: public SpriteBase {
+public:
     /* Rectangle of where to render from. */
     SDL_Rect rect;
 
-    inline int getWidth() const {
-        assert(hasTexture());
-        return texture -> getWidth();
-    }
+    virtual int getWidth() const;
+
+    virtual int getHeight() const;
 
     /* Returns the number of columns spriteWidth apart this spritesheet can 
     hold. */
     inline int getCols() const {
-        return getWidth() / rect.w;
-    }
-
-    inline int getHeight() const {
-        assert(hasTexture());
-        return texture -> getHeight();
+        return getTextureWidth() / rect.w;
     }
 
     /* Returns the number of rows of spriteHeight this spritesheet can hold. */
     inline int getRows() const {
-        return getHeight() / rect.h;
-    }
-
-    inline bool hasTexture() const {
-        return (bool)texture;
+        return getTextureHeight() / rect.h;
     }
 
     /* The constructor. */
-    Sprite();
+    inline Sprite() {
+        name = "";
+        rect.x = 0;
+        rect.y = 0;
+        rect.w = 0;
+        rect.h = 0;
+    }
+
+    /* Constructor that takes arguments. */
+    inline Sprite(int x, int y, int w, int h, std::string spritename) {
+        name = spritename;
+        rect.x = x;
+        rect.y = y;
+        rect.w = w;
+        rect.h = h;
+    }
 
     /* Assignment operator. */
     Sprite &operator=(const Sprite &sprite);
 
-    /* Load an SDL texture. */
-    void loadTexture(std::string prefix);
-
     /* Render itself. */
-    inline void render(const SDL_Rect *rectTo) const {
-        if (hasTexture()) {
-            texture -> render(&rect, rectTo);
-        }
-        else {
-            /* It should be loaded before being rendered, and the only way it
-            can be loaded properly without having a sprite is if name == "". */
-            assert(name == "");
-        }
+    virtual void render(const SDL_Rect &rectTo);
+
+    /* Use a different part of the spritesheet. */
+    inline void move(int x, int y) {
+        rect.x = x;
+        rect.y = y;
+    }
+
+    inline void setColorMod(const Light &light) {
+        color = light;
     }
 };
 
