@@ -27,7 +27,7 @@
             "name": "bunny.png"
         }],
     "run_left": {
-        "delay": 5,
+        "delay": 4,
         "name": "bunny.png",
         "frames": [{
                 "x": 0,
@@ -55,7 +55,7 @@
         }]
     }, 
     "run_right": {
-            "delay": 5,
+            "delay": 4,
             "name": "bunny.png",
             "frames": [{
                 "x": 0,
