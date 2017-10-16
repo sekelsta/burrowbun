@@ -47,9 +47,12 @@ public:
 
     virtual int getWidth() const;
     virtual int getHeight() const;
+    /* Returns the rect for the current frame (the one that will be renderered
+    next). */
+    virtual Rect getRect() const;
 
     /* Return an SDL_Rect with the width and height of the next frame. */
-    inline SDL_Rect getRect() const {
+    inline SDL_Rect getSDLRect() const {
         assert(frame < (int)frames.size() * delay);
         return frames[frame / delay];
     }

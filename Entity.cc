@@ -17,6 +17,8 @@ Entity::Entity(std::string filename) : movable::Movable(filename) {
     invincibilityLeft = 0;
     isFacingRight = true;
     sprites = j["sprites"].get<std::vector<Sprite>>();
+    /* The rect starts as size of the correct sprite. */
+    rect = sprites[isFacingRight].getRect();
     for (unsigned int i = 0; i < sprites.size(); i++) {
         sprites[i].loadTexture(MOVABLE_SPRITE_PATH);
     }
@@ -115,7 +117,9 @@ void Entity::render(const Rect &camera) {
     else {
         drawSprite = &run[isFacingRight];
     }
-    /* Otherwise we use the run sprite. */
+    /* Update our collision rect. */
+    rect = drawSprite -> getRect();
+    /* And draw! */
     rectTo.w = drawSprite -> getWidth();
     rectTo.h = drawSprite -> getHeight();
     convertRect(rectTo, camera);

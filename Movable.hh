@@ -23,9 +23,9 @@ void from_json(const nlohmann::json &j, Point &point);
     not including tiles. Monsters, NPCs, the player, and dropped items should
     all be subclasses. */
 class Movable {
-
-    // Sprite
-    Sprite sprite;
+protected:
+    /* Collision rectangle. */
+    Rect rect;
 
 public:
     /* Allow from_json access to private variables, since it is basically a
@@ -103,13 +103,15 @@ public:
     /* Convert a rectangle from world coordinates to screen coordinates. */
     static void convertRect(SDL_Rect &rect, const Rect &camera);
 
-    /* Render itself to the screen, given an SDL_Rect that tells it where the
-    screen is in the world. */
+    /* Render itself to the screen, given a Rect that tells it where the
+    screen is in the world. Since Movables don't have sprites, this is just
+    here to be virtual. */
     virtual void render(const Rect &camera);
 
     /* Get height and width, defined by height and width of the sprite. */
     virtual int getWidth() const;
     virtual int getHeight() const;
+    virtual Rect getRect() const;
 };
 
 /* Get a movable from a json file. */

@@ -20,6 +20,8 @@ public:
 
     virtual int getHeight() const;
 
+    virtual Rect getRect() const;
+
     /* Returns the number of columns spriteWidth apart this spritesheet can 
     hold. */
     inline int getCols() const {

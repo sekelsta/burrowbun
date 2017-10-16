@@ -41,7 +41,6 @@ Movable::Movable() {
     // The amount to accelerate by when trying to move
     dAccel.x = 0;
     dAccel.y = 0;
-    sprite.loadTexture(MOVABLE_SPRITE_PATH);
 }
 
 /* Constructor from json file. */
@@ -51,7 +50,6 @@ Movable::Movable(std::string filename) {
     /* Put data in json. */
     json j = json::parse(infile);
     *this = j.get<Movable>();
-    sprite.loadTexture(MOVABLE_SPRITE_PATH);
 }
 
 /* Copy constructor. */
@@ -64,6 +62,7 @@ Movable &Movable::operator=(const Movable &movable) {
     if (this == &movable) {
         return *this;
     }
+    rect = movable.rect;
     drag = movable.drag;
     velocity = movable.velocity;
     accel = movable.accel;
@@ -81,7 +80,6 @@ Movable &Movable::operator=(const Movable &movable) {
     minVelocity = movable.minVelocity;
     x = movable.x;
     y = movable.y;
-    sprite = movable.sprite;
     boulderSpeed = movable.boulderSpeed;
     return *this;
 }
@@ -167,38 +165,22 @@ void Movable::convertRect(SDL_Rect &rect, const Rect &camera) {
     rect.y = camera.y + camera.h - rect.y - rect.h;
 }
 
-
-/* Render itself. */
-void Movable::render(const Rect &camera) {
-    // Make sure the renderer draw color is set to white
-    Renderer::setColorWhite();
-
-    SDL_Rect rectTo;
-
-    // Render things
-    rectTo.x = x;
-    rectTo.y = y;
-    rectTo.w = sprite.getWidth();
-    rectTo.h = sprite.getHeight();
-    // Convert the rectangle to screen coordinates
-    convertRect(rectTo, camera);
-
-    // Draw!
-    // TODO: check whether it's actually anywhere near the screen
-    sprite.render(rectTo);
-}
+void Movable::render(const Rect &camera) {}
 
 int Movable::getWidth() const {
-    return sprite.getWidth();
+    return rect.w;
 }
 
 int Movable::getHeight() const {
-    return sprite.getHeight();
+    return rect.h;
+}
+
+Rect Movable::getRect() const {
+    return rect;
 }
 
 /* Get a movable from a json file. */
 void from_json(const json &j, Movable &movable) {
-    movable.sprite = j["sprite"].get<Sprite>();
     movable.drag = j["drag"].get<Point>();
     assert(movable.drag.x <= 1.0);
     assert(movable.drag.y <= 1.0);

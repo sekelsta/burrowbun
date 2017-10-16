@@ -32,6 +32,10 @@ int Sprite::getHeight() const {
     return rect.h;
 }
 
+Rect Sprite::getRect() const {
+    return rect;
+}
+
 void Sprite::renderGrid(int width, int height) {
     SDL_Rect rectTo;
     rectTo.x = 0;

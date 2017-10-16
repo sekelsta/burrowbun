@@ -3,6 +3,7 @@
 
 #include "Texture.hh"
 #include "Light.hh"
+#include "Rect.hh"
 
 /* Class that has a texture and knows the size. */
 class SpriteBase {
@@ -28,6 +29,7 @@ public:
 
     virtual int getWidth() const = 0;
     virtual int getHeight() const = 0;
+    virtual Rect getRect() const = 0;
     /* Return true if the texture pointer is not null. */
     inline bool hasTexture() const {
         return (bool)texture;

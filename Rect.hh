@@ -4,6 +4,7 @@
 #include <cassert>
 #include <algorithm>
 #include "json.hpp"
+#include <SDL2/SDL.h>
 
 /* Rectangle, capable of seeing if another intersects it taking into account
     the world wrapping around the x direction. */
@@ -14,6 +15,19 @@ public:
     int y;
     int w;
     int h;
+
+    /* Constructor. */
+    inline Rect() {}
+
+    /* Copy-constructor from SDL_Rect. */
+    inline Rect(const SDL_Rect &other) {
+        x = other.x;
+        y = other.y;
+        w = other.w;
+        h = other.h;
+        /* SDL_Rect doesn't have a worldwidth, and whatever calls this will
+        likely not kknow the worldwidth maybe. */
+    }
 
     /* Returns true if only adjustments in the y direction are needed to
     make the rectangles intersect. */

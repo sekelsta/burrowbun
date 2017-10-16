@@ -24,4 +24,6 @@ int Animation::getHeight() const {
     return frames[frame / delay].h;
 }
 
-
+Rect Animation::getRect() const {
+    return Rect(frames[frame / delay]);
+}
