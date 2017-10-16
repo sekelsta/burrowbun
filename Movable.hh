@@ -26,6 +26,8 @@ class Movable {
 protected:
     /* Collision rectangle. */
     Rect rect;
+    /* For attempting to change collision rect size. */
+    Rect nextRect;
 
 public:
     /* Allow from_json access to private variables, since it is basically a
@@ -111,7 +113,11 @@ public:
     /* Get height and width, defined by height and width of the sprite. */
     virtual int getWidth() const;
     virtual int getHeight() const;
-    virtual Rect getRect() const;
+    Rect getRect() const;
+    Rect getNextRect() const;
+    /* Allow change of collision rect. */
+    void advanceRect();
+    
 };
 
 /* Get a movable from a json file. */

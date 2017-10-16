@@ -104,6 +104,10 @@ class Collider {
     void findYCollision(CollisionInfo &info, int dy, int h, const Rect &stays)
         const;
 
+    /* Returns true if the rect is colliding with any solid (not platform) map
+    tile. */
+    bool collidesTiles(const Rect &rect, Map &map) const;
+
     // Returns info on the collision between a moving thing and a stationary 
     // thing. Collisions that occur even if the moving thing stays still will
     // be ignored. 

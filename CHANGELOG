@@ -1,9 +1,6 @@
 Changes since last push:
- - Apparently last commit I somehow deleted WindowHandler.hh's #endif? It's
-back now.
- - Movables no longer have a sprite, just a collision rect
- - Because CollisionHandler doesn't yet know what to do about collision rects
-changing between updates, this causes some collision issues
+ - Updated Collider to be able to handle changes to collision rects.
+ - Wierdness happens when changing, though. Should be fixable.
 
 Known "features":
  - The strenth of gravity is independent of the world.

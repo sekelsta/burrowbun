@@ -117,8 +117,19 @@ void Entity::render(const Rect &camera) {
     else {
         drawSprite = &run[isFacingRight];
     }
+    // TODO: what should the camera be centered on?
     /* Update our collision rect. */
-    rect = drawSprite -> getRect();
+    nextRect = drawSprite -> getRect();
+    /* When changing the sprite size, move the feet over, not the head. */
+    /* If isFacingRight need to move the sprite over, otherwise it should
+    stay where it is. */
+    /* TODO: uncomment following line when movable.x is replaced by 
+    moable.rect.x. */
+    //nextRect.x = (int)isFacingRight * (rect.w - nextRect.w);
+    nextRect.x = 0;
+    /* Keeping the feet still is easy. */
+    nextRect.y = 0;
+
     /* And draw! */
     rectTo.w = drawSprite -> getWidth();
     rectTo.h = drawSprite -> getHeight();

@@ -44,6 +44,49 @@ inline void Collider::findYCollision(CollisionInfo &info, int dy,
     }
 }
 
+bool Collider::collidesTiles(const Rect &rect, Map &map) const {
+    /* Rect for tiles. */
+    Rect stays;
+    stays.worldWidth = TILE_WIDTH * map.getWidth();
+    stays.w = TILE_WIDTH;
+    stays.h = TILE_HEIGHT;
+
+    /* width and height are how many tiles away to check for collisions
+    with tiles that it was already colliding with. */
+    int width = rect.w / TILE_WIDTH + 2;
+    int height = rect.h / TILE_HEIGHT + 2;
+    int startX = rect.x / TILE_WIDTH;
+    int startY = rect.y / TILE_HEIGHT;
+    // Collide with the tiles it starts on
+    for (int k = startX; k < startX + width; k++) {
+        /* Adjust so 0 <= l < map.getWidth() */
+        int l = (k + map.getWidth()) % map.getWidth();
+        stays.x = l * TILE_WIDTH + xOffset;
+        assert(0 <= stays.x);
+        assert(stays.x < stays.worldWidth);
+        for (int j = startY; j < startY + height; j++) {
+            stays.y = j * TILE_HEIGHT + yOffset;
+            assert(0 <= stays.y);
+            /* Ignore tiles that don't exist. */
+            if (!map.isOnMap(l, j)) {
+                break;
+            }
+            /* If the player starts off overlapping this tile */
+            if (stays.intersects(rect) && enableCollisions) {
+                /* Deal damage based on tile type. */
+                Tile *tile = map.getForeground(l, j);
+                /* If the tile is solid, then there is a collision with a 
+                solid tile. */
+                if (tile -> getIsSolid()) {
+                    return true;
+                }
+            }
+        }
+    }
+    /* None of the tiles were solid. */
+    return false;
+}
+
 // Return information about a collision between a moving thing and a non-moving
 // thing. 
 CollisionInfo Collider::findCollision(const Rect &from, const Rect &to, 
@@ -213,6 +256,16 @@ void Collider::collide(Map &map, movable::Movable &movable) {
     // Calculate the world width and height
     int worldWidth = map.getWidth() * TILE_WIDTH;
     int worldHeight = map.getHeight() * TILE_HEIGHT;
+
+    /* Now time to see if we can update the movable's collision rect. */
+    Rect nextRect = movable.getNextRect();
+    nextRect.worldWidth = worldWidth;
+    nextRect.x += movable.x;
+    nextRect.y += movable.y;
+    /* If the next rect doesn't overlap anything, we can update it. */
+    if (!collidesTiles(nextRect, map)) {
+        movable.advanceRect();
+    }
 
     // from is the rectangle of the player the update before, to is the 
     // rectangle the player would move to if it didn't collide with anything,

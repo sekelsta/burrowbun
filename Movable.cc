@@ -63,6 +63,7 @@ Movable &Movable::operator=(const Movable &movable) {
         return *this;
     }
     rect = movable.rect;
+    nextRect = movable.nextRect;
     drag = movable.drag;
     velocity = movable.velocity;
     accel = movable.accel;
@@ -177,6 +178,20 @@ int Movable::getHeight() const {
 
 Rect Movable::getRect() const {
     return rect;
+}
+
+Rect Movable::getNextRect() const {
+    return nextRect;
+}
+
+void Movable::advanceRect() {
+    rect.x += nextRect.x;
+    rect.y += nextRect.y;
+    rect.w = nextRect.w;
+    rect.h = nextRect.h;
+    /* In case this gets called multiple times. */
+    nextRect.x = 0;
+    nextRect.y = 0;
 }
 
 /* Get a movable from a json file. */
