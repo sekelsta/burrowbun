@@ -1,8 +1,12 @@
 Changes since last push:
- - Collider no longer changes collision rects. Too many bugs.
- - Movables now store their x and y in  their collision rect.
+ - Updateed main.cc from last commit (had been keeping it the same since I
+had made an edit I didn't want to commit, so I didn't notice when I made an 
+edit I did want to commit)
 
 Known "features":
+- The 'water' added in map generation means blocks can't be placed in seemingly
+empty map tiles. Should be fixed when worldgeneration is fixed to not leave
+so much water around, and when water is actually visible
  - The strenth of gravity is independent of the world.
  - Things that move multiple tiles per second won't collide as if they were moving in a straight line. The best way to solve this may be to not allow anything to move that fast, possibly via multiple updates between renderings.
  - The spawn point sometimes puts the player on top of dirt. Spawning should be changed so it destroys any tiles in the way.

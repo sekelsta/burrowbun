@@ -48,8 +48,8 @@ int main(int argc, char **argv) {
     vector<movable::Movable *> movables;
     movables.push_back(&player);
     /* Set the player's position to the spawnpoint. */
-    player.x = map.getSpawn().x * TILE_WIDTH;
-    player.y = map.getSpawn().y * TILE_HEIGHT;
+    player.setX(map.getSpawn().x * TILE_WIDTH);
+    player.setY(map.getSpawn().y * TILE_HEIGHT);
 
     Collider collider(TILE_WIDTH, TILE_HEIGHT);
 
