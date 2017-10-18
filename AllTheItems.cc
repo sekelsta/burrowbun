@@ -82,8 +82,10 @@ bool Block::canPlace(int x, int y, const Player &player, const Map &map) {
 
     // Figure out which tile the top middle of the player is at, so we can
     // see whether the tile is in range
-    int xPlayer = (player.x + (player.getWidth() / 2)) / map.getTileWidth();
-    int yPlayer = (player.y + player.getHeight()) / map.getTileHeight();
+    int xPlayer = (player.getRect().x + (player.getWidth() / 2));
+    xPlayer /= map.getTileWidth();
+    int yPlayer = (player.getRect().y + player.getHeight());
+    yPlayer /= map.getTileHeight();
 
     /* And now we have our answer. We don't need to do anything special about 
     wrapping the map because xTile will already be outside of the map range if 

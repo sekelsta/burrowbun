@@ -254,8 +254,8 @@ void EventHandler::useMouse(Player &player, Map &map) {
         SDL_GetMouseState(&x, &y);
         /* Note that this will give a negative answer if it wraps around with
         the player near 0 and the click near the width of the map. */
-        x = player.x + x - player.screenX;
-        y = player.y - y + player.screenY;
+        x = player.getRect().x + x - player.screenX;
+        y = player.getRect().y - y + player.screenY;
         // Have the player figure out whether to use an item, and which one
         player.useAction(type, x, y, map);
     }
@@ -287,18 +287,6 @@ void EventHandler::keyEvent(const SDL_Event &event, Player &player) {
                 player.hotbar.select(i);
             }
         }
-    }
-    // For testing only, TODO: remove
-    else if (key == SDL_SCANCODE_J) {
-        // Move one pixel down
-        move = -1;
-    }
-    else if (key == SDL_SCANCODE_K) {
-        // Move one pixel up
-        move = 1;
-    }
-    else {
-        move = 0;
     }
 }
 
@@ -390,13 +378,6 @@ void EventHandler::updatePlayer(Player &player) {
 
     // Change the player's acceleration
     player.setAccel(newAccel);
-
-    // Move the player by a pixel
-    player.y += move;
-    if (move != 0) {
-        cout << player.y << "\n";
-    }
-    move = 0;
 }
 
 // Do all the things that need to be done every update

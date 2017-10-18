@@ -30,6 +30,14 @@ protected:
     Rect nextRect;
 
 public:
+    /* Access functions. */
+    inline void setX(int x) {
+        rect.x = x;
+    }
+    inline void setY(int y) {
+        rect.y = y;
+    }
+
     /* Allow from_json access to private variables, since it is basically a
     factory function. */
     friend void from_json(const nlohmann::json &j, Movable &movable);
@@ -63,9 +71,6 @@ public:
     resetting its maxHeight. (To avoid taking fall damage, slow down to this
     speed.) */
     double minVelocity;
-
-    // Location
-    int x, y;
 
     /* How fast are all the boulders trying to move it this update. */
     int boulderSpeed;
@@ -117,6 +122,8 @@ public:
     Rect getNextRect() const;
     /* Allow change of collision rect. */
     void advanceRect();
+    /* Set nextRect = rect, cancel collision rect change. */
+    void resetRect();
     
 };
 

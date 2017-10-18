@@ -1,6 +1,6 @@
 Changes since last push:
- - Updated Collider to be able to handle changes to collision rects.
- - Wierdness happens when changing, though. Should be fixable.
+ - Collider no longer changes collision rects. Too many bugs.
+ - Movables now store their x and y in  their collision rect.
 
 Known "features":
  - The strenth of gravity is independent of the world.

@@ -291,7 +291,7 @@ public:
 
     /* Return the pointer the the tile at this location. */
     inline Tile *getTile(int x, int y, MapLayer layer) {
-        return getTile(getTileType(x, y, layer));
+        return getTile(getTileType(wrapX(x), y, layer));
     }
 
     inline Tile *getTile(Location place) {

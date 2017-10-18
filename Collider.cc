@@ -257,16 +257,6 @@ void Collider::collide(Map &map, movable::Movable &movable) {
     int worldWidth = map.getWidth() * TILE_WIDTH;
     int worldHeight = map.getHeight() * TILE_HEIGHT;
 
-    /* Now time to see if we can update the movable's collision rect. */
-    Rect nextRect = movable.getNextRect();
-    nextRect.worldWidth = worldWidth;
-    nextRect.x += movable.x;
-    nextRect.y += movable.y;
-    /* If the next rect doesn't overlap anything, we can update it. */
-    if (!collidesTiles(nextRect, map)) {
-        movable.advanceRect();
-    }
-
     // from is the rectangle of the player the update before, to is the 
     // rectangle the player would move to if it didn't collide with anything,
     // and stays is the tile currently being checked for collisions with the
@@ -280,28 +270,18 @@ void Collider::collide(Map &map, movable::Movable &movable) {
     stays.h = TILE_HEIGHT - 2 * yOffset;
     assert(0 <= stays.w);
     assert(0 <= stays.h);
-
-    // Tell all the Rects the world width, so they can wrap when checking for
-    // collisions
     stays.worldWidth = worldWidth;
-    from.worldWidth = worldWidth;
-    to.worldWidth = worldWidth;
-
-    // Move, collide, and stop at the edge of the mapi
 
     /* Set the starting location and the width and height. */
-    from.x = movable.x;
-    from.y = movable.y;
-    from.w = movable.getWidth();
-    to.w = movable.getWidth();
-    from.h = movable.getHeight();
-    to.h = movable.getHeight();
+    from = movable.getRect();
+    from.worldWidth = worldWidth;
+    from.x = (from.x + worldWidth) % worldWidth;
+    to = movable.getRect();
+    to.worldWidth = worldWidth;
 
-    assert(0 <= from.x);
     assert(0 <= from.y);
     assert(0 <= from.w);
     assert(0 <= from.h);
-    assert(from.x < worldWidth);
 
     assert(0 <= to.w);
     assert(0 <= to.h);
@@ -456,12 +436,23 @@ void Collider::collide(Map &map, movable::Movable &movable) {
     velocity.y *= yCoefficient;
     movable.setVelocity(velocity);
 
-    movable.x = from.x;
-    movable.y = from.y;
+    movable.setX(from.x);
+    movable.setY(from.y);
     // Collide with the edge of the map
     // Wrap in the x direction
-    movable.x += worldWidth;
-    movable.x %= worldWidth;
+    movable.setX((movable.getRect().x + worldWidth) % worldWidth);
+
+    /* Now time to see if we can update the movable's collision rect. */
+    Rect nextRect = movable.getNextRect();
+    nextRect.worldWidth = worldWidth;
+    nextRect.x += movable.getRect().x;
+    nextRect.y += movable.getRect().y;
+    /* If the next rect doesn't overlap anything, we can update it. */
+    if (!collidesTiles(nextRect, map)) {
+        /* Unfortunately this breaks stuff. TODO: fix bugs and implement. */
+        //movable.advanceRect();
+    }
+
 }
 
 
@@ -472,9 +463,10 @@ void Collider::update(Map &map, vector<movable::Movable *> &movables) {
     for (unsigned i = 0; i < movables.size(); i++) {
         // If it fell, figure out how far
         if (movables[i] -> isCollidingDown) {
-            int distanceFallen = movables[i] -> maxHeight - movables[i] -> y;
+            int distanceFallen = movables[i] -> maxHeight - 
+                    movables[i] -> getRect().y;
             movables[i] -> pixelsFallen = distanceFallen;
-            movables[i] -> maxHeight = movables[i] -> y;
+            movables[i] -> maxHeight = movables[i] -> getRect().y;
             // Also set ticksCollidingDown
             movables[i] -> ticksCollidingDown++;
         }
@@ -493,7 +485,7 @@ void Collider::update(Map &map, vector<movable::Movable *> &movables) {
         movables[i] -> isCollidingDown = false;
 
         // toX is the x value the movable expects to end up having.
-        int toX = movables[i] -> x + movables[i] -> getVelocity().x;
+        int toX = movables[i] -> getRect().x + movables[i] -> getVelocity().x;
         collide(map, *movables[i]);
         // Because collide() may stop things in the x direction before it 
         // should, we should try again.
@@ -503,7 +495,7 @@ void Collider::update(Map &map, vector<movable::Movable *> &movables) {
         if (movables[i] -> isCollidingX) {
             // Have it move only the rest of the way in the x direction, now.
             movable::Point newVelocity;
-            newVelocity.x = toX - movables[i] -> x;
+            newVelocity.x = toX - movables[i] -> getRect().x;
             newVelocity.y = 0;
             movable::Point oldVelocity = movables[i] -> getVelocity();
             movables[i] -> setVelocity(newVelocity);
@@ -515,8 +507,10 @@ void Collider::update(Map &map, vector<movable::Movable *> &movables) {
         // stop you
         if (movables[i] -> isCollidingX) {
             movable::Movable hypothetical(*(movables[i]));
+            /* Don't have hypothetical change collision rect. */
+            hypothetical.resetRect();
             // See if it can go up one tile or less without colliding
-            int oldY = hypothetical.y;
+            int oldY = hypothetical.getRect().y;
             // The amount to move by to go up one tile or less, assuming 
             // gravity is in the usual direction
             // TODO: it probably doesn't matter, but this is inaccurate when 
@@ -530,20 +524,20 @@ void Collider::update(Map &map, vector<movable::Movable *> &movables) {
             hypothetical.setVelocity(newVelocity);
             collide(map, hypothetical);
             // If there wasn't a collision
-            if (hypothetical.y == oldY + dy) {
-                assert(hypothetical.x == movables[i] -> x);
-                assert(movables[i] -> y == oldY);
+            if (hypothetical.getRect().y == oldY + dy) {
+                assert(hypothetical.getRect().x == movables[i] -> getRect().x);
+                assert(movables[i] -> getRect().y == oldY);
                 // check that it would end up standing on the tile, and not 
                 // randomly jump up and fall back down
                 // dx is how much more it could have gone in the x direction, 
                 // if it didn't collide with the tile it's stepping up
-                int dx = toX - hypothetical.x;
+                int dx = toX - hypothetical.getRect().x;
                 movable::Point newVelocity;
                 newVelocity.x = dx;
                 newVelocity.y = 0;
                 hypothetical.setVelocity(newVelocity);
                 collide(map, hypothetical);
-                if (hypothetical.x != movables[i] -> x) {
+                if (hypothetical.getRect().x != movables[i] -> getRect().x) {
                     // Ok, so we do want to jump up and continue
                     // doing that instantaneously would look like:
                     // movables[i] -> x = hypothetical.x;
@@ -555,14 +549,15 @@ void Collider::update(Map &map, vector<movable::Movable *> &movables) {
                     is within one tile of the bottom of the map, it can stand
                     on the tile it's stepping up to. */
                     if (dy < abs(movables[i] -> getVelocity().x)
-                                || movables[i] -> y < TILE_HEIGHT) {
-                        movables[i] -> x = hypothetical.x;
-                        movables[i] -> y = hypothetical.y;
+                                || movables[i] -> getRect().y < TILE_HEIGHT) {
+                        movables[i] -> setX(hypothetical.getRect().x);
+                        movables[i] -> setY(hypothetical.getRect().y);
                     }
                     /* Else it will go partway up and temporarily ignore
                     gravity. */
                     else {
-                        movables[i] -> y += abs(movables[i] -> getVelocity().x);
+                        movables[i] -> setY(movables[i] -> getRect().y 
+                                + abs(movables[i] -> getVelocity().x));
                         movables[i] -> isSteppingUp = true;
                     }
                 }
@@ -571,7 +566,8 @@ void Collider::update(Map &map, vector<movable::Movable *> &movables) {
         // And done checking whether it needs to step up.
         // Now we're in just the "for each movable" loop
         // Update the distance fallen from
-        int newMaxHeight = max(movables[i] -> maxHeight, movables[i] -> y);
+        int newMaxHeight = max(movables[i] -> maxHeight, 
+                movables[i] -> getRect().y);
         movables[i] -> maxHeight = newMaxHeight;
     }
 }

@@ -19,6 +19,7 @@ Entity::Entity(std::string filename) : movable::Movable(filename) {
     sprites = j["sprites"].get<std::vector<Sprite>>();
     /* The rect starts as size of the correct sprite. */
     rect = sprites[isFacingRight].getRect();
+    nextRect = rect;
     for (unsigned int i = 0; i < sprites.size(); i++) {
         sprites[i].loadTexture(MOVABLE_SPRITE_PATH);
     }
@@ -104,8 +105,8 @@ void Entity::render(const Rect &camera) {
     Renderer::setColorWhite();
 
     SDL_Rect rectTo;
-    rectTo.x = x;
-    rectTo.y = y;
+    rectTo.x = rect.x;
+    rectTo.y = rect.y;
 
     /* Which sprite to draw. */
     SpriteBase *drawSprite = nullptr;
@@ -123,10 +124,7 @@ void Entity::render(const Rect &camera) {
     /* When changing the sprite size, move the feet over, not the head. */
     /* If isFacingRight need to move the sprite over, otherwise it should
     stay where it is. */
-    /* TODO: uncomment following line when movable.x is replaced by 
-    moable.rect.x. */
-    //nextRect.x = (int)isFacingRight * (rect.w - nextRect.w);
-    nextRect.x = 0;
+    nextRect.x = (int)isFacingRight * (rect.w - nextRect.w);
     /* Keeping the feet still is easy. */
     nextRect.y = 0;
 

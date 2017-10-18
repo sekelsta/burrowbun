@@ -79,8 +79,6 @@ Movable &Movable::operator=(const Movable &movable) {
     pixelsFallen = movable.pixelsFallen;
     maxHeight = movable.maxHeight;
     minVelocity = movable.minVelocity;
-    x = movable.x;
-    y = movable.y;
     boulderSpeed = movable.boulderSpeed;
     return *this;
 }
@@ -139,7 +137,7 @@ void Movable::accelerate(double gravity) {
     
     /* Reset maxHeight if it isn't falling fast enough. */
     if (velocity.y > minVelocity) {
-        maxHeight = min(maxHeight, y);
+        maxHeight = min(maxHeight, rect.y);
     }
 
     // Since location is an int, make velocity an int by rounding away from 0
@@ -194,6 +192,10 @@ void Movable::advanceRect() {
     nextRect.y = 0;
 }
 
+void Movable::resetRect() {
+    nextRect = rect;
+}
+
 /* Get a movable from a json file. */
 void from_json(const json &j, Movable &movable) {
     movable.drag = j["drag"].get<Point>();
@@ -216,8 +218,8 @@ void from_json(const json &j, Movable &movable) {
     movable.pixelsFallen = j["pixelsFallen"];
     movable.maxHeight = j["maxHeight"];
     movable.minVelocity = j["minVelocity"];
-    movable.x = j["x"];
-    movable.y = j["y"];
+    movable.rect.x = j["x"];
+    movable.rect.y = j["y"];
     movable.boulderSpeed = 0;
 }
 

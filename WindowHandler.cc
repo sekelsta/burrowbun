@@ -412,10 +412,10 @@ void WindowHandler::update(Map &map,
     /* Find the camera. */
     int w = player.getWidth();
     int h = player.getHeight();
-    Rect camera = findCamera(player.x, player.y, w, h);
+    Rect camera = findCamera(player.getRect().x, player.getRect().y, w, h);
     /* Tell the player where on the screen they are. This is only used by
     EventHandler. TODO: remove. */
-    SDL_Rect playerRect = { player.x, player.y, w, h };
+    SDL_Rect playerRect = { player.getRect().x, player.getRect().y, w, h };
     player.convertRect(playerRect, camera);
     player.screenX = playerRect.x;
     player.screenY = playerRect.y + playerRect.h;
