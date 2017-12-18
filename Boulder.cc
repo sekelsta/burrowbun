@@ -54,11 +54,6 @@ bool Boulder::move(Map &map, const Location &place, int direction,
         return true;
     }
 
-   /* Otherwise if it moves as a unit, this isn't the right function. */
-    if (movesTogether) {
-        return moveTogether(map, place, direction, movables);
-    }
-
     TileType blocking = map.getTileType(place, direction, 0);
     if (tilesDestroyed.count(blocking)) {
         map.moveTile(place, direction, 0);
@@ -84,85 +79,6 @@ bool Boulder::move(Map &map, const Location &place, int direction,
    }
 
     return true;
-}
-
-bool Boulder::moveTogether(Map &map, const Location &place, int direction,
-        std::vector<movable::Movable*> &movables) const {
-    /* Make sure we're the end of a row and no other places in the row
-    are in the list of things to update. If the row stretched across the
-    whole world with no end, just move the things on top. If there's a 
-    gap one tile wide, treat the whole thing as one continuous row. */
-    /* This isn't going to work if direction is something other than
-    1 or -1. */
-    assert(direction == 1 || direction == -1);
-    TileType oneBehind = map.getTileType(place, -1 * direction, 0);
-    TileType twoBehind = map.getTileType(place, -2 * direction, 0);
-    assert(map.getTileType(place, 0, 0) == type);
-    int distToLast = 0;
-    while ((oneBehind == type || twoBehind == type
-                || (tilesDisplaced.count(oneBehind) && twoBehind == type)
-                || (tilesCrushed.count(oneBehind) && twoBehind == type)) 
-            && abs(distToLast) != map.getWidth()) {
-        distToLast -= direction;
-        oneBehind = twoBehind;
-        twoBehind = map.getTileType(place, distToLast - 2 * direction, 0);    
-    }
-    if (distToLast == map.getWidth()) {
-        /* Just sit here and pretend everything's okay. */
-        // TODO: actually do something
-        return false;
-    }
-    else if (distToLast != 0) {
-        /* Make sure the last cloud is in the update list and return false. */
-        map.addToUpdate(map.wrapX(place.x + distToLast), place.y, place.layer);
-        return false;
-    }
-
-    /* So now we know we're the last block. Time to move everyone. */
-    int forwards = 0;
-    int unmoved = 0;
-    TileType current = type;
-    TileType ahead = map.getTileType(place, direction, 0);
-    while ((current == type || ahead == type) 
-            && abs(forwards) != map.getWidth()) {
-        forwards += direction;
-        if (ahead != type) {
-            Location toMove = place;
-            toMove.x = map.wrapX(toMove.x + unmoved);
-            if (tilesDestroyed.count(ahead)) {
-                map.moveTile(toMove, forwards - unmoved, 0);
-                unmoved = forwards + direction;
-            }
-            else if (tilesDisplaced.count(ahead)) {
-                map.displaceTile(toMove, forwards - unmoved, 0);
-                unmoved = forwards + direction;
-            }
-            else {
-                /* Our group of clouds is stuck behind a block but there's more
-                clouds ahead. Make sure the last of those ones is being 
-                updated. */
-                map.addToUpdate(map.wrapX(place.x + forwards + direction), 
-                        place.y, place.layer);
-                return unmoved;
-            }
-        }
-        current = ahead;
-        ahead = map.getTileType(place, forwards + direction, 0);
-    }
-  
-    if (carriesMovables) { 
-        Rect boulderRect;
-        boulderRect.worldWidth = map.getWidth() * map.getTileWidth();
-        boulderRect.y = place.y * map.getTileHeight();
-        boulderRect.h = BOULDER_CARRY_HEIGHT * map.getTileHeight();
-        boulderRect.w = abs(forwards) * map.getTileWidth();
-        /* Doesn't matter that boulderRect.x could be negative. */
-        boulderRect.x = std::min(place.x, place.x + forwards);
-        boulderRect.x *= map.getTileWidth();
-        carryMovables(map, boulderRect, direction, movables);
-    }
-
-    return unmoved;
 }
 
 void Boulder::carryMovables(const Map &map, const Rect &boulderRect, 
@@ -193,12 +109,10 @@ bool Boulder::canUpdate(const Map &map, const Location &place,
         return canUpdate(map, place, 1) || canUpdate(map, place, -1);;
     }
     TileType ahead = map.getTileType(place, direction, 0);
-    if (!movesTogether 
-            && (tilesDestroyed.count(ahead) || tilesDisplaced.count(ahead))) {
+    if (tilesDestroyed.count(ahead) || tilesDisplaced.count(ahead)) {
         return true;
     }
-    TileType behind = map.getTileType(place, -1 * direction, 0);
-    return movesTogether && behind != type;
+    return false;
 
 }
 
@@ -222,7 +136,6 @@ Boulder::Boulder(TileType type) : Tile(type) {
     isMoving = j["isMoving"];
     isFloating = j["isFloating"];
     isSliding = j["isSliding"];
-    movesTogether = j["movesTogether"];
     carriesMovables = j["carriesMovables"];
 }
 

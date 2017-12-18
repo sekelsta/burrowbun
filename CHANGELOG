@@ -1,7 +1,6 @@
 Changes since last push:
- - Updateed main.cc from last commit (had been keeping it the same since I
-had made an edit I didn't want to commit, so I didn't notice when I made an 
-edit I did want to commit)
+- Removed boulders being able to move together. It's too complicated to be
+worth having.
 
 Known "features":
 - The 'water' added in map generation means blocks can't be placed in seemingly

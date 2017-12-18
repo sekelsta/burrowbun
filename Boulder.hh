@@ -40,9 +40,6 @@ class Boulder: public Tile {
     more? */
     bool isSliding;
 
-    /* Can they get in each other's way? */
-    bool movesTogether;
-
     /* If someone stands on it while it moves, does it bring them? */
     bool carriesMovables;
 
@@ -55,10 +52,6 @@ class Boulder: public Tile {
     /* Try to move one tile. Return true on success. */
     bool move(Map &map, const Location &place, int direction, 
             std::vector<movable::Movable*> &movables);
-
-    /* Try to move together. Return true on success. */
-    bool moveTogether(Map &map, const Location &place, int direction,
-            std::vector<movable::Movable*> &movables) const;
 
     /* Find which movables are on top and tell them to move. */
     void carryMovables(const Map &map, const Rect &boulderRect, 
