@@ -16,6 +16,6 @@ $ cd burrowbun
 $ make
 It will probably take a while to compile. Once it finishes successfullly, run
 it with:
-$ ./main
-Running it from a different directory will result in it not being able to find
-the json files and crashing. (But hopefully I'll fix that soon.)
+$ ./burrowbun
+To be able to run it as just burrowbun from any working directory, add it to
+your PATH environment variable.
