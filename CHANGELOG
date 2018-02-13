@@ -1,8 +1,6 @@
 Changes since last push:
- - Now can be run from any location, and will use the correct path to find the
-files it needs or to save files
- - The source code files are now in burrowbun/src/, but the makefile puts
-object files in burrowbun/ and precompiled headers in burrowbun/src/.
+ - Now correctly finds the path to the program directory even when added to 
+the PATH.
 
 Known "features":
  - The strenth of gravity is independent of the world.
