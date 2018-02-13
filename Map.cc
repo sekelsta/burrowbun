@@ -612,7 +612,8 @@ bool Map::destroy(const TileHealth &health) {
 }
 
 void Map::kill(int x, int y, MapLayer layer) {
-    // TODO: drop itself as an item
+    // Drop itself as an item
+    // TODO
     setTile(x, y, layer, TileType::EMPTY);
 }
 void Map::kill(const Location &place) {

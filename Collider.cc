@@ -458,7 +458,9 @@ void Collider::collide(Map &map, movable::Movable &movable) {
 
 // A function to move and collide the movables
 // Note that this only ever resets distance fallen when it hits the ground.
-void Collider::update(Map &map, vector<movable::Movable *> &movables) {
+void Collider::update(Map &map, vector<movable::Movable *> &movables,
+        vector<DroppedItem *> droppedItems) {
+    // TODO: Deal with dropped items
     // Update the velocity of everything
     for (unsigned i = 0; i < movables.size(); i++) {
         // If it fell, figure out how far

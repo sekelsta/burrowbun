@@ -181,7 +181,6 @@ bool Tile::update(Map &map, Location place,
 }
 
 // Constructor, based on the tile type
-// This is basically a long list of the attributes of each tile type
 Tile::Tile(TileType tileType) 
         : type(tileType) {
     string filename = getFilename(tileType);

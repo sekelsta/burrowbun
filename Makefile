@@ -12,11 +12,13 @@ AllTheItems.hh.d = AllTheItems.hh $(Item.hh.d) $(Tile.hh.d) $(MapHelpers.hh.d)
 Animation.hh.d = Animation.hh $(Sprite.hh.d) $(SpriteBase.hh.d) $(Rect.hh.d)
 Boulder.hh.d = Boulder.hh $(Tile.hh.d)
 Collider.hh.d = Collider.hh $(Tile.hh.d) $(Map.hh.d) $(Movable.hh.d) \
-        $(Rect.hh.d)
+        $(Rect.hh.d) $(DroppedItem.hh.d)
 Damage.hh.d = Damage.hh
+DroppedItem.hh.d = DroppedItem.hh $(Item.hh.d) $(Movable.hh.d)
 Entity.hh.d = Entity.hh $(Movable.hh.d) $(Stat.hh.d) $(Damage.hh.d) \
         $(Animation.hh.d)
 EventHandler.hh.d = EventHandler.hh
+Game.hh.d = Game.hh $(WindowHandler.hh.d)
 Hotbar.hh.d = Hotbar.hh $(Sprite.hh.d) $(UIHelpers.hh.d) $(Action.hh.d)
 Inventory.hh.d = Inventory.hh $(Sprite.hh.d) $(UIHelpers.hh.d) \
         $(Light.hh.d) $(Item.hh.d)
@@ -39,19 +41,21 @@ UIHelpers.hh.d = UIHelpers.hh $(Light.hh.d) $(Stat.hh.d) $(Sprite.hh.d)
 WindowHandler.hh.d = WindowHandler.hh $(Sprite.hh.d) $(Renderer.hh.d) \
         $(Movable.hh.d) $(UIHelpers.hh.d)
 
-all : main
+all : burrowbun
 
-main : main.o Map.o Mapgen.o Tile.o WindowHandler.o EventHandler.o Movable.o \
+burrowbun : main.o Map.o Mapgen.o Tile.o WindowHandler.o EventHandler.o \
+        Movable.o DroppedItem.o Game.o \
         Player.o Collider.o Hotbar.o Entity.o Inventory.o Item.o \
         Sprite.o AllTheItems.o Boulder.o MapHelpers.o Light.o Stat.o \
         UIHelpers.o Damage.o Texture.o Renderer.o Animation.o SpriteBase.o
 	$(CC) $(CXXFLAGS) $^ -o $@ $(LDFLAGS) $(NOISE_FLAGS) $(LINKER_FLAGS)
 
-main.o : main.cc Action.hh AllTheItems.cc Animation.hh Boulder.hh Collider.hh \
-        Damage.hh Entity.hh EventHandler.hh filepaths.hh Hotbar.hh \
-        Inventory.hh Item.hh Light.hh Mapgen.hh MapHelpers.hh Map.hh \
-        Movable.hh Player.hh Rect.hh Renderer.hh Sprite.hh Stat.hh Texture.hh \
-        Tile.hh UIHelpers.hh version.hh WindowHandler.hh
+main.o : main.cc $(Game.hh.d)
+	$(CC) $(CXXFLAGS) $^ -c $(LDFLAGS) $(NOISE_FLAGS) $(LINKER_FLAGS)
+
+Game.o : Game.cc $(Game.hh.d) $(Tile.hh.d) $(Map.hh.d) $(Mapgen.hh.d) \
+        $(EventHandler.hh.d) $(Movable.hh.d) $(Entity.hh.d) $(Player.hh.d) \
+        $(Collider.hh.d) $(Hotbar.hh.d)
 	$(CC) $(CXXFLAGS) $^ -c $(LDFLAGS) $(NOISE_FLAGS) $(LINKER_FLAGS)
 
 Animation.o : Animation.cc $(Animation.hh.d)
@@ -129,6 +133,9 @@ Texture.o: Texture.cc $(Texture.hh.d)
 	$(CC) $(CXXFLAGS) $^ -c $(LDFLAGS)
 
 Renderer.o: Renderer.cc $(Renderer.hh.d)
+	$(CC) $(CXXFLAGS) $^ -c $(LDFLAGS)
+
+DroppedItem.o: DroppedItem.cc $(DroppedItem.hh.d)
 	$(CC) $(CXXFLAGS) $^ -c $(LDFLAGS)
 
 tests : collider_tests.o

@@ -1,6 +1,10 @@
 Changes since last push:
-- Removed boulders being able to move together. It's too complicated to be
-worth having.
+ - Changed world generation to make a deeper part where an ocean can go. This
+is not adjusted perfectly but is on its way.
+ - Moved pretty much everything from main.cc to a new class Game
+ - Created a DroppedItem class and started making some changes that will 
+allow it to be actually used
+ - Made water visible, though it doesn't really act like a liquid yet.
 
 Known "features":
 - The 'water' added in map generation means blocks can't be placed in seemingly

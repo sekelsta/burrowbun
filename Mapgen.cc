@@ -155,6 +155,8 @@ void Mapgen::generateEarth() {
             /* Find the sky and make it empty. */
             double surface = getCylinderValue(i, j, finalSurface);
             surface += (j - baseHeight) / steepness;
+            /* Experimental: try making something like an ocean. */
+            surface += 20 * float((i - map.width / 2) * (i - map.width / 2)) / (map.width * map.width);
             if (surface > 0) {
                 tileType = TileType::EMPTY;
             }
@@ -178,6 +180,8 @@ void Mapgen::generateEarth() {
 
     /* Put water on the surface. */
     map.savePPM(MapLayer::FOREGROUND, "wunsettled.world.ppm");
+    settleWater();
+    removeWater(10);
     settleWater();
 
     /* When done setting non-boulders and before setting boulders, have
