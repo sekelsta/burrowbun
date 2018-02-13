@@ -9,6 +9,9 @@ class Game {
     const uint32_t SCREEN_FPS;
     const uint32_t TICKS_PER_FRAME;
 
+    /* The path to the folder containing the executable. */
+    std::string path;
+
     WindowHandler window;
 
     /* Create a new world. */
@@ -16,8 +19,8 @@ class Game {
     /* Load the given map and start playing. */
     void play(std::string mapname);
 public:
-    /* Constructor */
-    Game();
+    /* Constructor. Takes the path to the folder containing the executable. */
+    Game(std::string p);
 
     /* Do everything. */
     void run();

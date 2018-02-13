@@ -1,4 +1,3 @@
-#include <string>
 #include <fstream>
 #include <vector>
 #include "Item.hh"
@@ -11,14 +10,18 @@ using json = nlohmann::json;
 using namespace std;
 
 // Constructor
-Item::Item(ItemType type) {
+Item::Item(ItemType type, string path) {
     itemType = type;
 
     /* Figure out which json file to use. */
-    string filename = getJsonFilename(type);
+    string filename = path + getJsonFilename(type);
 
     /* Put the data in the json. */
     ifstream infile(filename);
+    /* Check that file was opened successfully. */
+    if (!infile) {
+        cerr << "Can't open " << filename << "\n";
+    }
     json j = json::parse(infile);
 
     /* Set each of the values equal to the json's values. */
@@ -26,7 +29,7 @@ Item::Item(ItemType type) {
     isItem = j["isItem"];
     maxStack = j["maxStack"];
     useTime = j["useTime"];
-    sprite.loadTexture(ICON_SPRITE_PATH);
+    sprite.loadTexture(path + ICON_SPRITE_PATH);
 }
 
 /* Non-pure-virtual use function. Does nothing. */

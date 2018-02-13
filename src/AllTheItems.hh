@@ -19,7 +19,7 @@ class Potion : public Item {
 
 public:
     // Constructor
-    Potion(ItemType type);
+    Potion(ItemType type, std::string path);
 
     // What to do when used
     void use(InputType type, int x, int y, Player &player, Map &map);
@@ -42,7 +42,7 @@ protected:
 
 public:
     // Constructor
-    Block(ItemType type);
+    Block(ItemType type, std::string path);
 
     /* Destructor must be virtual. */
     virtual ~Block();
@@ -57,7 +57,7 @@ class Pickaxe: public Block {
     int pickaxeTier;
 public:
     /* Constructor. */
-    Pickaxe(ItemType type);
+    Pickaxe(ItemType type, std::string path);
 
     /* What to do when used. */
     void use(InputType type, int x, int y, Player &player, Map &map);
@@ -78,7 +78,7 @@ namespace ItemMaker {
     bool isIn(std::vector<ItemType> items, ItemType type);
 
     // Take an item type and make the correct child class based on that
-    Item *makeItem(ItemType type);
+    Item *makeItem(ItemType type, std::string path);
 }
 
 

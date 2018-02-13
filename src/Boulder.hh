@@ -1,9 +1,10 @@
 #ifndef BOULDER_HH
 #define BOULDER_HH
 
+#include "Tile.hh"
 #include <vector>
 #include <set>
-#include "Tile.hh"
+#include <string>
 
 /* Forward declare. */
 struct Rect;
@@ -62,7 +63,7 @@ class Boulder: public Tile {
 
 public:
     /* Constructor. */
-    Boulder(TileType type);
+    Boulder(TileType type, std::string path);
 
     /* Set the direction the boulder moves, if it does move. Note that
     this will change its sprite. */

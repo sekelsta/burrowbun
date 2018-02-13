@@ -376,7 +376,10 @@ void Mapgen::removeWater(int removeDepth) {
     }
 }
 
-void Mapgen::generate(std::string filename, WorldType worldType) {
+Mapgen::Mapgen(std::string path) : map(path) { }
+
+void Mapgen::generate(std::string filename, WorldType worldType, 
+        std::string path) {
     /* Seed the random number generators. */
     map.seed = time(NULL);
     srand(map.seed);
@@ -387,7 +390,10 @@ void Mapgen::generate(std::string filename, WorldType worldType) {
     cylinder.SetModule(cylinderScale);
 
     /* Set the biome data vector. TODO: not hardcode filename? */
-    std::ifstream infile("content/biomes.json");
+    std::ifstream infile(path + "content/biomes.json");
+    if (!infile) {
+        std::cout << "Can't open " << path + "content/biomes.json" << "\n";
+    }
     json j = json::parse(infile);
     biomeData = j["biomes"].get<std::vector<std::vector<int>>>();
 

@@ -3,6 +3,8 @@
 #include "Inventory.hh"
 #include "filepaths.hh"
 
+using namespace std;
+
 void Inventory::updateSprite() {
     // Tell the renderer to draw to the texture
     sprite.texture -> SetRenderTarget();
@@ -53,7 +55,7 @@ void Inventory::updateSprite() {
 }
 
 // Constructor
-Inventory::Inventory(int cols, int rows) {
+Inventory::Inventory(int cols, int rows, string path) {
     // Initialize the location
     x = 0;
     y = 0;
@@ -87,8 +89,8 @@ Inventory::Inventory(int cols, int rows) {
     squareSprite.setColorMod(squareColor);
 
     // And actually load it
-    squareSprite.loadTexture(UI_SPRITE_PATH);
-    frameSprite.loadTexture(UI_SPRITE_PATH);
+    squareSprite.loadTexture(path + UI_SPRITE_PATH);
+    frameSprite.loadTexture(path + UI_SPRITE_PATH);
 
     /* Actually set the clickboxes to what they should be. */
     updateClickBoxes();    

@@ -19,19 +19,19 @@ using namespace std;
 
 /* Create a new world. */
 void Game::createWorld(string filename) {
-    Mapgen mapgen;
-    mapgen.generate(filename, WorldType::EARTH);
+    Mapgen mapgen(path);
+    mapgen.generate(path + filename, WorldType::EARTH, path);
 }
 
 void Game::play(string mapname) {
     /* Load a map. */
-    Map map = Map(mapname, TILE_WIDTH, TILE_HEIGHT);
+    Map map = Map(path + mapname, TILE_WIDTH, TILE_HEIGHT, path);
     window.setMapSize(map.getWidth(), map.getHeight());
 
     SDL_Event event;
     EventHandler eventHandler;
 
-    Player player;
+    Player player(path);
 
     /* Vectors to hold all the things that need to collide. */
     vector<DroppedItem *> droppedItems;
@@ -114,12 +114,13 @@ void Game::play(string mapname) {
             SDL_Delay(TICKS_PER_FRAME - frameTicks);
         }
     }
-    map.save(mapname);
+    map.save(path + mapname);
 }
 
-Game::Game() : SCREEN_FPS(60), TICKS_PER_FRAME(1000 / SCREEN_FPS),
-    // 800 x 600 window, resizable
-    window(800, 600, TILE_WIDTH, TILE_HEIGHT) {
+Game::Game(string p) : SCREEN_FPS(60), TICKS_PER_FRAME(1000 / SCREEN_FPS),
+        // 800 x 600 window, resizable
+        window(800, 600, TILE_WIDTH, TILE_HEIGHT) {
+    path = p;
 }
 
 void Game::run() {

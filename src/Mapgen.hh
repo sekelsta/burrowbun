@@ -81,8 +81,10 @@ class Mapgen {
     not protected by an overhang. */
     void removeWater(int removeDepth);
 public:
+    Mapgen(std::string path);
+
     /* Take a reference to a newly created map, and fill it with stuff. */
-    void generate(std::string filename, WorldType worldType);
+    void generate(std::string filename, WorldType worldType, std::string path);
 };
 
 #endif

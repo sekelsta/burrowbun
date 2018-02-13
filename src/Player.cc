@@ -5,21 +5,31 @@
 #include "AllTheItems.hh"
 #include <iostream>
 #include "json.hpp"
+#include "filepaths.hh"
 
 using namespace std;
 using json = nlohmann::json;
 
 // Constructor
-Player::Player() : Entity("entities/bunny.json"), inventory(10, 6), trash(1, 1) {
+Player::Player(string path) : Entity(path + "entities/bunny.json", path), 
+        inventory(10, 6, path), trash(1, 1, path), hotbar(path) {
     /* Open json file that contains info about the stat bars. */
-    ifstream bar_infile("UI/stat_bars.json");
+    ifstream bar_infile(path + "UI/stat_bars.json");
     json jstats = json::parse(bar_infile);
 
     healthBar = jstats["healthBar"].get<StatBar>();
     fullnessBar = jstats["fullnessBar"].get<StatBar>();
     manaBar = jstats["manaBar"].get<StatBar>();
 
-    ifstream infile("entities/bunny.json");
+    /* Load spritebar textures. */
+    healthBar.overlay.loadTexture(path + UI_SPRITE_PATH);
+    fullnessBar.overlay.loadTexture(path + UI_SPRITE_PATH);
+    manaBar.overlay.loadTexture(path + UI_SPRITE_PATH);
+
+    ifstream infile(path + "entities/bunny.json");
+    if (!infile) {
+        cerr << "Can't open " << path + "entities/bunny.json" << "!\n";
+    }
     json j = json::parse(infile);
 
     tileReachUp = j["tileReachUp"];
@@ -53,32 +63,32 @@ Player::Player() : Entity("entities/bunny.json"), inventory(10, 6), trash(1, 1) 
     mouseSlot = NULL;
 
     // Have starting items
-    inventory.pickup(ItemMaker::makeItem(ItemType::HEALTH_POTION));
-    inventory.pickup(ItemMaker::makeItem(ItemType::DIRT));
-    inventory.pickup(ItemMaker::makeItem(ItemType::TOPSOIL));
-    inventory.pickup(ItemMaker::makeItem(ItemType::SAND));
-    inventory.pickup(ItemMaker::makeItem(ItemType::CLAY));
-    inventory.pickup(ItemMaker::makeItem(ItemType::CALCAREOUS_OOZE));
-    inventory.pickup(ItemMaker::makeItem(ItemType::SNOW));
-    inventory.pickup(ItemMaker::makeItem(ItemType::ICE));
-    inventory.pickup(ItemMaker::makeItem(ItemType::STONE));
-    inventory.pickup(ItemMaker::makeItem(ItemType::GRANITE));
-    inventory.pickup(ItemMaker::makeItem(ItemType::BASALT));
-    inventory.pickup(ItemMaker::makeItem(ItemType::LIMESTONE));
-    inventory.pickup(ItemMaker::makeItem(ItemType::MUDSTONE));
-    inventory.pickup(ItemMaker::makeItem(ItemType::PERIDOTITE));
-    inventory.pickup(ItemMaker::makeItem(ItemType::SANDSTONE));
-    inventory.pickup(ItemMaker::makeItem(ItemType::RED_SANDSTONE));
-    inventory.pickup(ItemMaker::makeItem(ItemType::PLATFORM));
-    inventory.pickup(ItemMaker::makeItem(ItemType::LUMBER));
-    inventory.pickup(ItemMaker::makeItem(ItemType::RED_BRICK));
-    inventory.pickup(ItemMaker::makeItem(ItemType::GRAY_BRICK));
-    inventory.pickup(ItemMaker::makeItem(ItemType::DARK_BRICK));
-    inventory.pickup(ItemMaker::makeItem(ItemType::MUD));
-    inventory.pickup(ItemMaker::makeItem(ItemType::CLOUD));
-    inventory.pickup(ItemMaker::makeItem(ItemType::BOULDER));
-    inventory.pickup(ItemMaker::makeItem(ItemType::GLACIER));
-    inventory.pickup(ItemMaker::makeItem(ItemType::PICKAXE));
+    inventory.pickup(ItemMaker::makeItem(ItemType::HEALTH_POTION, path));
+    inventory.pickup(ItemMaker::makeItem(ItemType::DIRT, path));
+    inventory.pickup(ItemMaker::makeItem(ItemType::TOPSOIL, path));
+    inventory.pickup(ItemMaker::makeItem(ItemType::SAND, path));
+    inventory.pickup(ItemMaker::makeItem(ItemType::CLAY, path));
+    inventory.pickup(ItemMaker::makeItem(ItemType::CALCAREOUS_OOZE, path));
+    inventory.pickup(ItemMaker::makeItem(ItemType::SNOW, path));
+    inventory.pickup(ItemMaker::makeItem(ItemType::ICE, path));
+    inventory.pickup(ItemMaker::makeItem(ItemType::STONE, path));
+    inventory.pickup(ItemMaker::makeItem(ItemType::GRANITE, path));
+    inventory.pickup(ItemMaker::makeItem(ItemType::BASALT, path));
+    inventory.pickup(ItemMaker::makeItem(ItemType::LIMESTONE, path));
+    inventory.pickup(ItemMaker::makeItem(ItemType::MUDSTONE, path));
+    inventory.pickup(ItemMaker::makeItem(ItemType::PERIDOTITE, path));
+    inventory.pickup(ItemMaker::makeItem(ItemType::SANDSTONE, path));
+    inventory.pickup(ItemMaker::makeItem(ItemType::RED_SANDSTONE, path));
+    inventory.pickup(ItemMaker::makeItem(ItemType::PLATFORM, path));
+    inventory.pickup(ItemMaker::makeItem(ItemType::LUMBER, path));
+    inventory.pickup(ItemMaker::makeItem(ItemType::RED_BRICK, path));
+    inventory.pickup(ItemMaker::makeItem(ItemType::GRAY_BRICK, path));
+    inventory.pickup(ItemMaker::makeItem(ItemType::DARK_BRICK, path));
+    inventory.pickup(ItemMaker::makeItem(ItemType::MUD, path));
+    inventory.pickup(ItemMaker::makeItem(ItemType::CLOUD, path));
+    inventory.pickup(ItemMaker::makeItem(ItemType::BOULDER, path));
+    inventory.pickup(ItemMaker::makeItem(ItemType::GLACIER, path));
+    inventory.pickup(ItemMaker::makeItem(ItemType::PICKAXE, path));
 
     isInventoryOpen = false;
 }

@@ -124,7 +124,7 @@ public:
         std::vector<movable::Movable*> &movables, int tick);
 
     // Constructor, based on the tile type
-    Tile(TileType tileType);
+    Tile(TileType tileType, std::string path);
 
     /* Virtual destructor. */
     virtual ~Tile();

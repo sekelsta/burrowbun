@@ -6,6 +6,7 @@
 #include "Hotbar.hh"
 #include "Inventory.hh"
 #include "UIHelpers.hh"
+#include <string>
 
 // Forward declare
 class Action;
@@ -45,7 +46,7 @@ public:
     Hotbar hotbar;
 
     // Constructor
-    Player();
+    Player(std::string path);
 
     // Switch the open / closed state of the inventory.
     void toggleInventory();

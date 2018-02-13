@@ -1,10 +1,11 @@
 #ifndef HOTBAR_HH
 #define HOTBAR_HH
 
-#include <vector>
 #include "Sprite.hh"
 #include "UIHelpers.hh"
 #include "Action.hh"
+#include <vector>
+#include <string>
 
 /* The hotbar consists of 24 slots that action shortcuts can be stored. These
 action shortcuts can be items, skills, or maybe other things I haven't added 
@@ -47,7 +48,7 @@ public:
     std::vector<MouseBox> clickBoxes;
 
     // Constructor
-    Hotbar();
+    Hotbar(std::string path);
 
     // Switch the two rows
     void toggle();

@@ -1,11 +1,12 @@
 #ifndef INVENTORY_HH
 #define INVENTORY_HH
 
-#include <vector>
 #include "Sprite.hh"
 #include "UIHelpers.hh"
 #include "Light.hh"
 #include "Item.hh"
+#include <vector>
+#include <string>
 
 /* An inventory is basically just a thing that holds items. */
 class Inventory {
@@ -33,7 +34,7 @@ public:
     bool isSpriteUpdated;
 
     // Constructor, given the size
-    Inventory(int cols, int rows);
+    Inventory(int cols, int rows, std::string path);
 
     /* Copy constructor. Don't use; all it does it assert false. If I ever
     think of any good reason why anyone would use a copy constructor of an

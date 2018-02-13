@@ -11,14 +11,19 @@
 #define TILE_HEIGHT 16
 
 using json = nlohmann::json;
+using namespace std;
 
 // Potion constructor
-Potion::Potion(ItemType type) : Item(type) {
+Potion::Potion(ItemType type, string path) : Item(type, path) {
     /* Figure out which json file to use. */
-    std::string filename = Item::getJsonFilename(type);
+    std::string filename = path + Item::getJsonFilename(type);
 
     /* Put the data into the json. */
     std::ifstream infile(filename);
+    /* Check that the file could be opened. */
+    if (!infile) {
+        cerr << "Can't open " << filename << "\n";
+    }
     json j = json::parse(infile);
 
     /* Set values equal to the json's values. */
@@ -49,14 +54,18 @@ void Potion::use(InputType type, int x, int y, Player &player, Map &map) {
 
 
 // Block constructor
-Block::Block(ItemType type) : Item(type) {
+Block::Block(ItemType type, string path) : Item(type, path) {
     /* Make sure we should actually be a block. */
     assert(ItemType::FIRST_BLOCK <= type);
     assert(type <= ItemType::LAST_BLOCK);
 
     /* Read in the json. */
-    std::string filename = Item::getJsonFilename(type);
+    std::string filename = path + Item::getJsonFilename(type);
     std::ifstream infile(filename);
+    /* Check that the file could be opened. */
+    if (!infile) {
+        cerr << "Can't open " << filename << "\n";
+    }
     json j = json::parse(infile);
 
     /* Set values. */
@@ -133,10 +142,14 @@ void Block::use(InputType type, int x, int y, Player &player, Map &map) {
 }
 
 /* Pickaxe constructor. */
-Pickaxe::Pickaxe(ItemType type) : Block(type) {
+Pickaxe::Pickaxe(ItemType type, string path) : Block(type, path) {
     /* Load the right json based on the type. */
-    std::string filename = Item::getJsonFilename(type);
+    std::string filename = path + Item::getJsonFilename(type);
     std::ifstream infile(filename);
+    /* Check that the file could be opened. */
+    if (!infile) {
+        cerr << "Can't open " << filename << "\n";
+    }
     json j = json::parse(infile);
 
     blockDamage = j["blockDamage"];
@@ -212,27 +225,27 @@ bool ItemMaker::isIn(std::vector<ItemType> items, ItemType type) {
 }
 
 // Take an item type and make the correct child class based on that
-Item *ItemMaker::makeItem(ItemType type) {
+Item *ItemMaker::makeItem(ItemType type, string path) {
     // A list of all the item types that should be potions
     std::vector<ItemType> potions;
     potions.push_back(ItemType::HEALTH_POTION);
 
     // If it's a potion, make a potion
     if (isIn(potions, type)) {
-        return new Potion(type);
+        return new Potion(type, path);
     }
     // If it's a block, make a block
     else if ((int)ItemType::FIRST_BLOCK <= (int)type
                 && (int)type <= (int)ItemType::LAST_PURE_BLOCK) {
-        return new Block(type);
+        return new Block(type, path);
     }
     /* If it's a pickaxe, make a pickaxe. */
     else if (type == ItemType::PICKAXE) {
-        return new Pickaxe(type);
+        return new Pickaxe(type, path);
     }
     // If it's not a subclass of item, than it's a plain old item
     else {
-        return new Item(type);
+        return new Item(type, path);
     }
 }
 

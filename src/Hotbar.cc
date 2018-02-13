@@ -7,7 +7,7 @@
 using namespace std;
 
 // Constructor, which fills it with default values
-Hotbar::Hotbar(void) {
+Hotbar::Hotbar(string path) {
     // If you want to change these default settings, this is the place in the 
     // code to do it.
     smallGap = 4;
@@ -57,7 +57,7 @@ Hotbar::Hotbar(void) {
     }
 
     /* Load the frame's texture. */
-    frame.loadTexture(UI_SPRITE_PATH);
+    frame.loadTexture(path + UI_SPRITE_PATH);
 }
 
 // Toggle which row is on top

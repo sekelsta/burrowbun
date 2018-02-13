@@ -1,6 +1,7 @@
 *.o
 *.gch
 main
+burrowbun
 tests
 map.bmp
 *.swp

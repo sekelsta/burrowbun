@@ -181,11 +181,15 @@ bool Tile::update(Map &map, Location place,
 }
 
 // Constructor, based on the tile type
-Tile::Tile(TileType tileType) 
+Tile::Tile(TileType tileType, string path) 
         : type(tileType) {
-    string filename = getFilename(tileType);
+    string filename = path + getFilename(tileType);
     /* Put data in json. */
     ifstream infile(filename);
+    /* Check that file was opened successfully. */
+    if (!infile) {
+        cerr << "Can't open " << filename << "\n";
+    }
     json j = json::parse(infile);
     /* Set each of this tile's non-const values equal to the json's values. */
     sprite = j["sprite"].get<Sprite>();
@@ -197,7 +201,7 @@ Tile::Tile(TileType tileType)
     opacity = j["opacity"];
     int edgeInt = j["edgeType"];
     edgeType = (EdgeType)edgeInt;
-    sprite.loadTexture(TILE_SPRITE_PATH);
+    sprite.loadTexture(path + TILE_SPRITE_PATH);
 }
 
 /* Virtual destructor. */

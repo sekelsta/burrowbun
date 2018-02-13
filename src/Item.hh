@@ -55,7 +55,7 @@ class Item : public Action {
 
 public:
     // Constructor
-    Item(ItemType type);
+    Item(ItemType type, std::string path);
 
     /* Virtual use function. Does nothing. */
     virtual void use(InputType type, int x, int y, Player &player, Map &map);

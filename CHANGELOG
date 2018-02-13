@@ -1,15 +1,10 @@
 Changes since last push:
- - Changed world generation to make a deeper part where an ocean can go. This
-is not adjusted perfectly but is on its way.
- - Moved pretty much everything from main.cc to a new class Game
- - Created a DroppedItem class and started making some changes that will 
-allow it to be actually used
- - Made water visible, though it doesn't really act like a liquid yet.
+ - Now can be run from any location, and will use the correct path to find the
+files it needs or to save files
+ - The source code files are now in burrowbun/src/, but the makefile puts
+object files in burrowbun/ and precompiled headers in burrowbun/src/.
 
 Known "features":
-- The 'water' added in map generation means blocks can't be placed in seemingly
-empty map tiles. Should be fixed when worldgeneration is fixed to not leave
-so much water around, and when water is actually visible
  - The strenth of gravity is independent of the world.
  - Things that move multiple tiles per second won't collide as if they were moving in a straight line. The best way to solve this may be to not allow anything to move that fast, possibly via multiple updates between renderings.
  - The spawn point sometimes puts the player on top of dirt. Spawning should be changed so it destroys any tiles in the way.
@@ -22,8 +17,6 @@ boulder updates first and traps you.
 Known bugs:
  - Collision detection misses one when falling into a two-wide gap at just the
 right angle
- - Riding on clouds sometimes has the cloud go forwards one update before
-the player
  - When the window is bigger than the map, crossing x = 0 causes an assertion
 error.
  - The player can't jump when colliding with a wall.
@@ -32,21 +25,16 @@ error.
 
 
 To do:
- - load and unload textures
  - stacking items, throwing / picking up items
  - Trees!
- - Store data for UI and sprites in a file instead of the source code
  - save and load the player
  - Make all public Map functions accept any x value
- - Use exception handling with all file io
  - remove Map.getForeground() and Map.getBackground()
- - write Map::Map()
 Still need to do:
 Collider, Entity, EventHandler, Hotbar, Inventory, MapHelpers, Movable, Player,
 Rect, Sprite, Tile, UIHelpers, WindowHandler, World
  - Change style (/* */ comments instead of // usually, and no repeated comments
 in both the .hh and .cc files)
- - Inline short functions
  - Replace NULL with nullptr
 
 

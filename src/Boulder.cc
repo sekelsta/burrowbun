@@ -12,6 +12,8 @@
 // For convenience
 using json = nlohmann::json;
 
+using namespace std;
+
 /* Convert a vector<int> to a vector<TileType>. */
 std::set<TileType> Boulder::vectorConvert(const std::vector<int> &input) {
     std::set<TileType> output;
@@ -117,12 +119,16 @@ bool Boulder::canUpdate(const Map &map, const Location &place,
 }
 
 /* Constructor. */
-Boulder::Boulder(TileType type) : Tile(type) {
+Boulder::Boulder(TileType type, string path) : Tile(type, path) {
     /* The name of the file where the initial values are stored. */
-    std::string filename = getFilename(type);
+    std::string filename = path + getFilename(type);
 
     /* Put data in a json. */
     std::ifstream infile(filename);
+    /* Check that file was opened successfully. */
+    if (!infile) {
+        cerr << "Can't open " << filename << "\n";
+    }
     json j = json::parse(infile);
 
     /* Set the boulder's values to the json values. (The tile-but-not-boulder

@@ -4,7 +4,8 @@
 using json = nlohmann::json;
 
 // Constructor
-Entity::Entity(std::string filename) : movable::Movable(filename) {
+Entity::Entity(std::string filename, std::string path) 
+        : movable::Movable(filename) {
     /* Open the json file. */
     std::ifstream infile(filename);
     /* Put data in json. */
@@ -21,10 +22,10 @@ Entity::Entity(std::string filename) : movable::Movable(filename) {
     rect = sprites[isFacingRight].getRect();
     nextRect = rect;
     for (unsigned int i = 0; i < sprites.size(); i++) {
-        sprites[i].loadTexture(MOVABLE_SPRITE_PATH);
+        sprites[i].loadTexture(path + MOVABLE_SPRITE_PATH);
     }
-    run.emplace_back(j["run_left"], MOVABLE_SPRITE_PATH);
-    run.emplace_back(j["run_right"], MOVABLE_SPRITE_PATH);
+    run.emplace_back(j["run_left"], path + MOVABLE_SPRITE_PATH);
+    run.emplace_back(j["run_right"], path + MOVABLE_SPRITE_PATH);
 }
 
 Entity::Entity() {};

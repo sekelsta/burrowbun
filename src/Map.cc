@@ -16,11 +16,11 @@ Tile *Map::newTile(TileType val) {
     /* If it's a boulder, make a boulder. */
     if ((unsigned int)TileType::FIRST_BOULDER <= (unsigned int)val
             && (unsigned int)val <= (unsigned int)TileType::LAST_BOULDER) {
-        tile = new Boulder(val);
+        tile = new Boulder(val, path);
     }
     /* Otherwise it's just a plain tile. */
     else {
-        tile = new Tile(val);
+        tile = new Tile(val, path);
         assert((unsigned int)TileType::FIRST_TILE <= (unsigned int)val);
         assert((unsigned int)val <= (unsigned int)TileType::LAST_PURE_TILE);
     }
@@ -304,11 +304,12 @@ void Map::loadLayer(MapLayer layer, ifstream &infile) {
 }
 
 // Constructor
-Map::Map(string filename, int tileWidth, int tileHeight) : 
+Map::Map(string filename, int tileWidth, int tileHeight, string p) : 
         TILE_WIDTH(tileWidth), TILE_HEIGHT(tileHeight) {
     /* It's the 0th tick. */
     tick = 0;
     ifstream infile(filename);
+    path = p;
 
     /* Create a tile object for each type. */
     for (int i = 0; i <= (int)TileType::LAST_TILE; i++) {
@@ -316,7 +317,6 @@ Map::Map(string filename, int tileWidth, int tileHeight) :
     }
 
     /* Check that the file could be opened. */
-    // TODO: use exceptions like a proper person
     if (!infile) {
         cerr << "Can't open " << filename << "\n";
     }
