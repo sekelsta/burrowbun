@@ -63,7 +63,7 @@ public:
     bool canUse();
 
     // Use the item held or selected
-    void useAction(InputType type, int x, int y, Map &map);
+    void useAction(InputType type, int x, int y, World &world);
 
     void update();
 };

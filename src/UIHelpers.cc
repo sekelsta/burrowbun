@@ -15,7 +15,7 @@ void StatBar::render() {
     SDL_RenderFillRect(Renderer::renderer, &rect);
 
     // Draw the part that can regenerate ("part")
-    rect.x += full;
+    rect.x += full; 
     rect.w = part - full;
     assert(rect.w >= 0);
     Renderer::setColor(partColor);

@@ -1,6 +1,7 @@
 Changes since last push:
- - Now correctly finds the path to the program directory even when added to 
-the PATH.
+ - Added a World class, which is in charge of the map and movables
+ - Makefile dependencies are now out of date, but I'm in the process of 
+automating the makefile dependencies, so hopefully soon it won't matter
 
 Known "features":
  - The strenth of gravity is independent of the world.

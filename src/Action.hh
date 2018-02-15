@@ -4,8 +4,7 @@
 #include "Sprite.hh"
 
 // Forward declare
-class Player;
-class Map;
+class World;
 
 // A class to describe how the player is trying to use an item
 enum class InputType {
@@ -34,7 +33,7 @@ public:
 
     /* Do the action, or use the item or skill. */
     virtual void 
-            use(InputType type, int x, int y, Player &player, Map &map) = 0;
+            use(InputType type, int x, int y, World &world) = 0;
 
     // Access function
     inline int getUseTime() const {

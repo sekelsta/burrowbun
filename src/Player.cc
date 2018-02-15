@@ -3,6 +3,7 @@
 #include "Player.hh"
 #include "Item.hh"
 #include "AllTheItems.hh"
+#include "Action.hh"
 #include <iostream>
 #include "json.hpp"
 #include "filepaths.hh"
@@ -15,11 +16,19 @@ Player::Player(string path) : Entity(path + "entities/bunny.json", path),
         inventory(10, 6, path), trash(1, 1, path), hotbar(path) {
     /* Open json file that contains info about the stat bars. */
     ifstream bar_infile(path + "UI/stat_bars.json");
+    if (!bar_infile) {
+        cerr << "Can't open " << path + "UI/stat_bars.json" << "\n";
+    }
     json jstats = json::parse(bar_infile);
 
     healthBar = jstats["healthBar"].get<StatBar>();
     fullnessBar = jstats["fullnessBar"].get<StatBar>();
     manaBar = jstats["manaBar"].get<StatBar>();
+
+    // Make sure the bars start with the correct stats
+    healthBar.update(health);
+    fullnessBar.update(fullness);
+    manaBar.update(mana);
 
     /* Load spritebar textures. */
     healthBar.overlay.loadTexture(path + UI_SPRITE_PATH);
@@ -131,16 +140,16 @@ bool Player::canUse() {
 }
 
 // Use the item or skill held or selected
-void Player::useAction(InputType type, int x, int y, Map &map) {
+void Player::useAction(InputType type, int x, int y, World &world) {
     // Only bother if we actually can
     if (canUse() && type != InputType::NONE) {
         // Try to use the item held by the mouse
         if (mouseSlot != NULL) {
-            mouseSlot -> use(type, x, y, *this, map);
+            mouseSlot -> use(type, x, y, world);
         }
         // Try to use the item in the selected hotbar slot
         else if (hotbar.getSelected() != NULL) {
-            hotbar.getSelected() -> use(type, x, y, *this, map);
+            hotbar.getSelected() -> use(type, x, y, world);
         }
     }
 }

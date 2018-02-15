@@ -9,7 +9,7 @@ class WindowHandler;
 class Player;
 class Inventory;
 class Hotbar;
-class Map;
+class World;
 struct MouseBox;
 struct StatBar;
 
@@ -87,7 +87,7 @@ public:
     void mouseEvent(const SDL_Event &event);
 
     // Do whatever should be done when a mouse event happens
-    void useMouse(Player &player, Map &map);
+    void useMouse(Player &player, World &world);
 
     // Do whatever should be done when a key is pressed or released
     void keyEvent(const SDL_Event &event, Player &player);
@@ -99,7 +99,7 @@ public:
     void updatePlayer(Player &player);
 
     // Do all the stuff that needs to be done every frame
-    void update(Player &player, Map &map);
+    void update(World &world);
 };
 
 #endif

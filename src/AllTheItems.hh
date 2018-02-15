@@ -6,6 +6,9 @@
 #include "Tile.hh"
 #include "MapHelpers.hh"
 
+class Player;
+class Map;
+
 
 // All the child classes of "Item"
 // Items that change the player's stats
@@ -22,7 +25,7 @@ public:
     Potion(ItemType type, std::string path);
 
     // What to do when used
-    void use(InputType type, int x, int y, Player &player, Map &map);
+    void use(InputType type, int x, int y, World &world);
 };
 
 // Items that can be placed
@@ -48,7 +51,7 @@ public:
     virtual ~Block();
 
     // What to do when used
-    virtual void use(InputType type, int x, int y, Player &player, Map &map);
+    virtual void use(InputType type, int x, int y, World &world);
 };
 
 /* Items that can damage blocks. */
@@ -60,7 +63,7 @@ public:
     Pickaxe(ItemType type, std::string path);
 
     /* What to do when used. */
-    void use(InputType type, int x, int y, Player &player, Map &map);
+    void use(InputType type, int x, int y, World &world);
 };
 
 // Function to make an item of the correct class given only an item type

@@ -5,6 +5,7 @@
 #include "AllTheItems.hh"
 #include "Player.hh"
 #include "Map.hh"
+#include "World.hh"
 #include "json.hpp"
 
 #define TILE_WIDTH 16
@@ -36,19 +37,19 @@ Potion::Potion(ItemType type, string path) : Item(type, path) {
 }
 
 // Add the potion amount to all the stats
-void Potion::use(InputType type, int x, int y, Player &player, Map &map) {
+void Potion::use(InputType type, int x, int y, World &world) {
     // Add the potion amount to the player, but only if the left mouse
     // button wqs pressed (not held, and not the right button).
     if (type == InputType::LEFT_BUTTON_PRESSED) {
-        player.health.addPart(woundsCured);
-        player.fullness.addPart(hungerCured);
-        player.mana.addPart(manaCured);
-        player.health.addFull(healthGained);
-        player.fullness.addFull(fullnessGained);
-        player.mana.addFull(manaGained);
+        world.player.health.addPart(woundsCured);
+        world.player.fullness.addPart(hungerCured);
+        world.player.mana.addPart(manaCured);
+        world.player.health.addFull(healthGained);
+        world.player.fullness.addFull(fullnessGained);
+        world.player.mana.addFull(manaGained);
         // TODO: make consumable
         // Use useTime
-        player.useTimeLeft = useTime;
+        world.player.useTimeLeft = useTime;
     }
 }
 
@@ -120,9 +121,9 @@ MapLayer Block::getLayer(InputType type) {
 }
 
 // When used, place the tile
-void Block::use(InputType type, int x, int y, Player &player, Map &map) {
+void Block::use(InputType type, int x, int y, World &world) {
     // Only do anything if the tile is within range
-    if (!canPlace(x, y, player, map)) {
+    if (!canPlace(x, y, world.player, world.map)) {
         return;
     }
 
@@ -135,10 +136,11 @@ void Block::use(InputType type, int x, int y, Player &player, Map &map) {
 
     /* If success is still false at the end, don't set the player's use
     time left. */
-    bool success = map.placeTile(map.getMapCoords(x, y, layer), tileType);
+    bool success = world.map.placeTile(
+            world.map.getMapCoords(x, y, layer), tileType);
 
     // If success, add the use time
-    player.useTimeLeft += (int)success * useTime;
+    world.player.useTimeLeft += (int)success * useTime;
 }
 
 /* Pickaxe constructor. */
@@ -157,14 +159,15 @@ Pickaxe::Pickaxe(ItemType type, string path) : Block(type, path) {
 }
 
 /* Pickaxe use. */
-void Pickaxe::use(InputType type, int x, int y, Player &player, Map &map) {
+void Pickaxe::use(InputType type, int x, int y, World &world) {
     // Only do anything if the tile is within range
-    if (canPlace(x, y, player, map)) {
+    if (canPlace(x, y, world.player, world.map)) {
         /* Which layer to damage. */
         MapLayer layer = getLayer(type);
-        bool success = map.damage(map.getMapCoords(x, y, layer), blockDamage);
+        bool success = world.map.damage(
+                world.map.getMapCoords(x, y, layer), blockDamage);
         // If success, add the use time
-        player.useTimeLeft += (int)success * useTime;
+        world.player.useTimeLeft += (int)success * useTime;
     }
 }
 

@@ -5,6 +5,7 @@
 // Include things that were forward declared in the header
 #include "WindowHandler.hh"
 #include "Player.hh"
+#include "World.hh"
 #include "Hotbar.hh"
 #include "UIHelpers.hh"
 
@@ -218,7 +219,7 @@ void EventHandler::mouseEvent(const SDL_Event &event) {
 }
 
 // Do whatever should be done when a mouse event happens
-void EventHandler::useMouse(Player &player, Map &map) {
+void EventHandler::useMouse(Player &player, World &world) {
     // Whether the mouse has clicked on something
     bool isMouseUsed;
 
@@ -257,7 +258,7 @@ void EventHandler::useMouse(Player &player, Map &map) {
         x = player.getRect().x + x - player.screenX;
         y = player.getRect().y - y + player.screenY;
         // Have the player figure out whether to use an item, and which one
-        player.useAction(type, x, y, map);
+        player.useAction(type, x, y, world);
     }
     // All done, set clicks to 0 for next time
     leftClicks = 0;
@@ -381,18 +382,18 @@ void EventHandler::updatePlayer(Player &player) {
 }
 
 // Do all the things that need to be done every update
-void EventHandler::update(Player &player, Map &map) {
+void EventHandler::update(World &world) {
     // Use keys that need to be held down
     const Uint8 *state = SDL_GetKeyboardState(NULL);
     updateKeys(state);
 
     // Use the mouse if a button is being held down
-    useMouse(player, map);
+    useMouse(world.player, world);
     // Get ready for next update
     wasLeftButtonDown = isLeftButtonDown;
     wasRightButtonDown = isRightButtonDown;
 
     // Tell the player what they're trying to do
-    updatePlayer(player);
+    updatePlayer(world.player);
 
 }

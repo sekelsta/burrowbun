@@ -33,7 +33,7 @@ Item::Item(ItemType type, string path) {
 }
 
 /* Non-pure-virtual use function. Does nothing. */
-void Item::use(InputType type, int x, int y, Player &player, Map &map) {}
+void Item::use(InputType type, int x, int y, World &world) {}
 
 Item::~Item() {}
 

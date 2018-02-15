@@ -3,14 +3,13 @@
 #include <iostream>
 #include <cassert>
 #include "Tile.hh"
-#include "Map.hh"
 #include "Mapgen.hh"
 #include "EventHandler.hh"
 #include "Movable.hh"
 #include "Entity.hh"
-#include "Player.hh"
-#include "Collider.hh"
 #include "Hotbar.hh"
+
+#include "World.hh"
 
 using namespace std;
 
@@ -24,29 +23,18 @@ void Game::createWorld(string filename) {
 }
 
 void Game::play(string mapname) {
-    /* Load a map. */
-    Map map = Map(path + mapname, TILE_WIDTH, TILE_HEIGHT, path);
-    window.setMapSize(map.getWidth(), map.getHeight());
+    /* Load a world. */
+    World world = World(path + mapname, TILE_WIDTH, TILE_HEIGHT, path);
+
+    window.setMapSize(world.map.getWidth(), world.map.getHeight());
 
     SDL_Event event;
     EventHandler eventHandler;
 
-    Player player(path);
-
-    /* Vectors to hold all the things that need to collide. */
-    vector<DroppedItem *> droppedItems;
-    vector<movable::Movable *> movables;
-    movables.push_back(&player);
-    /* Set the player's position to the spawnpoint. */
-    player.setX(map.getSpawn().x * TILE_WIDTH);
-    player.setY(map.getSpawn().y * TILE_HEIGHT);
-
-    Collider collider(TILE_WIDTH, TILE_HEIGHT);
-
     /* Whether the window is in focus. */
     bool isFocused = true;
 
-    /* Frames since the start of the game. */
+    /* Frames since the start of the world. */
     uint32_t gameTicks = 0;
 
     /* Loop infinitely until exiting. */
@@ -66,7 +54,7 @@ void Game::play(string mapname) {
                     break;
                 case SDL_KEYDOWN:
                 case SDL_KEYUP:
-                    eventHandler.keyEvent(event, player);
+                    eventHandler.keyEvent(event, world.player);
                     break;
                 case SDL_MOUSEMOTION:
                 case SDL_MOUSEWHEEL:
@@ -80,29 +68,18 @@ void Game::play(string mapname) {
             }
         }
 
-        /* TODO: move elsewhere, and update all entities. */
-        player.update();
-
         /* Now that all the events have been handled, do eventhandling things 
         that need to be done every update (like checking whether any keys
         or mouse buttons are being held down). */
-        eventHandler.update(player, map);
+        eventHandler.update(world);
 
-        /* Move things around. */
-        collider.update(map, movables, droppedItems);
-        /* Have every movable take fall damage. */
-        for (unsigned int i = 0; i < movables.size(); i++) {
-            movables[i] -> takeFallDamage();
-        }
-
-        /* Have the map update itself and relevent movables. */
-        map.update(movables);
+        world.update();
 
         /* Put pictures on the screen, but only if rendering isn't really 
         slow. */
         uint32_t frameTicks = SDL_GetTicks() - ticks;
         if (frameTicks < 2 * TICKS_PER_FRAME) { 
-            window.update(map, movables, player);
+            window.update(world.map, world.movables, world.player);
         }
 
         /* Count the number of times we've gone through this loop. */
@@ -114,7 +91,7 @@ void Game::play(string mapname) {
             SDL_Delay(TICKS_PER_FRAME - frameTicks);
         }
     }
-    map.save(path + mapname);
+    world.map.save(path + mapname);
 }
 
 Game::Game(string p) : SCREEN_FPS(60), TICKS_PER_FRAME(1000 / SCREEN_FPS),

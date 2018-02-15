@@ -8,3 +8,4 @@ map.bmp
 *.world
 catch.hpp
 *.world.ppm
+.d
