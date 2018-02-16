@@ -1,5 +1,6 @@
 Changes since last push:
- - Makefile dependencies are now automated.
+ - Destroying a tile now drops it as an item
+ - Dropped items do not yet move or despawn
 
 Known "features":
  - The strenth of gravity is independent of the world.

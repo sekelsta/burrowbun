@@ -6,6 +6,7 @@
 #include "MapHelpers.hh"
 #include "Rect.hh"
 #include "json.hpp"
+#include "DroppedItem.hh"
 
 #define BOULDER_CARRY_HEIGHT 1.5
 
@@ -24,11 +25,12 @@ std::set<TileType> Boulder::vectorConvert(const std::vector<int> &input) {
 }
 
 /* Check if it can fall one tile. If it can, do. */
-bool Boulder::fall(Map &map, const Location &place) const {
+bool Boulder::fall(Map &map, const Location &place, 
+        std::vector<DroppedItem*> &items) const {
     TileType blocking = map.getTileType(place, 0, -1);
     /* If it can crush it, do so. */
     if (tilesCrushed.count(blocking)) {
-        map.moveTile(place, 0, -1);
+        map.moveTile(place, 0, -1, items);
         return true;
     }
     else if (tilesSunk.count(blocking)) {
@@ -41,7 +43,8 @@ bool Boulder::fall(Map &map, const Location &place) const {
 
 /* Try to move one tile. Return true on success. */
 bool Boulder::move(Map &map, const Location &place, int direction,
-        std::vector<movable::Movable*> &movables) {
+        std::vector<movable::Movable*> &movables, 
+        std::vector<DroppedItem*> &items) {
     /* If it has no preference for direction, it should move sideways if
     that will let it fall. */
     if (direction == 0) {
@@ -52,13 +55,13 @@ bool Boulder::move(Map &map, const Location &place, int direction,
         /* If it slides, pick a random direction (-1 or 1) to try to go. */
         int newDirection = (rand() % 2) * 2 - 1;
         assert(newDirection == -1 || newDirection == 1);
-        move(map, place, newDirection, movables);
+        move(map, place, newDirection, movables, items);
         return true;
     }
 
     TileType blocking = map.getTileType(place, direction, 0);
     if (tilesDestroyed.count(blocking)) {
-        map.moveTile(place, direction, 0);
+        map.moveTile(place, direction, 0, items);
     }
     else if (tilesDisplaced.count(blocking)) {
         map.displaceTile(place, direction, 0);
@@ -162,10 +165,11 @@ void Boulder::setDirection(Map &map, const Location &place, int direction)
 Return false if it didn't move and should therefore be removed from any
 lists of boulders to try to move. */
 bool Boulder::update(Map &map, Location place, 
-        std::vector<movable::Movable*> &movables, int tick) {
+        std::vector<movable::Movable*> &movables, 
+        std::vector<DroppedItem*> &items, int tick) {
     /* If it can fall, it should. */
     if (fallTicks != 0 && (tick % fallTicks == 0) && !isFloating) {
-        if (fall(map, place)) {
+        if (fall(map, place, items)) {
             return true;
         }
     }
@@ -175,7 +179,7 @@ bool Boulder::update(Map &map, Location place,
     /* If it hasn't fallen this update, and wants to move sideways, it should 
     do that. */
     if (moveTicks != 0 && (tick % moveTicks == 0)) {
-        return move(map, place, direction, movables);
+        return move(map, place, direction, movables, items);
     }
     return true;
 }

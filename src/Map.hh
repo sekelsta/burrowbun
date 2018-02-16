@@ -7,6 +7,8 @@
 #include "Tile.hh"
 #include "MapHelpers.hh"
 
+class DroppedItem;
+
 /* In the biome information stored, each piee refers to a square this size of
 tiles. */
 #define BIOME_SIZE 32
@@ -343,15 +345,15 @@ public:
 
     /* Damage a tile (with a pickax or something). Return false if there
     was no tile to damage. */
-    bool damage(Location place, int amount);
+    bool damage(Location place, int amount, std::vector<DroppedItem*> &items);
 
     /* Destroy a tile if it has no health. Return true if it was destroyed, or
     false if it still had health and lived. */
-    bool destroy(const TileHealth &health);
+    bool destroy(const TileHealth &health, std::vector<DroppedItem*> &items);
 
     /* Destroy a tile. */
-    void kill(int x, int y, MapLayer layer);
-    void kill(const Location &place);
+    void kill(int x, int y, MapLayer layer, std::vector<DroppedItem*> &items);
+    void kill(const Location &place, std::vector<DroppedItem*> &items);
 
     /* Take an invalid x location and add or subtract width until
     0 <= x < width. */
@@ -373,7 +375,8 @@ public:
 
     /* Move a tile x in the +x direction and y in the +y directoin. If there's 
     a tile at the destination, it will be destroyed. */
-    void moveTile(const Location &place, int x, int y);
+    void moveTile(const Location &place, int x, int y,
+        std::vector<DroppedItem*> &items);
 
     /* Move a tile x in the +x direction and y in the +y direction. If there's 
     a tile there, they switch places. */

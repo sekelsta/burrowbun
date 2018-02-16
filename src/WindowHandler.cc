@@ -15,6 +15,7 @@
 #include "Inventory.hh"
 #include "Action.hh"
 #include "Rect.hh"
+#include "World.hh"
 
 using namespace std;
 
@@ -407,18 +408,19 @@ void WindowHandler::renderMap(Map &m, const Rect &camera) {
 }
 
 // Update the screen
-void WindowHandler::update(Map &map, 
-        const vector<movable::Movable *> &movables, Player &player) {
+void WindowHandler::update(World &world) {
     /* Find the camera. */
-    int w = player.getWidth();
-    int h = player.getHeight();
-    Rect camera = findCamera(player.getRect().x, player.getRect().y, w, h);
+    int w = world.player.getWidth();
+    int h = world.player.getHeight();
+    Rect camera = findCamera(world.player.getRect().x, 
+        world.player.getRect().y, w, h);
     /* Tell the player where on the screen they are. This is only used by
     EventHandler. TODO: remove. */
-    SDL_Rect playerRect = { player.getRect().x, player.getRect().y, w, h };
-    player.convertRect(playerRect, camera);
-    player.screenX = playerRect.x;
-    player.screenY = playerRect.y + playerRect.h;
+    SDL_Rect playerRect = { world.player.getRect().x, 
+        world.player.getRect().y, w, h };
+    world.player.convertRect(playerRect, camera);
+    world.player.screenX = playerRect.x;
+    world.player.screenY = playerRect.y + playerRect.h;
 
 
     // Make sure the renderer isn't rendering to a texture
@@ -433,15 +435,18 @@ void WindowHandler::update(Map &map,
 
     // Only draw stuff if it isn't minimized
     if (!isMinimized) {
-        renderMap(map, camera);
+        renderMap(world.map, camera);
 
         // Draw any movables
-        for (unsigned int i = 0; i < movables.size(); i++) {
-            movables[i] -> render(camera);
+        for (unsigned int i = 0; i < world.movables.size(); i++) {
+            world.movables[i] -> render(camera);
+        }
+        for (unsigned int i = 0; i < world.droppedItems.size(); i++) {
+            world.droppedItems[i] -> render(camera);
         }
 
         // Draw the UI
-        renderUI(player);
+        renderUI(world.player);
 
         // Update the screen
         SDL_RenderPresent(Renderer::renderer);

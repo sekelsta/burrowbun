@@ -27,6 +27,7 @@ class Inventory;
 class Action;
 struct MouseBox;
 struct StatBar;
+class World;
 
 // A class to open a window and display things to it
 class WindowHandler {
@@ -101,8 +102,7 @@ public:
     void renderMap(Map &m, const Rect &camera);
 
     // Update the screen
-    void update(Map &m, const std::vector<movable::Movable *> &movables, 
-        Player &player);
+    void update(World &world);
 };
 
 #endif

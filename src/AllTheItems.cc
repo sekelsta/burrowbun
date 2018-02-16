@@ -164,8 +164,8 @@ void Pickaxe::use(InputType type, int x, int y, World &world) {
     if (canPlace(x, y, world.player, world.map)) {
         /* Which layer to damage. */
         MapLayer layer = getLayer(type);
-        bool success = world.map.damage(
-                world.map.getMapCoords(x, y, layer), blockDamage);
+        bool success = world.map.damage(world.map.getMapCoords(x, y, layer),
+                 blockDamage, world.droppedItems);
         // If success, add the use time
         world.player.useTimeLeft += (int)success * useTime;
     }

@@ -8,6 +8,8 @@
 #include "Map.hh"
 #include "Boulder.hh"
 #include "version.hh"
+#include "DroppedItem.hh"
+#include "AllTheItems.hh"
 
 using namespace std;
 
@@ -568,7 +570,7 @@ void Map::update(vector<movable::Movable*> &movables) {
     tick++;
 }
 
-bool Map::damage(Location place, int amount) {
+bool Map::damage(Location place, int amount, vector<DroppedItem*> &items) {
     /* If there's no tile here, just return false. */
     if (getTile(place) -> type == TileType::EMPTY) {
         return false;
@@ -595,7 +597,7 @@ bool Map::damage(Location place, int amount) {
     }
 
     /* Now see if we need to destroy the tile. */
-    if (destroy(damaged[index])) {
+    if (destroy(damaged[index], items)) {
         /* If it was destroyed, removed it from the list. */
         damaged.erase(damaged.begin() + index);
     }
@@ -603,21 +605,26 @@ bool Map::damage(Location place, int amount) {
     return true;
 }
 
-bool Map::destroy(const TileHealth &health) {
+bool Map::destroy(const TileHealth &health, vector<DroppedItem*> &items) {
     if (health.health <= 0) {
-        kill(health.place);
+        kill(health.place, items);
     }
 
     return health.health <= 0;
 }
 
-void Map::kill(int x, int y, MapLayer layer) {
+void Map::kill(int x, int y, MapLayer layer, vector<DroppedItem*> &items) {
     // Drop itself as an item
-    // TODO
+    items.push_back(new DroppedItem ((ItemMaker::makeItem(
+        ItemMaker::tileToItem(getTileType(wrapX(x), y, layer)), path)), 
+        x * TILE_WIDTH,
+        y * TILE_HEIGHT + TILE_HEIGHT / 4));
+
+    // Set the place it used to be to empty
     setTile(x, y, layer, TileType::EMPTY);
 }
-void Map::kill(const Location &place) {
-    kill(place.x, place.y, place.layer);
+void Map::kill(const Location &place, vector<DroppedItem*> &items) {
+    kill(place.x, place.y, place.layer, items);
 }
 
 Location Map::getMapCoords(int x, int y, MapLayer layer) {
@@ -645,7 +652,8 @@ Location Map::getMapCoords(int x, int y, MapLayer layer) {
     return place;
 }
 
-void Map::moveTile(const Location &place, int x, int y) {
+void Map::moveTile(const Location &place, int x, int y, 
+        vector<DroppedItem*> &items) {
     assert(place.x >= 0);
     assert(place.x < width);
     assert(place.y >=0);
@@ -658,7 +666,7 @@ void Map::moveTile(const Location &place, int x, int y) {
         return;
     }
 
-    kill(newX, place.y + y, place.layer);
+    kill(newX, place.y + y, place.layer, items);
     TileType val = getTileType(place, 0, 0);
     uint8_t spritePlace = getSprite(place);
     setSprite(newX, place.y + y, place.layer, spritePlace);

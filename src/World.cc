@@ -12,6 +12,13 @@ World::World(string filename, int tileWidth, int tileHeight, string path)
     player.setY(map.getSpawn().y * tileHeight);
 }
 
+World::~World() {
+    while (!droppedItems.empty()) {
+        delete droppedItems.back();
+        droppedItems.erase(droppedItems.end() - 1);
+    }
+}
+
 void World::update() {
 
     /* TODO: update all entities. */

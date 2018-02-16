@@ -97,7 +97,7 @@ public:
     Point getDAccel() const;
 
     // Updates velocity
-    void accelerate(double gravity);
+    void updateMotion(double gravity);
 
     /* Take damage. Since movables in general don't have health, this mostly
     exists so the collider can tell movables to take damage from overlapping a

@@ -101,7 +101,6 @@ void Entity::update() {
 }
 
 void Entity::render(const Rect &camera) {
-    /* TODO: this is copypasta code */
     // Make sure the renderer draw color is set to white
     Renderer::setColorWhite();
 

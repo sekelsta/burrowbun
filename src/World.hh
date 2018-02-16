@@ -25,6 +25,7 @@ private:
 
 public:
     World(std::string filename, int tileWidth, int tileHeight, std::string path);
+    ~World();
 
     void update();
 };

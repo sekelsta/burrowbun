@@ -79,7 +79,7 @@ void Game::play(string mapname) {
         slow. */
         uint32_t frameTicks = SDL_GetTicks() - ticks;
         if (frameTicks < 2 * TICKS_PER_FRAME) { 
-            window.update(world.map, world.movables, world.player);
+            window.update(world);
         }
 
         /* Count the number of times we've gone through this loop. */
@@ -102,7 +102,7 @@ Game::Game(string p) : SCREEN_FPS(60), TICKS_PER_FRAME(1000 / SCREEN_FPS),
 
 void Game::run() {
     const string filename = "world.world";
-    createWorld(filename);
+    //createWorld(filename);
 
     play(filename);
 }

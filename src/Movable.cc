@@ -1,6 +1,7 @@
 #include <cassert>
 #include <cmath> // For rounding
 #include <fstream>
+#include <algorithm>
 #include "Movable.hh"
 #include <iostream>
 #include "filepaths.hh"
@@ -106,14 +107,21 @@ Point Movable::getDAccel() const {
 
 // This adds acceleration to speed, and limits speed at maxSpeed. This also
 // updates the value of timeOffGround and maxHeight.
-void Movable::accelerate(double gravity) {
-    // If on the ground, timeOffGround should be 0, otherwise it should be
-    // one more than it was before
+void Movable::updateMotion(double gravity) {
+    // If it fell, figure out how far
     if (isCollidingDown) {
+        pixelsFallen = maxHeight - getRect().y;
+        maxHeight = getRect().y;
+        // Also set ticksCollidingDown and timeOffGround
+        ticksCollidingDown++;
         timeOffGround = 0;
     }
     else {
+        pixelsFallen = 0;
+        ticksCollidingDown = 0;
         timeOffGround++;
+        // Update maxHeight
+        maxHeight = max(maxHeight, rect.y);
     }
 
     // Update velocity
@@ -150,6 +158,12 @@ void Movable::accelerate(double gravity) {
         velocity.y = floor(velocity.y);
     }
     velocity.y = ceil(velocity.y);
+
+    // Reset collision info
+    isDroppingDown = isCollidingDown && !(collidePlatforms);
+    isSteppingUp = false;
+    isCollidingX = false;
+    isCollidingDown = false;
 }
 
 /* Take damage. Does nothing. */

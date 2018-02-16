@@ -125,6 +125,9 @@ class Collider {
     // Takes a movable and a map, and moves it to where it should end up
     void collide(Map &map, movable::Movable &movable);
 
+    /* Does everything needed to update a movable. */
+    void updateMovable(Map &map, movable::Movable *movable);
+
 public:
     // Constructor
     Collider(int tileWidth, int tileHeight);

@@ -9,6 +9,10 @@ class DroppedItem: public movable::Movable {
 
 public:
     DroppedItem(Item *item, int x, int y);
+    ~DroppedItem();
+
+    /* Render itself. */
+    virtual void render(const Rect &camera);
 };
 
 #endif

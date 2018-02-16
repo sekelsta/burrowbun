@@ -456,6 +456,88 @@ void Collider::collide(Map &map, movable::Movable &movable) {
 }
 
 
+void Collider::updateMovable(Map &map, movable::Movable *movable) {
+    // Update the velocity
+
+    // TODO: replace this with gravity as a function of height and map
+    double gravity = -1.5;
+    movable -> updateMotion(gravity);
+
+    // toX is the x value the movable expects to end up having.
+    int toX = movable -> getRect().x + movable -> getVelocity().x;
+    collide(map, *movable);
+    // Because collide() may stop things in the x direction before it 
+    // should, we should try again.
+    // Actually since after corner collisions it will just step up and 
+    // continue, this won't be a noticable bug most of the time, but might
+    // as well fix it anyway.
+    if (movable -> isCollidingX) {
+        // Have it move only the rest of the way in the x direction, now.
+        movable::Point newVelocity;
+        newVelocity.x = toX - movable -> getRect().x;
+        newVelocity.y = 0;
+        movable::Point oldVelocity = movable -> getVelocity();
+        movable -> setVelocity(newVelocity);
+        collide(map, *movable);
+        movable -> setVelocity(oldVelocity);
+    }
+
+    // Do the thing where colliding with a wall one block high doesn't
+    // stop you
+    if (movable -> isCollidingX) {
+        movable::Movable hypothetical(*(movable));
+        /* Don't have hypothetical change collision rect. */
+        hypothetical.resetRect();
+        // See if it can go up one tile or less without colliding
+        int oldY = hypothetical.getRect().y;
+        // The amount to move by to go up one tile or less, assuming 
+        // gravity is in the usual direction
+        // TODO: it probably doesn't matter, but this is inaccurate when 
+        // the movable is in the air
+        int dy = TILE_HEIGHT - ((oldY + yOffset)  % TILE_HEIGHT);
+        assert(dy <= TILE_HEIGHT);
+        assert(dy > 0);
+        hypothetical.setVelocity({0, (double)dy});
+        collide(map, hypothetical);
+        // If there wasn't a collision
+        if (hypothetical.getRect().y == oldY + dy) {
+            assert(hypothetical.getRect().x == movable -> getRect().x);
+            assert(movable -> getRect().y == oldY);
+            // check that it would end up standing on the tile, and not 
+            // randomly jump up and fall back down
+            // dx is how much more it could have gone in the x direction, 
+            // if it didn't collide with the tile it's stepping up
+            int dx = toX - hypothetical.getRect().x;
+            hypothetical.setVelocity({(double)dx, 0});
+            collide(map, hypothetical);
+            if (hypothetical.getRect().x != movable -> getRect().x) {
+                // Ok, so we do want to jump up and continue
+                // doing that instantaneously would look like:
+                // movables[i] -> x = hypothetical.x;
+                // movables[i] -> y = hypothetical.y;
+                // but we actually only want to go up by one x velocity
+                // (not one y velocity because the whole point of this is 
+                // that you go up without jumping).
+                /* If it can jump up and still go sideways, or if it
+                is within one tile of the bottom of the map, it can stand
+                on the tile it's stepping up to. */
+                if (dy < abs(movable -> getVelocity().x)
+                            || movable -> getRect().y < TILE_HEIGHT) {
+                    movable -> setX(hypothetical.getRect().x);
+                    movable -> setY(hypothetical.getRect().y);
+                }
+                /* Else it will go partway up and temporarily ignore
+                gravity. */
+                else {
+                    movable -> setY(movable -> getRect().y 
+                            + abs(movable -> getVelocity().x));
+                    movable -> isSteppingUp = true;
+                }
+            }
+        }
+    }
+}
+
 // A function to move and collide the movables
 // Note that this only ever resets distance fallen when it hits the ground.
 void Collider::update(Map &map, vector<movable::Movable *> &movables,
@@ -463,114 +545,14 @@ void Collider::update(Map &map, vector<movable::Movable *> &movables,
     // TODO: Deal with dropped items
     // Update the velocity of everything
     for (unsigned i = 0; i < movables.size(); i++) {
-        // If it fell, figure out how far
-        if (movables[i] -> isCollidingDown) {
-            int distanceFallen = movables[i] -> maxHeight - 
-                    movables[i] -> getRect().y;
-            movables[i] -> pixelsFallen = distanceFallen;
-            movables[i] -> maxHeight = movables[i] -> getRect().y;
-            // Also set ticksCollidingDown
-            movables[i] -> ticksCollidingDown++;
-        }
-        else {
-            movables[i] -> pixelsFallen = 0;
-            movables[i] -> ticksCollidingDown = 0;
-        }
-
-        // TODO: replace this with gravity as a function of height
-        double gravity = -1.5;
-        movables[i] -> accelerate(gravity);
-        movables[i] -> isDroppingDown = movables[i] -> isCollidingDown
-            && !(movables[i] -> collidePlatforms);
-        movables[i] -> isSteppingUp = false;
-        movables[i] -> isCollidingX = false;
-        movables[i] -> isCollidingDown = false;
-
-        // toX is the x value the movable expects to end up having.
-        int toX = movables[i] -> getRect().x + movables[i] -> getVelocity().x;
-        collide(map, *movables[i]);
-        // Because collide() may stop things in the x direction before it 
-        // should, we should try again.
-        // Actually since after corner collisions it will just step up and 
-        // continue, this won't be a noticable bug most of the time, but might
-        // as well fix it anyway.
-        if (movables[i] -> isCollidingX) {
-            // Have it move only the rest of the way in the x direction, now.
-            movable::Point newVelocity;
-            newVelocity.x = toX - movables[i] -> getRect().x;
-            newVelocity.y = 0;
-            movable::Point oldVelocity = movables[i] -> getVelocity();
-            movables[i] -> setVelocity(newVelocity);
-            collide(map, *movables[i]);
-            movables[i] -> setVelocity(oldVelocity);
-        }
-
-        // Do the thing where colliding with a wall one block high doesn't
-        // stop you
-        if (movables[i] -> isCollidingX) {
-            movable::Movable hypothetical(*(movables[i]));
-            /* Don't have hypothetical change collision rect. */
-            hypothetical.resetRect();
-            // See if it can go up one tile or less without colliding
-            int oldY = hypothetical.getRect().y;
-            // The amount to move by to go up one tile or less, assuming 
-            // gravity is in the usual direction
-            // TODO: it probably doesn't matter, but this is inaccurate when 
-            // the movable is in the air
-            int dy = TILE_HEIGHT - ((oldY + yOffset)  % TILE_HEIGHT);
-            assert(dy <= TILE_HEIGHT);
-            assert(dy > 0);
-            movable::Point newVelocity;
-            newVelocity.x = 0;
-            newVelocity.y = dy;
-            hypothetical.setVelocity(newVelocity);
-            collide(map, hypothetical);
-            // If there wasn't a collision
-            if (hypothetical.getRect().y == oldY + dy) {
-                assert(hypothetical.getRect().x == movables[i] -> getRect().x);
-                assert(movables[i] -> getRect().y == oldY);
-                // check that it would end up standing on the tile, and not 
-                // randomly jump up and fall back down
-                // dx is how much more it could have gone in the x direction, 
-                // if it didn't collide with the tile it's stepping up
-                int dx = toX - hypothetical.getRect().x;
-                movable::Point newVelocity;
-                newVelocity.x = dx;
-                newVelocity.y = 0;
-                hypothetical.setVelocity(newVelocity);
-                collide(map, hypothetical);
-                if (hypothetical.getRect().x != movables[i] -> getRect().x) {
-                    // Ok, so we do want to jump up and continue
-                    // doing that instantaneously would look like:
-                    // movables[i] -> x = hypothetical.x;
-                    // movables[i] -> y = hypothetical.y;
-                    // but we actually only want to go up by one x velocity
-                    // (not one y velocity because the whole point of this is 
-                    // that you go up without jumping).
-                    /* If it can jump up and still go sideways, or if it
-                    is within one tile of the bottom of the map, it can stand
-                    on the tile it's stepping up to. */
-                    if (dy < abs(movables[i] -> getVelocity().x)
-                                || movables[i] -> getRect().y < TILE_HEIGHT) {
-                        movables[i] -> setX(hypothetical.getRect().x);
-                        movables[i] -> setY(hypothetical.getRect().y);
-                    }
-                    /* Else it will go partway up and temporarily ignore
-                    gravity. */
-                    else {
-                        movables[i] -> setY(movables[i] -> getRect().y 
-                                + abs(movables[i] -> getVelocity().x));
-                        movables[i] -> isSteppingUp = true;
-                    }
-                }
-            }
-        }
-        // And done checking whether it needs to step up.
-        // Now we're in just the "for each movable" loop
-        // Update the distance fallen from
-        int newMaxHeight = max(movables[i] -> maxHeight, 
-                movables[i] -> getRect().y);
-        movables[i] -> maxHeight = newMaxHeight;
+        updateMovable(map, movables[i]);
     }
+
+    // TODO: figure out why this makes it stop?
+/*
+    for (unsigned i = 0; i < droppedItems.size(); i++) {
+        updateMovable(map, (movable::Movable *)droppedItems[i]);
+    }
+*/
 }
 
