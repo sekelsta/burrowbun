@@ -543,16 +543,16 @@ void Collider::updateMovable(Map &map, movable::Movable *movable) {
 void Collider::update(Map &map, vector<movable::Movable *> &movables,
         vector<DroppedItem *> droppedItems) {
     // TODO: Deal with dropped items
-    // Update the velocity of everything
+    // Update the velocity of everythingdelete
     for (unsigned i = 0; i < movables.size(); i++) {
         updateMovable(map, movables[i]);
     }
 
     // TODO: figure out why this makes it stop?
-/*
+
     for (unsigned i = 0; i < droppedItems.size(); i++) {
         updateMovable(map, (movable::Movable *)droppedItems[i]);
     }
-*/
+
 }
 

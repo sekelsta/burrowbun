@@ -39,6 +39,10 @@ Movable::Movable() {
     // These should be changed by the child class's init.
     drag.x = 0;
     drag.y = 0;
+
+    maxJumpTime = 0;
+    minVelocity = 0;
+
     // The amount to accelerate by when trying to move
     dAccel.x = 0;
     dAccel.y = 0;
@@ -108,6 +112,9 @@ Point Movable::getDAccel() const {
 // This adds acceleration to speed, and limits speed at maxSpeed. This also
 // updates the value of timeOffGround and maxHeight.
 void Movable::updateMotion(double gravity) {
+    // Make sure the movable has been properly initialized
+    assert(drag.x || drag.y);
+
     // If it fell, figure out how far
     if (isCollidingDown) {
         pixelsFallen = maxHeight - getRect().y;

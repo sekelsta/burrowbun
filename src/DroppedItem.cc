@@ -2,12 +2,19 @@
 
 using namespace std;
 
-DroppedItem::DroppedItem(Item *i, int x, int y) {
+DroppedItem::DroppedItem(Item *i, int x, int y, int worldWidth) {
     item = i;
     setX(x);
     setY(y);
     rect.w = i->sprite.getWidth();
     rect.h = i->sprite.getHeight();
+    rect.worldWidth = worldWidth;
+    nextRect = rect;
+    nextRect.x = 0;
+    nextRect.y = 0;
+
+    // TODO: remove magic numbers
+    drag = {0.6, 0.9166};
 }
 
 DroppedItem::~DroppedItem() {

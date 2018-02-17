@@ -617,8 +617,7 @@ void Map::kill(int x, int y, MapLayer layer, vector<DroppedItem*> &items) {
     // Drop itself as an item
     items.push_back(new DroppedItem ((ItemMaker::makeItem(
         ItemMaker::tileToItem(getTileType(wrapX(x), y, layer)), path)), 
-        x * TILE_WIDTH,
-        y * TILE_HEIGHT + TILE_HEIGHT / 4));
+        x * TILE_WIDTH, y * TILE_HEIGHT, width * TILE_WIDTH));
 
     // Set the place it used to be to empty
     setTile(x, y, layer, TileType::EMPTY);

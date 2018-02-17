@@ -8,7 +8,7 @@ class DroppedItem: public movable::Movable {
     Item *item;
 
 public:
-    DroppedItem(Item *item, int x, int y);
+    DroppedItem(Item *item, int x, int y, int worldWidth);
     ~DroppedItem();
 
     /* Render itself. */

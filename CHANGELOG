@@ -1,6 +1,6 @@
 Changes since last push:
- - Destroying a tile now drops it as an item
- - Dropped items do not yet move or despawn
+ - Dropped items are now affected by gravity but don't merge stacks and don't 
+get picked up
 
 Known "features":
  - The strenth of gravity is independent of the world.
