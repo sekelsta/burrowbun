@@ -548,8 +548,6 @@ void Collider::update(Map &map, vector<movable::Movable *> &movables,
         updateMovable(map, movables[i]);
     }
 
-    // TODO: figure out why this makes it stop?
-
     for (unsigned i = 0; i < droppedItems.size(); i++) {
         updateMovable(map, (movable::Movable *)droppedItems[i]);
     }
