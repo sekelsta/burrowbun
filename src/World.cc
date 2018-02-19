@@ -1,6 +1,6 @@
 #include "World.hh"
 
-#define ITEM_LIMIT 400
+#define ITEM_LIMIT 3
 
 using namespace std;
 
@@ -48,6 +48,10 @@ void World::update() {
     with some mechanism of keeping track of where the line between newest and
     oldest items is. */
     if (droppedItems.size() > ITEM_LIMIT) {
+        for (int i = 0; i < (int)droppedItems.size() - ITEM_LIMIT; i++) {
+            delete droppedItems[i];
+            droppedItems[i] = nullptr;
+        }
         droppedItems.erase(droppedItems.begin(), 
             droppedItems.begin() + (droppedItems.size() - ITEM_LIMIT));
     }

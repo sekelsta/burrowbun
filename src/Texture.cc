@@ -79,8 +79,8 @@ Texture::~Texture() {
             if (loaded[i].count == 0) {
                 SDL_DestroyTexture(texture);
                 loaded.erase(loaded.begin() + i);
-                return;
             }
+            return;
         }
     }
 

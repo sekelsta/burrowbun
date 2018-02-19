@@ -310,7 +310,7 @@ void WindowHandler::init() {
     }
     else {
         // Create window
-        window = SDL_CreateWindow("Hello whirreled!", SDL_WINDOWPOS_UNDEFINED,
+        window = SDL_CreateWindow("Burrowbun", SDL_WINDOWPOS_UNDEFINED,
                     SDL_WINDOWPOS_UNDEFINED, screenWidth, screenHeight,
                     SDL_WINDOW_SHOWN | SDL_WINDOW_RESIZABLE);
         if (window == NULL) {

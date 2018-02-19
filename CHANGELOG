@@ -1,6 +1,7 @@
 Changes since last push:
- - Dropped items are now affected by gravity and can be picked up, but don't
-yet merge into bigger stacks.
+ - Fixed bug in deleting Textures
+ - Fixed memory leak
+ - Changed window title to "Burrowbun"
 
 Known "features":
  - The strenth of gravity is independent of the world.
