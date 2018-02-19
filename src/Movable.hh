@@ -124,6 +124,11 @@ public:
     void advanceRect();
     /* Set nextRect = rect, cancel collision rect change. */
     void resetRect();
+
+    // Set the rect's worldwidth
+    inline void setWorldwidth(int worldwidth) {
+        rect.worldWidth = worldwidth;
+    }
     
 };
 

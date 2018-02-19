@@ -24,7 +24,7 @@ void Mapgen::setSize(int x, int y) {
 
 void Mapgen::generateEarth() {
     /* Set height and width, and use them to make a tile array. */
-    setSize(4096, 2048);
+    setSize(6114, 2048);
     /* Some constants to use in the perlin moise. */
     const int octaves = 2;
     const double persistence = 0.2;

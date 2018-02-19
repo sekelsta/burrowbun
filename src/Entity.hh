@@ -9,6 +9,8 @@
 #include "Damage.hh"
 #include "Animation.hh"
 
+class DroppedItem;
+
 /* A class for monsters, NPCs, and players to inherit from.
 If any features are added later that should reset fall damage, they should
 do the resetting of the fall damage in this class or one of its children. */
@@ -31,6 +33,9 @@ public:
     /* Which direction it's facing. */
     bool isFacingRight;
 
+    /* Whether or not it can pick up items. */
+    bool hasInventory;
+
     /* Sitting sprites. */
     std::vector<Sprite> sprites;
     std::vector<Animation> run;
@@ -42,6 +47,11 @@ public:
     // Virtual destructor
     virtual ~Entity();
 
+    // Access function
+    inline bool getHasInventory() {
+        return hasInventory;
+    }
+
     virtual void takeDamage(const Damage &damage);
 
     // Calculate fall damage
@@ -52,6 +62,9 @@ public:
 
     /* Render the correct sprite / animation. */
     virtual void render(const Rect &camera);
+
+    /* Attempt to pick up an item. */
+    virtual void pickup(DroppedItem *item);
 };
 
 void from_json(const nlohmann::json &j, Entity &entity);

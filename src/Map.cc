@@ -531,7 +531,7 @@ vector<Tile *> Map::getPointers() const {
     return pointers;
 }
 
-void Map::update(vector<movable::Movable*> &movables) {
+void Map::update() {
     /* Make sure we're updating tiles that need to be updated. */
     set<Location>::iterator removeIter = toUpdate.begin();
     while (removeIter != toUpdate.end()) {
@@ -548,7 +548,7 @@ void Map::update(vector<movable::Movable*> &movables) {
     set<Location>::iterator iter = newUpdate.begin();
     while (iter != newUpdate.end()) {
         Tile *tile = getTile(*iter);
-        tile -> update(*this, *iter, movables, tick);
+        tile -> update(*this, *iter, tick);
         iter++;
     }
 

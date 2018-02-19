@@ -175,8 +175,7 @@ uint8_t Tile::updateSprite(Map &map, const Location &place) const {
 }
 
 /* Change the map in whatever way needs doing. */
-bool Tile::update(Map &map, Location place, 
-        vector<movable::Movable*> &movables, int tick) {
+bool Tile::update(Map &map, Location place, int tick) {
     return false;
 }
 

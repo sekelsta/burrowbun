@@ -15,7 +15,7 @@ public:
 
     /* Vectors to hold all the things that need to collide. */
     std::vector<DroppedItem *> droppedItems;
-    std::vector<movable::Movable *> movables;
+    std::vector<Entity *> entities;
 
 private:
     Collider collider;

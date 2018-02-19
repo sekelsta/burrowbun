@@ -3,6 +3,7 @@
 
 #include <string>
 #include "WindowHandler.hh"
+#include "MapHelpers.hh"
 
 class Game { 
     /* For capping the frame rate. */
@@ -15,7 +16,7 @@ class Game {
     WindowHandler window;
 
     /* Create a new world. */
-    void createWorld(std::string filename);
+    void createWorld(std::string filename, WorldType type);
     /* Load the given map and start playing. */
     void play(std::string mapname);
 public:

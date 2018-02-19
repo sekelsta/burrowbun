@@ -17,9 +17,9 @@ using namespace std;
 #define TILE_HEIGHT 16
 
 /* Create a new world. */
-void Game::createWorld(string filename) {
+void Game::createWorld(string filename, WorldType type) {
     Mapgen mapgen(path);
-    mapgen.generate(path + filename, WorldType::EARTH, path);
+    mapgen.generate(path + filename, type, path);
 }
 
 void Game::play(string mapname) {
@@ -102,7 +102,7 @@ Game::Game(string p) : SCREEN_FPS(60), TICKS_PER_FRAME(1000 / SCREEN_FPS),
 
 void Game::run() {
     const string filename = "world.world";
-    //createWorld(filename);
+    createWorld(filename, WorldType::EARTH);
 
     play(filename);
 }

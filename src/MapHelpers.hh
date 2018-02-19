@@ -40,6 +40,14 @@ enum class WorldType {
     SMOLTEST,
     EARTH,
     MOON
+    /*
+    Possible other world types would be ones that focus more on certain biomes,
+    such as:
+    POLAR - tundra, taiga, ice caps, ice sheets, mammoth steppe, polar ocean
+    TEMPERATE - shortgrass prairie, tallgrass prairie, steppe (Eurasian),
+    woodlands, mediterranian / scrub, 
+    TROPICAL - tropical rainforest, desert, savannah
+    */
 };
 
 /* A class to talk about nonglobal (only part of the world) biomes.*/

@@ -1,6 +1,6 @@
 Changes since last push:
- - Dropped items are now affected by gravity but don't merge stacks and don't 
-get picked up
+ - Dropped items are now affected by gravity and can be picked up, but don't
+yet merge into bigger stacks.
 
 Known "features":
  - The strenth of gravity is independent of the world.

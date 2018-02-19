@@ -5,14 +5,17 @@
 #include "Item.hh"
 
 class DroppedItem: public movable::Movable {
+public:
     Item *item;
 
-public:
     DroppedItem(Item *item, int x, int y, int worldWidth);
     ~DroppedItem();
 
     /* Render itself. */
     virtual void render(const Rect &camera);
+
+    /* Merge with another stack. */
+    virtual void merge(DroppedItem *item);
 };
 
 #endif

@@ -65,7 +65,11 @@ public:
     // Use the item held or selected
     void useAction(InputType type, int x, int y, World &world);
 
+    // Update self, including statbars (so changes to stats actually render).
     void update();
+
+    // Try to pick up an item
+    virtual void pickup(DroppedItem *item);
 };
 
 #endif

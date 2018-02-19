@@ -341,7 +341,7 @@ public:
     std::vector<Tile *> getPointers() const;
 
     /* Update the map. */
-    void update(std::vector<movable::Movable*> &movables);
+    void update();
 
     /* Damage a tile (with a pickax or something). Return false if there
     was no tile to damage. */

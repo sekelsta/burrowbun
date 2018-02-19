@@ -42,9 +42,6 @@ class Boulder: public Tile {
     more? */
     bool isSliding;
 
-    /* If someone stands on it while it moves, does it bring them? */
-    bool carriesMovables;
-
     /* Convert a vector<int> to a vector<TileType> */
     static std::set<TileType> vectorConvert(const std::vector<int> &input);
 
@@ -54,12 +51,7 @@ class Boulder: public Tile {
 
     /* Try to move one tile. Return true on success. */
     bool move(Map &map, const Location &place, int direction, 
-            std::vector<movable::Movable*> &movables, 
             std::vector<DroppedItem*> &items);
-
-    /* Find which movables are on top and tell them to move. */
-    void carryMovables(const Map &map, const Rect &boulderRect, 
-            int direction, std::vector<movable::Movable*> &movables) const;
 
     bool canUpdate(const Map &map, const Location &place, 
             int direction) const;
@@ -75,8 +67,7 @@ public:
     /* Look at the map and move, bringing movables along if required. 
     Return false if it didn't move and should therefore be removed from any
     lists of boulders to try to move. */
-    virtual bool update(Map &map, Location place, 
-            std::vector<movable::Movable*> &movables, 
+    virtual bool update(Map &map, Location place,  
             std::vector<DroppedItem*> &items, 
             int tick);
 

@@ -1,5 +1,6 @@
 #include "Entity.hh"
 #include "filepaths.hh"
+#include "DroppedItem.hh"
 
 using json = nlohmann::json;
 
@@ -17,6 +18,7 @@ Entity::Entity(std::string filename, std::string path)
     invincibilityTime = j["invincibilityTime"];
     invincibilityLeft = 0;
     isFacingRight = true;
+    hasInventory = false; // A child class with an inventory should set this
     sprites = j["sprites"].get<std::vector<Sprite>>();
     /* The rect starts as size of the correct sprite. */
     rect = sprites[isFacingRight].getRect();
@@ -135,6 +137,8 @@ void Entity::render(const Rect &camera) {
     // TODO: check whether it's actually anywhere near the screen
     drawSprite -> render(rectTo);
 }
+
+void Entity::pickup(DroppedItem *item) {}
 
 /* Make an entity from a json. */
 void from_json(const json &j, Entity &entity) {

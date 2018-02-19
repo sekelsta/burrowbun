@@ -56,8 +56,8 @@ public:
     // Put the item in the slot, if possible. If not possible, return false.
     Item *add(Item *item, int row, int col);
 
-    // Take an item and put it in the first empty slot of the inventory. Return
-    // false if there isn't room for it.
+    // Take an item and put it in the first empty slot of the inventory. Return 
+    // the item if it doesn't fit or NULL if it does.
     Item *pickup(Item *item);
 
     // Call this after changing x or y, puts clickboxes in the right place

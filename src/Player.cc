@@ -7,6 +7,7 @@
 #include <iostream>
 #include "json.hpp"
 #include "filepaths.hh"
+#include "DroppedItem.hh"
 
 using namespace std;
 using json = nlohmann::json;
@@ -14,6 +15,8 @@ using json = nlohmann::json;
 // Constructor
 Player::Player(string path) : Entity(path + "entities/bunny.json", path), 
         inventory(10, 6, path), trash(1, 1, path), hotbar(path) {
+    hasInventory = true;
+
     /* Open json file that contains info about the stat bars. */
     ifstream bar_infile(path + "UI/stat_bars.json");
     if (!bar_infile) {
@@ -161,3 +164,18 @@ void Player::update() {
     fullnessBar.update(fullness);
     manaBar.update(mana);
 }
+
+void Player::pickup(DroppedItem *item) {
+    // Pick it up if colliding with it
+    if (rect.intersects(item -> getRect())) {
+        item -> item = inventory.pickup(item -> item);
+    }
+}
+
+
+
+
+
+
+
+

@@ -120,8 +120,7 @@ public:
             const;
 
     /* Change the map in whatever way needs doing. */
-    virtual bool update(Map &map, Location place, 
-        std::vector<movable::Movable*> &movables, int tick);
+    virtual bool update(Map &map, Location place, int tick);
 
     // Constructor, based on the tile type
     Tile(TileType tileType, std::string path);

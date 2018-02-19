@@ -43,7 +43,6 @@ bool Boulder::fall(Map &map, const Location &place,
 
 /* Try to move one tile. Return true on success. */
 bool Boulder::move(Map &map, const Location &place, int direction,
-        std::vector<movable::Movable*> &movables, 
         std::vector<DroppedItem*> &items) {
     /* If it has no preference for direction, it should move sideways if
     that will let it fall. */
@@ -55,7 +54,7 @@ bool Boulder::move(Map &map, const Location &place, int direction,
         /* If it slides, pick a random direction (-1 or 1) to try to go. */
         int newDirection = (rand() % 2) * 2 - 1;
         assert(newDirection == -1 || newDirection == 1);
-        move(map, place, newDirection, movables, items);
+        move(map, place, newDirection, items);
         return true;
     }
 
@@ -70,33 +69,7 @@ bool Boulder::move(Map &map, const Location &place, int direction,
         return false;
     }
 
-    /* We moved, so we should see if we need to carry movables. */
-    if (carriesMovables) {
-        /* Find the movables that are within one block above, 
-        and add to their boulderSpeed. */
-        Rect boulderRect;
-        boulderRect.worldWidth = map.getWidth() * map.getTileWidth();
-        boulderRect.x = place.x * map.getTileWidth();
-        boulderRect.y = place.y * map.getTileHeight();
-        boulderRect.w = map.getTileWidth();
-        boulderRect.h = BOULDER_CARRY_HEIGHT * map.getTileHeight();
-        carryMovables(map, boulderRect, direction, movables);
-   }
-
     return true;
-}
-
-void Boulder::carryMovables(const Map &map, const Rect &boulderRect, 
-        int direction, std::vector<movable::Movable*> &movables) const {
-    Rect movableRect;
-    movableRect.worldWidth = boulderRect.worldWidth;
-    for (unsigned int i = 0; i < movables.size(); i++) {
-        movableRect = movables[i] -> getRect();
-        movableRect.worldWidth = boulderRect.worldWidth;
-        if (boulderRect.intersects(movableRect)) {
-            movables[i] -> boulderSpeed += direction * map.getTileWidth();
-        }
-    } 
 }
 
 bool Boulder::canUpdate(const Map &map, const Location &place, 
@@ -145,7 +118,6 @@ Boulder::Boulder(TileType type, string path) : Tile(type, path) {
     isMoving = j["isMoving"];
     isFloating = j["isFloating"];
     isSliding = j["isSliding"];
-    carriesMovables = j["carriesMovables"];
 }
 
 void Boulder::setDirection(Map &map, const Location &place, int direction)
@@ -161,11 +133,10 @@ void Boulder::setDirection(Map &map, const Location &place, int direction)
     map.setSprite(place, SpaceInfo::toSpritePlace(spritePlace)); 
 }
 
-/* Look at the map and move, bringing movables along if required. 
+/* Look at the map and move.
 Return false if it didn't move and should therefore be removed from any
 lists of boulders to try to move. */
 bool Boulder::update(Map &map, Location place, 
-        std::vector<movable::Movable*> &movables, 
         std::vector<DroppedItem*> &items, int tick) {
     /* If it can fall, it should. */
     if (fallTicks != 0 && (tick % fallTicks == 0) && !isFloating) {
@@ -179,7 +150,7 @@ bool Boulder::update(Map &map, Location place,
     /* If it hasn't fallen this update, and wants to move sideways, it should 
     do that. */
     if (moveTicks != 0 && (tick % moveTicks == 0)) {
-        return move(map, place, direction, movables, items);
+        return move(map, place, direction, items);
     }
     return true;
 }

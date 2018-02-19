@@ -540,12 +540,38 @@ void Collider::updateMovable(Map &map, movable::Movable *movable) {
 
 // A function to move and collide the movables
 // Note that this only ever resets distance fallen when it hits the ground.
-void Collider::update(Map &map, vector<movable::Movable *> &movables,
+void Collider::update(Map &map, vector<Entity *> &entities,
         vector<DroppedItem *> droppedItems) {
-    // TODO: Deal with dropped items
+    // Have entities with inventories pick up dropped items if they can
+    for (unsigned int i = 0; i < entities.size(); i++) {
+        // Make sure worldwith is updated correctly
+        entities[i] -> setWorldwidth(map.getWidth() * map.getTileWidth());
+
+        // Skip things that can't pick up items
+        if (!entities[i] -> getHasInventory()) {
+            continue;
+        }
+
+        // Check for each item
+        for (unsigned int j = 0; j < droppedItems.size(); j++) {
+            entities[i] -> pickup(droppedItems[i]);
+        }
+    }
+
+    // Have dropped items try to merge with each other
+    for (unsigned int i = 0; i < droppedItems.size(); i++) {
+        for (unsigned int j = i + 1; j < droppedItems.size(); j++) {
+            /* Merging in this order means the older item will still be at 
+            the front of the vector. */
+            droppedItems[j] -> merge(droppedItems[i]);
+        }
+    }
+
+    // TODO: collide entities and attackboxes
+
     // Update the velocity of everythingdelete
-    for (unsigned i = 0; i < movables.size(); i++) {
-        updateMovable(map, movables[i]);
+    for (unsigned i = 0; i < entities.size(); i++) {
+        updateMovable(map, (movable::Movable *)entities[i]);
     }
 
     for (unsigned i = 0; i < droppedItems.size(); i++) {

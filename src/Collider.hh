@@ -9,6 +9,7 @@
 #include "Movable.hh"
 #include "Rect.hh"
 #include "DroppedItem.hh"
+#include "Entity.hh"
 
 /* To be able to describe collisions better. */
 enum class CollisionType {
@@ -134,7 +135,7 @@ public:
 
     // A function that takes a map and a list of things and moves them, 
     // colliding when necessary
-    void update(Map &map, std::vector<movable::Movable *> &movables, 
+    void update(Map &map, std::vector<Entity *> &entities, 
         std::vector<DroppedItem *> droppedItems);
 };
 

@@ -438,8 +438,8 @@ void WindowHandler::update(World &world) {
         renderMap(world.map, camera);
 
         // Draw any movables
-        for (unsigned int i = 0; i < world.movables.size(); i++) {
-            world.movables[i] -> render(camera);
+        for (unsigned int i = 0; i < world.entities.size(); i++) {
+            world.entities[i] -> render(camera);
         }
         for (unsigned int i = 0; i < world.droppedItems.size(); i++) {
             world.droppedItems[i] -> render(camera);

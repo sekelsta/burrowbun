@@ -30,4 +30,8 @@ void DroppedItem::render(const Rect &camera) {
     item -> sprite.render(to);
 }
 
+void DroppedItem::merge(DroppedItem *item) {
+    // TODO
+}
+
 
