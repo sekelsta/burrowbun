@@ -2,6 +2,7 @@
 #define TEXTURE_HH
 
 #include <SDL2/SDL.h>
+#include <SDL2/SDL_ttf.h>
 #include <string>
 #include <vector>
 #include "Light.hh"
@@ -23,10 +24,20 @@ class Texture {
 
     /* For keeping track of which textures have been loaded. */
     static std::vector<LoadedTexture> loaded;
-    
+
+    /* Render text to a texture, with proper wrapping, and an outline. */
+    SDL_Texture *getText(std::string text, std::string path, int size, 
+        int outline_size, Light color, Light outline_color, int wrap_length);
+
 public:
     /* Constructor from filename of the picture. */
     Texture(const std::string &name);
+
+    /* Constructor with text to display and font size.
+    By default renders white text with a black outline. */
+    Texture(std::string text, std::string path, int size, int wrap_length);
+    Texture(std::string text, std::string path, int size, int outline_size,
+        Light color, Light outline_color, int wrap_length);
 
     /* Constructor from all the parameters SDL_CreateTexture() needs (except
     the renderer, which is a global variable). */
@@ -50,21 +61,33 @@ public:
         }
     }
 
-    inline int getWidth() {
+    /* Render the whole image at normal size with the top-left corner at x, y */
+    inline void render(int x, int y) const {
+        if (texture) {
+            /* rectTo can have x or y less than 0, that just means it'll
+            be rendered a bit off the screen. */
+            SDL_Rect rectTo = {x, y, getWidth(), getHeight()};
+            assert(rectTo.w != 0);
+            assert(rectTo.h != 0);
+            SDL_RenderCopy(Renderer::renderer, texture, nullptr, &rectTo);
+        }
+    }
+
+    inline int getWidth() const {
         assert(texture);
         int width;
         SDL_QueryTexture(texture, nullptr, nullptr, &width, nullptr);
         return width;
     }
 
-    inline int getHeight() {
+    inline int getHeight() const {
         assert(texture);
         int height;
         SDL_QueryTexture(texture, nullptr, nullptr, nullptr, &height);
         return height;
     }
 
-    inline Uint32 getFormat() {
+    inline Uint32 getFormat() const {
         assert(texture);
         Uint32 format;
         SDL_QueryTexture(texture, &format, nullptr, nullptr, nullptr);

@@ -4,6 +4,8 @@
 #include <algorithm>
 #include "json.hpp"
 
+struct SDL_Color;
+
 /* A struct to store the color (rgb) and intensity of light. */
 struct Light {
     uint8_t r;
@@ -36,6 +38,9 @@ struct Light {
         g = g * intensity / 255;
         b = b * intensity / 255;
     }
+
+    /* Converts to an SDL_Rect. */
+    operator SDL_Color() const;
 };
 
 void from_json(const nlohmann::json &j, Light &light);

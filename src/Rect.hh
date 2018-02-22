@@ -26,7 +26,7 @@ public:
         w = other.w;
         h = other.h;
         /* SDL_Rect doesn't have a worldwidth, and whatever calls this will
-        likely not kknow the worldwidth maybe. */
+        likely not know the worldwidth maybe. */
     }
 
     /* Returns true if only adjustments in the y direction are needed to
@@ -89,6 +89,11 @@ public:
             return true;
         }
         return false;
+    }
+
+    /* Convert to an SDL_Rect. */
+    inline operator SDL_Rect() {
+        return {x, y, w, h};
     }
 };
 

@@ -1,6 +1,6 @@
 #include "World.hh"
 
-#define ITEM_LIMIT 3
+#define ITEM_LIMIT 400
 
 using namespace std;
 

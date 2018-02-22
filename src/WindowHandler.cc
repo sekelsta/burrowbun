@@ -2,6 +2,7 @@
 #include <iostream>
 #include <vector>
 #include <SDL2/SDL_image.h>
+#include <SDL2/SDL_ttf.h>
 #include "WindowHandler.hh"
 
 // Include things that were forward declared
@@ -347,6 +348,13 @@ void WindowHandler::init() {
                             + "SDL_image Error: " + IMG_GetError() + "\n";
                     throw message;
                 }
+
+                // Initialize font rendering
+                if (TTF_Init() < 0) {
+                    string message = (string)"SDL_ttf could not initialize. "
+                            + "SDL_ttf error: " + TTF_GetError() + "\n";
+                    throw message;
+                }
             }
         }
     }
@@ -463,5 +471,6 @@ void WindowHandler::close() {
 
     // Quit SDL subsystems
     IMG_Quit();
+    TTF_Quit();
     SDL_Quit();
 }

@@ -1,14 +1,9 @@
 Changes since last push:
- - Fixed bug in deleting Textures
- - Fixed memory leak
- - Changed window title to "Burrowbun"
+ - Added functions for text rendering
 
 Known "features":
  - The strenth of gravity is independent of the world.
  - Things that move multiple tiles per second won't collide as if they were moving in a straight line. The best way to solve this may be to not allow anything to move that fast, possibly via multiple updates between renderings.
- - The spawn point sometimes puts the player on top of dirt. Spawning should be changed so it destroys any tiles in the way.
- - You can place dirt on top of creatures, including yourself
- - Tiles have an opacity between 0 and 64, but right now it only matters whether it's zero or not.
  - If carried by a boulder with another boulder right behind you, the top
 boulder updates first and traps you.
  - Dirt and mud look very similar, and mud looks identical to humus
@@ -24,16 +19,20 @@ error.
 
 
 To do:
- - stacking items, throwing / picking up items
- - Trees!
+ - stacking items, throwing / picking up items, attracting items, merging items
+ - add menu
+ - multithreading so the window remains responsive while generating a map
+ - fix wierd disappearance bug
  - save and load the player
- - Make all public Map functions accept any x value
+ - Make all public Map functions accept any x value (might be done?)
  - remove Map.getForeground() and Map.getBackground()
-Still need to do:
-Collider, Entity, EventHandler, Hotbar, Inventory, MapHelpers, Movable, Player,
-Rect, Sprite, Tile, UIHelpers, WindowHandler, World
- - Change style (/* */ comments instead of // usually, and no repeated comments
-in both the .hh and .cc files)
- - Replace NULL with nullptr
+ - Make spawning destroy solid tiles at the spawn
+ - make it impossible to place solid blocks on top of creatures
+ - make light work properly with background walls and water
+ - add light sources other than the sky
+ - make collisions with semi-solid blocks slow the player down
+ - Trees!
+ - add actual liquids?
+ - make sprites for all tile types
 
 

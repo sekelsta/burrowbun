@@ -4,7 +4,7 @@ CXX = g++
 CXXFLAGS = -std=c++14 -Wall -D_GLIBCXX_DEBUG -D_LIBCXX_DEBUG_PEDANTIC -Og -g
 #CXXFLAGS = -std=c++14 -Wall -O3
 INCLUDE_FLAGS = -I/usr/include/libnoise -L/usr/lib 
-LINKER_FLAGS = -lSDL2 -lSDL2_image -lnoise
+LINKER_FLAGS = -lSDL2 -lSDL2_image -lSDL2_ttf -lnoise
 
 # what folders
 SRCDIR = src/
