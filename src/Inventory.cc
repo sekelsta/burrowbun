@@ -5,7 +5,7 @@
 
 using namespace std;
 
-void Inventory::updateSprite() {
+void Inventory::updateSprite(string path) {
     // Tell the renderer to draw to the texture
     sprite.texture -> SetRenderTarget();
 
@@ -37,6 +37,13 @@ void Inventory::updateSprite() {
                 rectTo.x = refRect.x + (refRect.w - rectTo.w) / 2;
                 rectTo.y = refRect.y + (refRect.h - rectTo.h) / 2;
                 item -> sprite.render(rectTo);
+
+                // Render the number of that item
+                Texture num(to_string(item->getStack()), path, 
+                    ITEMSTACK_FONT_SIZE, 0);
+                num.render(refRect.x + ITEMSTACK_FONT_BUFFER_X, 
+                    refRect.y - num.getHeight() + refRect.h 
+                    - ITEMSTACK_FONT_BUFFER_Y);
             }
             refRect.x += refRect.w;
         }
@@ -263,9 +270,9 @@ void Inventory::update(Action *&mouse) {
     }
 }
 
-void Inventory::render() {
+void Inventory::render(string path) {
     if (!isSpriteUpdated) {
-        updateSprite();
+        updateSprite(path);
     }
 
     /* Set the rect to draw to. */

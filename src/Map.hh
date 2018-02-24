@@ -48,9 +48,11 @@ class Map {
     spawn points later. */
     Location spawn;
 
+public:
     /* Path to the folder containing the executable. */
     std::string path;
 
+private:
     /* The tiles whose update function should be called. */
     std::set<Location> toUpdate;
 

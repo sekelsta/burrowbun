@@ -21,7 +21,7 @@ SDL_Texture *Texture::getText(string text, string path, int size,
     string fontfile = path + FONT_FILE_PATH + FONT_NAME;
     font = TTF_OpenFont(fontfile.c_str(), size);
     font_outline = TTF_OpenFont(fontfile.c_str(), size);
-    if (!font) {
+    if (!font || !font_outline) {
         string message = (string)"Failed to load font " + fontfile
             + ".\nSDL_ttf Error: " + TTF_GetError() + "\n";
         cerr << message;

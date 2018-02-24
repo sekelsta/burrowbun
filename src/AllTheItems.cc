@@ -15,7 +15,7 @@ using json = nlohmann::json;
 using namespace std;
 
 // Potion constructor
-Potion::Potion(ItemType type, string path) : Item(type, path) {
+Potion::Potion(ActionType type, string path) : Item(type, path) {
     /* Figure out which json file to use. */
     std::string filename = path + Item::getJsonFilename(type);
 
@@ -37,7 +37,7 @@ Potion::Potion(ItemType type, string path) : Item(type, path) {
 }
 
 // Add the potion amount to all the stats
-void Potion::use(InputType type, int x, int y, World &world) {
+bool Potion::use_internal(InputType type, int x, int y, World &world) {
     // Add the potion amount to the player, but only if the left mouse
     // button wqs pressed (not held, and not the right button).
     if (type == InputType::LEFT_BUTTON_PRESSED) {
@@ -51,14 +51,15 @@ void Potion::use(InputType type, int x, int y, World &world) {
         // Use useTime
         world.player.useTimeLeft = useTime;
     }
+    return true;
 }
 
 
 // Block constructor
-Block::Block(ItemType type, string path) : Item(type, path) {
+Block::Block(ActionType type, string path) : Item(type, path) {
     /* Make sure we should actually be a block. */
-    assert(ItemType::FIRST_BLOCK <= type);
-    assert(type <= ItemType::LAST_BLOCK);
+    assert(ActionType::FIRST_BLOCK <= type);
+    assert(type <= ActionType::LAST_BLOCK);
 
     /* Read in the json. */
     std::string filename = path + Item::getJsonFilename(type);
@@ -73,7 +74,7 @@ Block::Block(ItemType type, string path) : Item(type, path) {
     bonusReach = j["bonusReach"];
     
     /* (The json doesn't include the tiletype) */
-    if (type <= ItemType::LAST_PURE_BLOCK) {
+    if (type <= ActionType::LAST_PURE_BLOCK) {
         tileType = ItemMaker::itemToTile(type);
     }
     else {
@@ -121,17 +122,17 @@ MapLayer Block::getLayer(InputType type) {
 }
 
 // When used, place the tile
-void Block::use(InputType type, int x, int y, World &world) {
+bool Block::use_internal(InputType type, int x, int y, World &world) {
     // Only do anything if the tile is within range
     if (!canPlace(x, y, world.player, world.map)) {
-        return;
+        return false;
     }
 
     MapLayer layer = getLayer(type);
 
     /* Only do anything if it's a real layer. */
     if (layer == MapLayer::NONE) {
-        return;
+        return false;
     }
 
     /* If success is still false at the end, don't set the player's use
@@ -139,12 +140,13 @@ void Block::use(InputType type, int x, int y, World &world) {
     bool success = world.map.placeTile(
             world.map.getMapCoords(x, y, layer), tileType);
 
-    // If success, add the use time
+    // If success, add the use time.
     world.player.useTimeLeft += (int)success * useTime;
+    return success;
 }
 
 /* Pickaxe constructor. */
-Pickaxe::Pickaxe(ItemType type, string path) : Block(type, path) {
+Pickaxe::Pickaxe(ActionType type, string path) : Block(type, path) {
     /* Load the right json based on the type. */
     std::string filename = path + Item::getJsonFilename(type);
     std::ifstream infile(filename);
@@ -159,7 +161,7 @@ Pickaxe::Pickaxe(ItemType type, string path) : Block(type, path) {
 }
 
 /* Pickaxe use. */
-void Pickaxe::use(InputType type, int x, int y, World &world) {
+bool Pickaxe::use_internal(InputType type, int x, int y, World &world) {
     // Only do anything if the tile is within range
     if (canPlace(x, y, world.player, world.map)) {
         /* Which layer to damage. */
@@ -168,42 +170,45 @@ void Pickaxe::use(InputType type, int x, int y, World &world) {
                  blockDamage, world.droppedItems);
         // If success, add the use time
         world.player.useTimeLeft += (int)success * useTime;
+        return success;
     }
+    return false;
 }
 
-/* Turn an ItemType into the corresponding TileType. Requires that the 
-tileTypes and ItemTypes are listed in the same order in their enum classes. */
-TileType ItemMaker::itemToTile(ItemType itemType) {
+/* Turn an ActionType into the corresponding TileType. Requires that the 
+tileTypes and ActionTypes are listed in the same order in their enum classes. */
+TileType ItemMaker::itemToTile(ActionType type) {
+    assert(Action::isItem(type));
     /* The first and last tiletypes that are also items are dirt and 
     dark brick. */
     int firstTile = (int)TileType::FIRST_ITEMED_TILE;
     int lastTile = (int)TileType::LAST_TILE;
-    /* The first and last ItemTypes that are also tiles are dirt and 
+    /* The first and last ActionTypes that are also tiles are dirt and 
     dark brick as well. */
-    int firstItem = (int)ItemType::FIRST_BLOCK;
-    int lastItem = (int)ItemType::LAST_PURE_BLOCK;
+    int firstItem = (int)ActionType::FIRST_BLOCK;
+    int lastItem = (int)ActionType::LAST_PURE_BLOCK;
 
     assert(lastTile - firstTile == lastItem - firstItem);
-    assert(firstItem <= (int)itemType);
-    assert((int)itemType <= lastItem);
+    assert(firstItem <= (int)type);
+    assert((int)type <= lastItem);
 
     /* Now just convert. */
-    int answer = (int)itemType - firstItem + firstTile;
+    int answer = (int)type - firstItem + firstTile;
     assert(firstTile <= answer);
     assert(answer <= lastTile);
     return (TileType)answer;
 }
 
-/* Turn a TileType into the corresponding ItemType. */
-ItemType ItemMaker::tileToItem(TileType tileType) {
+/* Turn a TileType into the corresponding ActionType. */
+ActionType ItemMaker::tileToItem(TileType tileType) {
     /* The first and last tiletypes that are also items are dirt and 
     dark brick. */
     int firstTile = (int)TileType::FIRST_ITEMED_TILE;
     int lastTile = (int)TileType::LAST_TILE;
-    /* The first and last ItemTypes that are also tiles are dirt and 
+    /* The first and last ActionTypes that are also tiles are dirt and 
     dark brick as well. */
-    int firstItem = (int)ItemType::FIRST_BLOCK;
-    int lastItem = (int)ItemType::LAST_PURE_BLOCK;
+    int firstItem = (int)ActionType::FIRST_BLOCK;
+    int lastItem = (int)ActionType::LAST_PURE_BLOCK;
 
     assert(lastTile - firstTile == lastItem - firstItem);
     assert(firstTile <= (int)tileType);
@@ -213,11 +218,11 @@ ItemType ItemMaker::tileToItem(TileType tileType) {
     int answer = (int)tileType + firstItem - firstTile;
     assert(firstItem <= answer);
     assert(answer <= lastItem);
-    return (ItemType)answer;
+    return (ActionType)answer;
 }
 
 // Whether the type is in the vector
-bool ItemMaker::isIn(std::vector<ItemType> items, ItemType type) {
+bool ItemMaker::isIn(std::vector<ActionType> items, ActionType type) {
     for (unsigned int i = 0; i < items.size(); i++) {
         if (items[i] == type) {
             return true;
@@ -228,22 +233,22 @@ bool ItemMaker::isIn(std::vector<ItemType> items, ItemType type) {
 }
 
 // Take an item type and make the correct child class based on that
-Item *ItemMaker::makeItem(ItemType type, string path) {
+Item *ItemMaker::makeItem(ActionType type, string path) {
     // A list of all the item types that should be potions
-    std::vector<ItemType> potions;
-    potions.push_back(ItemType::HEALTH_POTION);
+    std::vector<ActionType> potions;
+    potions.push_back(ActionType::HEALTH_POTION);
 
     // If it's a potion, make a potion
     if (isIn(potions, type)) {
         return new Potion(type, path);
     }
     // If it's a block, make a block
-    else if ((int)ItemType::FIRST_BLOCK <= (int)type
-                && (int)type <= (int)ItemType::LAST_PURE_BLOCK) {
+    else if ((int)ActionType::FIRST_BLOCK <= (int)type
+                && (int)type <= (int)ActionType::LAST_PURE_BLOCK) {
         return new Block(type, path);
     }
     /* If it's a pickaxe, make a pickaxe. */
-    else if (type == ItemType::PICKAXE) {
+    else if (type == ActionType::PICKAXE) {
         return new Pickaxe(type, path);
     }
     // If it's not a subclass of item, than it's a plain old item

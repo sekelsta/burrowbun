@@ -4,72 +4,48 @@
 #include <string>
 #include "Action.hh"
 
-/* Class to enumerate the different types of items. */
-enum class ItemType {
-    /* NONE is just a nullptr instead of an actual object. */
-    DIRT,
-    TOPSOIL,
-    CLAY,
-    CALCAREOUS_OOZE,
-    SNOW,
-    ICE,
-    STONE,
-    GRANITE,
-    BASALT,
-    LIMESTONE,
-    MUDSTONE,
-    PERIDOTITE,
-    SANDSTONE,
-    RED_SANDSTONE,
-    PLATFORM,
-    LUMBER,
-    RED_BRICK,
-    GRAY_BRICK,
-    DARK_BRICK,
-    SAND,
-    MUD,
-    CLOUD,
-    BOULDER,
-    GLACIER,
-    PICKAXE,
 
-    /* Other things. */
-    MAPLE_LEAF,
-    HEALTH_POTION,   
-
-    FIRST_BLOCK = DIRT,
-    LAST_BLOCK = PICKAXE,
-    LAST_PURE_BLOCK = GLACIER,
-
-    FIRST_ITEM = DIRT,
-    LAST_ITEM = HEALTH_POTION
-};
 
 /* The thing inventories store. */
 class Item : public Action {
-    /* Which item it is. */
-    ItemType itemType;
-
+protected:
     /* How many can be in a stack in the same slot. */
     int maxStack;
 
+    /* How many are in this stack. */
+    int stack;
+
+    /* Whether it gets used up when used. */
+    bool consumable;
+
+    /* Virtual use function. Does nothing, returns false. */
+    virtual bool use_internal(InputType type, int x, int y, World &world);
+
 public:
     // Constructor
-    Item(ItemType type, std::string path);
+    Item(ActionType type, std::string path);
 
-    /* Virtual use function. Does nothing. */
-    virtual void use(InputType type, int x, int y, World &world);
+    /* Use function. Decreases number if consumable, and calls use_internal(). */
+    void use(InputType type, int x, int y, World &world);
 
     /* Destructor must be virtual. */
     virtual ~Item();
 
     /* Access functions. */
-    inline ItemType getType() {
-        return itemType;
+    inline int getStack() {
+        return stack;
     }
 
-    /* Get json filename from itemtype. */
-    static std::string getJsonFilename(ItemType type);
+    inline void setStack(int s) {
+        stack = s;
+    }
+
+    inline int isConsumable() {
+        return consumable;
+    }
+
+    /* Get json filename from ActionType. */
+    static std::string getJsonFilename(ActionType type);
 };
 
 #endif

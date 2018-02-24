@@ -11,5 +11,6 @@
 	"bonusReach": 0,
     "isItem": true,
 	"maxStack": 1,
-	"useTime": 8
+	"useTime": 8,
+    "consumable": true
 }

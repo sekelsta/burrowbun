@@ -1,5 +1,8 @@
 Changes since last push:
- - Added functions for text rendering
+ - Items now keep track of how many are in their stack and whether they're 
+consumed when used, but they don't yet vanish when stack size becomes 0
+ - Added sprites for calcareous ooze and ice
+ - Replaced ItemType with ActionType
 
 Known "features":
  - The strenth of gravity is independent of the world.
@@ -16,7 +19,8 @@ error.
  - The player can't jump when colliding with a wall.
  - All map rendering vanishes when the player goes too high
  - When colliding with the bottom of the map, position is set but velocity isn't
-
+ - Rendering text very quickly can result in failure to open the font. Can
+probably solve this by not opening and closing the font as often.
 
 To do:
  - stacking items, throwing / picking up items, attracting items, merging items

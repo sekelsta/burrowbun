@@ -14,7 +14,7 @@ class Inventory {
     std::vector<std::vector<Item*>> items;
 
     /* Have an up-to-date sprite. */
-    void updateSprite();
+    void updateSprite(std::string path);
 public:
     // Where the top left corner of the inventory is
     int x;
@@ -67,7 +67,7 @@ public:
     void update(Action *&mouse);
 
     /* Render itself. */
-    void render();
+    void render(std::string path);
 };
 
 #endif

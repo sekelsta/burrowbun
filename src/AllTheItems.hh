@@ -22,10 +22,10 @@ class Potion : public Item {
 
 public:
     // Constructor
-    Potion(ItemType type, std::string path);
+    Potion(ActionType type, std::string path);
 
     // What to do when used
-    void use(InputType type, int x, int y, World &world);
+    virtual bool use_internal(InputType type, int x, int y, World &world);
 };
 
 // Items that can be placed
@@ -45,13 +45,13 @@ protected:
 
 public:
     // Constructor
-    Block(ItemType type, std::string path);
+    Block(ActionType type, std::string path);
 
     /* Destructor must be virtual. */
     virtual ~Block();
 
     // What to do when used
-    virtual void use(InputType type, int x, int y, World &world);
+    virtual bool use_internal(InputType type, int x, int y, World &world);
 };
 
 /* Items that can damage blocks. */
@@ -60,28 +60,28 @@ class Pickaxe: public Block {
     int pickaxeTier;
 public:
     /* Constructor. */
-    Pickaxe(ItemType type, std::string path);
+    Pickaxe(ActionType type, std::string path);
 
     /* What to do when used. */
-    void use(InputType type, int x, int y, World &world);
+    virtual bool use_internal(InputType type, int x, int y, World &world);
 };
 
 // Function to make an item of the correct class given only an item type
 // Because everything deserves a namespace
 namespace ItemMaker {
-    /* Turn an ItemType into the corresponding TileType. Requires that the
-    itemTypes and TileTypes are listed in the same order in the 
+    /* Turn an ActionType into the corresponding TileType. Requires that the
+    ActionTypes and TileTypes are listed in the same order in the 
     enum class. */
-    TileType itemToTile(ItemType itemType);
+    TileType itemToTile(ActionType ActionType);
 
-    /* Turn a TileType into the corresponding ItemType. */
-    ItemType tileToItem(TileType tileType);
+    /* Turn a TileType into the corresponding ActionType. */
+    ActionType tileToItem(TileType tileType);
 
     // Whether the type is in the vector
-    bool isIn(std::vector<ItemType> items, ItemType type);
+    bool isIn(std::vector<ActionType> items, ActionType type);
 
     // Take an item type and make the correct child class based on that
-    Item *makeItem(ItemType type, std::string path);
+    Item *makeItem(ActionType type, std::string path);
 }
 
 

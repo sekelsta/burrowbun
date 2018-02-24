@@ -9,9 +9,13 @@ using json = nlohmann::json;
 
 using namespace std;
 
+bool Item::use_internal(InputType type, int x, int y, World &world) {
+    return false;
+}
+
 // Constructor
-Item::Item(ItemType type, string path) {
-    itemType = type;
+Item::Item(ActionType t, string path) {
+    type = t;
 
     /* Figure out which json file to use. */
     string filename = path + getJsonFilename(type);
@@ -26,104 +30,107 @@ Item::Item(ItemType type, string path) {
 
     /* Set each of the values equal to the json's values. */
     sprite = j["sprite"].get<Sprite>();
-    isItem = j["isItem"];
     maxStack = j["maxStack"];
     useTime = j["useTime"];
+    consumable = j["consumable"];
+    stack = 957;
     sprite.loadTexture(path + ICON_SPRITE_PATH);
 }
 
-/* Non-pure-virtual use function. Does nothing. */
-void Item::use(InputType type, int x, int y, World &world) {}
+void Item::use(InputType type, int x, int y, World &world) {
+    assert(stack > 0);
+    stack -= (int)isConsumable() * (int)use_internal(type, x, y, world);
+}
 
 Item::~Item() {}
 
-/* Get json filename from itemtype. */
-std::string Item::getJsonFilename(ItemType type) {
+/* Get json filename from ActionType. */
+std::string Item::getJsonFilename(ActionType type) {
     string filename;
     string prefix = "items/";
     string suffix = ".json";
 
     /* Actually set filename to the right value. */
     switch(type) {
-        case ItemType::DIRT:
+        case ActionType::DIRT:
             filename = "dirt";
             break;
-        case ItemType::TOPSOIL:
+        case ActionType::TOPSOIL:
             filename = "topsoil";
             break;
-        case ItemType::CLAY:
+        case ActionType::CLAY:
             filename = "clay";
             break;
-        case ItemType::CALCAREOUS_OOZE:
+        case ActionType::CALCAREOUS_OOZE:
             filename = "calcareous_ooze";
             break;
-        case ItemType::SNOW:
+        case ActionType::SNOW:
             filename = "snow";
             break;
-        case ItemType::ICE:
+        case ActionType::ICE:
             filename = "ice";
             break;
-        case ItemType::STONE:
+        case ActionType::STONE:
             filename = "stone";
             break;
-        case ItemType::GRANITE:
+        case ActionType::GRANITE:
             filename = "granite";
             break;
-        case ItemType::BASALT:
+        case ActionType::BASALT:
             filename = "basalt";
             break;
-        case ItemType::LIMESTONE:
+        case ActionType::LIMESTONE:
             filename = "limestone";
             break;
-        case ItemType::MUDSTONE:
+        case ActionType::MUDSTONE:
             filename = "mudstone";
             break;
-        case ItemType::PERIDOTITE:
+        case ActionType::PERIDOTITE:
             filename = "peridotite";
             break;
-        case ItemType::SANDSTONE:
+        case ActionType::SANDSTONE:
             filename = "sandstone";
             break;
-        case ItemType::RED_SANDSTONE:
+        case ActionType::RED_SANDSTONE:
             filename = "red_sandstone";
             break;
-        case ItemType::PLATFORM:
+        case ActionType::PLATFORM:
             filename = "platform";
             break;
-        case ItemType::LUMBER:
+        case ActionType::LUMBER:
             filename = "lumber";
             break;
-        case ItemType::RED_BRICK:
+        case ActionType::RED_BRICK:
             filename = "red_brick";
             break;
-        case ItemType::GRAY_BRICK:
+        case ActionType::GRAY_BRICK:
             filename = "gray_brick";
             break;
-        case ItemType::DARK_BRICK:
+        case ActionType::DARK_BRICK:
             filename = "dark_brick";
             break;
-        case ItemType::SAND:
+        case ActionType::SAND:
             filename = "sand";
             break;
-        case ItemType::MUD:
+        case ActionType::MUD:
             filename = "mud";
             break;
-        case ItemType::CLOUD:
+        case ActionType::CLOUD:
             filename = "cloud";
             break;
-        case ItemType::BOULDER:
+        case ActionType::BOULDER:
             filename = "boulder";
             break;
-        case ItemType::GLACIER:
+        case ActionType::GLACIER:
             filename = "glacier";
             break;
-        case ItemType::MAPLE_LEAF:
+        case ActionType::MAPLE_LEAF:
             filename = "maple_leaf";
             break;
-        case ItemType::HEALTH_POTION:
+        case ActionType::HEALTH_POTION:
             filename = "health_potion";
             break;
-        case ItemType::PICKAXE:
+        case ActionType::PICKAXE:
             filename = "pickaxe";
             break;
         default:

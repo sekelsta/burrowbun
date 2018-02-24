@@ -203,7 +203,7 @@ void WindowHandler::updateHotbarSprite(Hotbar &hotbar) {
     SDL_DestroyTexture(back);
 }
 
-void WindowHandler::renderUI(Player &player) {
+void WindowHandler::renderUI(Player &player, string path) {
     // Re-render the hotbar sprite if necessary
     if (!player.hotbar.isSpriteUpdated) {
         updateHotbarSprite(player.hotbar);
@@ -234,8 +234,8 @@ void WindowHandler::renderUI(Player &player) {
 
     // Render the inventory, if necessary
     if (player.isInventoryOpen) {
-        player.inventory.render();
-        player.trash.render();
+        player.inventory.render(path);
+        player.trash.render(path);
     }
 
     /* TODO: Note to self: when adding chests, make sure to not have infinite
@@ -454,7 +454,7 @@ void WindowHandler::update(World &world) {
         }
 
         // Draw the UI
-        renderUI(world.player);
+        renderUI(world.player, world.map.path);
 
         // Update the screen
         SDL_RenderPresent(Renderer::renderer);

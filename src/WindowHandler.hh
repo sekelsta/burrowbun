@@ -74,7 +74,7 @@ class WindowHandler {
     void updateHotbarSprite(Hotbar &hotbar);
 
     // Render everything UI
-    void renderUI(Player &player);
+    void renderUI(Player &player, std::string path);
 
     // Clean up and close SDL
     void close();

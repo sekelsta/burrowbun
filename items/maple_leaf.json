@@ -10,5 +10,6 @@
     },
     "isItem": true,
 	"maxStack": 1,
-	"useTime": 1
+	"useTime": 1,
+    "consumable": true
 }
