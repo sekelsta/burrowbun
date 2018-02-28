@@ -1,11 +1,6 @@
 Changes since last push:
- - hotbar now holds {Action*, bool isItem} rather than Action*
- - hotbar rendering functions are now in the hotbar class instead of the
-windowhandler class
- - removed toggling of hotbar because it seemed useless
- - adjusted hotbar position so both rows are accessable at once
- - made most hotbar fields private
-
+ - Inventory now properly updates sprite when items are used.
+ - Items now disappear when their stack size is 0
 
 Known "features":
  - The strenth of gravity is independent of the world.

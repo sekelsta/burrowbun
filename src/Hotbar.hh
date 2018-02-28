@@ -7,6 +7,8 @@
 #include <vector>
 #include <string>
 
+class Inventory;
+
 /* Helper struct. An action pointer and whether it's an item. If it is, then
 it should be removed if it can't be found in the inventory. */
 struct HotbarItem {
@@ -89,11 +91,19 @@ public:
     // Use mouse input, return true if the item should be put in the inventory
     bool update(Action *mouse);
 
+    /* Get rid of items that no longer exist. */
+    void update(Inventory &inv, Action *mouse);
+
     // Return the pointer to the selected action
     Action *getSelected();
 
     // Draw to the screen
     void render();
+
+    /* Set isSpriteUpdated to false. */
+    inline void touch() {
+        isSpriteUpdated = false;
+    }
 };
 
 #endif

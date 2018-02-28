@@ -66,8 +66,19 @@ public:
     // Use mouse input
     void update(Action *&mouse);
 
+    /* Delete any items with a stack of 0. */
+    void update();
+
     /* Render itself. */
     void render(std::string path);
+
+    /* Set isSpriteUpdated to false. */
+    inline void touch() {
+        isSpriteUpdated = false;
+    }
+
+    /* Return true if the item is in the inventory. */
+    bool contains(Item *item);
 };
 
 #endif

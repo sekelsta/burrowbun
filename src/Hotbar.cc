@@ -1,6 +1,7 @@
 #include <iostream>
 #include "Hotbar.hh"
 #include "filepaths.hh"
+#include "Inventory.hh"
 
 // The number of slots in the hotbar
 
@@ -255,6 +256,17 @@ bool Hotbar::update(Action *mouse) {
         }
     }
     return answer;
+}
+
+
+void Hotbar::update(Inventory &inv, Action *mouse) {
+    for (unsigned int i = 0; i < actions.size(); i++) {
+        if (actions[i].isItem && !inv.contains((Item*)actions[i].action)
+                && actions[i].action != mouse) {
+            actions[i] = {nullptr, false};
+            isSpriteUpdated = false;
+        }
+    } 
 }
 
 // Return the selected action

@@ -270,6 +270,18 @@ void Inventory::update(Action *&mouse) {
     }
 }
 
+void Inventory::update() {
+    for (unsigned int i = 0; i < items.size(); i++) {
+        for (unsigned int j = 0; j < items[i].size(); j++) {
+            if (items[i][j] != nullptr && items[i][j] -> getStack() <= 0) {
+                delete items[i][j];
+                items[i][j] = nullptr;
+                touch();
+            }
+        }
+    }
+}
+
 void Inventory::render(string path) {
     if (!isSpriteUpdated) {
         updateSprite(path);
@@ -287,4 +299,15 @@ void Inventory::render(string path) {
     // And actually render
     sprite.render(rectTo);
 
+}
+
+bool Inventory::contains(Item *item) {
+    for (unsigned int i = 0; i < items.size(); i++) {
+        for (unsigned int j = 0; j < items[i].size(); j++) {
+            if (items[i][j] == item) {
+                return true;
+            }
+        }
+    }
+    return false;
 }

@@ -149,11 +149,22 @@ void Player::useAction(InputType type, int x, int y, World &world) {
         // Try to use the item held by the mouse
         if (mouseSlot != NULL) {
             mouseSlot -> use(type, x, y, world);
+            if (mouseSlot -> isItem && ((Item *)mouseSlot) -> getStack() <= 0) {
+                delete mouseSlot;
+                mouseSlot = nullptr;
+                hotbar.update(inventory, mouseSlot);
+            }
         }
         // Try to use the item in the selected hotbar slot
         else if (hotbar.getSelected() != NULL) {
             hotbar.getSelected() -> use(type, x, y, world);
+            /* Assume the item was consumable and tell the inventory to 
+            update. */
+            inventory.touch();
+            inventory.update();
+            hotbar.update(inventory, mouseSlot);
         }
+
     }
 }
 

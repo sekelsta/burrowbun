@@ -33,7 +33,7 @@ Item::Item(ActionType t, string path) {
     maxStack = j["maxStack"];
     useTime = j["useTime"];
     consumable = j["consumable"];
-    stack = 957;
+    stack = 7;
     sprite.loadTexture(path + ICON_SPRITE_PATH);
 }
 
