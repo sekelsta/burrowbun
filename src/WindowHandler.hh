@@ -63,16 +63,6 @@ class WindowHandler {
     // w and h are the width and height of the player sprite.
     Rect findCamera(int x, int y, int w, int h);
 
-    // Create a texture and render all the textures to it, using the spacing 
-    // variables from hotbar. The texture to is expected to have the correct 
-    // width and height, and the vector is expected to have length 12.
-    SDL_Texture *renderHotbarPart(const Hotbar &hotbar, 
-        std::vector<Sprite> textures, SDL_Texture *texture) const;
-
-    // Draw the entire hotbar sprite to a texture. This only needs to be called
-    // when the hotbar is first made, or when anything about it changes.
-    void updateHotbarSprite(Hotbar &hotbar);
-
     // Render everything UI
     void renderUI(Player &player, std::string path);
 

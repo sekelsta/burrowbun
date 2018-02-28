@@ -55,9 +55,9 @@ Player::Player(string path) : Entity(path + "entities/bunny.json", path),
     // already did.
 
     // Set the location of the inventory
-    inventory.x = hotbar.xStart;
+    inventory.x = hotbar.getX();
     // The position of the bottom of the hotbar
-    inventory.y = hotbar.yStart + hotbar.frame.getHeight() + hotbar.offsetDown;
+    inventory.y = hotbar.getY() + hotbar.getHeight();
     // The size of the gap between the hotbar and the inventory
     inventory.y += 16;
     trash.x = inventory.x;

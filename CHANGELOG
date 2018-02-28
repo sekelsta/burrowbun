@@ -1,8 +1,11 @@
 Changes since last push:
- - Items now keep track of how many are in their stack and whether they're 
-consumed when used, but they don't yet vanish when stack size becomes 0
- - Added sprites for calcareous ooze and ice
- - Replaced ItemType with ActionType
+ - hotbar now holds {Action*, bool isItem} rather than Action*
+ - hotbar rendering functions are now in the hotbar class instead of the
+windowhandler class
+ - removed toggling of hotbar because it seemed useless
+ - adjusted hotbar position so both rows are accessable at once
+ - made most hotbar fields private
+
 
 Known "features":
  - The strenth of gravity is independent of the world.

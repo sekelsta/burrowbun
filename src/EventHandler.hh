@@ -22,9 +22,6 @@ struct KeySettings {
     // Key to open the inventory and whatever opens along with it
     std::vector<SDL_Scancode> inventoryKeys;
 
-    // Key to toggle the hotbar
-    std::vector<SDL_Scancode> toggleHotbarKeys;
-
     // 24 keys to select a hotbar slot
     std::vector<SDL_Scancode> hotbarKeys;
 };
