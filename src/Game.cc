@@ -102,7 +102,7 @@ Game::Game(string p) : SCREEN_FPS(60), TICKS_PER_FRAME(1000 / SCREEN_FPS),
 
 void Game::run() {
     const string filename = "world.world";
-    //createWorld(filename, WorldType::EARTH);
+    createWorld(filename, WorldType::EARTH);
 
     play(filename);
 }
