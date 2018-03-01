@@ -1,6 +1,5 @@
 Changes since last push:
- - Texture now keeps a list of loaded fonts.
- - No longer crashes due to attempting to load fonts too quickly
+ - Items can now stack, but don't yet stack for all the cases where they should
 
 Known "features":
  - The strenth of gravity is independent of the world.
@@ -17,6 +16,9 @@ error.
  - The player can't jump when colliding with a wall.
  - All map rendering vanishes when the player goes too high
  - When colliding with the bottom of the map, position is set but velocity isn't
+ - Occasionally dropped items don't get picked up, even when they're colliding
+the player. This seems to happen more often when the player falls onto a 
+dropped item and there are other droppeditems nearby.
 
 To do:
  - stacking items, throwing / picking up items, attracting items, merging items

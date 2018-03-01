@@ -10,7 +10,7 @@
     },
 	"bonusReach": 0,
     "isItem": true,
-	"maxStack": 1,
+	"maxStack": 999,
 	"useTime": 8,
     "consumable": true
 }

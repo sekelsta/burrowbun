@@ -11,7 +11,7 @@ class Game {
     const uint32_t TICKS_PER_FRAME;
 
     /* The path to the folder containing the executable. */
-    std::string path;
+    static std::string path;
 
     WindowHandler window;
 
@@ -22,6 +22,11 @@ class Game {
 public:
     /* Constructor. Takes the path to the folder containing the executable. */
     Game(std::string p);
+
+    /* Get the path. */
+    static inline std::string getPath() {
+        return path;
+    }
 
     /* Do everything. */
     void run();

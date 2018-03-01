@@ -47,6 +47,11 @@ public:
     /* Render itself. */
     virtual void render(SDL_Rect &rect, std::string path);
 
+    /* Move n of the stack from other to this. n can be negative. 
+    If n is 0, merge as many as possible. Return the item for the other stack,
+    or nullptr if it was merged completely. */
+    Item *merge(Item *other, int n);
+
     /* Get json filename from ActionType. */
     static std::string getJsonFilename(ActionType type);
 };

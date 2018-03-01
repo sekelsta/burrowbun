@@ -169,24 +169,27 @@ Item *Inventory::add(Item *item, int row, int col) {
         return NULL;
     }
 
-    // If we're not adding an item, it's successful.
-    if (item == NULL) {
-        return NULL;
-    }
-
-    // If they're different types of items, then they definately don't stack
-    if (items[row][col] -> getType() != item -> getType()) {
-        return item;
-    }
-
-    // TODO: stack items if possible
-    return item;
-    
+    /* Otherwise, try to add it to whatever's in the slot. */
+    return items[row][col] -> merge(item, 0);   
 }
 
 // Take an item and put it in the first empty slot of the inventory. Return 
 // the item if it doesn't fit or NULL if it does.
 Item *Inventory::pickup(Item *item) {
+    /* Loop through the inventory looking for a stack to merge. */
+    for (int row = 0; row < getHeight(); row++) {
+        for (int col = 0; col < getWidth(); col++) {
+            // Return NULL if we can successfully add it to this spot
+            if (items[row][col]) {
+                item = items[row][col] -> merge(item, 0);
+            }
+            // If item is NULL now, then we're done.
+            if (item == NULL) {
+                return NULL;
+            }
+        }
+    }
+
     // Loop through the inventory looking for a space
     for (int row = 0; row < getHeight(); row++) {
         for (int col = 0; col < getWidth(); col++) {

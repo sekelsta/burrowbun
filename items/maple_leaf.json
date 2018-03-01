@@ -9,7 +9,7 @@
         "name": "maple_leaf.png"
     },
     "isItem": true,
-	"maxStack": 1,
+	"maxStack": 999,
 	"useTime": 1,
     "consumable": true
 }

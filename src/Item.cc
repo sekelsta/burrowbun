@@ -3,7 +3,10 @@
 #include "Item.hh"
 #include "json.hpp"
 #include "filepaths.hh"
+#include "AllTheItems.hh"
+#include "Game.hh"
 #include <SDL2/SDL.h>
+#include <algorithm>
 
 /* For convenience. */
 using json = nlohmann::json;
@@ -53,10 +56,44 @@ void Item::render(SDL_Rect &rect, std::string path) {
         w, h};
     /* Render sprite. */
     sprite.render(rectTo);
-    /* Render text. */
-    Texture num(to_string(getStack()), path, ITEMSTACK_FONT_SIZE, 0);
-    num.render(rect.x + ITEMSTACK_FONT_BUFFER_X, 
-        rect.y - num.getHeight() + rect.h - ITEMSTACK_FONT_BUFFER_Y);
+    /* Render text only if there's more than one in the stack. */
+    if (getStack() != 1) {
+        Texture num(to_string(getStack()), path, ITEMSTACK_FONT_SIZE, 0);
+        num.render(rect.x + ITEMSTACK_FONT_BUFFER_X, 
+            rect.y - num.getHeight() + rect.h - ITEMSTACK_FONT_BUFFER_Y);
+    }
+}
+
+Item *Item::merge(Item *other, int n) {
+    assert(other || n <= 0);
+    if (!n && !other) {
+        return nullptr;
+    }
+    if (!other) {
+        other = ItemMaker::makeItem(getType(), Game::getPath());
+    }
+    /* If they're different types, no merging can be done. */
+    if (other -> getType() != getType()) {
+        return other;
+    }
+    /* Merge in the other direction. */
+    if (n < 0) {
+        n = min(-1 * n, getStack());
+        assert(n >= 0);
+        other -> setStack(n);
+        stack -= n;
+        assert(stack >= 0);
+        return other;
+    }
+    /* If n is 0, merge the maximum possible amount. */
+    if (n == 0) {
+        n = maxStack - getStack();
+    }
+    assert(n >= 0);
+    n = min(n, other -> getStack());
+    stack = stack + n;
+    other -> setStack(other -> getStack() - n);
+    return other;
 }
 
 /* Get json filename from ActionType. */
