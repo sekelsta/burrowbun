@@ -1,5 +1,8 @@
 Changes since last push:
- - Items can now stack, but don't yet stack for all the cases where they should
+ - Fixed bug where only the oldest item could be picked up
+ - Stacks of dropped items now merge together when they intersect
+ - Fixed block icons - they were off by one pixel
+ - Right-clicking in invenotry now does stuff
 
 Known "features":
  - The strenth of gravity is independent of the world.

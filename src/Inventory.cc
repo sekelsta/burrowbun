@@ -49,6 +49,35 @@ void Inventory::updateSprite(string path) {
     SDL_SetRenderTarget(Renderer::renderer, NULL);
 }
 
+
+void Inventory::useMouse(Item *&mouse, int row, int col) {
+    /* Handle left clicks. */
+    if (clickBoxes[row][col].event.button == SDL_BUTTON_LEFT) {
+        // Switch the items
+        Item *temp = mouse;
+        mouse = items[row][col];
+        items[row][col] = temp;
+        /* Add the item being held to the stack, if possible and if 
+        there's an item in the slot. If there isn't an item in the
+        slot, we can assume the player was trying to pick up an item. */
+        if (items[row][col] != NULL) {
+            mouse = add(mouse, row, col);
+        }
+    }
+    else if (clickBoxes[row][col].event.button == SDL_BUTTON_RIGHT) {
+        /* On right clicks, if holding an item set down one, otherwise pick
+        up half the stack. */
+        if (mouse) {
+            items[row][col] = mouse->merge(items[row][col], -1);
+        }
+        else {
+            int n = items[row][col]->getStack();
+            mouse = items[row][col]->merge(mouse, n / 2 - n);
+        }
+    
+    }
+}
+
 // Constructor
 Inventory::Inventory(int cols, int rows, string path) {
     // Initialize the location
@@ -238,26 +267,17 @@ void Inventory::update(Action *&mouse) {
                     && clickBoxes[row][col].event.type == SDL_MOUSEBUTTONDOWN) {
                 // Now we've used the input for this clickBox
                 clickBoxes[row][col].wasClicked = false;
-                // If the mouse is holding something but it's not an item,
-                // ignore it
+                /* If the mouse is holding something but it's not an item,
+                ignore it. */
                 if (mouse != NULL && !(mouse -> isItem)) {
                     // Abort
                     break;
                 }
-                // Now we don't have to worry that the mouse might be holding
-                // something that isn't an item
-                // TODO: quit assuming it was a left click
-                // Switch the items
-                isSpriteUpdated = false;
-                Item *item = (Item *)mouse;
-                mouse = items[row][col];
-                items[row][col] = item;
-                // Add the item being held to the stack, if possible and if 
-                // there's an item in the slot. If there isn't an item in the
-                // slot, we can assume the player was trying to pick up an item.
-                if (items[row][col] != NULL) {
-                    mouse = add((Item *)mouse, row, col);
-                }
+                /* Now if the mouse is holding anything it's definitely an 
+                item. */
+                touch();
+                Item **mouseitem = (Item **)&mouse;
+                useMouse(*mouseitem, row, col);
             }
         }
     }

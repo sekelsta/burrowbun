@@ -554,7 +554,7 @@ void Collider::update(Map &map, vector<Entity *> &entities,
 
         // Check for each item
         for (unsigned int j = 0; j < droppedItems.size(); j++) {
-            entities[i] -> pickup(droppedItems[i]);
+            entities[i] -> pickup(droppedItems[j]);
         }
     }
 

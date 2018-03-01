@@ -71,16 +71,19 @@ Item *Item::merge(Item *other, int n) {
     }
     if (!other) {
         other = ItemMaker::makeItem(getType(), Game::getPath());
+        other->setStack(0);
     }
     /* If they're different types, no merging can be done. */
     if (other -> getType() != getType()) {
         return other;
     }
+    assert(maxStack == other->maxStack);
     /* Merge in the other direction. */
     if (n < 0) {
         n = min(-1 * n, getStack());
+        n = min(n, maxStack - other->getStack());
         assert(n >= 0);
-        other -> setStack(n);
+        other->setStack(other->getStack() + n);
         stack -= n;
         assert(stack >= 0);
         return other;

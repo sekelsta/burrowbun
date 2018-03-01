@@ -30,8 +30,18 @@ void DroppedItem::render(const Rect &camera) {
     item -> sprite.render(to);
 }
 
-void DroppedItem::merge(DroppedItem *item) {
-    // TODO
+void DroppedItem::merge(DroppedItem *dropped) {
+    if (!item || !dropped->item) {
+        return;
+    }
+    if (rect.intersects(dropped->rect)) {
+        dropped->item = item->merge(dropped->item, 0);
+        /* Now if we don't have an item, delete it. */
+        if (item && item->getStack() == 0) {
+            delete item;
+            item = nullptr;
+        }
+    }
 }
 
 

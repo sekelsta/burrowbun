@@ -14,7 +14,7 @@ using json = nlohmann::json;
 
 // Constructor
 Player::Player(string path) : Entity(path + "entities/bunny.json", path), 
-        inventory(10, 6, path), trash(1, 1, path), hotbar(path) {
+        inventory(12, 6, path), trash(1, 1, path), hotbar(path) {
     hasInventory = true;
 
     /* Open json file that contains info about the stat bars. */

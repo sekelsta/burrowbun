@@ -33,6 +33,11 @@ public:
     // Whether the sprite is updated
     bool isSpriteUpdated;
 
+private:
+    /* Use mouse input on a given square. */
+    void useMouse(Item *&mouse, int row, int col);
+
+public:
     // Constructor, given the size
     Inventory(int cols, int rows, std::string path);
 
