@@ -149,11 +149,6 @@ void Player::useAction(InputType type, int x, int y, World &world) {
         // Try to use the item held by the mouse
         if (mouseSlot != NULL) {
             mouseSlot -> use(type, x, y, world);
-            if (mouseSlot -> isItem && ((Item *)mouseSlot) -> getStack() <= 0) {
-                delete mouseSlot;
-                mouseSlot = nullptr;
-                hotbar.update(inventory, mouseSlot);
-            }
         }
         // Try to use the item in the selected hotbar slot
         else if (hotbar.getSelected() != NULL) {
@@ -161,10 +156,10 @@ void Player::useAction(InputType type, int x, int y, World &world) {
             /* Assume the item was consumable and tell the inventory to 
             update. */
             inventory.touch();
-            inventory.update();
-            hotbar.update(inventory, mouseSlot);
         }
-
+        /* That thing could have been in the hotbar, so better update its
+        sprite. */
+        hotbar.touch();
     }
 }
 
@@ -174,6 +169,14 @@ void Player::update() {
     healthBar.update(health);
     fullnessBar.update(fullness);
     manaBar.update(mana);
+    /* Delete empty stacks in inventory and mouseSlot. */
+    inventory.update();
+    if (mouseSlot != nullptr && mouseSlot -> isItem 
+            && ((Item *)mouseSlot) -> getStack() <= 0) {
+        delete mouseSlot;
+        mouseSlot = nullptr;
+    }
+    hotbar.update(inventory, mouseSlot);
 }
 
 void Player::pickup(DroppedItem *item) {

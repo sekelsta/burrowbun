@@ -55,14 +55,13 @@ public: // This is public because it gets updated by EventHandler
 
 private:
     // Create a texture and render all the textures to it, using the spacing 
-    // variables from hotbar. The texture to is expected to have the correct 
-    // width and height, and the vector is expected to have length 12.
-    SDL_Texture *renderHotbarPart(std::vector<Sprite> textures, 
-        SDL_Texture *texture) const;
+    // variables from hotbar. Start is expected to be 0 or 12.
+    SDL_Texture *renderHotbarPart(int start, std::string path, 
+        SDL_Texture* texture) const;
 
     // Draw the entire hotbar sprite to a texture. This only needs to be called
     // when the hotbar is first made, or when anything about it changes.
-    void updateSprite();
+    void updateSprite(std::string path);
 
 public:
     // Constructor
@@ -98,7 +97,7 @@ public:
     Action *getSelected();
 
     // Draw to the screen
-    void render();
+    void render(std::string path);
 
     /* Set isSpriteUpdated to false. */
     inline void touch() {

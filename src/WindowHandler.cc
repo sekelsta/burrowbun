@@ -50,7 +50,7 @@ Rect WindowHandler::findCamera(int x, int y, int w, int h) {
 
 void WindowHandler::renderUI(Player &player, string path) {
     // Render the hotbar
-    player.hotbar.render();
+    player.hotbar.render(path);
 
     // Render the stat bars
     player.healthBar.y = screenHeight - player.healthBar.distFromBottom;
@@ -79,13 +79,13 @@ void WindowHandler::renderUI(Player &player, string path) {
         SDL_GetMouseState(&x, &y);
         // Make a rect to render to
         SDL_Rect rect;
-        rect.w = player.mouseSlot -> sprite.getWidth();
-        rect.h = player.mouseSlot -> sprite.getHeight();
+        rect.w = ACTION_SPRITE_SIZE;
+        rect.h = ACTION_SPRITE_SIZE;
         // Put it on the center of the mouse
         rect.x = x - (rect.w / 2);
         rect.y = y - (rect.h / 2);
         // Render
-        player.mouseSlot -> sprite.render(rect);
+        player.mouseSlot -> render(rect, path);
     }
 }
 

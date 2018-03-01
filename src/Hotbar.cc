@@ -10,11 +10,10 @@ using namespace std;
 // Render each texture from textures onto to, using the spacing variables
 // from hotbar. The texture to is expected to have the correct width and
 // height, and the vector is expected to have length 12. 
-SDL_Texture *Hotbar::renderHotbarPart(vector<Sprite> textures,
+SDL_Texture *Hotbar::renderHotbarPart(int start, string path, 
         SDL_Texture *texture) const {
-    assert(textures.size() == 12);
     // Make a texture if necessary
-    if (texture == NULL) {
+    if (texture == nullptr) {
         // Create texture to draw to
         // Get the width and height of the textures to render
         // This function assumes they are all the same
@@ -40,22 +39,25 @@ SDL_Texture *Hotbar::renderHotbarPart(vector<Sprite> textures,
     Renderer::setColorWhite();
 
     // Actually render
-    SDL_Rect rectTo;
-    rectTo.w = frame.getWidth();
-    rectTo.h = frame.getHeight();
-    SDL_Rect refRect = rectTo;
+    SDL_Rect refRect;
+    refRect.w = frame.getWidth();
+    refRect.h = frame.getHeight();
     // For each slot
-    for (int i = 0; i < 12; i++) {
+    for (int i = start; i < start + 12; i++) {
         // We know the clickboxes have the correct spacing, but the first one 
         // probably isn't at 0, 0. So we just correct for that.
-        refRect.x = clickBoxes[i].x - clickBoxes[0].x;
-        refRect.y = clickBoxes[i].y - clickBoxes[0].y;
-        // Put rectTo in the middle of refRect
-        rectTo.w = textures[i].getWidth();
-        rectTo.h = textures[i].getHeight();
-        rectTo.x = refRect.x + (refRect.w - rectTo.w) / 2;
-        rectTo.y = refRect.y + (refRect.h - rectTo.h) / 2;
-        textures[i].render(rectTo);
+        refRect.x = clickBoxes[i].x - clickBoxes[start].x;
+        refRect.y = clickBoxes[i].y - clickBoxes[start].y;
+        /* Render the item. */
+        if (actions[i].action != nullptr) {
+            actions[i].action -> render(refRect, path);
+        }
+        /* Render the frame. */
+        Sprite f = frame;
+        if (selected == i) {
+            f.rect.y += frame.getHeight();
+        }
+        f.render(refRect);
     }
 
     return texture;
@@ -63,7 +65,7 @@ SDL_Texture *Hotbar::renderHotbarPart(vector<Sprite> textures,
 
 // Draw the entire hotbar sprite to a texture. This only needs to be called 
 // when the hotbar is first made, or when anything about it changes.
-void Hotbar::updateSprite() {
+void Hotbar::updateSprite(string path) {
     /* Sprite will soon be updated. */
     isSpriteUpdated = true;
     // Make the texture to render the sprite of the hotbar to
@@ -77,7 +79,7 @@ void Hotbar::updateSprite() {
     Uint32 pixelFormat = SDL_PIXELFORMAT_ARGB8888;
     // Actually create the texture
     Texture *all;
-    if (sprite.texture == NULL) {
+    if (sprite.texture == nullptr) {
         all = new Texture(pixelFormat, SDL_TEXTUREACCESS_TARGET, width, height);
         // Set the sprite thing in the hotbar to the texture we just made
         sprite.texture.reset(all);
@@ -86,47 +88,9 @@ void Hotbar::updateSprite() {
         all = sprite.texture.get();
     }
 
-
-    // Fill a vector with frame images to render
-    // The frame to put around each sprite
-    vector<Sprite> frontFrames;
-    vector<Sprite> backFrames;
-    // The image of the item in the slot
-    vector<Sprite> frontSprites;
-    vector<Sprite> backSprites;
-    for (int i = 0; i < 12; i++) {
-        frontFrames.push_back(frame);
-        backFrames.push_back(frame);
-        // Use the other version if that key is selected
-        if (selected == i) {
-            frontFrames[i].rect.y += frame.getHeight();
-        }
-        else if (selected == i + 12) {
-            backFrames[i].rect.y += frame.getHeight();
-        }
-
-        // Add the Action sprites to their lists of textures, if there is one 
-        // in that slot.
-        if (actions[i].action != NULL) {
-            // Add a sprite to the front row
-            // Load the sprite if it doesn't have one
-            frontSprites.push_back(actions[i].action -> sprite);
-        }
-        else {
-            frontSprites.push_back(Sprite());
-        }
-        if (actions[i + 12].action != NULL) {
-            // Load the sprite if necessary
-            backSprites.push_back(actions[i + 12].action -> sprite);
-        }
-        else {
-            backSprites.push_back(Sprite());
-        }
-    }
-    SDL_Texture *front = renderHotbarPart(frontSprites, NULL);
-    front = renderHotbarPart(frontFrames, front);
-    SDL_Texture *back = renderHotbarPart(backSprites, NULL);
-    back = renderHotbarPart(backFrames, back);
+    /* Render */
+    SDL_Texture *front = renderHotbarPart(0, path, nullptr);
+    SDL_Texture *back = renderHotbarPart(12, path, nullptr);
 
     all -> SetRenderTarget();
     // Tell SDL to do transparency when it renders
@@ -274,10 +238,10 @@ Action *Hotbar::getSelected() {
     return actions[selected].action;
 }
 
-void Hotbar::render() {
+void Hotbar::render(string path) {
     // Re-render the sprite if necessary
     if (!isSpriteUpdated) {
-        updateSprite();
+        updateSprite(path);
     }
 
     // Make sure the renderer isn't rendering to a texture

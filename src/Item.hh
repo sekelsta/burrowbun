@@ -44,6 +44,9 @@ public:
         return consumable;
     }
 
+    /* Render itself. */
+    virtual void render(SDL_Rect &rect, std::string path);
+
     /* Get json filename from ActionType. */
     static std::string getJsonFilename(ActionType type);
 };

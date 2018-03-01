@@ -3,6 +3,7 @@
 #include "Item.hh"
 #include "json.hpp"
 #include "filepaths.hh"
+#include <SDL2/SDL.h>
 
 /* For convenience. */
 using json = nlohmann::json;
@@ -43,6 +44,20 @@ void Item::use(InputType type, int x, int y, World &world) {
 }
 
 Item::~Item() {}
+
+void Item::render(SDL_Rect &rect, std::string path) {
+    int w = sprite.getWidth();
+    int h = sprite.getHeight();
+    /* Center inside given rect. */
+    SDL_Rect rectTo = {rect.x + (rect.w - w) / 2, rect.y + (rect.h - h) / 2,
+        w, h};
+    /* Render sprite. */
+    sprite.render(rectTo);
+    /* Render text. */
+    Texture num(to_string(getStack()), path, ITEMSTACK_FONT_SIZE, 0);
+    num.render(rect.x + ITEMSTACK_FONT_BUFFER_X, 
+        rect.y - num.getHeight() + rect.h - ITEMSTACK_FONT_BUFFER_Y);
+}
 
 /* Get json filename from ActionType. */
 std::string Item::getJsonFilename(ActionType type) {

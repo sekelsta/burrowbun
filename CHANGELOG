@@ -1,6 +1,6 @@
 Changes since last push:
- - Inventory now properly updates sprite when items are used.
- - Items now disappear when their stack size is 0
+ - Items can now render themselves
+ - Mouse item and hotbar now render the number in the stack
 
 Known "features":
  - The strenth of gravity is independent of the world.

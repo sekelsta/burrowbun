@@ -31,19 +31,7 @@ void Inventory::updateSprite(string path) {
             // exists
             Item *item = getItem(row, col);
             if (item != NULL) {
-                // Center rectTo inside refRect
-                rectTo.w = item -> sprite.getWidth();
-                rectTo.h = item -> sprite.getHeight();
-                rectTo.x = refRect.x + (refRect.w - rectTo.w) / 2;
-                rectTo.y = refRect.y + (refRect.h - rectTo.h) / 2;
-                item -> sprite.render(rectTo);
-
-                // Render the number of that item
-                Texture num(to_string(item->getStack()), path, 
-                    ITEMSTACK_FONT_SIZE, 0);
-                num.render(refRect.x + ITEMSTACK_FONT_BUFFER_X, 
-                    refRect.y - num.getHeight() + refRect.h 
-                    - ITEMSTACK_FONT_BUFFER_Y);
+                item -> render(refRect, path);
             }
             refRect.x += refRect.w;
         }
@@ -89,8 +77,10 @@ Inventory::Inventory(int cols, int rows, string path) {
 
     // TODO: fix having hard-coded sprite info. 
     /* x, y, w, h, name */
-    squareSprite = Sprite(0, 0, 32, 32, "inventory.png");
-    frameSprite = Sprite(32, 0, 32, 32, "inventory.png");
+    squareSprite = Sprite(0, 0, ACTION_SPRITE_SIZE, ACTION_SPRITE_SIZE, 
+        "inventory.png");
+    frameSprite = Sprite(ACTION_SPRITE_SIZE, 0, ACTION_SPRITE_SIZE, 
+        ACTION_SPRITE_SIZE, "inventory.png");
 
     /* Assign the squareSprite a different color. */
     squareSprite.setColorMod(squareColor);

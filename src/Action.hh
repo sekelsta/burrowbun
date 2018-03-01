@@ -3,9 +3,12 @@
 
 #include "Sprite.hh"
 
+struct SDL_Rect;
+
 #define ITEMSTACK_FONT_SIZE 13
 #define ITEMSTACK_FONT_BUFFER_Y 2
 #define ITEMSTACK_FONT_BUFFER_X 3
+#define ACTION_SPRITE_SIZE 32
 
 /* Class to enumerate the different types of items. */
 enum class ActionType {
@@ -93,6 +96,8 @@ public:
         // TODO: change when adding skills
         return true;
     }
+
+    virtual void render(SDL_Rect &rect, std::string path) = 0;
 };
 
 
