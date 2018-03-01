@@ -9,26 +9,16 @@
 
 using namespace std;
 
-/* Declare static variable. */
+/* Declare static variables. */
 std::vector<LoadedTexture> Texture::loaded;
+std::vector<LoadedFont> Texture::fonts;
 
 
 SDL_Texture *Texture::getText(string text, string path, int size, 
         int outline_size, Light color, Light outline_color, int wrap_length) {
-    // Outline size of 1 seems to work fine for all font sizes. Can change this
-    // later if it turns out not to be.
-    TTF_Font *font, *font_outline;
-    string fontfile = path + FONT_FILE_PATH + FONT_NAME;
-    font = TTF_OpenFont(fontfile.c_str(), size);
-    font_outline = TTF_OpenFont(fontfile.c_str(), size);
-    if (!font || !font_outline) {
-        string message = (string)"Failed to load font " + fontfile
-            + ".\nSDL_ttf Error: " + TTF_GetError() + "\n";
-        cerr << message;
-        throw message;
-    }
-    TTF_SetFontOutline(font_outline, outline_size);
-
+    TTF_Font *font = getFont(FONT_NAME, size, 0, path);
+    TTF_Font *font_outline = getFont(FONT_NAME, size, outline_size, path);
+    
     // Render text surface
     SDL_Surface *bg_surface = nullptr;
     SDL_Surface *fg_surface = nullptr;
@@ -62,6 +52,30 @@ SDL_Texture *Texture::getText(string text, string path, int size,
         bg_surface);
     SDL_FreeSurface(bg_surface);
     return answer;   
+}
+
+TTF_Font *Texture::getFont(string name, int size, int outline, string path) {
+    for (unsigned int i = 0; i < fonts.size(); i++) {
+        if (fonts[i].name == name && fonts[i].size == size 
+                && fonts[i].outline == outline) {
+            return fonts[i].font;
+        }
+    }
+    /* Font not found. Try loading one. */
+    string fontfile = path + FONT_FILE_PATH + name;
+    TTF_Font *font = TTF_OpenFont((fontfile).c_str(), size);
+    if (outline) {
+        TTF_SetFontOutline(font, outline);
+    }
+    if (!font) {
+        string message = (string)"Failed to load font " + fontfile
+            + ".\nSDL_ttf Error: " + TTF_GetError() + "\n";
+        cerr << message;
+        throw message;
+    }
+    
+    fonts.push_back({font, name, size, outline});
+    return font;
 }
 
 Texture::Texture(const std::string &name) {

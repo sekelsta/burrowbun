@@ -17,6 +17,13 @@ struct LoadedTexture {
     int count;
 };
 
+struct LoadedFont {
+    TTF_Font *font;
+    std::string name;
+    int size;
+    int outline; // nonzero iff font is an outline
+};
+
 /* A wrapper for SDL_Texture. Also avoids loading multiple copies of the same
 texture, and destroys textures when it's time. */
 class Texture {
@@ -25,9 +32,16 @@ class Texture {
     /* For keeping track of which textures have been loaded. */
     static std::vector<LoadedTexture> loaded;
 
+    /* For keeping track of which fonts have been loaded. */
+    static std::vector<LoadedFont> fonts;
+
     /* Render text to a texture, with proper wrapping, and an outline. */
     SDL_Texture *getText(std::string text, std::string path, int size, 
         int outline_size, Light color, Light outline_color, int wrap_length);
+
+    /* Return a font with the specified characteristics. */
+    TTF_Font *getFont(std::string name, int size, int outline, 
+        std::string path);
 
 public:
     /* Constructor from filename of the picture. */
@@ -109,6 +123,12 @@ public:
 
     inline void SetRenderTarget() {
         SDL_SetRenderTarget(Renderer::renderer, texture);
+    }
+
+    static inline void closeFonts() {
+        for (unsigned int i = 0; i < fonts.size(); i++) {
+            TTF_CloseFont(fonts[i].font);
+        }
     }
 
 };

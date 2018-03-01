@@ -19,6 +19,8 @@ int main(int argc, char **argv) {
 
     Game game(path);
     game.run();
+    // Clean up fonts
+    Texture::closeFonts();
     return 0;
 }
 
