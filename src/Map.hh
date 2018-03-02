@@ -343,7 +343,7 @@ public:
     std::vector<Tile *> getPointers() const;
 
     /* Update the map. */
-    void update();
+    void update(std::vector<DroppedItem*> &items);
 
     /* Damage a tile (with a pickax or something). Return false if there
     was no tile to damage. */

@@ -12,6 +12,7 @@
 class Map;
 struct Location;
 struct SDL_Rect;
+class DroppedItem;
 
 // A class for keeping track of which tiles there are
 enum class TileType : short {
@@ -120,7 +121,8 @@ public:
             const;
 
     /* Change the map in whatever way needs doing. */
-    virtual bool update(Map &map, Location place, int tick);
+    virtual bool update(Map &map, Location place,
+        std::vector<DroppedItem*> &items, int tick);
 
     // Constructor, based on the tile type
     Tile(TileType tileType, std::string path);

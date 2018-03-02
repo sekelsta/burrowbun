@@ -1,8 +1,5 @@
 Changes since last push:
- - Fixed bug where only the oldest item could be picked up
- - Stacks of dropped items now merge together when they intersect
- - Fixed block icons - they were off by one pixel
- - Right-clicking in invenotry now does stuff
+ - Fixed bug where Boulder::update was not being called
 
 Known "features":
  - The strenth of gravity is independent of the world.

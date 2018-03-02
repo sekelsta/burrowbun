@@ -531,7 +531,7 @@ vector<Tile *> Map::getPointers() const {
     return pointers;
 }
 
-void Map::update() {
+void Map::update(vector<DroppedItem*> &items) {
     /* Make sure we're updating tiles that need to be updated. */
     set<Location>::iterator removeIter = toUpdate.begin();
     while (removeIter != toUpdate.end()) {
@@ -548,7 +548,7 @@ void Map::update() {
     set<Location>::iterator iter = newUpdate.begin();
     while (iter != newUpdate.end()) {
         Tile *tile = getTile(*iter);
-        tile -> update(*this, *iter, tick);
+        tile -> update(*this, *iter, items, tick);
         iter++;
     }
 
@@ -615,9 +615,12 @@ bool Map::destroy(const TileHealth &health, vector<DroppedItem*> &items) {
 
 void Map::kill(int x, int y, MapLayer layer, vector<DroppedItem*> &items) {
     // Drop itself as an item
-    items.push_back(new DroppedItem ((ItemMaker::makeItem(
-        ItemMaker::tileToItem(getTileType(wrapX(x), y, layer)), path)), 
-        x * TILE_WIDTH, y * TILE_HEIGHT, width * TILE_WIDTH));
+    TileType type = getTileType(wrapX(x), y, layer);
+    if (type != TileType::EMPTY) {
+        items.push_back(new DroppedItem ((ItemMaker::makeItem(
+            ItemMaker::tileToItem(type), path)), 
+            x * TILE_WIDTH, y * TILE_HEIGHT, width * TILE_WIDTH));
+    }
 
     // Set the place it used to be to empty
     setTile(x, y, layer, TileType::EMPTY);

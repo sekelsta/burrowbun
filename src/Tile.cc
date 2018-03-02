@@ -8,6 +8,7 @@
 #include "json.hpp"
 #include "filepaths.hh"
 #include <SDL2/SDL.h>
+#include "DroppedItem.hh"
 
 // For convenience
 using json = nlohmann::json;
@@ -175,7 +176,8 @@ uint8_t Tile::updateSprite(Map &map, const Location &place) const {
 }
 
 /* Change the map in whatever way needs doing. */
-bool Tile::update(Map &map, Location place, int tick) {
+bool Tile::update(Map &map, Location place,
+        std::vector<DroppedItem*> &items, int tick) {
     return false;
 }
 
