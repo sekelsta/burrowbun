@@ -78,6 +78,29 @@ void Inventory::useMouse(Item *&mouse, int row, int col) {
     }
 }
 
+
+void Inventory::update_internal(Action *&mouse) {
+    for (int row = 0; row < getHeight(); row++) {
+        for (int col = 0; col < getWidth(); col++) {
+            // Ignore buttonup
+            if (clickBoxes[row][col].wasClicked && !clickBoxes[row][col].isHeld
+                    && clickBoxes[row][col].event.type == SDL_MOUSEBUTTONDOWN) {
+                /* If the mouse is holding something but it's not an item,
+                ignore it. */
+                if (mouse != NULL && !(mouse -> isItem())) {
+                    // Abort
+                    break;
+                }
+                /* Now if the mouse is holding anything it's definitely an 
+                item. */
+                touch();
+                Item **mouseitem = (Item **)&mouse;
+                useMouse(*mouseitem, row, col);
+            }
+        }
+    }
+}
+
 // Constructor
 Inventory::Inventory(int cols, int rows, string path) {
     // Initialize the location
@@ -206,12 +229,13 @@ Item *Inventory::add(Item *item, int row, int col) {
 // the item if it doesn't fit or NULL if it does.
 Item *Inventory::pickup(Item *item) {
     /* Loop through the inventory looking for a stack to merge. */
+    item = stack(item);
+
+    // Loop through the inventory looking for a space
     for (int row = 0; row < getHeight(); row++) {
         for (int col = 0; col < getWidth(); col++) {
             // Return NULL if we can successfully add it to this spot
-            if (items[row][col]) {
-                item = items[row][col] -> merge(item, 0);
-            }
+            item = add(item, row, col);
             // If item is NULL now, then we're done.
             if (item == NULL) {
                 return NULL;
@@ -219,11 +243,20 @@ Item *Inventory::pickup(Item *item) {
         }
     }
 
-    // Loop through the inventory looking for a space
+    // If we've looped through the whole inventory and not sucessfully added 
+    // it, then we can't.
+    return item;
+}
+
+
+Item *Inventory::stack(Item *item) {
+    /* Loop through the inventory looking for a stack to merge. */
     for (int row = 0; row < getHeight(); row++) {
         for (int col = 0; col < getWidth(); col++) {
             // Return NULL if we can successfully add it to this spot
-            item = add(item, row, col);
+            if (items[row][col]) {
+                item = items[row][col] -> merge(item, 0);
+            }
             // If item is NULL now, then we're done.
             if (item == NULL) {
                 return NULL;
@@ -258,29 +291,18 @@ void Inventory::updateClickBoxes() {
     }
 }
 
-// Use mouse input
-void Inventory::update(Action *&mouse) {
-    for (int row = 0; row < getHeight(); row++) {
-        for (int col = 0; col < getWidth(); col++) {
-            // Ignore buttonup
-            if (clickBoxes[row][col].wasClicked && !clickBoxes[row][col].isHeld
-                    && clickBoxes[row][col].event.type == SDL_MOUSEBUTTONDOWN) {
-                // Now we've used the input for this clickBox
-                clickBoxes[row][col].wasClicked = false;
-                /* If the mouse is holding something but it's not an item,
-                ignore it. */
-                if (mouse != NULL && !(mouse -> isItem)) {
-                    // Abort
-                    break;
-                }
-                /* Now if the mouse is holding anything it's definitely an 
-                item. */
-                touch();
-                Item **mouseitem = (Item **)&mouse;
-                useMouse(*mouseitem, row, col);
-            }
+void Inventory::resetClicks() {
+    for (unsigned int i = 0; i < clickBoxes.size(); i++) {
+        for (unsigned int j = 0; j < clickBoxes[i].size(); j++) {
+            clickBoxes[i][j].wasClicked = false;
         }
     }
+}
+
+// Use mouse input
+void Inventory::update(Action *&mouse) {
+    update_internal(mouse);
+    resetClicks();
 }
 
 void Inventory::update() {

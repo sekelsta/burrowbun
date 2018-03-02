@@ -178,7 +178,6 @@ bool Pickaxe::use_internal(InputType type, int x, int y, World &world) {
 /* Turn an ActionType into the corresponding TileType. Requires that the 
 tileTypes and ActionTypes are listed in the same order in their enum classes. */
 TileType ItemMaker::itemToTile(ActionType type) {
-    assert(Action::isItem(type));
     /* The first and last tiletypes that are also items are dirt and 
     dark brick. */
     int firstTile = (int)TileType::FIRST_ITEMED_TILE;

@@ -20,6 +20,7 @@ bool Item::use_internal(InputType type, int x, int y, World &world) {
 // Constructor
 Item::Item(ActionType t, string path) {
     type = t;
+    item = true;
 
     /* Figure out which json file to use. */
     string filename = path + getJsonFilename(type);

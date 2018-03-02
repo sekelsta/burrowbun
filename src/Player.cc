@@ -14,7 +14,7 @@ using json = nlohmann::json;
 
 // Constructor
 Player::Player(string path) : Entity(path + "entities/bunny.json", path), 
-        inventory(12, 6, path), trash(1, 1, path), hotbar(path) {
+        inventory(12, 5, path), trash(1, 1, path), hotbar(path) {
     hasInventory = true;
 
     /* Open json file that contains info about the stat bars. */
@@ -75,32 +75,32 @@ Player::Player(string path) : Entity(path + "entities/bunny.json", path),
     mouseSlot = NULL;
 
     // Have starting items
-    inventory.pickup(ItemMaker::makeItem(ActionType::HEALTH_POTION, path));
-    inventory.pickup(ItemMaker::makeItem(ActionType::DIRT, path));
-    inventory.pickup(ItemMaker::makeItem(ActionType::TOPSOIL, path));
-    inventory.pickup(ItemMaker::makeItem(ActionType::SAND, path));
-    inventory.pickup(ItemMaker::makeItem(ActionType::CLAY, path));
-    inventory.pickup(ItemMaker::makeItem(ActionType::CALCAREOUS_OOZE, path));
-    inventory.pickup(ItemMaker::makeItem(ActionType::SNOW, path));
-    inventory.pickup(ItemMaker::makeItem(ActionType::ICE, path));
-    inventory.pickup(ItemMaker::makeItem(ActionType::STONE, path));
-    inventory.pickup(ItemMaker::makeItem(ActionType::GRANITE, path));
-    inventory.pickup(ItemMaker::makeItem(ActionType::BASALT, path));
-    inventory.pickup(ItemMaker::makeItem(ActionType::LIMESTONE, path));
-    inventory.pickup(ItemMaker::makeItem(ActionType::MUDSTONE, path));
-    inventory.pickup(ItemMaker::makeItem(ActionType::PERIDOTITE, path));
-    inventory.pickup(ItemMaker::makeItem(ActionType::SANDSTONE, path));
-    inventory.pickup(ItemMaker::makeItem(ActionType::RED_SANDSTONE, path));
-    inventory.pickup(ItemMaker::makeItem(ActionType::PLATFORM, path));
-    inventory.pickup(ItemMaker::makeItem(ActionType::LUMBER, path));
-    inventory.pickup(ItemMaker::makeItem(ActionType::RED_BRICK, path));
-    inventory.pickup(ItemMaker::makeItem(ActionType::GRAY_BRICK, path));
-    inventory.pickup(ItemMaker::makeItem(ActionType::DARK_BRICK, path));
-    inventory.pickup(ItemMaker::makeItem(ActionType::MUD, path));
-    inventory.pickup(ItemMaker::makeItem(ActionType::CLOUD, path));
-    inventory.pickup(ItemMaker::makeItem(ActionType::BOULDER, path));
-    inventory.pickup(ItemMaker::makeItem(ActionType::GLACIER, path));
-    inventory.pickup(ItemMaker::makeItem(ActionType::PICKAXE, path));
+    pickup(ItemMaker::makeItem(ActionType::PICKAXE, path));
+    pickup(ItemMaker::makeItem(ActionType::HEALTH_POTION, path));
+    pickup(ItemMaker::makeItem(ActionType::DIRT, path));
+    pickup(ItemMaker::makeItem(ActionType::TOPSOIL, path));
+    pickup(ItemMaker::makeItem(ActionType::SAND, path));
+    pickup(ItemMaker::makeItem(ActionType::CLAY, path));
+    pickup(ItemMaker::makeItem(ActionType::CALCAREOUS_OOZE, path));
+    pickup(ItemMaker::makeItem(ActionType::SNOW, path));
+    pickup(ItemMaker::makeItem(ActionType::ICE, path));
+    pickup(ItemMaker::makeItem(ActionType::STONE, path));
+    pickup(ItemMaker::makeItem(ActionType::GRANITE, path));
+    pickup(ItemMaker::makeItem(ActionType::BASALT, path));
+    pickup(ItemMaker::makeItem(ActionType::LIMESTONE, path));
+    pickup(ItemMaker::makeItem(ActionType::MUDSTONE, path));
+    pickup(ItemMaker::makeItem(ActionType::PERIDOTITE, path));
+    pickup(ItemMaker::makeItem(ActionType::SANDSTONE, path));
+    pickup(ItemMaker::makeItem(ActionType::RED_SANDSTONE, path));
+    pickup(ItemMaker::makeItem(ActionType::PLATFORM, path));
+    pickup(ItemMaker::makeItem(ActionType::LUMBER, path));
+    pickup(ItemMaker::makeItem(ActionType::RED_BRICK, path));
+    pickup(ItemMaker::makeItem(ActionType::GRAY_BRICK, path));
+    pickup(ItemMaker::makeItem(ActionType::DARK_BRICK, path));
+    pickup(ItemMaker::makeItem(ActionType::MUD, path));
+    pickup(ItemMaker::makeItem(ActionType::CLOUD, path));
+    pickup(ItemMaker::makeItem(ActionType::BOULDER, path));
+    pickup(ItemMaker::makeItem(ActionType::GLACIER, path));
 
     isInventoryOpen = false;
 }
@@ -165,28 +165,43 @@ void Player::useAction(InputType type, int x, int y, World &world) {
 
 void Player::update() {
     Entity::update();
+    // Tick down the time until we can use items again
+    assert(useTimeLeft >= 0);
+    if (!canUse()) {
+        useTimeLeft--;
+    }
     /* Update the bars so changes to the stats will actually be displayed. */
     healthBar.update(health);
     fullnessBar.update(fullness);
     manaBar.update(mana);
     /* Delete empty stacks in inventory and mouseSlot. */
     inventory.update();
-    if (mouseSlot != nullptr && mouseSlot -> isItem 
+    trash.update();
+    // Update the inventories
+    inventory.update(mouseSlot);
+    trash.update(mouseSlot);
+    if (mouseSlot != nullptr && mouseSlot -> isItem() 
             && ((Item *)mouseSlot) -> getStack() <= 0) {
         delete mouseSlot;
         mouseSlot = nullptr;
     }
-    hotbar.update(inventory, mouseSlot);
+    hotbar.update(mouseSlot, isInventoryOpen);
+}
+
+Item *Player::pickup(Item *item) {
+    item = hotbar.stack(item);
+    item = inventory.stack(item);
+    item = hotbar.pickup(item);
+    item = inventory.pickup(item);
+    return item;
 }
 
 void Player::pickup(DroppedItem *item) {
     // Pick it up if colliding with it
     if (rect.intersects(item -> getRect())) {
-        item -> item = inventory.pickup(item -> item);
+        item -> item = pickup(item -> item);
     }
 }
-
-
 
 
 

@@ -339,7 +339,7 @@ Map::Map(string filename, int tileWidth, int tileHeight, string p) :
         cerr << "Warning: This map was written with version ";
         cerr << major << "." << minor << "." << patch << ", ";
         cerr << "but this software is version " << MAJOR << ".";
-        cerr << MINOR << "." << PATCH << "." << "The save format may";
+        cerr << MINOR << "." << PATCH << "." << " The save format may ";
         cerr << "have changed.\n";
     }
 

@@ -68,6 +68,8 @@ public:
     /* Update self, including statbars (so changes to stats actually render). */
     void update();
 
+    Item *pickup(Item *item);
+
     // Try to pick up an item
     virtual void pickup(DroppedItem *item);
 };

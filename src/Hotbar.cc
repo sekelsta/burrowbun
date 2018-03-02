@@ -1,7 +1,6 @@
 #include <iostream>
 #include "Hotbar.hh"
 #include "filepaths.hh"
-#include "Inventory.hh"
 
 // The number of slots in the hotbar
 
@@ -10,8 +9,9 @@ using namespace std;
 // Render each texture from textures onto to, using the spacing variables
 // from hotbar. The texture to is expected to have the correct width and
 // height, and the vector is expected to have length 12. 
-SDL_Texture *Hotbar::renderHotbarPart(int start, string path, 
+SDL_Texture *Hotbar::renderHotbarPart(int row, string path, 
         SDL_Texture *texture) const {
+    assert(row == 0 || row == 1);
     // Make a texture if necessary
     if (texture == nullptr) {
         // Create texture to draw to
@@ -43,18 +43,26 @@ SDL_Texture *Hotbar::renderHotbarPart(int start, string path,
     refRect.w = frame.getWidth();
     refRect.h = frame.getHeight();
     // For each slot
-    for (int i = start; i < start + 12; i++) {
+    for (int i = 0; i < 12; i++) {
         // We know the clickboxes have the correct spacing, but the first one 
         // probably isn't at 0, 0. So we just correct for that.
-        refRect.x = clickBoxes[i].x - clickBoxes[start].x;
-        refRect.y = clickBoxes[i].y - clickBoxes[start].y;
+        refRect.x = clickBoxes[row][i].x - clickBoxes[row][0].x;
+        refRect.y = clickBoxes[row][i].y - clickBoxes[row][0].y;
         /* Render the item. */
-        if (actions[i].action != nullptr) {
-            actions[i].action -> render(refRect, path);
+        // TODO
+        /*
+        if (actions[row][i]) {
+            actions[row][i] -> render(refRect, path);
         }
+        */
+        if (false) {}
+        else if (items[row][i]) {
+            items[row][i] -> render(refRect, path);
+        }
+
         /* Render the frame. */
         Sprite f = frame;
-        if (selected == i) {
+        if (selected == 12 * row + i) {
             f.rect.y += frame.getHeight();
         }
         f.render(refRect);
@@ -90,7 +98,7 @@ void Hotbar::updateSprite(string path) {
 
     /* Render */
     SDL_Texture *front = renderHotbarPart(0, path, nullptr);
-    SDL_Texture *back = renderHotbarPart(12, path, nullptr);
+    SDL_Texture *back = renderHotbarPart(1, path, nullptr);
 
     all -> SetRenderTarget();
     // Tell SDL to do transparency when it renders
@@ -121,7 +129,7 @@ void Hotbar::updateSprite(string path) {
 }
 
 // Constructor, which fills it with default values
-Hotbar::Hotbar(string path) {
+Hotbar::Hotbar(string path) : Inventory(12, 2, path) {
     // If you want to change these default settings, this is the place in the 
     // code to do it.
     smallGap = 4;
@@ -145,35 +153,36 @@ Hotbar::Hotbar(string path) {
 
     selected = 0;
 
-    clickBoxes.resize(24);
-
     int x = xStart + offsetRight;
     // For each section of four
     for (int i = 0; i < 3; i++) {
         for (int j = 0; j < 4; j++) {
             int index = 4 * i + j;
-            clickBoxes[index].x = x;
-            clickBoxes[index].y = yStart + offsetDown;
-            clickBoxes[index].w = frame.getWidth();
-            clickBoxes[index].h = frame.getHeight();
-            clickBoxes[index].wasClicked = false;
-            clickBoxes[index].containsMouse = false;
-            clickBoxes[index + 12].x = x - offsetRight;
-            clickBoxes[index + 12].y = yStart;
-            clickBoxes[index + 12].w = frame.getWidth();
-            clickBoxes[index + 12].h = frame.getHeight();
-            clickBoxes[index + 12].wasClicked = false;
-            clickBoxes[index + 12].containsMouse = false;
+            clickBoxes[0][index].x = x;
+            clickBoxes[0][index].y = yStart + offsetDown;
+            clickBoxes[0][index].w = frame.getWidth();
+            clickBoxes[0][index].h = frame.getHeight();
+            clickBoxes[0][index].wasClicked = false;
+            clickBoxes[0][index].containsMouse = false;
+            clickBoxes[1][index].x = x - offsetRight;
+            clickBoxes[1][index].y = yStart;
+            clickBoxes[1][index].w = frame.getWidth();
+            clickBoxes[1][index].h = frame.getHeight();
+            clickBoxes[1][index].wasClicked = false;
+            clickBoxes[1][index].containsMouse = false;
             x += frame.getWidth() + smallGap;
         }
         x += largeGap;
     }
 
     // Set every action * to NULL
+    // TODO
+    /*
     actions.resize(24);
     for (unsigned int i = 0; i < actions.size(); i++) {
         actions[i] = {NULL, false};
     }
+    */
 
     /* Load the frame's texture. */
     frame.loadTexture(path + UI_SPRITE_PATH);
@@ -189,53 +198,48 @@ void Hotbar::select(int slot) {
 
 // Use mouse input, return true if the item the mouse was holding should
 // be put in the inventory
-bool Hotbar::update(Action *mouse) {
-    bool answer = false;
-    for (unsigned int i = 0; i < clickBoxes.size(); i++) {
-        // Ignore mouse button up or mouse button held down
-        if (clickBoxes[i].wasClicked && !clickBoxes[i].isHeld
-                && clickBoxes[i].event.type == SDL_MOUSEBUTTONDOWN ) {
-            /* Select it if it wasn't already. */
-            select(i);
-            // See if we should put something in the slot
-            if (clickBoxes[i].event.button == SDL_BUTTON_LEFT
-                    && mouse != NULL) {
-                actions[i] = {mouse, mouse -> isItem};
-                // If it's an item, put it back in the inventory
-                if (mouse -> isItem) {
-                    answer = true;
+void Hotbar::update(Action *&mouse, bool isInvOpen) {
+    Inventory::update();
+    if (isInvOpen && (!mouse || mouse -> isItem())) {
+        Inventory::update_internal(mouse);
+    }
+    for (unsigned int row = 0; row < clickBoxes.size(); row++) {
+        for (unsigned int col = 0; col < clickBoxes[row].size(); col++) {
+            // Ignore mouse button up or mouse button held down
+            if (clickBoxes[row][col].wasClicked && !clickBoxes[row][col].isHeld
+                    && clickBoxes[row][col].event.type == SDL_MOUSEBUTTONDOWN ) {
+                /* Select it if it wasn't already. */
+                select(row * clickBoxes[row].size() + col);
+                // See if we should put something in the slot
+                if (clickBoxes[row][col].event.button == SDL_BUTTON_LEFT
+                        && mouse) {
+                    // TODO
+                    /* And now the sprite needs to change. */
+                    isSpriteUpdated = false;
                 }
-                /* And now the sprite needs to change. */
-                isSpriteUpdated = false;
+                // If it was a right click, we should remove that item from the
+                // hotbar.
+                else if (clickBoxes[row][col].event.button == SDL_BUTTON_RIGHT) {
+                    // TODO
+                    //actions[i].action == nullptr;
+                    /* And again the sprite needs to change. */
+                    isSpriteUpdated = false;
+                }
+                /* Now we've used this click. */
+                clickBoxes[row][col].wasClicked = false;
             }
-            // If it was a right click, we should remove that item from the
-            // hotbar.
-            else if (clickBoxes[i].event.button == SDL_BUTTON_RIGHT) {
-                actions[i] = {NULL, false};
-                /* And again the sprite needs to change. */
-                isSpriteUpdated = false;
-            }
-            /* Now we've used this click. */
-            clickBoxes[i].wasClicked = false;
         }
     }
-    return answer;
-}
-
-
-void Hotbar::update(Inventory &inv, Action *mouse) {
-    for (unsigned int i = 0; i < actions.size(); i++) {
-        if (actions[i].isItem && !inv.contains((Item*)actions[i].action)
-                && actions[i].action != mouse) {
-            actions[i] = {nullptr, false};
-            isSpriteUpdated = false;
-        }
-    } 
+    Inventory::resetClicks();
 }
 
 // Return the selected action
 Action *Hotbar::getSelected() {
+    // TODO
+    /*
     return actions[selected].action;
+    */
+    return items[selected / 12][selected % 12];
 }
 
 void Hotbar::render(string path) {

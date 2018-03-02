@@ -1,5 +1,7 @@
 Changes since last push:
- - Fixed bug where Boulder::update was not being called
+ - Hotbar is now basically a different inventory, rather than a link to items
+in the inventory. The plan is that when skills get added, they can be visible
+in the hotbar only when the inventory isn't open.
 
 Known "features":
  - The strenth of gravity is independent of the world.
@@ -16,12 +18,9 @@ error.
  - The player can't jump when colliding with a wall.
  - All map rendering vanishes when the player goes too high
  - When colliding with the bottom of the map, position is set but velocity isn't
- - Occasionally dropped items don't get picked up, even when they're colliding
-the player. This seems to happen more often when the player falls onto a 
-dropped item and there are other droppeditems nearby.
 
 To do:
- - stacking items, throwing / picking up items, attracting items, merging items
+ - throwing items, attracting items
  - add menu
  - multithreading so the window remains responsive while generating a map
  - fix wierd disappearance bug

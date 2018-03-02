@@ -10,6 +10,7 @@
 
 /* An inventory is basically just a thing that holds items. */
 class Inventory {
+protected:
     // For storing the list of items
     std::vector<std::vector<Item*>> items;
 
@@ -33,9 +34,13 @@ public:
     // Whether the sprite is updated
     bool isSpriteUpdated;
 
-private:
+protected:
     /* Use mouse input on a given square. */
     void useMouse(Item *&mouse, int row, int col);
+
+    /* Implementation of update, for use by child classes that don't want to
+    reset the clickboxes afterwards. */
+    void update_internal(Action *&mouse);
 
 public:
     // Constructor, given the size
@@ -43,14 +48,15 @@ public:
 
     /* Copy constructor. Don't use; all it does it assert false. If I ever
     think of any good reason why anyone would use a copy constructor of an
-    inventory, I'll write a proper one. */
+    inventory, and a way it could be implemented that won't make everything go 
+    horribly wrong, I'll write a proper one. */
     Inventory(const Inventory &toCopy);
 
     /* operator=. Also don't use, also just asserts false. */
     Inventory &operator=(const Inventory &toCopy);
 
     // Destructor
-    ~Inventory();
+    virtual ~Inventory();
 
     // Access functions
     int getWidth() const;
@@ -65,17 +71,24 @@ public:
     // the item if it doesn't fit or NULL if it does.
     Item *pickup(Item *item);
 
+    /* Take an item and add it to an existing stack, without putting it in an 
+    empty space. Return whatever we can't add. */
+    Item *stack(Item *item);
+
     // Call this after changing x or y, puts clickboxes in the right place
     void updateClickBoxes();
 
+    /* Set wasClicked to false for all clickboxes. */
+    void resetClicks();
+
     // Use mouse input
-    void update(Action *&mouse);
+    virtual void update(Action *&mouse);
 
     /* Delete any items with a stack of 0. */
     void update();
 
     /* Render itself. */
-    void render(std::string path);
+    virtual void render(std::string path);
 
     /* Set isSpriteUpdated to false. */
     inline void touch() {

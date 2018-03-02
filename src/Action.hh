@@ -72,11 +72,14 @@ protected:
     /* Which action it is. */
     ActionType type;
 
+    /* Whether or not it's an item. */
+    bool item;
+
 public:
     // Virtual destructor
     inline virtual ~Action() {};
 
-    /* What sprite should be displayed in the hotbar. */
+    /* What sprite should be displayed in the hotbar or inventory. */
     Sprite sprite;
 
     /* Do the action, or use the item or skill. */
@@ -92,9 +95,8 @@ public:
         return type;
     }
 
-    static inline bool isItem(ActionType type) {
-        // TODO: change when adding skills
-        return true;
+    inline bool isItem() {
+        return item;
     }
 
     virtual void render(SDL_Rect &rect, std::string path) = 0;

@@ -222,7 +222,7 @@ void EventHandler::useMouse(Player &player, World &world) {
     bool isMouseUsed;
 
     // Tell the hotbar and inventories whether they were clicked
-    isMouseUsed = updateMouseBoxes(player.hotbar.clickBoxes);
+    isMouseUsed = updateInventoryClickBoxes(player.hotbar);
     // Only send the inventory clicks if it's open
     if (player.isInventoryOpen) {
         // Update the inventory clickboxes and set isMosueUsed to true if
@@ -319,26 +319,7 @@ void EventHandler::updateKeys(const Uint8 *state) {
 
 // Change the player's acceleration
 void EventHandler::updatePlayer(Player &player) {
-    // Tick down the time until the player can use items again
-    assert(player.useTimeLeft >= 0);
-    if (!player.canUse()) {
-        player.useTimeLeft--;
-    }
-    // Update the player's inventories
-    player.inventory.update(player.mouseSlot);
-    player.trash.update(player.mouseSlot);
-    // Update the player's hotbar
-    // Put the item in the inventory if we should
-    if (player.hotbar.update(player.mouseSlot) && player.mouseSlot != NULL) {
-        // If we can successfully put the item in the inventory, have the mouse
-        // stop holding it.
-        assert(player.mouseSlot -> isItem);
-        Item *mouseItem = (Item *)player.mouseSlot;
-        // Try to put the item in the inventory
-        player.mouseSlot = player.inventory.pickup(mouseItem);
-    }
-
-    // and update the player's accelleration
+    // update the player's accelleration
     movable::Point newAccel;
     newAccel.x = 0;
     newAccel.y = 0;
