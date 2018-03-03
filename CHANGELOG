@@ -1,6 +1,6 @@
 Changes since last push:
- - Added slightly transparent background to hotbar slots that are holding an 
-item.
+ - Fixed bug where stack of 0 items would briefly flash on the hotbar while 
+picking up an item
 
 Known "features":
  - The strenth of gravity is independent of the world.

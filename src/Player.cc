@@ -174,9 +174,10 @@ void Player::update() {
     healthBar.update(health);
     fullnessBar.update(fullness);
     manaBar.update(mana);
-    /* Delete empty stacks in inventory and mouseSlot. */
+    /* Delete empty stacks in inventories and mouseSlot. */
     inventory.update();
     trash.update();
+    hotbar.Inventory::update();
     // Update the inventories
     inventory.update(mouseSlot);
     trash.update(mouseSlot);
@@ -191,8 +192,14 @@ void Player::update() {
 Item *Player::pickup(Item *item) {
     item = hotbar.stack(item);
     item = inventory.stack(item);
-    item = hotbar.pickup(item);
-    item = inventory.pickup(item);
+    if (item && item->getStack()) {
+        item = hotbar.pickup(item);
+        item = inventory.pickup(item);
+    }
+    else {
+        delete item;
+        item = nullptr;
+    }
     return item;
 }
 
