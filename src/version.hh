@@ -4,6 +4,6 @@
 /* Keep track of the version. */
 #define MAJOR 0
 #define MINOR 8
-#define PATCH 0
+#define PATCH 1
 
 #endif

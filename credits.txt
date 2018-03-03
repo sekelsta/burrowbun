@@ -46,5 +46,8 @@ Some of the tiles (lumber, red brick, gray brick, dark brick): user nkorth from 
 
 Leaf and potions and pickax: Open Game Art user Johann C (https://opengameart.org/content/svg-inventory-icons)
 
+Trash - Open Game Art user qubodup (https://opengameart.org/content/forum-
+controls), public domain, edited (changed color and format)
+
 I edited most of the art, mostly just to get it into the right format.
 All other art was drawn by me.

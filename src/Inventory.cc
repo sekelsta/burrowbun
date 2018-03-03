@@ -33,6 +33,13 @@ void Inventory::updateSprite(string path) {
             if (item != NULL) {
                 item -> render(refRect, path);
             }
+            else if (isTrash) {
+                int w = trashSprite.getWidth();
+                int h = trashSprite.getHeight();
+                SDL_Rect rectTo = {refRect.x + (refRect.w - w) / 2,
+                    refRect.y + (refRect.h - h) / 2, w, h};
+                trashSprite.render(rectTo);
+            }
             refRect.x += refRect.w;
         }
         refRect.x = 0;
@@ -55,7 +62,13 @@ void Inventory::useMouse(Item *&mouse, int row, int col) {
     if (clickBoxes[row][col].event.button == SDL_BUTTON_LEFT) {
         // Switch the items
         Item *temp = mouse;
-        mouse = items[row][col];
+        if (isTrash && mouse) {
+            delete items[row][col];
+            mouse = nullptr;
+        }
+        else {
+            mouse = items[row][col];
+        }
         items[row][col] = temp;
         /* Add the item being held to the stack, if possible and if 
         there's an item in the slot. If there isn't an item in the
@@ -70,7 +83,7 @@ void Inventory::useMouse(Item *&mouse, int row, int col) {
         if (mouse) {
             items[row][col] = mouse->merge(items[row][col], -1);
         }
-        else {
+        else if (items[row][col]) {
             int n = items[row][col]->getStack();
             mouse = items[row][col]->merge(mouse, n / 2 - n);
         }
@@ -101,8 +114,11 @@ void Inventory::update_internal(Action *&mouse) {
     }
 }
 
-// Constructor
-Inventory::Inventory(int cols, int rows, string path) {
+// Constructors
+Inventory::Inventory(int cols, int rows, string path) : 
+    Inventory(cols, rows, path, false) {}
+
+Inventory::Inventory(int cols, int rows, string path, bool trash) {
     // Initialize the location
     x = 0;
     y = 0;
@@ -133,13 +149,15 @@ Inventory::Inventory(int cols, int rows, string path) {
         "inventory.png");
     frameSprite = Sprite(ACTION_SPRITE_SIZE, 0, ACTION_SPRITE_SIZE, 
         ACTION_SPRITE_SIZE, "inventory.png");
-
-    /* Assign the squareSprite a different color. */
-    squareSprite.setColorMod(squareColor);
+    trashSprite = Sprite(0, 0, 16, 16, "trash.png");
 
     // And actually load it
     squareSprite.loadTexture(path + UI_SPRITE_PATH);
     frameSprite.loadTexture(path + UI_SPRITE_PATH);
+    trashSprite.loadTexture(path + UI_SPRITE_PATH);
+
+    /* Assign the squareSprite a different color. */
+    squareSprite.setColorMod(squareColor);
 
     /* Actually set the clickboxes to what they should be. */
     updateClickBoxes();    
@@ -154,6 +172,8 @@ Inventory::Inventory(int cols, int rows, string path) {
     sprite.rect.h = height;
     sprite.rect.x = 0;
     sprite.rect.y = 0;
+
+    isTrash = trash;
 }
 
 /* Copy constructor. Don't use, it just asserts false. If I ever think of a 

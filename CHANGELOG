@@ -1,7 +1,6 @@
 Changes since last push:
- - Hotbar is now basically a different inventory, rather than a link to items
-in the inventory. The plan is that when skills get added, they can be visible
-in the hotbar only when the inventory isn't open.
+ - Trash now has an icon
+ - Right-clicking on the inventory no longer crashes the game
 
 Known "features":
  - The strenth of gravity is independent of the world.

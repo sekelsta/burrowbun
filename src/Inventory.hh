@@ -11,11 +11,15 @@
 /* An inventory is basically just a thing that holds items. */
 class Inventory {
 protected:
+    /* Whether to destroy items or switch them. */
+    bool isTrash;
+
     // For storing the list of items
     std::vector<std::vector<Item*>> items;
 
     /* Have an up-to-date sprite. */
     void updateSprite(std::string path);
+
 public:
     // Where the top left corner of the inventory is
     int x;
@@ -24,17 +28,18 @@ public:
     // For storing information about where has been clicked
     std::vector<std::vector<MouseBox>> clickBoxes;
 
+protected:
     /* The sprite of the square to use for the background, which other than
     the color is the same for all inventories. */
     Sprite squareSprite;
     Sprite frameSprite;
+    Sprite trashSprite;
 
     // The sprite of all the things, put together
     Sprite sprite;
     // Whether the sprite is updated
     bool isSpriteUpdated;
 
-protected:
     /* Use mouse input on a given square. */
     void useMouse(Item *&mouse, int row, int col);
 
@@ -43,8 +48,9 @@ protected:
     void update_internal(Action *&mouse);
 
 public:
-    // Constructor, given the size
+    // Constructors
     Inventory(int cols, int rows, std::string path);
+    Inventory(int cols, int rows, std::string path, bool trash);
 
     /* Copy constructor. Don't use; all it does it assert false. If I ever
     think of any good reason why anyone would use a copy constructor of an
