@@ -1,9 +1,8 @@
 #include "Texture.hh"
 #include "filepaths.hh"
+#include "Game.hh"
 #include <SDL2/SDL_image.h>
 
-#define FONT_NAME "FreeMonoBold.ttf"
-#define DEFAULT_OUTLINE_SIZE 1
 #define DEFAULT_OUTLINE_COLOR {0x00, 0x00, 0x00, 0xFF}
 #define DEFAULT_TEXT_COLOR {0xFF, 0xFF, 0xFF, 0xFF}
 
@@ -16,8 +15,8 @@ std::vector<LoadedFont> Texture::fonts;
 
 SDL_Texture *Texture::getText(string text, string path, int size, 
         int outline_size, Light color, Light outline_color, int wrap_length) {
-    TTF_Font *font = getFont(FONT_NAME, size, 0, path);
-    TTF_Font *font_outline = getFont(FONT_NAME, size, outline_size, path);
+    TTF_Font *font = getFont(FONT_NAME, size, 0);
+    TTF_Font *font_outline = getFont(FONT_NAME, size, outline_size);
     
     // Render text surface
     SDL_Surface *bg_surface = nullptr;
@@ -54,7 +53,7 @@ SDL_Texture *Texture::getText(string text, string path, int size,
     return answer;   
 }
 
-TTF_Font *Texture::getFont(string name, int size, int outline, string path) {
+TTF_Font *Texture::getFont(string name, int size, int outline) {
     for (unsigned int i = 0; i < fonts.size(); i++) {
         if (fonts[i].name == name && fonts[i].size == size 
                 && fonts[i].outline == outline) {
@@ -62,7 +61,7 @@ TTF_Font *Texture::getFont(string name, int size, int outline, string path) {
         }
     }
     /* Font not found. Try loading one. */
-    string fontfile = path + FONT_FILE_PATH + name;
+    string fontfile = getPath() + FONT_FILE_PATH + name;
     TTF_Font *font = TTF_OpenFont((fontfile).c_str(), size);
     if (outline) {
         TTF_SetFontOutline(font, outline);
@@ -172,4 +171,10 @@ Texture::~Texture() {
     /* It wasn't in the list, so it should be destroyed. */
     SDL_DestroyTexture(texture);
 }
+
+string Texture::getPath() {
+    return Game::getPath();
+}
+
+
 

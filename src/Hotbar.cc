@@ -1,39 +1,22 @@
 #include <iostream>
 #include "Hotbar.hh"
 #include "filepaths.hh"
+#include "Texture.hh"
 
 // The number of slots in the hotbar
-
+#define KEYLABEL_FONT_SIZE 12
 using namespace std;
 
 // Render each texture from textures onto to, using the spacing variables
 // from hotbar. The texture to is expected to have the correct width and
 // height, and the vector is expected to have length 12. 
-SDL_Texture *Hotbar::renderHotbarPart(int row, string path, 
-        SDL_Texture *texture) const {
+Texture *Hotbar::renderHotbarPart(int row, string path, 
+        Texture *texture, int left, int up) const {
     assert(row == 0 || row == 1);
-    // Make a texture if necessary
-    if (texture == nullptr) {
-        // Create texture to draw to
-        // Get the width and height of the textures to render
-        // This function assumes they are all the same
-        int width = frame.getWidth();
-        int height = frame.getHeight();
-        int totalWidth = 12 * width + 12 * smallGap;
-        totalWidth += 2 * largeGap;
-        Uint32 pixelFormat = SDL_PIXELFORMAT_ARGB8888;
-        texture = SDL_CreateTexture(Renderer::renderer, pixelFormat, 
-        SDL_TEXTUREACCESS_TARGET, totalWidth, height);
-        // Make the new texture have a transparent background
-        SDL_SetRenderTarget(Renderer::renderer, texture);
-        SDL_SetTextureBlendMode(texture, SDL_BLENDMODE_BLEND);
-        SDL_SetRenderDrawColor(Renderer::renderer, 0, 0, 0 ,0);
-        SDL_RenderClear(Renderer::renderer);
-    }
 
     // Set render settings
-    SDL_SetRenderTarget(Renderer::renderer, texture);
-    SDL_SetTextureBlendMode(texture, SDL_BLENDMODE_BLEND);
+    texture -> SetRenderTarget();
+    texture -> SetTextureBlendMode(SDL_BLENDMODE_BLEND);
 
     // Set the draw color to white so it draws whatever it's drawing normally
     Renderer::setColorWhite();
@@ -46,8 +29,8 @@ SDL_Texture *Hotbar::renderHotbarPart(int row, string path,
     for (int i = 0; i < 12; i++) {
         // We know the clickboxes have the correct spacing, but the first one 
         // probably isn't at 0, 0. So we just correct for that.
-        refRect.x = clickBoxes[row][i].x - clickBoxes[row][0].x;
-        refRect.y = clickBoxes[row][i].y - clickBoxes[row][0].y;
+        refRect.x = clickBoxes[row][i].x - clickBoxes[1][0].x + left;
+        refRect.y = clickBoxes[row][i].y - clickBoxes[1][0].y + up;
         /* Render the item. */
         // TODO
         /*
@@ -76,12 +59,20 @@ SDL_Texture *Hotbar::renderHotbarPart(int row, string path,
 void Hotbar::updateSprite(string path) {
     /* Sprite will soon be updated. */
     isSpriteUpdated = true;
+
+    /* Labels, plus extra distance up to move the letters. */
+    int up = Texture::getTextHeight(KEYLABEL_FONT_SIZE, 
+        "F1", DEFAULT_OUTLINE_SIZE) / 2;
+    vector<vector<string>> labels = {
+        {"1", "2", "3", "4", "5", "6", "7", "8", "9", "0", "-", "="},
+        {"F1", "F2", "F3", "F4", "F5", "F6", "F7", "F8", "F9", "F10", 
+        "F11", "F12"}};
     // Make the texture to render the sprite of the hotbar to
     // Hardcoding 12 because I don't expect to change my mind (12 is the
     // number of F keys).
     int width = 12 * frame.getWidth() + 12 * smallGap;
-    width += 2 * largeGap + offsetRight;
-    int height = frame.getHeight() + offsetDown;
+    width += 2 * largeGap + offsetRight + up;
+    int height = frame.getHeight() + offsetDown + up;
     sprite.rect.w = width;
     sprite.rect.h = height;
     Uint32 pixelFormat = SDL_PIXELFORMAT_ARGB8888;
@@ -96,10 +87,6 @@ void Hotbar::updateSprite(string path) {
         all = sprite.texture.get();
     }
 
-    /* Render */
-    SDL_Texture *front = renderHotbarPart(0, path, nullptr);
-    SDL_Texture *back = renderHotbarPart(1, path, nullptr);
-
     all -> SetRenderTarget();
     // Tell SDL to do transparency when it renders
     all -> SetTextureBlendMode(SDL_BLENDMODE_BLEND);
@@ -108,31 +95,27 @@ void Hotbar::updateSprite(string path) {
     SDL_SetRenderDrawColor(Renderer::renderer, 0, 0, 0 ,0);
     SDL_RenderClear(Renderer::renderer);
 
-    // Actually render the sprite onto the texture
-    Renderer::setColorWhite();
-    // TODO: make the back layer slightly transparent
-    SDL_Rect rectTo;
-    rectTo.x = 0;
-    rectTo.y = 0;
-    rectTo.w = width - offsetRight;
-    rectTo.h = height - offsetDown;
-    // Render the back layer
-    SDL_RenderCopy(Renderer::renderer, back, NULL, &rectTo);
-    // Render the front layer
-    rectTo.x = offsetRight;
-    rectTo.y = offsetDown;
-    SDL_RenderCopy(Renderer::renderer, front, NULL, &rectTo);
+    /* Render */
+    renderHotbarPart(1, path, all, up, up);
+    renderHotbarPart(0, path, all, up, up);
 
-    // Not leak memory
-    SDL_DestroyTexture(front);
-    SDL_DestroyTexture(back);
+    /* Render the key / number labels. */
+    for (unsigned int i = 0; i < clickBoxes.size(); i++) {
+        for (unsigned int j = 0; j < clickBoxes[i].size(); j++) {
+            /* Render the label. */
+            Texture text(labels[i][j], path, KEYLABEL_FONT_SIZE, 0);
+            int x = clickBoxes[i][j].x - clickBoxes[1][0].x;
+            int y = clickBoxes[i][j].y - clickBoxes[1][0].y;
+            text.render(x, y);
+        }
+    }
 }
 
 // Constructor, which fills it with default values
 Hotbar::Hotbar(string path) : Inventory(12, 2, path) {
     // If you want to change these default settings, this is the place in the 
     // code to do it.
-    smallGap = 4;
+    smallGap = 8;
     largeGap = 16;
     offsetRight = 0;
     offsetDown = 36;

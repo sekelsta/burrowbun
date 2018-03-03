@@ -8,6 +8,9 @@
 #include "Light.hh"
 #include "Renderer.hh"
 
+#define FONT_NAME "FreeMonoBold.ttf"
+#define DEFAULT_OUTLINE_SIZE 1
+
 /* A struct for holding an SDL_Texture * and filename so that the same texture
 doesn't get loaded twice, as well as a count of how many Textures are using 
 it. */
@@ -40,8 +43,7 @@ class Texture {
         int outline_size, Light color, Light outline_color, int wrap_length);
 
     /* Return a font with the specified characteristics. */
-    TTF_Font *getFont(std::string name, int size, int outline, 
-        std::string path);
+    static TTF_Font *getFont(std::string name, int size, int outline);
 
 public:
     /* Constructor from filename of the picture. */
@@ -59,6 +61,9 @@ public:
 
     /* Destructor. */
     ~Texture();
+
+    /* Get the path to the executable. */
+    static std::string getPath();
 
     /* Render itself. */
     inline void render(const SDL_Rect &rectFrom, const SDL_Rect &rectTo) const {
@@ -106,6 +111,32 @@ public:
         Uint32 format;
         SDL_QueryTexture(texture, &format, nullptr, nullptr, nullptr);
         return format;
+    }
+
+private:
+    /* Wrapper for TTF_Size_Text. */
+    static inline void SizeText(int size, std::string s, int *w, int *h, 
+            int outline) {
+        int success = TTF_SizeText(getFont(FONT_NAME, size, outline), 
+            s.c_str(), w, h);
+        if (success != 0) {
+            std::string message = (std::string)"The font " + FONT_NAME 
+                + " does not have " + "a glyph in " + s + "\n";
+            std::cerr << message;
+            throw message;
+        }
+    }
+public:
+    static inline int getTextWidth(int size, std::string s, int outline) {
+        int w;
+        SizeText(size, s, &w, nullptr, outline);
+        return w;
+    }
+
+    static inline int getTextHeight(int size, std::string s, int outline) {
+        int h;
+        SizeText(size, s, nullptr, &h, outline);
+        return h;
     }
 
     /* Functions that mimic the SDL functions. */

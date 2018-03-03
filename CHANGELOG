@@ -1,6 +1,6 @@
 Changes since last push:
- - Trash now has an icon
- - Right-clicking on the inventory no longer crashes the game
+ - Refactored hotbar rendering
+ - Hotbar now renders a label for which key goes to which slot
 
 Known "features":
  - The strenth of gravity is independent of the world.
@@ -34,5 +34,7 @@ To do:
  - Trees!
  - add actual liquids?
  - make sprites for all tile types
+ - Refactor sprites so they load in their constructor (make path a global 
+variable?)
 
 
