@@ -14,6 +14,7 @@ protected:
     inline void render(const SDL_Rect &rectFrom, const SDL_Rect &rectTo) {
         if (hasTexture()) {
             texture -> SetTextureColorMod(color);
+            texture -> SetTextureAlphaMod(color.a);
             texture -> render(rectFrom, rectTo);
         }
         else {

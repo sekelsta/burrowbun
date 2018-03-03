@@ -152,6 +152,16 @@ public:
         }
     }
 
+    inline void SetTextureAlphaMod(Uint8 a) {
+        if (texture) {
+            int success = SDL_SetTextureAlphaMod(texture, a);
+            if (success < 0) {
+                std::cerr << "Warning: renderer does not support alpha "
+                        << "modulation.\n";
+            }
+        }
+    }
+
     inline void SetRenderTarget() {
         SDL_SetRenderTarget(Renderer::renderer, texture);
     }

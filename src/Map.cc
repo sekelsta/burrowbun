@@ -118,9 +118,9 @@ void Map::setLight(int x, int y) {
     place -> light.g = 0;
     place -> light.b = 0;
     int dist = skyDistance(x, y, 25);
-    /* Make sure skyIntensity is between 0 and 255. */
+    /* Make sure a is between 0 and 255. */
     double lightIntensity = min(1.0, exp((1 - dist) / 8.0));
-    place -> light.skyIntensity = 255 * max(0.0, lightIntensity);
+    place -> light.a = 255 * max(0.0, lightIntensity);
 
     place -> isLightUpdated = true;
 }
@@ -458,7 +458,7 @@ Light Map::getSkyColor(int x, int y) const {
     light.r = 255;
     light.g = 255;
     light.b = 255;
-    light.skyIntensity = 255;
+    light.a = 255;
     return light;
 }
 

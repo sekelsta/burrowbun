@@ -32,10 +32,14 @@ private:
     // Which frame is selected
     int selected;
 
+    /* What color for selected and unselected squares. */
+    Light selectColor;
+    Light unselectColor;
+
     // Create a texture and render all the textures to it, using the spacing 
     // variables from hotbar. row is expected to be 0 or 1.
     Texture *renderHotbarPart(int row, std::string path, 
-        Texture *texture, int left, int up) const;
+        Texture *texture, int left, int up);
 
     // Draw the entire hotbar sprite to a texture. This only needs to be called
     // when the hotbar is first made, or when anything about it changes.

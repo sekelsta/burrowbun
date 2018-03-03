@@ -1,6 +1,6 @@
 Changes since last push:
- - Refactored hotbar rendering
- - Hotbar now renders a label for which key goes to which slot
+ - Added slightly transparent background to hotbar slots that are holding an 
+item.
 
 Known "features":
  - The strenth of gravity is independent of the world.

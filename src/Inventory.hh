@@ -8,6 +8,8 @@
 #include <vector>
 #include <string>
 
+#define INVENTORY_COLOR {128, 128, 255, 255}
+
 /* An inventory is basically just a thing that holds items. */
 class Inventory {
 protected:

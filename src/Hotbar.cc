@@ -11,7 +11,7 @@ using namespace std;
 // from hotbar. The texture to is expected to have the correct width and
 // height, and the vector is expected to have length 12. 
 Texture *Hotbar::renderHotbarPart(int row, string path, 
-        Texture *texture, int left, int up) const {
+        Texture *texture, int left, int up) {
     assert(row == 0 || row == 1);
 
     // Set render settings
@@ -40,6 +40,13 @@ Texture *Hotbar::renderHotbarPart(int row, string path,
         */
         if (false) {}
         else if (items[row][i]) {
+            if (selected == 12 * row + i) {
+                squareSprite.setColorMod(selectColor);
+            }
+            else {
+                squareSprite.setColorMod(unselectColor);
+            }
+            squareSprite.render(refRect);
             items[row][i] -> render(refRect, path);
         }
 
@@ -131,6 +138,10 @@ Hotbar::Hotbar(string path) : Inventory(12, 2, path) {
         + offsetRight;
     int spriteHeight = frame.getHeight() + offsetDown;
     sprite = Sprite(0, 0, spriteWidth, spriteHeight, "");
+
+    unselectColor = INVENTORY_COLOR;
+    unselectColor.a = 0xCC;
+    selectColor = {255, 128, 128, 0xCC};
 
     isSpriteUpdated = false;
 

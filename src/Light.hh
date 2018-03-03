@@ -11,7 +11,7 @@ struct Light {
     uint8_t r;
     uint8_t g;
     uint8_t b;
-    uint8_t skyIntensity;
+    uint8_t a;
 
     /* Sets this light equal to the sum of two other lights. */
     inline void sum(const Light &one, const Light &two) {
@@ -25,7 +25,7 @@ struct Light {
     skyIntensity of the light provided and the color of the skyColor). */
     inline void useSky(const Light &light, const Light &skyColor) {
         Light skyLight = skyColor;
-        skyLight.setIntensity(light.skyIntensity);
+        skyLight.setIntensity(light.a);
         sum(light, skyLight);
     }
 
@@ -33,7 +33,7 @@ struct Light {
     be used just after r, g, and b have been set to their max for the given
     light color. */
     inline void setIntensity(uint8_t intensity) {
-        skyIntensity = intensity;
+        a = intensity;
         r = r * intensity / 255;
         g = g * intensity / 255;
         b = b * intensity / 255;

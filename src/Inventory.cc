@@ -138,10 +138,7 @@ Inventory::Inventory(int cols, int rows, string path, bool trash) {
     isSpriteUpdated = false;
 
     /* Pick a background color. */
-    Light squareColor;
-    squareColor.r = 128;
-    squareColor.g = 128;
-    squareColor.b = 255;
+    Light squareColor = INVENTORY_COLOR;
 
     // TODO: fix having hard-coded sprite info. 
     /* x, y, w, h, name */
