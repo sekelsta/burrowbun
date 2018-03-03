@@ -232,7 +232,7 @@ void WindowHandler::renderMap(Map &m, const Rect &camera) {
             assert (0 <= xTile);
             assert (xTile < m.getWidth());
             if (!m.isOnMap(xTile, yTile)) {
-                break;
+                continue;
             }
 
             /* Modulate the color due to lighting. */

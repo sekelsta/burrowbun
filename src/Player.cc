@@ -76,7 +76,9 @@ Player::Player(string path) : Entity(path + "entities/bunny.json", path),
 
     // Have starting items
     pickup(ItemMaker::makeItem(ActionType::PICKAXE, path));
-    pickup(ItemMaker::makeItem(ActionType::HEALTH_POTION, path));
+    for (int i = 0; i < 20; i++) {
+        pickup(ItemMaker::makeItem(ActionType::HEALTH_POTION, path));
+    }
     pickup(ItemMaker::makeItem(ActionType::DIRT, path));
     pickup(ItemMaker::makeItem(ActionType::TOPSOIL, path));
     pickup(ItemMaker::makeItem(ActionType::SAND, path));

@@ -1,6 +1,6 @@
 Changes since last push:
- - Fixed bug where stack of 0 items would briefly flash on the hotbar while 
-picking up an item
+ - Fixed the bug that made map rendering vanish when the player went too high
+ - Changed potion stack size to 30
 
 Known "features":
  - The strenth of gravity is independent of the world.
@@ -15,14 +15,12 @@ right angle
  - When the window is bigger than the map, crossing x = 0 causes an assertion
 error.
  - The player can't jump when colliding with a wall.
- - All map rendering vanishes when the player goes too high
  - When colliding with the bottom of the map, position is set but velocity isn't
 
 To do:
  - throwing items, attracting items
  - add menu
  - multithreading so the window remains responsive while generating a map
- - fix wierd disappearance bug
  - save and load the player
  - Make all public Map functions accept any x value (might be done?)
  - remove Map.getForeground() and Map.getBackground()

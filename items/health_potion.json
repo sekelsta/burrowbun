@@ -15,7 +15,7 @@
 	"hungerCured": 0,
 	"manaCured": 0,
     "isItem": true,
-	"maxStack": 1,
+	"maxStack": 30,
 	"useTime": 32,
     "consumable": true
 }
