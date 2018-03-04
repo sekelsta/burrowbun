@@ -5,7 +5,7 @@
 #include "Entity.hh"
 #include "Hotbar.hh"
 #include "Inventory.hh"
-#include "UIHelpers.hh"
+#include "StatBar.hh"
 #include <string>
 
 // Forward declare

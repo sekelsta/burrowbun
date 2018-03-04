@@ -14,7 +14,6 @@ the only thing screen coordinates are used for. */
 #include "Renderer.hh"
 #include "Sprite.hh"
 #include "Movable.hh"
-#include "UIHelpers.hh"
 #include "filepaths.hh"
 
 // Forawrd declare

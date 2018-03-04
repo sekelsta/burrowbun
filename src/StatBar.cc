@@ -1,4 +1,4 @@
-#include "UIHelpers.hh"
+#include "StatBar.hh"
 #include "filepaths.hh"
 #include "Renderer.hh"
 #include <SDL2/SDL.h>

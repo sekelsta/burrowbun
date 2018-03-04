@@ -68,7 +68,8 @@ void Map::chooseSprite(int x, int y) {
 
 bool Map::isBesideTile(int x, int y, MapLayer layer) {
     /* Check at this place. */
-    if (getTile(x, y, layer) -> type != TileType::EMPTY) {
+    if (getTile(x, y, layer) -> type != TileType::EMPTY
+            && getTile(x, y, layer) -> type != TileType::WATER) {
         return true;
     }
 
@@ -78,7 +79,8 @@ bool Map::isBesideTile(int x, int y, MapLayer layer) {
             /* Don't check the status of tiles off the edge of the map, 
             or if it's part of a diagonal line through the center tile. */
             if (isOnMap(x + i, y + j) && i != j && i != -1 * j
-                    && getTile(x+i, y+j, layer) -> type != TileType::EMPTY) {
+                    && getTile(x+i, y+j, layer) -> type != TileType::EMPTY
+                    && getTile(x+i, y+j, layer) -> type != TileType::WATER) {
                 return true;
             }
         }
@@ -508,8 +510,10 @@ void Map::setTile(int x, int y, MapLayer layer, TileType val) {
 }
 
 bool Map::placeTile(Location place, TileType type) {
-    /* Can only place a tile if there isn't one there already. */
-    if (getTile(place) -> type != TileType::EMPTY) {
+    /* Can only place a tile if there isn't one there already. 
+    Placing over water is allowed. */
+    if (getTile(place) -> type != TileType::EMPTY
+            && getTile(place) -> type != TileType::WATER) {
         return false;
     }
 
@@ -572,7 +576,8 @@ void Map::update(vector<DroppedItem*> &items) {
 
 bool Map::damage(Location place, int amount, vector<DroppedItem*> &items) {
     /* If there's no tile here, just return false. */
-    if (getTile(place) -> type == TileType::EMPTY) {
+    if (getTile(place) -> type == TileType::EMPTY
+        || getTile(place) -> type == TileType::WATER) {
         return false;
     }
 
@@ -616,6 +621,7 @@ bool Map::destroy(const TileHealth &health, vector<DroppedItem*> &items) {
 void Map::kill(int x, int y, MapLayer layer, vector<DroppedItem*> &items) {
     // Drop itself as an item
     TileType type = getTileType(wrapX(x), y, layer);
+    assert(type != TileType::WATER);
     if (type != TileType::EMPTY) {
         items.push_back(new DroppedItem ((ItemMaker::makeItem(
             ItemMaker::tileToItem(type), path)), 

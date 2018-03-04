@@ -1,6 +1,10 @@
 Changes since last push:
- - Fixed the bug that made map rendering vanish when the player went too high
- - Changed potion stack size to 30
+ - Water is no longer minable
+ - Water can now have blocks placed on top of it
+ - Water no longer counts as a block for the purposes of placing a block next
+to it.
+ - Put MouseBox and StatBar into different source files, also refactored 
+MouseBox
 
 Known "features":
  - The strenth of gravity is independent of the world.

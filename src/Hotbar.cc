@@ -29,8 +29,8 @@ Texture *Hotbar::renderHotbarPart(int row, string path,
     for (int i = 0; i < 12; i++) {
         // We know the clickboxes have the correct spacing, but the first one 
         // probably isn't at 0, 0. So we just correct for that.
-        refRect.x = clickBoxes[row][i].x - clickBoxes[1][0].x + left;
-        refRect.y = clickBoxes[row][i].y - clickBoxes[1][0].y + up;
+        refRect.x = clickBoxes[row][i].getX() - clickBoxes[1][0].getX() + left;
+        refRect.y = clickBoxes[row][i].getY() - clickBoxes[1][0].getY() + up;
         /* Render the item. */
         // TODO
         /*
@@ -111,8 +111,8 @@ void Hotbar::updateSprite(string path) {
         for (unsigned int j = 0; j < clickBoxes[i].size(); j++) {
             /* Render the label. */
             Texture text(labels[i][j], path, KEYLABEL_FONT_SIZE, 0);
-            int x = clickBoxes[i][j].x - clickBoxes[1][0].x;
-            int y = clickBoxes[i][j].y - clickBoxes[1][0].y;
+            int x = clickBoxes[i][j].getX() - clickBoxes[1][0].getX();
+            int y = clickBoxes[i][j].getY() - clickBoxes[1][0].getY();
             text.render(x, y);
         }
     }
@@ -152,18 +152,12 @@ Hotbar::Hotbar(string path) : Inventory(12, 2, path) {
     for (int i = 0; i < 3; i++) {
         for (int j = 0; j < 4; j++) {
             int index = 4 * i + j;
-            clickBoxes[0][index].x = x;
-            clickBoxes[0][index].y = yStart + offsetDown;
-            clickBoxes[0][index].w = frame.getWidth();
-            clickBoxes[0][index].h = frame.getHeight();
-            clickBoxes[0][index].wasClicked = false;
-            clickBoxes[0][index].containsMouse = false;
-            clickBoxes[1][index].x = x - offsetRight;
-            clickBoxes[1][index].y = yStart;
-            clickBoxes[1][index].w = frame.getWidth();
-            clickBoxes[1][index].h = frame.getHeight();
-            clickBoxes[1][index].wasClicked = false;
-            clickBoxes[1][index].containsMouse = false;
+            clickBoxes[0][index].move(x, yStart + offsetDown,
+                frame.getWidth(), frame.getHeight());
+            clickBoxes[0][index].reset();
+            clickBoxes[1][index].move(x - offsetRight, yStart,
+                frame.getWidth(), frame.getHeight());
+            clickBoxes[1][index].reset();
             x += frame.getWidth() + smallGap;
         }
         x += largeGap;
@@ -200,27 +194,25 @@ void Hotbar::update(Action *&mouse, bool isInvOpen) {
     for (unsigned int row = 0; row < clickBoxes.size(); row++) {
         for (unsigned int col = 0; col < clickBoxes[row].size(); col++) {
             // Ignore mouse button up or mouse button held down
-            if (clickBoxes[row][col].wasClicked && !clickBoxes[row][col].isHeld
-                    && clickBoxes[row][col].event.type == SDL_MOUSEBUTTONDOWN ) {
+            if (clickBoxes[row][col].clicked()) {
                 /* Select it if it wasn't already. */
                 select(row * clickBoxes[row].size() + col);
                 // See if we should put something in the slot
-                if (clickBoxes[row][col].event.button == SDL_BUTTON_LEFT
-                        && mouse) {
+                if (clickBoxes[row][col].leftClicked()) {
                     // TODO
                     /* And now the sprite needs to change. */
                     isSpriteUpdated = false;
                 }
                 // If it was a right click, we should remove that item from the
                 // hotbar.
-                else if (clickBoxes[row][col].event.button == SDL_BUTTON_RIGHT) {
+                else if (clickBoxes[row][col].rightClicked()) {
                     // TODO
                     //actions[i].action == nullptr;
                     /* And again the sprite needs to change. */
                     isSpriteUpdated = false;
                 }
                 /* Now we've used this click. */
-                clickBoxes[row][col].wasClicked = false;
+                clickBoxes[row][col].reset();
             }
         }
     }

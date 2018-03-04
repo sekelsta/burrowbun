@@ -59,7 +59,7 @@ void Inventory::updateSprite(string path) {
 
 void Inventory::useMouse(Item *&mouse, int row, int col) {
     /* Handle left clicks. */
-    if (clickBoxes[row][col].event.button == SDL_BUTTON_LEFT) {
+    if (clickBoxes[row][col].leftClicked()) {
         // Switch the items
         Item *temp = mouse;
         if (isTrash && mouse) {
@@ -77,7 +77,7 @@ void Inventory::useMouse(Item *&mouse, int row, int col) {
             mouse = add(mouse, row, col);
         }
     }
-    else if (clickBoxes[row][col].event.button == SDL_BUTTON_RIGHT) {
+    else if (clickBoxes[row][col].rightClicked()) {
         /* On right clicks, if holding an item set down one, otherwise pick
         up half the stack. */
         if (mouse) {
@@ -96,8 +96,7 @@ void Inventory::update_internal(Action *&mouse) {
     for (int row = 0; row < getHeight(); row++) {
         for (int col = 0; col < getWidth(); col++) {
             // Ignore buttonup
-            if (clickBoxes[row][col].wasClicked && !clickBoxes[row][col].isHeld
-                    && clickBoxes[row][col].event.type == SDL_MOUSEBUTTONDOWN) {
+            if (clickBoxes[row][col].clicked()) {
                 /* If the mouse is holding something but it's not an item,
                 ignore it. */
                 if (mouse != NULL && !(mouse -> isItem())) {
@@ -293,13 +292,11 @@ void Inventory::updateClickBoxes() {
     int newY = y;
     for (int row = 0; row < getHeight(); row++) {
         for (int col = 0; col < getWidth(); col++) {
-            clickBoxes[row][col].w = Inventory::squareSprite.getWidth();
-            clickBoxes[row][col].h = Inventory::squareSprite.getHeight();
-            clickBoxes[row][col].x = newX;
-            clickBoxes[row][col].y = newY;
+            clickBoxes[row][col].move(newX, newY,
+                Inventory::squareSprite.getWidth(),
+                Inventory::squareSprite.getHeight());
             // Also initialize the click info
-            clickBoxes[row][col].wasClicked = false;
-            clickBoxes[row][col].containsMouse = false;
+            clickBoxes[row][col].reset();
  
             newX += Inventory::squareSprite.getWidth();
         }
@@ -311,7 +308,7 @@ void Inventory::updateClickBoxes() {
 void Inventory::resetClicks() {
     for (unsigned int i = 0; i < clickBoxes.size(); i++) {
         for (unsigned int j = 0; j < clickBoxes[i].size(); j++) {
-            clickBoxes[i][j].wasClicked = false;
+            clickBoxes[i][j].reset();
         }
     }
 }

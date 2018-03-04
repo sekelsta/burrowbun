@@ -2,7 +2,7 @@
 #define INVENTORY_HH
 
 #include "Sprite.hh"
-#include "UIHelpers.hh"
+#include "Button.hh"
 #include "Light.hh"
 #include "Item.hh"
 #include <vector>

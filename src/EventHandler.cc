@@ -7,7 +7,7 @@
 #include "Player.hh"
 #include "World.hh"
 #include "Hotbar.hh"
-#include "UIHelpers.hh"
+#include "Button.hh"
 
 using namespace std;
 

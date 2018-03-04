@@ -2,7 +2,7 @@
 #define HOTBAR_HH
 
 #include "Sprite.hh"
-#include "UIHelpers.hh"
+#include "Button.hh"
 #include "Action.hh"
 #include "Inventory.hh"
 #include <vector>
