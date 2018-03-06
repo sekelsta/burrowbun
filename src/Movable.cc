@@ -24,6 +24,8 @@ Movable::Movable() {
     velocity.y = 0;
     accel.x = 0;
     accel.y = 0;
+    collides = true;
+    gravity = true;
     isCollidingDown = false;
     ticksCollidingDown = 0;
     isCollidingX = false;
@@ -73,6 +75,8 @@ Movable &Movable::operator=(const Movable &movable) {
     velocity = movable.velocity;
     accel = movable.accel;
     dAccel = movable.dAccel;
+    collides = movable.collides;
+    gravity = movable.gravity;
     isCollidingX  = movable.isCollidingX;
     isCollidingDown = movable.isCollidingDown;
     ticksCollidingDown = movable.ticksCollidingDown;
@@ -111,7 +115,7 @@ Point Movable::getDAccel() const {
 
 // This adds acceleration to speed, and limits speed at maxSpeed. This also
 // updates the value of timeOffGround and maxHeight.
-void Movable::updateMotion(double gravity) {
+void Movable::updateMotion(double gravitynum) {
     // Make sure the movable has been properly initialized
     assert(drag.x || drag.y);
 
@@ -134,8 +138,8 @@ void Movable::updateMotion(double gravity) {
     // Update velocity
     velocity.x += accel.x;
     velocity.y += accel.y;
-    if (!isSteppingUp) {
-        velocity.y += gravity;
+    if (!isSteppingUp && gravity) {
+        velocity.y += gravitynum;
     }
 
     // Add drag effects

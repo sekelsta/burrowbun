@@ -15,6 +15,7 @@ DroppedItem::DroppedItem(Item *i, int x, int y, int worldWidth) {
 
     // TODO: remove magic numbers
     drag = {0.6, 0.9166};
+    attracting = false;
 }
 
 DroppedItem::~DroppedItem() {
@@ -22,6 +23,9 @@ DroppedItem::~DroppedItem() {
 }
 
 void DroppedItem::render(const Rect &camera) {
+    if (!item) {
+        return;
+    }
     // Make sure the renderer draw color is set to white
     Renderer::setColorWhite();
 
@@ -36,12 +40,39 @@ void DroppedItem::merge(DroppedItem *dropped) {
     }
     if (rect.intersects(dropped->rect)) {
         dropped->item = item->merge(dropped->item, 0);
-        /* Now if we don't have an item, delete it. */
-        if (item && item->getStack() == 0) {
-            delete item;
-            item = nullptr;
-        }
+        updateItem();
+        dropped -> updateItem();
     }
+    else if (item -> getType() == dropped -> item -> getType()) {
+        attractOther(ITEM_MERGE_DISTANCE, ITEM_ATTRACT_SPEED, dropped);
+    }
+    /* Now if one of these stacks no longer exists, set location to 
+    their average. */
+    if (!item || !dropped->item) {
+        int avgx = (getRect().x + dropped->getRect().x) / 2;
+        int avgy = (getRect().y + dropped->getRect().y) / 2;
+        setX(avgx);
+        setY(avgy);
+        dropped -> setX(avgx);
+        dropped -> setY(avgy);
+    }
+}
+
+void DroppedItem::attract(int x, int y, double speed) {
+    Movable::attract(x, y, speed);
+    gravity = false;
+    collides = false;
+    attracting = true;
+}
+
+void DroppedItem::update() {
+    updateItem();
+    if (!attracting || !item) {
+        gravity = true;
+        collides = true;
+    }
+    attracting = false;
+    setAccel({0, 0});
 }
 
 

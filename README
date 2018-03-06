@@ -1,17 +1,14 @@
-To compile, it requires SDL2 and libnoise. The Makefile also expects gcc to be installed, but could be edited to use a different compiler. This program is written for and tested on Debian Linux (Jessie), but might work if compiled on other operating stystems. (Windows definitely requires edits to the source code, if only to change the include locations of libraries.)
+To compile, it requires SDL2 and libnoise. The Makefile also expects gcc to be installed, but could be edited to use a different compiler. This program is written for and tested on Ubuntu MATE 17, but should work for any Debian-based distro and might work on other operating stystems as well. (Windows definitely requires edits to the source code, if only to change the include locations of libraries and the way the current directory is found.)
 
 The test suite requires Catch (available from https://github.com/philsquared/Catch) in the working directory.
 
 Example installation (Ubuntu / other Debian-based):
 (type the bit after the $ prompt into a terminal)
-$ sudo apt-get install libsdl2-2.0.0 libsdl2-dev libsld2-image-2.0.0
+$ sudo apt-get install make git libsdl2-2.0.0 libsdl2-dev libsld2-image-2.0.0
 $ sudo apt-get install libsdl2-image-dev libsdl2-ttf-2.0.0 libsdl2-ttf-dev
 (The SDL ttf library isn't needed yet, but will probably be at some point.)
-$ sudo apt-get install libnoise libnoise-dev
+$ sudo apt-get install libnoise libnoise-dev g++
 $ git clone https://github.com/felinoidthekeratincoated/burrowbun
-(Or if git isn't installed, 
-$ sudo apt-get install git
-and try again.)
 $ cd burrowbun
 $ make
 It will probably take a while to compile. Once it finishes successfullly, run

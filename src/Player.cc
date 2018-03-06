@@ -99,10 +99,6 @@ Player::Player(string path) : Entity(path + "entities/bunny.json", path),
     pickup(ItemMaker::makeItem(ActionType::RED_BRICK, path));
     pickup(ItemMaker::makeItem(ActionType::GRAY_BRICK, path));
     pickup(ItemMaker::makeItem(ActionType::DARK_BRICK, path));
-    pickup(ItemMaker::makeItem(ActionType::MUD, path));
-    pickup(ItemMaker::makeItem(ActionType::CLOUD, path));
-    pickup(ItemMaker::makeItem(ActionType::BOULDER, path));
-    pickup(ItemMaker::makeItem(ActionType::GLACIER, path));
 
     isInventoryOpen = false;
 }
@@ -209,7 +205,10 @@ void Player::pickup(DroppedItem *item) {
     // Pick it up if colliding with it
     if (rect.intersects(item -> getRect())) {
         item -> item = pickup(item -> item);
+        return;
     }
+    // TODO: remove magic number
+    attractOther(64, ITEM_ATTRACT_SPEED, item);
 }
 
 

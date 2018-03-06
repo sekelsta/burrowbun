@@ -1,10 +1,7 @@
 Changes since last push:
- - Water is no longer minable
- - Water can now have blocks placed on top of it
- - Water no longer counts as a block for the purposes of placing a block next
-to it.
- - Put MouseBox and StatBar into different source files, also refactored 
-MouseBox
+ - Player now attracts dropped items
+ - Dropped items will now go towards each other to merge their stacks
+ - Constants may still need some fine-tuning
 
 Known "features":
  - The strenth of gravity is independent of the world.
@@ -22,7 +19,7 @@ error.
  - When colliding with the bottom of the map, position is set but velocity isn't
 
 To do:
- - throwing items, attracting items
+ - throwing items
  - add menu
  - multithreading so the window remains responsive while generating a map
  - save and load the player

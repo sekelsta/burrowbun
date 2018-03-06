@@ -463,6 +463,12 @@ void Collider::updateMovable(Map &map, movable::Movable *movable) {
     double gravity = -1.5;
     movable -> updateMotion(gravity);
 
+    if (!movable -> collides) {
+        movable -> setX(movable -> getRect().x + movable -> getVelocity().x);
+        movable -> setY(movable -> getRect().y + movable -> getVelocity().y);
+        return;
+    }
+
     // toX is the x value the movable expects to end up having.
     int toX = movable -> getRect().x + movable -> getVelocity().x;
     collide(map, *movable);

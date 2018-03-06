@@ -46,6 +46,12 @@ public:
     // Drag is a number between 0 and 1 which the velocity is multiplied by
     Point drag, velocity, accel, dAccel;
 
+    /* Information about how it reacts to collisions. */
+    // Whether it collides at all
+    bool collides;
+    // Whether it's affected by gravity
+    bool gravity;
+
     // Information about recent collisions
     // We need to know whether there was a collision down so that we can
     // avoid jumping midair, and we need isCollidingX to not be stopped by
@@ -96,6 +102,23 @@ public:
     void setAccel(Point newAccel);
     Point getDAccel() const;
 
+    inline int getCenterX() const {
+        return rect.x + rect.w / 2;
+    }
+
+    inline int getCenterY() const {
+        return rect.y + rect.h / 2;
+    }
+
+    inline Rect getRectDist(int dist) const {
+        Rect r = rect;
+        r.x = getCenterX() - (dist + rect.w) / 2;
+        r.y = getCenterY() - (dist + rect.h) / 2;
+        r.w = dist + rect.w;
+        r.h = dist + rect.h;
+        return r;
+    }
+
     // Updates velocity
     void updateMotion(double gravity);
 
@@ -128,6 +151,24 @@ public:
     // Set the rect's worldwidth
     inline void setWorldwidth(int worldwidth) {
         rect.worldWidth = worldwidth;
+    }
+
+    /* Go towards x, y. */
+    inline virtual void attract(int x, int y, double speed) {
+        if (rect.x != x) {
+            accel.x += speed  * abs(rect.x - x) / (x - rect.x);
+        }
+        if (rect.y != y) {
+            accel.y += speed * abs(rect.y - y) / (y - rect.y);
+        }
+    }
+
+    /* Go towards another movable. */
+    inline void attractOther(int dist, double speed, Movable *m) {
+        Rect attractRect = getRectDist(dist);
+        if (attractRect.intersects(m->getRect())) {
+            m->attract(getCenterX(), getCenterY(), speed);
+        }
     }
     
 };
