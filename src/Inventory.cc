@@ -234,7 +234,7 @@ Item *Inventory::add(Item *item, int row, int col) {
     if (items[row][col] == NULL) {
         setItem(item, row, col);
         isSpriteUpdated = false;
-        return NULL;
+        return nullptr;
     }
 
     /* Otherwise, try to add it to whatever's in the slot. */
@@ -254,7 +254,7 @@ Item *Inventory::pickup(Item *item) {
             item = add(item, row, col);
             // If item is NULL now, then we're done.
             if (item == NULL) {
-                return NULL;
+                return nullptr;
             }
         }
     }
@@ -266,6 +266,10 @@ Item *Inventory::pickup(Item *item) {
 
 
 Item *Inventory::stack(Item *item) {
+    /* Ignore NULL items. */
+    if (!item) {
+        return nullptr;
+    }
     /* Loop through the inventory looking for a stack to merge. */
     for (int row = 0; row < getHeight(); row++) {
         for (int col = 0; col < getWidth(); col++) {
@@ -274,8 +278,9 @@ Item *Inventory::stack(Item *item) {
                 item = items[row][col] -> merge(item, 0);
             }
             // If item is NULL now, then we're done.
-            if (item == NULL) {
-                return NULL;
+            if (!item) {
+                touch();
+                return nullptr;
             }
         }
     }

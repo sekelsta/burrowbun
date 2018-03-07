@@ -1,7 +1,6 @@
 Changes since last push:
- - Player now attracts dropped items
- - Dropped items will now go towards each other to merge their stacks
- - Constants may still need some fine-tuning
+ - Tweaked item attraction
+ - Fixed bug where items picked up didn't immediately cause the hotbar to update
 
 Known "features":
  - The strenth of gravity is independent of the world.

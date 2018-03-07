@@ -58,8 +58,8 @@ void DroppedItem::merge(DroppedItem *dropped) {
     }
 }
 
-void DroppedItem::attract(int x, int y, double speed) {
-    Movable::attract(x, y, speed);
+void DroppedItem::attract(int x, int y, double xspeed, double yspeed) {
+    Movable::attract(x, y, xspeed, yspeed);
     gravity = false;
     collides = false;
     attracting = true;

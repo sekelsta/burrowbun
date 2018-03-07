@@ -64,9 +64,4 @@ void World::update() {
     /* Have the map update itself and relevent entities. */
     map.update(droppedItems);
 
-    /* Update all the dropped items. */
-    for (unsigned int i = 0; i < droppedItems.size(); i++) {
-        droppedItems[i] -> update();
-    }
-
 }

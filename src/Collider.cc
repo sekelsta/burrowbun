@@ -318,6 +318,8 @@ void Collider::collide(Map &map, movable::Movable &movable) {
                 if (tile -> getIsSolid()) {
                     xVelocity = 0;
                     yVelocity = 0;
+                    /* But also actually set the movable's velocity. */
+                    movable.setVelocity({0, 0});
                 }
             }
         }
@@ -548,6 +550,12 @@ void Collider::updateMovable(Map &map, movable::Movable *movable) {
 // Note that this only ever resets distance fallen when it hits the ground.
 void Collider::update(Map &map, vector<Entity *> &entities,
         vector<DroppedItem *> droppedItems) {
+    /* Update dropped items. This needs to happen between when map collisions
+    get handled and when things try to attract dropped items. */
+    for (unsigned int i = 0; i < droppedItems.size(); i++) {
+        droppedItems[i] -> update();
+    }
+
     // Have entities with inventories pick up dropped items if they can
     for (unsigned int i = 0; i < entities.size(); i++) {
         // Make sure worldwith is updated correctly

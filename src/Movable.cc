@@ -221,6 +221,33 @@ void Movable::resetRect() {
     nextRect = rect;
 }
 
+
+void Movable::attractOther(int dist, double speed, Movable *m) {
+    assert(dist >= 0);
+    Rect attractRect = getRectDist(dist); 
+    if (attractRect.intersects(m->getRect())) {
+        int xdist = (attractRect.w + m->getRect().w) / 2;
+        int ydist = (attractRect.h + m->getRect().h) / 2;
+        int xfar = abs(getCenterX() - m->getCenterX());
+        int yfar = abs(getCenterY() - m->getCenterY());
+        assert(xdist >= xfar);
+        assert(ydist >= yfar);
+        double xspeed = xfar * speed / xdist;
+        assert (xspeed <= speed);
+        double yspeed = yfar * speed / ydist;
+        assert(yspeed <= speed);
+        double factor = (speed * speed) / (xspeed * xspeed + yspeed * yspeed);
+        double distsq = (xdist - xfar) * (xdist - xfar);
+        distsq += (ydist - yfar) * (ydist - yfar);
+        factor *= distsq / (xdist * xdist + ydist * ydist);
+        xspeed *= factor;
+        yspeed *= factor;
+        xspeed = std::max(1.0 / m->drag.x, xspeed);
+        yspeed = std::max(1.0 / m->drag.y, yspeed);
+        m->attract(getCenterX(), getCenterY(), xspeed, yspeed);
+    }
+}
+
 /* Get a movable from a json file. */
 void from_json(const json &j, Movable &movable) {
     movable.drag = j["drag"].get<Point>();

@@ -5,7 +5,7 @@
 #include "Item.hh"
 
 #define ITEM_MERGE_DISTANCE 64
-#define ITEM_ATTRACT_SPEED 4.0
+#define ITEM_ATTRACT_SPEED 8.0
 
 class DroppedItem: public movable::Movable {
     bool attracting;
@@ -32,7 +32,7 @@ public:
     void merge(DroppedItem *item);
 
     /* Move in a direction. */
-    virtual void attract(int x, int y, double speed);
+    virtual void attract(int x, int y, double xspeed, double yspeed);
 
     /* Self-explanatory. */
     virtual void update();

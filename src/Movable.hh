@@ -7,6 +7,7 @@
 #include "json.hpp"
 #include "Damage.hh"
 #include "Rect.hh"
+#include <algorithm>
 
 namespace movable {
 
@@ -154,22 +155,19 @@ public:
     }
 
     /* Go towards x, y. */
-    inline virtual void attract(int x, int y, double speed) {
+    inline virtual void attract(int x, int y, double xspeed, double yspeed) {
+        assert(xspeed >= 0);
+        assert(yspeed >= 0);
         if (rect.x != x) {
-            accel.x += speed  * abs(rect.x - x) / (x - rect.x);
+            accel.x += xspeed  * abs(rect.x - x) / (x - rect.x);
         }
         if (rect.y != y) {
-            accel.y += speed * abs(rect.y - y) / (y - rect.y);
+            accel.y += yspeed * abs(rect.y - y) / (y - rect.y);
         }
     }
 
     /* Go towards another movable. */
-    inline void attractOther(int dist, double speed, Movable *m) {
-        Rect attractRect = getRectDist(dist);
-        if (attractRect.intersects(m->getRect())) {
-            m->attract(getCenterX(), getCenterY(), speed);
-        }
-    }
+    void attractOther(int dist, double speed, Movable *m);
     
 };
 

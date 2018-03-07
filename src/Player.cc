@@ -208,7 +208,7 @@ void Player::pickup(DroppedItem *item) {
         return;
     }
     // TODO: remove magic number
-    attractOther(64, ITEM_ATTRACT_SPEED, item);
+    attractOther(128, ITEM_ATTRACT_SPEED, item);
 }
 
 
