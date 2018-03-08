@@ -82,10 +82,14 @@ void Inventory::useMouse(Item *&mouse, int row, int col) {
         up half the stack. */
         if (mouse) {
             items[row][col] = mouse->merge(items[row][col], -1);
+            update();
+            touch();
         }
         else if (items[row][col]) {
             int n = items[row][col]->getStack();
             mouse = items[row][col]->merge(mouse, n / 2 - n);
+            update();
+            touch();
         }
     
     }
@@ -230,10 +234,10 @@ void Inventory::setItem(Item *item, int row, int col) {
 // Add the item to the slot, if possible. Return whatever was not able to be
 // added (NULL if that slot could hold everything being added).
 Item *Inventory::add(Item *item, int row, int col) {
+    touch();
     // If there's nothing in the slot, we can definately add it.
     if (items[row][col] == NULL) {
         setItem(item, row, col);
-        isSpriteUpdated = false;
         return nullptr;
     }
 

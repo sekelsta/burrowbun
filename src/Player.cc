@@ -172,19 +172,24 @@ void Player::update() {
     healthBar.update(health);
     fullnessBar.update(fullness);
     manaBar.update(mana);
-    /* Delete empty stacks in inventories and mouseSlot. */
+    /* Delete empty stacks in inventories, so they don't interfere. */
     inventory.update();
     trash.update();
     hotbar.Inventory::update();
     // Update the inventories
     inventory.update(mouseSlot);
     trash.update(mouseSlot);
+    hotbar.update(mouseSlot, isInventoryOpen);
     if (mouseSlot != nullptr && mouseSlot -> isItem() 
             && ((Item *)mouseSlot) -> getStack() <= 0) {
         delete mouseSlot;
         mouseSlot = nullptr;
+    /* Again delete empty stacks in inventories, this time so they don't
+    render wierldy. */
+    inventory.update();
+    trash.update();
+    hotbar.Inventory::update();
     }
-    hotbar.update(mouseSlot, isInventoryOpen);
 }
 
 Item *Player::pickup(Item *item) {

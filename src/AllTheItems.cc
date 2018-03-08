@@ -50,8 +50,9 @@ bool Potion::use_internal(InputType type, int x, int y, World &world) {
         // TODO: make consumable
         // Use useTime
         world.player.useTimeLeft = useTime;
+        return true;
     }
-    return true;
+    return false;
 }
 
 

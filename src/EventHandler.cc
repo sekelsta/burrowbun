@@ -80,7 +80,7 @@ bool EventHandler::updateMouseBoxes(vector<MouseBox> &mouseBoxes) {
     bool answer = false;
 
     for (unsigned int i = 0; i < mouseBoxes.size(); i++) {
-        answer = updateBox(mouseBoxes[i]);
+        answer = answer || updateBox(mouseBoxes[i]);
     }
 
     return answer;

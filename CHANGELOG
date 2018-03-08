@@ -1,5 +1,10 @@
 Changes since last push:
- - Now has functional though simple menu
+ - Fixed bug where items were being used when the click was meant for something
+else
+ - Fixed bug where a stack of 0 items would sometimes briefly be rendered to 
+the hotbar.
+ - Fixed bug where on right click potions would be used without having any
+effect.
 
 Known "features":
  - The strenth of gravity is independent of the world.
