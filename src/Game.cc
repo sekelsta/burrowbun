@@ -18,12 +18,6 @@ using namespace std;
 
 string Game::path;
 
-/* Create a new world. */
-void Game::createWorld(string filename, WorldType type) {
-    Mapgen mapgen(path);
-    mapgen.generate(path + filename, type, path);
-}
-
 bool Game::play(string mapname) {
     isPlaying = true;
     /* Load a world. */
@@ -125,13 +119,24 @@ void Game::run() {
     menu = new Menu();
     bool quit = false;
     while (!quit) {
+        Uint32 ticks = SDL_GetTicks();
         quit = update();
-        menu -> update(800, 600);
+        eventHandler.updateMenu(*menu);
+        menu -> update(window.getWidth(), window.getHeight());
         menu -> render();
-        const string filename = "world.world";
-        //createWorld(filename, WorldType::EARTH);
 
-        quit = play(filename);
+        if (menu -> getState() == Screen::PLAY) {
+            quit = quit || play(menu -> getFilename());
+        }
+        else if (menu -> getState() == Screen::QUIT) {
+            quit = true;
+        }
+
+        /* Wait for enough time to pass before doing the next frame. */
+        uint32_t frameTicks = SDL_GetTicks() - ticks;
+        if (frameTicks < TICKS_PER_FRAME) {
+            SDL_Delay(TICKS_PER_FRAME - frameTicks);
+        }
     }
     delete menu;
     menu = nullptr;

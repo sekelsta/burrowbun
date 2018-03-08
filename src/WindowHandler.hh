@@ -85,6 +85,14 @@ public:
     void resize(int width, int height);
     void setMapSize(int tilesWide, int tilesHigh);
 
+    inline int getWidth() {
+        return screenWidth;
+    }
+
+    inline int getHeight() {
+        return screenHeight;
+    }
+
     // Render everything the map holds information about
     // x and y are the coordinates of the center of the camera, in pixels,
     // where y = 0 is at the bottom

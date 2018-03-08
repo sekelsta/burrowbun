@@ -1,22 +1,39 @@
 #include "Menu.hh"
+#include "Mapgen.hh"
 
-#define MENU_BUTTON_SIZE 32
+#define MENU_BUTTON_SIZE 48
 
 using namespace std;
 
-vector<Button> Menu::getButtons(Screen s) {
-    vector<Button> b;
+
+void Menu::createWorld(string filename, WorldType type) {
+    string path = Texture::getPath();
+    Mapgen mapgen(path);
+    mapgen.generate(path + filename, type, path);
+}
+
+vector<Buttonfun> Menu::getButtons(Screen s) {
+    vector<Buttonfun> b;
     if (s == Screen::START) {
         b.resize(3);
         b[0].sprite = Sprite(Texture("Play", MENU_BUTTON_SIZE, 0));
+        b[0].fun = [](Menu &menu) {
+            menu.setState(Screen::PLAY);
+        };
         b[1].sprite = Sprite(Texture("Create World", MENU_BUTTON_SIZE, 0));
+        b[1].fun = [](Menu &menu) {
+            menu.setState(Screen::CREATE);
+        };
         b[2].sprite = Sprite(Texture("Quit", MENU_BUTTON_SIZE, 0));
+        b[2].fun = [](Menu &menu) {
+            menu.setState(Screen::QUIT);
+        };
     }
     return b;
 }
 
 void Menu::setButtons() {
-    Light mouse = {0xCC, 0xFF, 0x00, 0xFF};
+    Light mouse = {0xFF, 0xFF, 0x00, 0xFF};
     Light noMouse = {0xFF, 0xFF, 0xFF, 0xFF};
     int space = 16;
     int start = 64;
@@ -37,9 +54,13 @@ void Menu::setButtons() {
 Menu::Menu() {
     screenWidth = 0;
     screenHeight = 0;
-    screen = Screen::START;
+    setState(Screen::START);
+}
 
-    buttons = getButtons(screen);
+void Menu::setState(Screen newstate) {
+    state = newstate;
+    buttons = getButtons(state);
+    setButtons();
 }
 
 void Menu::update(int width, int height) {
@@ -47,6 +68,15 @@ void Menu::update(int width, int height) {
     screenHeight = height;
 
     setButtons();
+
+    for (unsigned int i = 0; i < buttons.size(); i++) {
+        buttons[i].dofun(*this);
+    }
+
+    if (state == Screen::CREATE) {
+        createWorld(getFilename(), WorldType::EARTH);
+        setState(Screen::START);
+    }
 }
 
 void Menu::render() {

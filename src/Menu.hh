@@ -2,28 +2,69 @@
 #define MENU_HH
 
 #include "Button.hh"
+#include "EventHandler.hh"
+#include "MapHelpers.hh"
 #include <vector>
+#include <string>
+#include <functional>
 
 enum class Screen {
-    START
+    START,
+    PLAY,
+    CREATE,
+    QUIT
+};
+
+/* A struct to hold information about what to do when clicked on. */
+struct Buttonfun: public Button {
+    std::function<void(Menu &)> fun;
+
+    void dofun(Menu &menu) {
+        if (containsMouse && wasClicked && !isHeld) {
+            fun(menu);
+            reset();
+        }
+    }
 };
 
 class Menu {
-    Screen screen;
-    std::vector<Button> buttons;
+    friend void EventHandler::updateMenu(Menu &menu);
+
+    Screen state;
+    std::vector<Buttonfun> buttons;
+
 
     int screenWidth;
     int screenHeight;
 
-    static std::vector<Button> getButtons(Screen s);
+    /* Create a new world. */
+    void createWorld(std::string filename, WorldType type);
 
+    /* Get the list of buttons the given state should have. */
+    static std::vector<Buttonfun> getButtons(Screen s);
+
+    /* Position the buttons based on screen size. */
     void setButtons();
 
 public:
     Menu();
 
+    /* Access function. */
+    inline Screen getState() {
+        return state;
+    }
+
+    void setState(Screen newstate);
+
+    inline std::string getFilename() {
+        // TODO
+        return "world.world";
+    }
+
+    /* Update state. */
     void update(int screenWidth, int screenHeight);
 
+    /* Also self-explanatory. */
     void render();
 };
 

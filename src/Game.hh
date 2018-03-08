@@ -29,8 +29,6 @@ class Game {
     Menu *menu;
     World *world;
 
-    /* Create a new world. */
-    void createWorld(std::string filename, WorldType type);
     /* Load the given map and start playing. */
     bool play(std::string mapname);
 

@@ -12,6 +12,7 @@ class Hotbar;
 class World;
 struct MouseBox;
 struct StatBar;
+class Menu;
 
 /* A struct to hold information about which keys do what. This is so that
    later the player can change these settings. */
@@ -59,6 +60,10 @@ class EventHandler {
     // Tell whether a vector has a key that's being held down
     bool isHeld(const Uint8 *state, std::vector<SDL_Scancode> keys);
 
+public:
+    // Update a single mouse box
+    bool updateBox(MouseBox &box);
+
     // Change the bool values of a MouseBox vector so they know whether they 
     // were clicked
     // Return true if the mouse clicked any of the boxes
@@ -68,7 +73,6 @@ class EventHandler {
     // Return true if the mouse clicked any of the boxes
     bool updateInventoryClickBoxes(Inventory &inventory);
 
-public:
     // Constructor
     EventHandler();
 
@@ -94,6 +98,9 @@ public:
 
     // Tell the Player what its trying to do
     void updatePlayer(Player &player);
+
+    // Update the menu's mouseboxes
+    void updateMenu(Menu &menu);
 
     // Do all the stuff that needs to be done every frame
     void update(World &world);

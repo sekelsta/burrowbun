@@ -8,6 +8,7 @@
 #include "World.hh"
 #include "Hotbar.hh"
 #include "Button.hh"
+#include "Menu.hh"
 
 using namespace std;
 
@@ -34,45 +35,52 @@ bool EventHandler::isHeld(const Uint8 *state, vector<SDL_Scancode> keys) {
     return false;
 }
 
-// Change the bool values of a MouseBox vector so they know whether they were
-// clicked
-bool EventHandler::updateMouseBoxes(vector<MouseBox> &mouseBoxes) {
+// Update a single mouse box
+bool EventHandler::updateBox(MouseBox &box) {
     // Mouse coordinates, relative to the window
     int x;
     int y;
     // Find the mosue coordinates
     SDL_GetMouseState(&x, &y);
 
+    bool answer = false;
+    // Note that MouseBox.contains(x, y) also sets mouseBox.containsMouse
+    // to the appropriate value
+    if (box.contains(x, y)) {
+        answer = true;
+        box.event.x = x;
+        box.event.y = y;
+        // If it was a button press in the box, fill in the
+        // appropriate fields
+        bool clickedLeft = isLeftButtonDown || (leftClicks != 0);
+        bool clickedRight = isRightButtonDown || (rightClicks != 0);
+        if (clickedLeft || clickedRight) {
+            box.wasClicked = true;
+            box.event.type = SDL_MOUSEBUTTONDOWN;
+            // If left and right buttons clicked simultaneously, it's left
+            if (clickedLeft) {
+                box.event.button = SDL_BUTTON_LEFT;
+                box.isHeld = wasLeftButtonDown;
+            }
+            else {
+                box.event.button = SDL_BUTTON_RIGHT;
+                box.isHeld = wasRightButtonDown;
+            }
+        }
+    }
+    // And the mouseBox is responsible for making wasClicked false again,
+    // so we don't want to do that here
+    return answer;
+}
+
+// Change the bool values of a MouseBox vector so they know whether they were
+// clicked
+bool EventHandler::updateMouseBoxes(vector<MouseBox> &mouseBoxes) {
     // Whether the mouse is in a box
     bool answer = false;
 
     for (unsigned int i = 0; i < mouseBoxes.size(); i++) {
-        // Note that MouseBox.contains(x, y) also sets mouseBox.containsMouse
-        // to the appropriate value
-        if (mouseBoxes[i].contains(x, y)) {
-            answer = true;
-            mouseBoxes[i].event.x = x;
-            mouseBoxes[i].event.y = y;
-            // If it was a button press in the box, fill in the
-            // appropriate fields
-            bool clickedLeft = isLeftButtonDown || (leftClicks != 0);
-            bool clickedRight = isRightButtonDown || (rightClicks != 0);
-            if (clickedLeft || clickedRight) {
-                mouseBoxes[i].wasClicked = true;
-                mouseBoxes[i].event.type = SDL_MOUSEBUTTONDOWN;
-                // If left and right buttons clicked simultaneously, it's left
-                if (clickedLeft) {
-                    mouseBoxes[i].event.button = SDL_BUTTON_LEFT;
-                    mouseBoxes[i].isHeld = wasLeftButtonDown;
-                }
-                else {
-                    mouseBoxes[i].event.button = SDL_BUTTON_RIGHT;
-                    mouseBoxes[i].isHeld = wasRightButtonDown;
-                }
-            }
-        }
-        // And the mouseBox is responsible for making wasClicked false again,
-        // so we don't want to do that here
+        answer = updateBox(mouseBoxes[i]);
     }
 
     return answer;
@@ -355,6 +363,19 @@ void EventHandler::updatePlayer(Player &player) {
 
     // Change the player's acceleration
     player.setAccel(newAccel);
+}
+
+void EventHandler::updateMenu(Menu &menu) {
+    for (unsigned int i = 0; i < menu.buttons.size(); i++) {
+        updateBox(menu.buttons[i]);
+    }
+    // TODO: put this code elsewhere
+    // All done, set clicks to 0 for next time
+    leftClicks = 0;
+    rightClicks = 0;
+    // Get ready for next update
+    wasLeftButtonDown = isLeftButtonDown;
+    wasRightButtonDown = isRightButtonDown;
 }
 
 // Do all the things that need to be done every update
