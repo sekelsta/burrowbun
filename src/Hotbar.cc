@@ -110,7 +110,7 @@ void Hotbar::updateSprite(string path) {
     for (unsigned int i = 0; i < clickBoxes.size(); i++) {
         for (unsigned int j = 0; j < clickBoxes[i].size(); j++) {
             /* Render the label. */
-            Texture text(labels[i][j], path, KEYLABEL_FONT_SIZE, 0);
+            Texture text(labels[i][j], KEYLABEL_FONT_SIZE, 0);
             int x = clickBoxes[i][j].getX() - clickBoxes[1][0].getX();
             int y = clickBoxes[i][j].getY() - clickBoxes[1][0].getY();
             text.render(x, y);

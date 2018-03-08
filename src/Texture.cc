@@ -13,7 +13,7 @@ std::vector<LoadedTexture> Texture::loaded;
 std::vector<LoadedFont> Texture::fonts;
 
 
-SDL_Texture *Texture::getText(string text, string path, int size, 
+SDL_Texture *Texture::getText(string text, int size, 
         int outline_size, Light color, Light outline_color, int wrap_length) {
     TTF_Font *font = getFont(FONT_NAME, size, 0);
     TTF_Font *font_outline = getFont(FONT_NAME, size, outline_size);
@@ -42,7 +42,7 @@ SDL_Texture *Texture::getText(string text, string path, int size,
             fg_surface->h};
         /* blit text onto its outline */ 
         SDL_SetSurfaceBlendMode(fg_surface, SDL_BLENDMODE_BLEND); 
-        SDL_BlitSurface(fg_surface, NULL, bg_surface, &rect); 
+        SDL_BlitSurface(fg_surface, nullptr, bg_surface, &rect); 
         SDL_FreeSurface(fg_surface); 
     }
 
@@ -75,6 +75,23 @@ TTF_Font *Texture::getFont(string name, int size, int outline) {
     
     fonts.push_back({font, name, size, outline});
     return font;
+}
+
+void Texture::addToLoaded() {
+    /* Check if it's in the list of loaded textures. */
+    for (unsigned int i = 0; i < loaded.size(); i++) {
+        if (loaded[i].texture == texture) {
+            loaded[i].count++;
+            return;
+        }
+    }
+
+    /* Otherwise, add it to the list. */
+    LoadedTexture newTexture;
+    newTexture.name = "";
+    newTexture.texture = texture;
+    newTexture.count = 1;
+    loaded.push_back(newTexture);
 }
 
 Texture::Texture(const std::string &name) {
@@ -127,14 +144,15 @@ Texture::Texture(const std::string &name) {
 
 }
 
-Texture::Texture(string text, string path, int size, int wrap_length) 
-    : Texture(text, path, size, DEFAULT_OUTLINE_SIZE, DEFAULT_TEXT_COLOR,
+Texture::Texture(string text, int size, int wrap_length) 
+    : Texture(text, size, DEFAULT_OUTLINE_SIZE, DEFAULT_TEXT_COLOR,
         DEFAULT_OUTLINE_COLOR, wrap_length) {}
 
-Texture::Texture(string text, string path, int size, int outline_size,
+Texture::Texture(string text, int size, int outline_size,
         Light color, Light outline_color, int wrap_length) {
-    texture = getText(text, path, size, outline_size, color, 
+    texture = getText(text, size, outline_size, color, 
         outline_color, wrap_length);
+    addToLoaded();
 }
 
 Texture::Texture(Uint32 pixelFormat, int access, int width, int height) {
@@ -151,6 +169,21 @@ Texture::Texture(Uint32 pixelFormat, int access, int width, int height) {
     Renderer::setColorWhite();
     /* And stop drawing to the texture. */
     SDL_SetRenderTarget(Renderer::renderer, NULL);
+}
+
+Texture::Texture(const Texture &other) {
+    *this = other;
+}
+
+Texture &Texture::operator=(const Texture &other) {
+    /* Check for self-assignment. */
+    if (this == &other) {
+        return *this;
+    }
+
+    texture = other.texture;
+    addToLoaded();
+    return *this;
 }
 
 Texture::~Texture() {

@@ -1,6 +1,6 @@
 Changes since last push:
- - Tweaked item attraction
- - Fixed bug where items picked up didn't immediately cause the hotbar to update
+ - Now renders the menu screen while loading the world. This isn't the end
+goal.
 
 Known "features":
  - The strenth of gravity is independent of the world.

@@ -39,11 +39,15 @@ class Texture {
     static std::vector<LoadedFont> fonts;
 
     /* Render text to a texture, with proper wrapping, and an outline. */
-    SDL_Texture *getText(std::string text, std::string path, int size, 
+    SDL_Texture *getText(std::string text, int size, 
         int outline_size, Light color, Light outline_color, int wrap_length);
 
     /* Return a font with the specified characteristics. */
     static TTF_Font *getFont(std::string name, int size, int outline);
+
+    /* Add the texture to the list of loaded textures, or increase the count
+    if it's already there. */
+    void addToLoaded();
 
 public:
     /* Constructor from filename of the picture. */
@@ -51,13 +55,28 @@ public:
 
     /* Constructor with text to display and font size.
     By default renders white text with a black outline. */
-    Texture(std::string text, std::string path, int size, int wrap_length);
-    Texture(std::string text, std::string path, int size, int outline_size,
+    Texture(std::string text, int size, int wrap_length);
+    Texture(std::string text, int size, int outline_size,
         Light color, Light outline_color, int wrap_length);
 
     /* Constructor from all the parameters SDL_CreateTexture() needs (except
     the renderer, which is a global variable). */
     Texture(Uint32 pixelFormat, int access, int width, int height);
+
+    /* Copy constructor. */
+    Texture(const Texture &other);
+
+    /* Non-renderable texture. */
+    inline Texture() {
+        texture = nullptr;
+    }
+
+    inline bool hasTexture()  const{
+        return (bool)texture;
+    }
+
+    /* Operator= */
+    Texture &operator=(const Texture &other);
 
     /* Destructor. */
     ~Texture();

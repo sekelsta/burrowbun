@@ -51,6 +51,15 @@ public:
         rect.h = h;
     }
 
+    /* Constructor from a texture. */
+    inline Sprite(Texture t) {
+        texture.reset(new Texture(t));
+        rect.x = 0;
+        rect.y = 0;
+        rect.w = texture->getWidth();
+        rect.h = texture->getHeight();
+    }
+
     /* Assignment operator. */
     Sprite &operator=(const Sprite &sprite);
 

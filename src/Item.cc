@@ -59,7 +59,7 @@ void Item::render(SDL_Rect &rect, std::string path) {
     sprite.render(rectTo);
     /* Render text only if there's more than one in the stack. */
     if (getStack() != 1) {
-        Texture num(to_string(getStack()), path, ITEMSTACK_FONT_SIZE, 0);
+        Texture num(to_string(getStack()), ITEMSTACK_FONT_SIZE, 0);
         num.render(rect.x + ITEMSTACK_FONT_BUFFER_X, 
             rect.y - num.getHeight() + rect.h - ITEMSTACK_FONT_BUFFER_Y);
     }

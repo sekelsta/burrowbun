@@ -8,7 +8,7 @@
 #include "Movable.hh"
 #include "Entity.hh"
 #include "Hotbar.hh"
-
+#include "Menu.hh"
 #include "World.hh"
 
 using namespace std;
@@ -24,17 +24,12 @@ void Game::createWorld(string filename, WorldType type) {
     mapgen.generate(path + filename, type, path);
 }
 
-void Game::play(string mapname) {
+bool Game::play(string mapname) {
+    isPlaying = true;
     /* Load a world. */
-    World world = World(path + mapname, TILE_WIDTH, TILE_HEIGHT, path);
+    world = new World(path + mapname, TILE_WIDTH, TILE_HEIGHT, path);
 
-    window.setMapSize(world.map.getWidth(), world.map.getHeight());
-
-    SDL_Event event;
-    EventHandler eventHandler;
-
-    /* Whether the window is in focus. */
-    bool isFocused = true;
+    window.setMapSize(world -> map.getWidth(), world -> map.getHeight());
 
     /* Frames since the start of the world. */
     uint32_t gameTicks = 0;
@@ -44,44 +39,20 @@ void Game::play(string mapname) {
     while (!quit) {
         Uint32 ticks = SDL_GetTicks();
         /* Handle events on the queue. */
-        while(SDL_PollEvent(&event) != 0) {
-            /* Check whether to quit. */
-            switch(event.type) {
-                case SDL_QUIT: 
-                    quit = true;
-                    break;
-                /* Pass the event and relevent information to EventHandler. */
-                case SDL_WINDOWEVENT:
-                    eventHandler.windowEvent(event, isFocused, window);
-                    break;
-                case SDL_KEYDOWN:
-                case SDL_KEYUP:
-                    eventHandler.keyEvent(event, world.player);
-                    break;
-                case SDL_MOUSEMOTION:
-                case SDL_MOUSEWHEEL:
-                case SDL_MOUSEBUTTONDOWN:
-                case SDL_MOUSEBUTTONUP:
-                    eventHandler.mouseEvent(event);
-                    break;
-                default:
-                    // Pass
-                    break;
-            }
-        }
+        quit = update();
 
         /* Now that all the events have been handled, do eventhandling things 
         that need to be done every update (like checking whether any keys
         or mouse buttons are being held down). */
-        eventHandler.update(world);
+        eventHandler.update(*world);
 
-        world.update();
+        world -> update();
 
         /* Put pictures on the screen, but only if rendering isn't really 
         slow. */
         uint32_t frameTicks = SDL_GetTicks() - ticks;
         if (frameTicks < 2 * TICKS_PER_FRAME) { 
-            window.update(world);
+            window.update(*world);
         }
 
         /* Count the number of times we've gone through this loop. */
@@ -93,19 +64,76 @@ void Game::play(string mapname) {
             SDL_Delay(TICKS_PER_FRAME - frameTicks);
         }
     }
-    world.map.save(path + mapname);
+    world -> map.save(path + mapname);
+
+    isPlaying = false;
+    delete world;
+    world = nullptr;
+    // TODO: return false to return to the menu
+    return quit;
+}
+
+
+
+bool Game::update() {
+    SDL_Event event;
+    bool quit = false;
+    /* Handle events on the queue. */
+    while(SDL_PollEvent(&event) != 0) {
+        /* Check whether to quit. */
+        switch(event.type) {
+            case SDL_QUIT: 
+                quit = true;
+                break;
+            /* Pass the event and relevent information to EventHandler. */
+            case SDL_WINDOWEVENT:
+                eventHandler.windowEvent(event, isFocused, window);
+                break;
+            case SDL_KEYDOWN:
+            case SDL_KEYUP:
+                if (isPlaying) {
+                    assert(world);
+                    eventHandler.keyEvent(event, world -> player);
+                }
+                break;
+            case SDL_MOUSEMOTION:
+            case SDL_MOUSEWHEEL:
+            case SDL_MOUSEBUTTONDOWN:
+            case SDL_MOUSEBUTTONUP:
+                eventHandler.mouseEvent(event);
+                break;
+            default:
+                // Pass
+                break;
+        }
+    }
+
+    return quit;
 }
 
 Game::Game(string p) : SCREEN_FPS(60), TICKS_PER_FRAME(1000 / SCREEN_FPS),
         // 800 x 600 window, resizable
         window(800, 600, TILE_WIDTH, TILE_HEIGHT) {
     path = p;
+    isFocused = true;
+    isPlaying = false;
+    menu = nullptr;
+    world = nullptr;
 }
 
 void Game::run() {
-    const string filename = "world.world";
-    createWorld(filename, WorldType::EARTH);
+    menu = new Menu();
+    bool quit = false;
+    while (!quit) {
+        quit = update();
+        menu -> update(800, 600);
+        menu -> render();
+        const string filename = "world.world";
+        //createWorld(filename, WorldType::EARTH);
 
-    play(filename);
+        quit = play(filename);
+    }
+    delete menu;
+    menu = nullptr;
 }
 

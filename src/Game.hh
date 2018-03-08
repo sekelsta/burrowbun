@@ -3,7 +3,10 @@
 
 #include <string>
 #include "WindowHandler.hh"
+#include "EventHandler.hh"
 #include "MapHelpers.hh"
+
+class Menu;
 
 class Game { 
     /* For capping the frame rate. */
@@ -13,12 +16,27 @@ class Game {
     /* The path to the folder containing the executable. */
     static std::string path;
 
+    EventHandler eventHandler;
     WindowHandler window;
+
+    /* Whether the window is in focus. */
+    bool isFocused;
+
+    /* Whether we're currently playing or at a menu screen. */
+    bool isPlaying;
+
+    /* Things we might have. */
+    Menu *menu;
+    World *world;
 
     /* Create a new world. */
     void createWorld(std::string filename, WorldType type);
     /* Load the given map and start playing. */
-    void play(std::string mapname);
+    bool play(std::string mapname);
+
+    /* Poll the event queue and update internal state. Return true if the
+    user requested quit. */
+    bool update();
 public:
     /* Constructor. Takes the path to the folder containing the executable. */
     Game(std::string p);

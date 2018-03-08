@@ -12,12 +12,17 @@ class Menu {
     Screen screen;
     std::vector<Button> buttons;
 
+    int screenWidth;
+    int screenHeight;
+
     static std::vector<Button> getButtons(Screen s);
+
+    void setButtons();
 
 public:
     Menu();
 
-    void update();
+    void update(int screenWidth, int screenHeight);
 
     void render();
 };
