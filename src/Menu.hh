@@ -4,9 +4,12 @@
 #include "Button.hh"
 #include "EventHandler.hh"
 #include "MapHelpers.hh"
+#include "Mapgen.hh"
 #include <vector>
 #include <string>
 #include <functional>
+#include <thread>
+#include <mutex>
 
 enum class Screen {
     START,
@@ -45,6 +48,13 @@ class Menu {
 
     /* Position the buttons based on screen size. */
     void setButtons();
+
+    /* How far along world creation is. */
+    CreateState create;
+
+    /* Thread for creating a world */
+    std::thread *t;
+    std::mutex m;
 
 public:
     Menu();

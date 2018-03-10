@@ -1,10 +1,6 @@
 Changes since last push:
- - Fixed bug where items were being used when the click was meant for something
-else
- - Fixed bug where a stack of 0 items would sometimes briefly be rendered to 
-the hotbar.
- - Fixed bug where on right click potions would be used without having any
-effect.
+ - Added multithreading to generate map
+ - Made static variables in texture and renderer thread-safe
 
 Known "features":
  - The strenth of gravity is independent of the world.
@@ -23,7 +19,6 @@ error.
 
 To do:
  - throwing items
- - multithreading so the window remains responsive while generating a map
  - save and load the player
  - Make all public Map functions accept any x value (might be done?)
  - remove Map.getForeground() and Map.getBackground()
@@ -35,7 +30,5 @@ To do:
  - Trees!
  - add actual liquids?
  - make sprites for all tile types
- - Refactor sprites so they load in their constructor (make path a global 
-variable?)
 
 

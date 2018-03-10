@@ -12,20 +12,20 @@ void StatBar::render() {
     rect.x = x;
     rect.w = full;
     Renderer::setColor(fullColor);
-    SDL_RenderFillRect(Renderer::renderer, &rect);
+    Renderer::renderFillRect(rect);
 
     // Draw the part that can regenerate ("part")
     rect.x += full; 
     rect.w = part - full;
     assert(rect.w >= 0);
     Renderer::setColor(partColor);
-    SDL_RenderFillRect(Renderer::renderer, &rect);
+    Renderer::renderFillRect(rect);
 
     // Draw the empty part of the bar
     rect.x += rect.w;
     rect.w = totalWidth - part;
     Renderer::setColor(emptyColor);
-    SDL_RenderFillRect(Renderer::renderer, &rect);
+    Renderer::renderFillRect(rect);
 
     // And draw the overlay on top
     // The magic number comes from the width of the stat bar border

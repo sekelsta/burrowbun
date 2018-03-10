@@ -379,7 +379,7 @@ void Mapgen::removeWater(int removeDepth) {
 Mapgen::Mapgen(std::string path) : map(path) { }
 
 void Mapgen::generate(std::string filename, WorldType worldType, 
-        std::string path) {
+        std::string path, CreateState *state, mutex *m) {
     /* Seed the random number generators. */
     map.seed = time(NULL);
     srand(map.seed);
@@ -419,6 +419,9 @@ void Mapgen::generate(std::string filename, WorldType worldType,
     map.save(filename);
     /* TODO: remove when done testing. */
     map.savePPM(MapLayer::FOREGROUND, filename + ".ppm");
+    m -> lock();
+    *state = CreateState::DONE;
+    m -> unlock();
 }
 
 

@@ -9,6 +9,7 @@
 using namespace std;
 
 /* Declare static variables. */
+std::mutex Texture::m;
 std::vector<LoadedTexture> Texture::loaded;
 std::vector<LoadedFont> Texture::fonts;
 
@@ -47,8 +48,10 @@ SDL_Texture *Texture::getText(string text, int size,
     }
 
     // Create and return texture from surface
+    Renderer::m.lock();
     SDL_Texture *answer = SDL_CreateTextureFromSurface(Renderer::renderer, 
         bg_surface);
+    Renderer::m.unlock();
     SDL_FreeSurface(bg_surface);
     return answer;   
 }
@@ -96,7 +99,10 @@ void Texture::addToLoaded() {
 
 Texture::Texture(const std::string &name) {
     texture = nullptr;
+    m.lock();
+    Renderer::m.lock();
     assert(Renderer::renderer != nullptr);
+    Renderer::m.unlock();
     assert(name != "");
 
     /* Check if a texture with that name has already been loaded. */
@@ -106,6 +112,7 @@ Texture::Texture(const std::string &name) {
             the reference count, and return. */
             texture = loaded[i].texture;
             loaded[i].count++;
+            m.unlock();
             return;
         }
     }
@@ -117,12 +124,15 @@ Texture::Texture(const std::string &name) {
         string message = (string)"Failed to load image with filename " + name 
         + (string)"\nSDL_Error: " + SDL_GetError() + "\n";
         cerr << message;
+        m.unlock();
         throw message;
     }
     /* Make a texture. */
     else {
         // Convert the surface to a texture
+        Renderer::m.lock();
         texture = SDL_CreateTextureFromSurface(Renderer::renderer, surface);
+        Renderer::m.unlock();
         // Get rid of the surface
         SDL_FreeSurface(surface);
 
@@ -131,6 +141,7 @@ Texture::Texture(const std::string &name) {
                 + (string)" Surface loaded from " + name + "\nSDL_Error: " 
                 + SDL_GetError() + "\n";
             cerr << message;
+            m.unlock();
             throw message;
         }
     }
@@ -141,6 +152,7 @@ Texture::Texture(const std::string &name) {
     newTexture.texture = texture;
     newTexture.count = 1;
     loaded.push_back(newTexture);
+    m.unlock();
 
 }
 
@@ -150,25 +162,35 @@ Texture::Texture(string text, int size, int wrap_length)
 
 Texture::Texture(string text, int size, int outline_size,
         Light color, Light outline_color, int wrap_length) {
+    m.lock();
     texture = getText(text, size, outline_size, color, 
         outline_color, wrap_length);
     addToLoaded();
+    m.unlock();
 }
 
 Texture::Texture(Uint32 pixelFormat, int access, int width, int height) {
-    /* This won't be reloaded so there's no need to add it to the list. */
+    /* This won't be reloaded, but it might be copy-constructed, so we need 
+    to add it to the list. */
+    m.lock();
+    Renderer::m.lock();
     texture = SDL_CreateTexture(Renderer::renderer, pixelFormat, access, 
             width, height);
+    Renderer::m.unlock();
+    addToLoaded();
     /* Draw alpha to the texture while we're at it. */
     SetTextureBlendMode(SDL_BLENDMODE_BLEND);
+    m.unlock();
     SetRenderTarget();
+    m.lock();
     /* Set render draw color to alpha. */
     Renderer::setColor({0x00, 0x00, 0x00, 0x00});
-    SDL_RenderClear(Renderer::renderer);
+    Renderer::renderClear();
     /* Set render color back to white. */
     Renderer::setColorWhite();
     /* And stop drawing to the texture. */
-    SDL_SetRenderTarget(Renderer::renderer, NULL);
+    Renderer::setTarget(nullptr);
+    m.unlock();
 }
 
 Texture::Texture(const Texture &other) {
@@ -182,12 +204,15 @@ Texture &Texture::operator=(const Texture &other) {
     }
 
     texture = other.texture;
+    m.lock();
     addToLoaded();
+    m.unlock();
     return *this;
 }
 
 Texture::~Texture() {
     /* Check if it's in the list of loaded textures. */
+    m.lock();
     for (unsigned int i = 0; i < loaded.size(); i++) {
         if (loaded[i].texture == texture) {
             loaded[i].count--;
@@ -197,9 +222,11 @@ Texture::~Texture() {
                 SDL_DestroyTexture(texture);
                 loaded.erase(loaded.begin() + i);
             }
+            m.unlock();
             return;
         }
     }
+    m.unlock();
 
     /* It wasn't in the list, so it should be destroyed. */
     SDL_DestroyTexture(texture);

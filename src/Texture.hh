@@ -7,6 +7,7 @@
 #include <vector>
 #include "Light.hh"
 #include "Renderer.hh"
+#include <mutex>
 
 #define FONT_NAME "FreeMonoBold.ttf"
 #define DEFAULT_OUTLINE_SIZE 1
@@ -31,6 +32,9 @@ struct LoadedFont {
 texture, and destroys textures when it's time. */
 class Texture {
     SDL_Texture *texture;
+
+    /* For multithreaded access to static variables. */
+    static std::mutex m;
 
     /* For keeping track of which textures have been loaded. */
     static std::vector<LoadedTexture> loaded;
@@ -95,7 +99,11 @@ public:
             assert(rectFrom.y >= 0);
             /* rectTo can have x or y less than 0, that just means it'll
             be rendered a bit off the screen. */
+            m.lock();
+            Renderer::m.lock();
             SDL_RenderCopy(Renderer::renderer, texture, &rectFrom, &rectTo);
+            Renderer::m.unlock();
+            m.unlock();
         }
     }
 
@@ -107,7 +115,9 @@ public:
             SDL_Rect rectTo = {x, y, getWidth(), getHeight()};
             assert(rectTo.w != 0);
             assert(rectTo.h != 0);
+            Renderer::m.lock();
             SDL_RenderCopy(Renderer::renderer, texture, nullptr, &rectTo);
+            Renderer::m.unlock();
         }
     }
 
@@ -182,13 +192,17 @@ public:
     }
 
     inline void SetRenderTarget() {
-        SDL_SetRenderTarget(Renderer::renderer, texture);
+        m.lock();
+        Renderer::setTarget(texture);
+        m.unlock();
     }
 
     static inline void closeFonts() {
+        m.lock();
         for (unsigned int i = 0; i < fonts.size(); i++) {
             TTF_CloseFont(fonts[i].font);
         }
+        m.unlock();
     }
 
 };

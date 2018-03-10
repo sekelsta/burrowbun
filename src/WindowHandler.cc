@@ -148,6 +148,7 @@ void WindowHandler::init() {
         }
         else {
             // Create a renderer for the window
+            Renderer::m.lock();
             Renderer::renderer = SDL_CreateRenderer(window, -1, 
                                             SDL_RENDERER_ACCELERATED);
 
@@ -160,11 +161,13 @@ void WindowHandler::init() {
                                             SDL_RENDERER_SOFTWARE);
             }
             if (Renderer::renderer == NULL) {
+                Renderer::m.unlock();
                 string message = (string)"Software-accelerated renderer could "
                         + "not be created. SDL_Error: " + SDL_GetError() + "\n";
                 throw message;
             }
             else {
+                Renderer::m.unlock();
                 // Initialize renderer draw color
                 Renderer::setColorWhite();
 
@@ -260,9 +263,9 @@ void WindowHandler::update(World &world) {
 
 
     // Make sure the renderer isn't rendering to a texture
-    SDL_SetRenderTarget(Renderer::renderer, NULL);
+    Renderer::setTarget(NULL);
     // Clear the screen
-    SDL_RenderClear(Renderer::renderer);
+    Renderer::renderClear();;
 
     // Put a black rectangle in the background
     SDL_Rect fillRect = { 0, 0, screenWidth, screenHeight };
@@ -292,8 +295,10 @@ void WindowHandler::update(World &world) {
 // Close the window, clean up, and exit SDL
 void WindowHandler::close() {
     /* Destroy window and renderer. */
+    Renderer::m.lock();
     SDL_DestroyRenderer(Renderer::renderer);
     Renderer::renderer = NULL;
+    Renderer::m.unlock();
     SDL_DestroyWindow(window);
     window = NULL;
 

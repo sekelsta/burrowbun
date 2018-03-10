@@ -1,5 +1,5 @@
 #include "Menu.hh"
-#include "Mapgen.hh"
+#include <iostream>
 
 #define MENU_BUTTON_SIZE 48
 
@@ -9,7 +9,7 @@ using namespace std;
 void Menu::createWorld(string filename, WorldType type) {
     string path = Texture::getPath();
     Mapgen mapgen(path);
-    mapgen.generate(path + filename, type, path);
+    mapgen.generate(path + filename, type, path, &create, &m);
 }
 
 vector<Buttonfun> Menu::getButtons(Screen s) {
@@ -33,7 +33,7 @@ vector<Buttonfun> Menu::getButtons(Screen s) {
 }
 
 void Menu::setButtons() {
-    Light mouse = {0xFF, 0xFF, 0x00, 0xFF};
+    Light mouse = {0xFF, 0xCC, 0x00, 0xFF};
     Light noMouse = {0xFF, 0xFF, 0xFF, 0xFF};
     int space = 16;
     int start = 64;
@@ -55,6 +55,8 @@ Menu::Menu() {
     screenWidth = 0;
     screenHeight = 0;
     setState(Screen::START);
+    create = CreateState::NONE;
+    t = nullptr;
 }
 
 void Menu::setState(Screen newstate) {
@@ -74,28 +76,40 @@ void Menu::update(int width, int height) {
     }
 
     if (state == Screen::CREATE) {
-        createWorld(getFilename(), WorldType::EARTH);
-        setState(Screen::START);
+        m.lock();
+        if (create == CreateState::NONE) {
+            create = CreateState::NOT_STARTED;
+            assert(t == nullptr);
+            t = new thread(&Menu::createWorld, this, getFilename(), 
+                WorldType::TEST);
+        }
+        else if (create == CreateState::DONE) {
+            assert(t);
+            t -> join();
+            delete t;
+            t = nullptr;
+            setState(Screen::START);
+            create = CreateState::NONE;
+        }
+        m.unlock();
     }
 }
 
 void Menu::render() {
     // Make sure the renderer isn't rendering to a texture
-    SDL_SetRenderTarget(Renderer::renderer, NULL);
-    // Clear the screen
-    SDL_RenderClear(Renderer::renderer);
+    Renderer::setTarget(NULL);
+
     // Put a sky-colored rectangle in the background
-    SDL_Rect fillRect = { 0, 0, screenWidth, screenHeight };
     // TODO: remove magic numbers
-    SDL_SetRenderDrawColor(Renderer::renderer, 0x00, 0x99, 0xFF, 0xFF);
-    SDL_RenderFillRect(Renderer::renderer, &fillRect);
+    Renderer::setColor(0x00, 0x99, 0xFF, 0xFF);
+    Renderer::renderClear();
 
     for (unsigned int i = 0; i < buttons.size(); i++) {
         buttons[i].render();
     }
 
     // Update the screen
-    SDL_RenderPresent(Renderer::renderer);
+    Renderer::renderPresent();
 }
 
 

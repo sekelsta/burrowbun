@@ -8,6 +8,14 @@
 #include "Tile.hh"
 #include "MapHelpers.hh"
 #include "Map.hh"
+#include <mutex>
+
+/* How far along world creation is. */
+enum class CreateState {
+    NONE,
+    NOT_STARTED,
+    DONE
+};
 
 /* A class for generating a map. */
 class Mapgen {
@@ -84,7 +92,8 @@ public:
     Mapgen(std::string path);
 
     /* Take a reference to a newly created map, and fill it with stuff. */
-    void generate(std::string filename, WorldType worldType, std::string path);
+    void generate(std::string filename, WorldType worldType, std::string path, 
+        CreateState *state, std::mutex *m);
 };
 
 #endif

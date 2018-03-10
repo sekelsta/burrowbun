@@ -99,8 +99,8 @@ void Hotbar::updateSprite(string path) {
     all -> SetTextureBlendMode(SDL_BLENDMODE_BLEND);
     // Set draw color to transparent so the texture has a transparent 
     // background
-    SDL_SetRenderDrawColor(Renderer::renderer, 0, 0, 0 ,0);
-    SDL_RenderClear(Renderer::renderer);
+    Renderer::setColor(0, 0, 0 ,0);
+    Renderer::renderClear();
 
     /* Render */
     renderHotbarPart(1, path, all, up, up);
@@ -235,7 +235,7 @@ void Hotbar::render(string path) {
     }
 
     // Make sure the renderer isn't rendering to a texture
-    SDL_SetRenderTarget(Renderer::renderer, NULL);
+    Renderer::setTarget(NULL);
 
     // Create a rect to render to
     SDL_Rect rectTo = {xStart, yStart, sprite.getWidth(), sprite.getHeight()};

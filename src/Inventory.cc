@@ -53,7 +53,7 @@ void Inventory::updateSprite(string path) {
     isSpriteUpdated = true;
 
     /* Make sure the render target is set to render to the window again. */
-    SDL_SetRenderTarget(Renderer::renderer, NULL);
+    Renderer::setTarget(NULL);
 }
 
 
