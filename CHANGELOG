@@ -1,6 +1,5 @@
 Changes since last push:
- - Added multithreading to generate map
- - Made static variables in texture and renderer thread-safe
+ - Map generation now displays progress
 
 Known "features":
  - The strenth of gravity is independent of the world.

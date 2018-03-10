@@ -2,6 +2,7 @@
 #include <iostream>
 
 #define MENU_BUTTON_SIZE 48
+#define MENU_TEXT_SIZE 32
 
 using namespace std;
 
@@ -32,6 +33,50 @@ vector<Buttonfun> Menu::getButtons(Screen s) {
     return b;
 }
 
+std::vector<Spriterect> Menu::getSprites() {
+    vector<Spriterect> sprites;
+    if (state == Screen::PLAY) {
+        sprites.resize(1);
+        sprites[0].sprite = Sprite(Texture("Loading map...", 
+            MENU_BUTTON_SIZE, 0));
+    }
+    else if (state == Screen::CREATE) {
+        sprites.resize(2);
+        sprites[0].sprite = Sprite(Texture("Creating new world...", 
+            MENU_BUTTON_SIZE, 0));
+        string message = "";
+        m.lock();
+        switch (create) {
+            case CreateState::NOT_STARTED:
+                message = "Starting...";
+                break;
+            case CreateState::STUFF:
+                message = "Doing stuff...";
+            case CreateState::GENERATING_BIOMES:
+                message = "Setting biomes...";
+                break;
+            case CreateState::GENERATING_TERRAIN:
+                message = "Placing blocks...";
+                break;
+            case CreateState::SETTLING_WATER:
+                message = "Settling water...";
+                break;
+            case CreateState::SAVING:
+                message = "Saving generated map...";
+                break;
+            case CreateState::DONE:
+                message = "Finished!";
+                break;
+            case CreateState::NONE:
+                message = "Error?";
+                break;
+        }
+        m.unlock();
+        sprites[1].sprite = Sprite(Texture(message, MENU_TEXT_SIZE, 0));
+    }
+    return sprites;
+}
+
 void Menu::setButtons() {
     Light mouse = {0xFF, 0xCC, 0x00, 0xFF};
     Light noMouse = {0xFF, 0xFF, 0xFF, 0xFF};
@@ -51,6 +96,23 @@ void Menu::setButtons() {
     }
 }
 
+void Menu::setSprites() {
+    int space = 16;
+    int total = 0;
+    for (unsigned int i = 0; i < sprites.size(); i++) {
+        total += sprites[i].sprite.getHeight();
+    }
+
+    int y = (screenHeight - total - (space * sprites.size())) / 2;
+    for (unsigned int i = 0; i < sprites.size(); i++) {
+        sprites[i].rect.w = sprites[i].sprite.getWidth();
+        sprites[i].rect.h = sprites[i].sprite.getHeight();
+        sprites[i].rect.x = (screenWidth - sprites[i].rect.w) / 2;
+        sprites[i].rect.y = y;
+        y += sprites[i].rect.h + space;
+    }
+}
+
 Menu::Menu() {
     screenWidth = 0;
     screenHeight = 0;
@@ -62,7 +124,9 @@ Menu::Menu() {
 void Menu::setState(Screen newstate) {
     state = newstate;
     buttons = getButtons(state);
+    sprites = getSprites();
     setButtons();
+    setSprites();
 }
 
 void Menu::update(int width, int height) {
@@ -70,6 +134,7 @@ void Menu::update(int width, int height) {
     screenHeight = height;
 
     setButtons();
+    setSprites();
 
     for (unsigned int i = 0; i < buttons.size(); i++) {
         buttons[i].dofun(*this);
@@ -81,7 +146,7 @@ void Menu::update(int width, int height) {
             create = CreateState::NOT_STARTED;
             assert(t == nullptr);
             t = new thread(&Menu::createWorld, this, getFilename(), 
-                WorldType::TEST);
+                WorldType::EARTH);
         }
         else if (create == CreateState::DONE) {
             assert(t);
@@ -93,6 +158,15 @@ void Menu::update(int width, int height) {
         }
         m.unlock();
     }
+
+    m.lock();
+    if (create != CreateState::NONE) {
+        m.unlock();
+        sprites = getSprites();
+        m.lock();
+        setSprites();
+    }
+    m.unlock();
 }
 
 void Menu::render() {
@@ -106,6 +180,10 @@ void Menu::render() {
 
     for (unsigned int i = 0; i < buttons.size(); i++) {
         buttons[i].render();
+    }
+
+    for (unsigned int i = 0; i < sprites.size(); i++) {
+        sprites[i].render();
     }
 
     // Update the screen

@@ -22,9 +22,15 @@ void Mapgen::setSize(int x, int y) {
     cylinderScale.SetZScale(cylinderScale.GetXScale());
 }
 
-void Mapgen::generateEarth() {
+void Mapgen::generateEarth(CreateState *state, mutex *m) {
     /* Set height and width, and use them to make a tile array. */
     setSize(4096, 2048);
+
+    /* Inform on status. */
+    m -> lock();
+    *state = CreateState::GENERATING_BIOMES;
+    m -> unlock();
+
     /* Some constants to use in the perlin moise. */
     const int octaves = 2;
     const double persistence = 0.2;
@@ -80,6 +86,11 @@ void Mapgen::generateEarth() {
             map.setBiome(i, j, info);
         }
     }
+
+    /* Inform on status. */
+    m -> lock();
+    *state = CreateState::GENERATING_TERRAIN;
+    m -> unlock();
 
     /* Now that biomes are set, make a cave system. */
     module::RidgedMulti baseCaves;
@@ -178,8 +189,19 @@ void Mapgen::generateEarth() {
         }
     }
 
+    /* Inform on status. */
+    m -> lock();
+    *state = CreateState::STUFF;
+    m -> unlock();
+
     /* Put water on the surface. */
     map.savePPM(MapLayer::FOREGROUND, "wunsettled.world.ppm");
+
+    /* Inform on status. */
+    m -> lock();
+    *state = CreateState::SETTLING_WATER;
+    m -> unlock();
+
     settleWater();
     removeWater(10);
     settleWater();
@@ -405,7 +427,7 @@ void Mapgen::generate(std::string filename, WorldType worldType,
         case WorldType::SMOLTEST :
             break;
         case WorldType::EARTH :
-            generateEarth();
+            generateEarth(state, m);
             break;
         default :
             cerr << "Maybe I'll implement that later." << endl;
@@ -416,6 +438,7 @@ void Mapgen::generate(std::string filename, WorldType worldType,
     floating islands or whatever directly above the spawn point, so the
     player doesn't die of fall damage every time they respawn. */
     map.spawn.y = map.height * 0.9;
+    *state = CreateState::SAVING;
     map.save(filename);
     /* TODO: remove when done testing. */
     map.savePPM(MapLayer::FOREGROUND, filename + ".ppm");

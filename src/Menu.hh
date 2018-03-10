@@ -22,7 +22,7 @@ enum class Screen {
 struct Buttonfun: public Button {
     std::function<void(Menu &)> fun;
 
-    void dofun(Menu &menu) {
+    inline void dofun(Menu &menu) {
         if (containsMouse && wasClicked && !isHeld) {
             fun(menu);
             reset();
@@ -30,11 +30,23 @@ struct Buttonfun: public Button {
     }
 };
 
+/* Like a sprite, but it has a rect for where it is on the screen. */
+struct Spriterect {
+    Sprite sprite;
+    Rect rect;
+
+    inline void render() {
+        sprite.render(rect);
+    }
+};
+
+/* A class to do menu stuff. */
 class Menu {
     friend void EventHandler::updateMenu(Menu &menu);
 
     Screen state;
     std::vector<Buttonfun> buttons;
+    std::vector<Spriterect> sprites;
 
 
     int screenWidth;
@@ -46,8 +58,14 @@ class Menu {
     /* Get the list of buttons the given state should have. */
     static std::vector<Buttonfun> getButtons(Screen s);
 
+    /* Get the list of sprites the given state should have. */
+    std::vector<Spriterect> getSprites();
+
     /* Position the buttons based on screen size. */
     void setButtons();
+
+    /* Position the sprites based on screen size. */
+    void setSprites();
 
     /* How far along world creation is. */
     CreateState create;

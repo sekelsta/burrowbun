@@ -13,7 +13,12 @@
 /* How far along world creation is. */
 enum class CreateState {
     NONE,
+    STUFF,
     NOT_STARTED,
+    GENERATING_BIOMES,
+    GENERATING_TERRAIN,
+    SETTLING_WATER,
+    SAVING,
     DONE
 };
 
@@ -41,7 +46,7 @@ class Mapgen {
     void setSize(int x, int y);
 
     /* Generate a complex world. */
-    void generateEarth();
+    void generateEarth(CreateState *state, std::mutex *m);
 
     /* Generate a tiny world good for testing world generation. */
     void generateTest();
