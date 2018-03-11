@@ -39,8 +39,10 @@ public:
         // TODO: if I want this to throw at just the right speed, I'll need
         // to do a calculation involving drag.
         throwticks = 2 * dist / ITEM_THROW_SPEED;
-        velocity.x = d * ITEM_THROW_SPEED;
-        velocity.y = ITEM_THROW_SPEED;
+        velocity.x = d * ITEM_THROW_SPEED 
+            + (rand() % (int)(ITEM_THROW_SPEED * 10))/ 20.0;
+        velocity.y = ITEM_THROW_SPEED 
+            + (rand() % (int)(ITEM_THROW_SPEED * 10)) / 20.0;
     }
 
     /* Move in a direction. */

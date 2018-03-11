@@ -22,6 +22,9 @@ class Player : public Entity {
     int tileReachDown;
     int tileReachSideways;
 
+    /* Drop the item the mouse is holding on the ground and return the dropped
+    item. */
+    DroppedItem *drop();
 public:
 
     /* Info for rendering stat amounts. */
@@ -75,8 +78,14 @@ public:
     // Try to pick up an item
     virtual void pickup(DroppedItem *item);
 
-    /* Drop the item the mouse is holding on the ground. */
-    DroppedItem *drop();
+    /* Drop the items the mouse is holding to the ground and add it to the 
+    vector. */
+    inline void toss(std::vector<DroppedItem *> &drops) {
+        DroppedItem *d = drop();
+        if (d) {
+            drops.push_back(d);
+        }
+    }
 };
 
 #endif

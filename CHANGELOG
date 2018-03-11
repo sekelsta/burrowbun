@@ -1,8 +1,6 @@
 Changes since last push:
- - Movables no longer round their velocity to the nearest int
- - Items can now be thrown on the ground by closing the inventory while holding 
-one with the mouse. I might want to make them also throwable by pressing a key,
-but I'm not going to implement that until I'm sure.
+ - Added press T to toss
+ - Tweaked throwing to make the distance slightly random
 
 Known "features":
  - The strenth of gravity is independent of the world.
@@ -31,5 +29,5 @@ To do:
  - Trees!
  - add actual liquids?
  - make sprites for all tile types
-
+ - add a "quit to menu" option
 

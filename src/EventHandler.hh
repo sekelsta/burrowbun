@@ -13,6 +13,7 @@ class World;
 struct MouseBox;
 struct StatBar;
 class Menu;
+class DroppedItem;
 
 /* A struct to hold information about which keys do what. This is so that
    later the player can change these settings. */
@@ -20,11 +21,14 @@ struct KeySettings {
     // Which keys are for movement
     std::vector<SDL_Scancode> leftKeys, rightKeys, upKeys, downKeys, jumpKeys;
 
-    // Key to open the inventory and whatever opens along with it
+    // Keys to open the inventory and whatever opens along with it
     std::vector<SDL_Scancode> inventoryKeys;
 
     // 24 keys to select a hotbar slot
     std::vector<SDL_Scancode> hotbarKeys;
+
+    /* Keys to toss items onto the ground. */
+    std::vector<SDL_Scancode> tossKeys;
 };
 
 /* A class to handle events such as keyboard input or mouse movement. */
@@ -91,7 +95,8 @@ public:
     void useMouse(Player &player, World &world);
 
     // Do whatever should be done when a key is pressed or released
-    void keyEvent(const SDL_Event &event, Player &player);
+    void keyEvent(const SDL_Event &event, Player &player, 
+        std::vector<DroppedItem *> &drops);
 
     // Do stuff for keys being held down
     void updateKeys(const Uint8 *state);

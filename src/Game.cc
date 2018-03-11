@@ -87,7 +87,8 @@ bool Game::update() {
             case SDL_KEYUP:
                 if (isPlaying) {
                     assert(world);
-                    eventHandler.keyEvent(event, world -> player);
+                    eventHandler.keyEvent(event, world -> player, 
+                        world -> droppedItems);
                 }
                 break;
             case SDL_MOUSEMOTION:

@@ -189,10 +189,7 @@ void Player::update(vector<DroppedItem*> &drops) {
     }
     /* Drop the mouse item on the ground if the inventory is closed. */
     if (!isInventoryOpen) {
-        DroppedItem *d = drop();
-        if (d) {
-            drops.push_back(d);
-        }
+        toss(drops);
     }
 
     /* Again delete empty stacks in inventories, this time so they don't

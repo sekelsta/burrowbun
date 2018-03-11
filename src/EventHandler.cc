@@ -9,6 +9,7 @@
 #include "Hotbar.hh"
 #include "Button.hh"
 #include "Menu.hh"
+#include "DroppedItem.hh"
 
 using namespace std;
 
@@ -137,6 +138,8 @@ EventHandler::EventHandler() {
     // Keys to open the inventory and whatever else opens along with it
     keySettings.inventoryKeys.push_back(SDL_SCANCODE_I);
     keySettings.inventoryKeys.push_back(SDL_SCANCODE_C);
+    /* Keys to toss items. */
+    keySettings.tossKeys.push_back(SDL_SCANCODE_T);
     // And each of 24 keys to select a hotbar slot
     keySettings.hotbarKeys.push_back(SDL_SCANCODE_1);
     keySettings.hotbarKeys.push_back(SDL_SCANCODE_2);
@@ -272,7 +275,8 @@ void EventHandler::useMouse(Player &player, World &world) {
 }
 
 // Do whatever should be done when key presses or releases happen
-void EventHandler::keyEvent(const SDL_Event &event, Player &player) {
+void EventHandler::keyEvent(const SDL_Event &event, Player &player, 
+        vector<DroppedItem *> &drops) { 
     SDL_Scancode key = event.key.keysym.scancode;
 
     // Here we should handle keys which don't need to be held down to work.
@@ -281,6 +285,9 @@ void EventHandler::keyEvent(const SDL_Event &event, Player &player) {
     }
     else if (isIn(key, keySettings.inventoryKeys)) {
         player.toggleInventory();
+    }
+    else if (isIn(key, keySettings.tossKeys)) {
+        player.toss(drops);
     }
     else if (isIn(key, keySettings.hotbarKeys)) {
         // Select the appropriate slot in the hotbar
