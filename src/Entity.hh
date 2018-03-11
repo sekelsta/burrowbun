@@ -8,6 +8,7 @@
 #include "json.hpp"
 #include "Damage.hh"
 #include "Animation.hh"
+#include <vector>
 
 class DroppedItem;
 
@@ -58,7 +59,7 @@ public:
     virtual void takeFallDamage();
 
     /* Do the things! */
-    virtual void update();
+    virtual void update(std::vector<DroppedItem*> &drops);
 
     /* Render the correct sprite / animation. */
     virtual void render(const Rect &camera);

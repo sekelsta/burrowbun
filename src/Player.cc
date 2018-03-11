@@ -12,6 +12,8 @@
 using namespace std;
 using json = nlohmann::json;
 
+#define PLAYER_PICKUP_DISTANCE 128
+
 // Constructor
 Player::Player(string path) : Entity(path + "entities/bunny.json", path), 
         inventory(12, 5, path), trash(1, 1, path, true), hotbar(path) {
@@ -161,8 +163,8 @@ void Player::useAction(InputType type, int x, int y, World &world) {
     }
 }
 
-void Player::update() {
-    Entity::update();
+void Player::update(vector<DroppedItem*> &drops) {
+    Entity::update(drops);
     // Tick down the time until we can use items again
     assert(useTimeLeft >= 0);
     if (!canUse()) {
@@ -180,16 +182,24 @@ void Player::update() {
     inventory.update(mouseSlot);
     trash.update(mouseSlot);
     hotbar.update(mouseSlot, isInventoryOpen);
-    if (mouseSlot != nullptr && mouseSlot -> isItem() 
+    if (mouseSlot && mouseSlot -> isItem() 
             && ((Item *)mouseSlot) -> getStack() <= 0) {
         delete mouseSlot;
         mouseSlot = nullptr;
+    }
+    /* Drop the mouse item on the ground if the inventory is closed. */
+    if (!isInventoryOpen) {
+        DroppedItem *d = drop();
+        if (d) {
+            drops.push_back(d);
+        }
+    }
+
     /* Again delete empty stacks in inventories, this time so they don't
-    render wierldy. */
+    render weirldy. */
     inventory.update();
     trash.update();
     hotbar.Inventory::update();
-    }
 }
 
 Item *Player::pickup(Item *item) {
@@ -207,15 +217,30 @@ Item *Player::pickup(Item *item) {
 }
 
 void Player::pickup(DroppedItem *item) {
+    /* Ignore items that have just been thrown. */
+    if (!item -> canPickup()) {
+        return;
+    }
+
     // Pick it up if colliding with it
     if (rect.intersects(item -> getRect())) {
         item -> item = pickup(item -> item);
         return;
     }
     // TODO: remove magic number
-    attractOther(128, ITEM_ATTRACT_SPEED, item);
+    attractOther(PLAYER_PICKUP_DISTANCE, ITEM_ATTRACT_SPEED, item);
 }
 
+DroppedItem *Player::drop() {
+    if (mouseSlot && mouseSlot -> isItem()) {
+        DroppedItem *dropped = new DroppedItem((Item *)mouseSlot, 
+            getCenterX(), getCenterY(), rect.worldWidth);
+        dropped -> toss(isFacingRight, PLAYER_PICKUP_DISTANCE);
+        mouseSlot = nullptr;
+        return dropped;
+    }
+    return nullptr;
+}
 
 
 

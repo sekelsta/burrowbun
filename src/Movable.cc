@@ -159,17 +159,6 @@ void Movable::updateMotion(double gravitynum) {
         maxHeight = min(maxHeight, rect.y);
     }
 
-    // Since location is an int, make velocity an int by rounding away from 0
-    if (velocity.x < 0) {
-        velocity.x = floor(velocity.x);
-    }
-    velocity.x = ceil(velocity.x);
-
-    if (velocity.y < 0) {
-        velocity.y = floor(velocity.y);
-    }
-    velocity.y = ceil(velocity.y);
-
     // Reset collision info
     isDroppingDown = isCollidingDown && !(collidePlatforms);
     isSteppingUp = false;

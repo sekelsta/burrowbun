@@ -66,12 +66,17 @@ public:
     void useAction(InputType type, int x, int y, World &world);
 
     /* Update self, including statbars (so changes to stats actually render). */
-    void update();
+    void update(std::vector<DroppedItem*> &drops);
 
+    /* Place an item in the inventory or the hotbar. Return the item if it 
+    doesn't fit. */
     Item *pickup(Item *item);
 
     // Try to pick up an item
     virtual void pickup(DroppedItem *item);
+
+    /* Drop the item the mouse is holding on the ground. */
+    DroppedItem *drop();
 };
 
 #endif

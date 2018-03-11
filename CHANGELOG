@@ -1,5 +1,8 @@
 Changes since last push:
- - Map generation now displays progress
+ - Movables no longer round their velocity to the nearest int
+ - Items can now be thrown on the ground by closing the inventory while holding 
+one with the mouse. I might want to make them also throwable by pressing a key,
+but I'm not going to implement that until I'm sure.
 
 Known "features":
  - The strenth of gravity is independent of the world.
@@ -17,7 +20,6 @@ error.
  - When colliding with the bottom of the map, position is set but velocity isn't
 
 To do:
- - throwing items
  - save and load the player
  - Make all public Map functions accept any x value (might be done?)
  - remove Map.getForeground() and Map.getBackground()

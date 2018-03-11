@@ -14,7 +14,7 @@ DroppedItem::DroppedItem(Item *i, int x, int y, int worldWidth) {
     nextRect.y = 0;
 
     // TODO: remove magic numbers
-    drag = {0.6, 0.9166};
+    drag = {0.95, 0.9166};
     attracting = false;
 }
 
@@ -70,6 +70,9 @@ void DroppedItem::update() {
     if (!attracting || !item) {
         gravity = true;
         collides = true;
+    }
+    if (throwticks != 0) {
+        throwticks--;
     }
     attracting = false;
     setAccel({0, 0});

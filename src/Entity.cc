@@ -3,6 +3,7 @@
 #include "DroppedItem.hh"
 
 using json = nlohmann::json;
+using namespace std;
 
 // Constructor
 Entity::Entity(std::string filename, std::string path) 
@@ -88,7 +89,7 @@ void Entity::takeFallDamage() {
 }
 
 /* Do the things! */
-void Entity::update() {
+void Entity::update(vector<DroppedItem*> &drops) {
     health.update();
     fullness.update();
     mana.update();

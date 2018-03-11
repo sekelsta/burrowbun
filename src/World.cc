@@ -24,7 +24,7 @@ World::~World() {
 void World::update() {
 
     /* TODO: update all entities. */
-    player.update();
+    player.update(droppedItems);
 
 
     /* Move things around. */
