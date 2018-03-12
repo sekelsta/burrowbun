@@ -16,6 +16,7 @@ DroppedItem::DroppedItem(Item *i, int x, int y, int worldWidth) {
     // TODO: remove magic numbers
     drag = {0.95, 0.9166};
     attracting = false;
+    throwticks = 0;
 }
 
 DroppedItem::~DroppedItem() {

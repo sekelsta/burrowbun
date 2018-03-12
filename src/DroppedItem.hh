@@ -40,9 +40,9 @@ public:
         // to do a calculation involving drag.
         throwticks = 2 * dist / ITEM_THROW_SPEED;
         velocity.x = d * ITEM_THROW_SPEED 
-            + (rand() % (int)(ITEM_THROW_SPEED * 10))/ 20.0;
+            + (rand() % (int)(ITEM_THROW_SPEED * 16))/ 32.0;
         velocity.y = ITEM_THROW_SPEED 
-            + (rand() % (int)(ITEM_THROW_SPEED * 10)) / 20.0;
+            + (rand() % (int)(ITEM_THROW_SPEED * 16)) / 32.0;
     }
 
     /* Move in a direction. */

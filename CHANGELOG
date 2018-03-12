@@ -1,6 +1,7 @@
 Changes since last push:
- - Added press T to toss
- - Tweaked throwing to make the distance slightly random
+ - Fixed bug of uninitialized variable sometimes preventing items from being picked up
+ - Tweaked randomness of throwing
+ - Added torch item sprite and item json
 
 Known "features":
  - The strenth of gravity is independent of the world.
@@ -15,7 +16,6 @@ right angle
  - When the window is bigger than the map, crossing x = 0 causes an assertion
 error.
  - The player can't jump when colliding with a wall.
- - When colliding with the bottom of the map, position is set but velocity isn't
 
 To do:
  - save and load the player
