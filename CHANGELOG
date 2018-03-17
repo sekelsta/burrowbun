@@ -1,7 +1,6 @@
 Changes since last push:
- - Fixed bug of uninitialized variable sometimes preventing items from being picked up
- - Tweaked randomness of throwing
- - Added torch item sprite and item json
+ - Added torch, glass, and glowstone as placable blocks, though they don't
+yet act the way they should, and they don't yet all have sprites
 
 Known "features":
  - The strenth of gravity is independent of the world.

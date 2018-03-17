@@ -1,0 +1,16 @@
+{
+    "sprite": {
+        "rect": {
+            "x": 16,
+            "y": 32,
+            "w": 16,
+            "h": 16
+        },
+        "name": "blocks_0.png"
+    },
+	"bonusReach": 0,
+    "isItem": true,
+	"maxStack": 999,
+	"useTime": 6,
+    "consumable": true
+}

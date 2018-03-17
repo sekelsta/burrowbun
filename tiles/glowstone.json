@@ -1,0 +1,33 @@
+{
+    "sprite": {
+        "rect": {
+            "x": 0,
+            "y": 0,
+            "w": 16,
+            "h": 16
+        },
+        "name": "stone.png"
+    },
+    "color": {
+        "r": 82,
+        "g": 74,
+        "b": 64,
+        "a": 0
+    },
+    "isSolid": true,
+    "isPlatform": false,
+    "overlapDamage": {
+        "minDamage": 0,
+        "maxDamage": 0,
+        "balance": 0,
+        "criticalChance": 0,
+        "criticalAmount": 1,
+        "minWounds": 0,
+        "maxWounds": 0,
+        "type": 2
+    },
+    "maxHealth": 15,
+    "allowsLight": false,
+    "opacity": 64,
+    "edgeType": 1
+}

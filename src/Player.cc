@@ -101,6 +101,9 @@ Player::Player(string path) : Entity(path + "entities/bunny.json", path),
     pickup(ItemMaker::makeItem(ActionType::RED_BRICK, path));
     pickup(ItemMaker::makeItem(ActionType::GRAY_BRICK, path));
     pickup(ItemMaker::makeItem(ActionType::DARK_BRICK, path));
+    pickup(ItemMaker::makeItem(ActionType::GLOWSTONE, path));
+    pickup(ItemMaker::makeItem(ActionType::GLASS, path));
+    pickup(ItemMaker::makeItem(ActionType::TORCH, path));
 
     isInventoryOpen = false;
 }

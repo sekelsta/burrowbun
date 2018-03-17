@@ -37,6 +37,9 @@ enum class TileType : short {
     RED_BRICK,
     GRAY_BRICK,
     DARK_BRICK,
+    GLASS,
+    GLOWSTONE,
+    TORCH,
     SAND,
     MUD,
     CLOUD,
@@ -45,9 +48,9 @@ enum class TileType : short {
     FIRST_TILE = EMPTY,
     FIRST_ITEMED_TILE = DIRT, // First tile with an equivalent item
     LAST_TILE = GLACIER,
-    LAST_PURE_TILE = DARK_BRICK, // Last tile that's not a subclass
+    LAST_PURE_TILE = TORCH, // Last tile that's not a subclass
     FIRST_BOULDER = SAND,
-    LAST_BOULDER = GLACIER
+    LAST_BOULDER = GLACIER,
 };
 
 /* When looking at the tiles next to them in picking a sprite, tiles with

@@ -1,0 +1,33 @@
+{
+    "sprite": {
+        "rect": {
+            "x": 0,
+            "y": 0,
+            "w": 16,
+            "h": 16
+        },
+        "name": "torch.png"
+    },
+    "color": {
+        "r": 255,
+        "g": 114,
+        "b": 0,
+        "a": 0
+    },
+    "isSolid": false,
+    "isPlatform": false,
+    "overlapDamage": {
+        "minDamage": 0,
+        "maxDamage": 0,
+        "balance": 0,
+        "criticalChance": 0,
+        "criticalAmount": 1,
+        "minWounds": 0,
+        "maxWounds": 0,
+        "type": 2
+    },
+    "maxHealth": 16,
+    "allowsLight": true,
+    "opacity": 0,
+    "edgeType": 1
+}

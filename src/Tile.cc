@@ -85,6 +85,15 @@ std::string Tile::getFilename(TileType tileType) {
         case TileType::DARK_BRICK : 
             filename = "dark_brick.json";
             break;
+        case TileType::GLASS :
+            filename = "glass.json";
+            break;
+        case TileType::GLOWSTONE :
+            filename = "glowstone.json";
+            break;
+        case TileType::TORCH :
+            filename = "torch.json";
+            break;
         case TileType::SAND :
             filename = "sand.json";
             break;

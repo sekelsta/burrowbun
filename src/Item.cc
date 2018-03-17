@@ -165,6 +165,15 @@ std::string Item::getJsonFilename(ActionType type) {
         case ActionType::DARK_BRICK:
             filename = "dark_brick";
             break;
+        case ActionType::GLASS :
+            filename = "glass";
+            break;
+        case ActionType::GLOWSTONE :
+            filename = "glowstone";
+            break;
+        case ActionType::TORCH :
+            filename = "torch";
+            break;
         case ActionType::SAND:
             filename = "sand";
             break;
