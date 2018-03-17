@@ -1,6 +1,5 @@
 Changes since last push:
- - Added torch, glass, and glowstone as placable blocks, though they don't
-yet act the way they should, and they don't yet all have sprites
+ - Fixed boulder sprites, and added placeholder sprites for glass and glowstone
 
 Known "features":
  - The strenth of gravity is independent of the world.
