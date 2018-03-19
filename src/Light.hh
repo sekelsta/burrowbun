@@ -2,7 +2,7 @@
 #define LIGHT_HH
 
 #include <algorithm>
-#include "json.hpp"
+#include "json.hh"
 
 struct SDL_Color;
 

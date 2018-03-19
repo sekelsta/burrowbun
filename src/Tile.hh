@@ -146,6 +146,15 @@ public:
         return edgeType;
     }
 
+    inline bool getCanBackground() const {
+        return canBackground;
+    }
+
+    /* The number of foreground and background columns in the spritesheet. */
+    inline bool numSprites() const {
+        return sprite.getCols() / (2 - !canBackground);
+    }
+
     // Variables for how it interacts with the players
     bool getIsPlatform() const;
     bool getIsSolid() const;

@@ -5,6 +5,7 @@
 #include "filepaths.hh"
 #include "AllTheItems.hh"
 #include "Game.hh"
+#include "World.hh"
 #include <SDL2/SDL.h>
 #include <algorithm>
 
@@ -44,7 +45,10 @@ Item::Item(ActionType t, string path) {
 
 void Item::use(InputType type, int x, int y, World &world) {
     assert(stack > 0);
-    stack -= (int)isConsumable() * (int)use_internal(type, x, y, world);
+    bool success = use_internal(type, x, y, world);
+    stack -= (int)isConsumable() * (int)success;
+    // If success, add the use time.
+    world.player.useTimeLeft += (int)success * useTime;
 }
 
 Item::~Item() {}

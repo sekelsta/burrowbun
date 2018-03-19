@@ -524,6 +524,12 @@ bool Map::placeTile(Location place, TileType type) {
         return false;
     }
 
+    /* Can only place certain types of tiles in the background. */
+    if (place.layer == MapLayer::BACKGROUND 
+            && !getTile(type) -> getCanBackground()) {
+        return false;
+    }
+
     setTile(place, type);
     chooseSprite(place.x, place.y);
     // TODO: change this when I add furniture

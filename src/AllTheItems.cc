@@ -47,9 +47,6 @@ bool Potion::use_internal(InputType type, int x, int y, World &world) {
         world.player.health.addFull(healthGained);
         world.player.fullness.addFull(fullnessGained);
         world.player.mana.addFull(manaGained);
-        // TODO: make consumable
-        // Use useTime
-        world.player.useTimeLeft = useTime;
         return true;
     }
     return false;
@@ -141,8 +138,6 @@ bool Block::use_internal(InputType type, int x, int y, World &world) {
     bool success = world.map.placeTile(
             world.map.getMapCoords(x, y, layer), tileType);
 
-    // If success, add the use time.
-    world.player.useTimeLeft += (int)success * useTime;
     return success;
 }
 
@@ -169,8 +164,6 @@ bool Pickaxe::use_internal(InputType type, int x, int y, World &world) {
         MapLayer layer = getLayer(type);
         bool success = world.map.damage(world.map.getMapCoords(x, y, layer),
                  blockDamage, world.droppedItems);
-        // If success, add the use time
-        world.player.useTimeLeft += (int)success * useTime;
         return success;
     }
     return false;

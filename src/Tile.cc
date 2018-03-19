@@ -164,10 +164,11 @@ uint8_t Tile::getSpritePlace(Map &map, const Location &place) const {
         return SpaceInfo::toSpritePlace(x, y);
     }
     y = map.bordering(place);
-    x = rand() % sprite.getCols() / 2;
+    x = rand() % numSprites();
     /* On the sprite, the equivalent background tile is moved over by
     sprite.cols / 2. */
     if (place.layer == MapLayer::BACKGROUND) {
+        assert(canBackground);
         x += sprite.getCols() / 2;
     }
 
