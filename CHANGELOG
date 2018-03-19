@@ -1,5 +1,5 @@
 Changes since last push:
- - Fixed boulder sprites, and added placeholder sprites for glass and glowstone
+ - Added more tile fields which I expect to need in the near future
 
 Known "features":
  - The strenth of gravity is independent of the world.

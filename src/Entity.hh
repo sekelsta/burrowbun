@@ -5,7 +5,7 @@
 #include <fstream>
 #include "Movable.hh"
 #include "Stat.hh"
-#include "json.hpp"
+#include "json.hh"
 #include "Damage.hh"
 #include "Animation.hh"
 #include <vector>

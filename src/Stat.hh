@@ -2,7 +2,7 @@
 #define STAT_HH
 
 #include <iostream>
-#include "json.hpp"
+#include "json.hh"
 
 /* A struct for having a stat, such as health or mana. */
 struct Stat {

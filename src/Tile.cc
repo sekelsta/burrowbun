@@ -5,7 +5,7 @@
 #include "Tile.hh"
 #include "Map.hh"
 #include "Movable.hh"
-#include "json.hpp"
+#include "json.hh"
 #include "filepaths.hh"
 #include <SDL2/SDL.h>
 #include "DroppedItem.hh"
@@ -123,10 +123,6 @@ bool Tile::getIsSolid() const {
     return isSolid;
 }
 
-int Tile::getOpacity() const {
-    return opacity;
-}
-
 void Tile::render(uint8_t spritePlace, const Light &light, 
         const SDL_Rect &rectTo) {
     if (!sprite.hasTexture()) {
@@ -206,9 +202,16 @@ Tile::Tile(TileType tileType, string path)
     color = j["color"].get<Light>();
     isSolid = j["isSolid"];
     isPlatform = j["isPlatform"];
+    canBackground = j["canBackground"];
+    waterBreaks = j["waterBreaks"];
     overlapDamage = j["overlapDamage"].get<Damage>();
+    isAnimated = j["isAnimated"];
+    emitted = j["emitted"].get<Light>();
+    absorbed = {j["absorbed"]["r"], j["absorbed"]["g"], 
+        j["absorbed"]["b"], j["absorbed"]["a"]};
+    isSky = j["isSky"];
     maxHealth = j["maxHealth"];
-    opacity = j["opacity"];
+    tier = j["tier"];
     int edgeInt = j["edgeType"];
     edgeType = (EdgeType)edgeInt;
     sprite.loadTexture(path + TILE_SPRITE_PATH);

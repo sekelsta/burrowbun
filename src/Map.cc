@@ -92,8 +92,8 @@ bool Map::isBesideTile(int x, int y, MapLayer layer) {
 
 inline bool Map::isSky(int x, int y) {
     x = wrapX(x);
-    return (getForeground(x, y) -> getOpacity() == 0
-        && getBackground(x, y) -> getOpacity() == 0);
+    return (getForeground(x, y) -> getIsSky()
+        && getBackground(x, y) -> getIsSky());
 }
 
 int Map::skyDistance(int x, int y, int maxDist) {
@@ -164,7 +164,7 @@ void Map::updateNear(int x, int y) {
 
 
 int Map::bordering(const Location &place) {
-    EdgeType thisEdge = getTile(place) -> edgeType;
+    EdgeType thisEdge = getTile(place) -> getEdge();
     /* TODO: when rendering of liquids is added, see if this is actually what
     I want to happen. */
     if (thisEdge == EdgeType::LIQUID) {
@@ -173,21 +173,21 @@ int Map::bordering(const Location &place) {
 
     int col = 0;
     if (place.y != height - 1 
-            && getTile(place.x, place.y+1, place.layer) -> edgeType 
+            && getTile(place.x, place.y+1, place.layer) -> getEdge()
             != thisEdge) {
         col += 1;
     }
     /* WrapX is called so it matches up with the tile on the other side
     of the map, which it's next to when it wraps around. */
-    if (getTile(place.x+1, place.y, place.layer) -> edgeType != thisEdge) {
+    if (getTile(place.x+1, place.y, place.layer) -> getEdge() != thisEdge) {
         col += 2;
     }
     if (place.y != 0 
-            && getTile(place.x, place.y-1, place.layer) -> edgeType 
+            && getTile(place.x, place.y-1, place.layer) -> getEdge() 
             != thisEdge) {
         col += 4;
     }
-    if (getTile(place.x-1, place.y, place.layer) -> edgeType != thisEdge) {
+    if (getTile(place.x-1, place.y, place.layer) -> getEdge() != thisEdge) {
         col += 8;
     }
     return col;
@@ -432,9 +432,9 @@ void Map::savePPM(MapLayer layer, std::string filename) {
         for (int i = 0; i < width; i++) {
             Tile *tile = getTile(i, j, layer);
             /* Output red, green, and blue values for each tile. */
-            outfile << (int)(tile -> color.r) << " ";
-            outfile << (int)(tile -> color.g) << " ";
-            outfile << (int)(tile -> color.b) << " ";
+            outfile << (int)(tile -> getColor().r) << " ";
+            outfile << (int)(tile -> getColor().g) << " ";
+            outfile << (int)(tile -> getColor().b) << " ";
         }
         outfile << "\n";
     } 

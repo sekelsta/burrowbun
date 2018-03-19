@@ -4,7 +4,7 @@
 #include <string>
 #include <set>
 #include "Sprite.hh"
-#include "json.hpp"
+#include "json.hh"
 #include "Damage.hh"
 #include "Rect.hh"
 #include <algorithm>

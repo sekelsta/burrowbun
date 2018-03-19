@@ -16,6 +16,8 @@
     },
     "isSolid": true,
     "isPlatform": false,
+    "canBackground": false,
+    "waterBreaks": false,
     "overlapDamage": {
         "minDamage": 0,
         "maxDamage": 0,
@@ -26,8 +28,21 @@
         "maxWounds": 0,
         "type": 2
     },
+    "isAnimated": false,
+    "emitted": {
+        "r": 0,
+        "g": 0,
+        "b": 0,
+        "a": 0
+    },
+    "absorbed": {
+        "r": 1.96798967127,
+        "g": 1.96798967127,
+        "b": 1.96798967127,
+        "a": 0.3
+    },
     "maxHealth": 21,
-    "allowsLight": false,
-    "opacity": 64,
+    "tier": 0,
+    "isSky": false,
     "edgeType": 1
 }

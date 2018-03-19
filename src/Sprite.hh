@@ -6,7 +6,7 @@
 #include <memory>
 #include "Texture.hh"
 #include "SpriteBase.hh"
-#include "json.hpp"
+#include "json.hh"
 
 // Forward declare
 struct SDL_Texture;

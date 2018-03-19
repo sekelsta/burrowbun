@@ -58,7 +58,17 @@ the same edgetype count as next to them. */
 enum class EdgeType {
     LIQUID,
     SOLID,
-    PLATFORM
+    PLATFORM,
+    SOLITARY
+};
+
+/* A struct with four doubles. Useful for calculating what portion of the light
+passes through a block. */
+struct Absorb {
+    double r;
+    double b;
+    double g;
+    double a;
 };
 
 /* A class to make tiles based on their type, and store their infos. */
@@ -71,31 +81,36 @@ class Tile {
     bool isPlatform;
     /* Whether players can pass through the tile. */
     bool isSolid;
+
+    /* Whether it can be placed in the background layer. */
+    bool canBackground;
+
+    /* Whether it drops itself as an item when water touches it. */
+    bool waterBreaks;
+
     /* How much damage the player takes from sharing space with this tile. */
     Damage overlapDamage;
 
     // Display-related variables
-    /* Tiles with 0 opacity are completely permeable to light. */
-    int opacity;
+    bool isAnimated;
+
+    /* Nonzero if the block creates light. */
+    Light emitted;
+    /* How much light it blocks for each color, aside from the amount lost by
+    distance. */
+    Absorb absorbed;
+
+    /* Whether it is a source of natural light. For instance, an empty tile
+    or one that is mostly transparent. */
+    bool isSky;
 
     // Mining-related variables
     /* How much health the tile has determines how many hits it can take from
     a pickax before it breaks. */
     int maxHealth;
 
-protected:
-    /* Return the filename of the json file for that tiletype. */
-    static std::string getFilename(TileType tileType);
-
-public:
-    // The name of this type of tile
-    const TileType type;
-
-    // Information about the sprite
-    // Tile spritesheets use rows for the different versions that depend on
-    // whether each side is next to air, and the cols are the different 
-    // variations.
-    Sprite sprite;
+    /* How strong of a pickaxe is needed to break the tile at all. */
+    int tier;
 
     /* What color should represent it in images. */
     Light color;
@@ -104,13 +119,37 @@ public:
     picking a sprite. */
     EdgeType edgeType;
 
+protected:
+    // Information about the sprite
+    // Tile spritesheets use rows for the different versions that depend on
+    // whether each side is next to air, and the cols are the different 
+    // variations.
+    Sprite sprite;
+
+    /* Return the filename of the json file for that tiletype. */
+    static std::string getFilename(TileType tileType);
+
+public:
+    // The name of this type of tile
+    const TileType type;
+
+    /* Access functions. */
+    inline bool getIsSky() const {
+        return isSky;
+    }
+
+    inline Light getColor() const {
+        return color;
+    }
+
+    inline EdgeType getEdge() const {
+        return edgeType;
+    }
+
     // Variables for how it interacts with the players
     bool getIsPlatform() const;
     bool getIsSolid() const;
     void dealOverlapDamage(movable::Movable &movable) const;
-
-    /* For lighting. Tiles with 0 opacity are completely permeable to light.*/
-    int getOpacity() const;
 
     /* Basically the number of hits with a pickaxe to break it. */
     int getMaxHealth() const;
