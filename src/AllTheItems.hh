@@ -57,7 +57,7 @@ public:
 /* Items that can damage blocks. */
 class Pickaxe: public Block {
     int blockDamage;
-    int pickaxeTier;
+    int tier;
 public:
     /* Constructor. */
     Pickaxe(ActionType type, std::string path);

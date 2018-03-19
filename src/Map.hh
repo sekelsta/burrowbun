@@ -264,30 +264,38 @@ public:
         return findPointer(x, y) -> backgroundSprite;
     }
 
-    inline uint8_t getSprite(int x, int y, MapLayer layer) const {
+    inline Location getSprite(int x, int y, MapLayer layer) const {
+        uint8_t sprite;
         if (layer == MapLayer::FOREGROUND) {
-            return getForegroundSprite(x, y);
+            sprite = getForegroundSprite(x, y);
         }
-        assert(layer == MapLayer::BACKGROUND);
-        return getBackgroundSprite(x, y);
+        else {
+            assert(layer == MapLayer::BACKGROUND);
+            sprite = getBackgroundSprite(x, y);
+        }
+
+        Location answer;
+        SpaceInfo::fromSpritePlace(answer, sprite);
+        return answer;
     }
 
-    inline uint8_t getSprite(const Location &place) const {
+    inline Location getSprite(const Location &place) const {
         return getSprite(place.x, place.y, place.layer);
     }
 
     /* Set which part of the spritesheet should be used. */
-    inline void setSprite(int x, int y, MapLayer layer, uint8_t newSprite) {
+    inline void setSprite(int x, int y, MapLayer layer, Location newSprite) {
+        uint8_t toset = SpaceInfo::toSpritePlace(newSprite);
         if (layer == MapLayer::FOREGROUND) {
-            findPointer(x, y) -> foregroundSprite = newSprite;
+            findPointer(x, y) -> foregroundSprite = toset;
         }
         else {
             assert(layer == MapLayer::BACKGROUND);
-            findPointer(x, y) -> backgroundSprite = newSprite;
+            findPointer(x, y) -> backgroundSprite = toset;
         }
     }
 
-    inline void setSprite(const Location &place, uint8_t newSprite) {
+    inline void setSprite(const Location &place, Location newSprite) {
         setSprite(place.x, place.y, place.layer, newSprite);
     }
 

@@ -5,7 +5,7 @@
 #include "Map.hh"
 #include "MapHelpers.hh"
 #include "Rect.hh"
-#include "json.hpp"
+#include "json.hh"
 #include "DroppedItem.hh"
 
 #define BOULDER_CARRY_HEIGHT 1.5
@@ -125,12 +125,11 @@ void Boulder::setDirection(Map &map, const Location &place, int direction)
     assert(direction == 1 || direction == -1);
     /* Convert direction to 0 or 1. */
     direction = (direction + 1) / 2;
-    Location spritePlace;
-    SpaceInfo::fromSpritePlace(spritePlace, map.getSprite(place));
+    Location spritePlace = map.getSprite(place);
     /* If direction = 1, spritePlace.y should be at least sprite.cols / 4. */
     spritePlace.x %= sprite.getCols() / 4;
     spritePlace.x += direction * (sprite.getCols() / 4);
-    map.setSprite(place, SpaceInfo::toSpritePlace(spritePlace)); 
+    map.setSprite(place, spritePlace); 
 }
 
 /* Look at the map and move.
@@ -165,8 +164,7 @@ int Boulder::getDirection(const Map &map, const Location &place) const {
     if (!isMoving) {
         return 0; 
     }
-    Location spritePlace;
-    SpaceInfo::fromSpritePlace(spritePlace, map.getSprite(place));
+    Location spritePlace = map.getSprite(place);
     return (spritePlace.x < sprite.getCols() / 4) ? -1 : 1;
 }
 

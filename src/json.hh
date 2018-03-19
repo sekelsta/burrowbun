@@ -1,3 +1,7 @@
-#pragma GCC diagnostic ignored "-Wuninitialized"
+#ifndef JSON_HH
+#define JSON_HH
+#pragma GCC diagnostic ignored "-Wmaybe-uninitialized"
 #include "json.hpp"
-#pragma GCC diagnostic warning "-Wuninitialized"
+#pragma GCC diagnostic warning "-Wmaybe-uninitialized"
+#endif
+

@@ -1,5 +1,10 @@
 Changes since last push:
- - Added more tile fields which I expect to need in the near future
+ - Tiles now can't be placed in the background and don't expect to have background sprites if canBackground is false
+ - Pickaxe and block tiers now matter
+ - Map now mostly works with sprite places as locations rather than uint8s
+ - Tiles can now have an animation
+ - Ignore compiler warnings from json.hpp, since I didn't write it
+
 
 Known "features":
  - The strenth of gravity is independent of the world.
@@ -9,6 +14,7 @@ boulder updates first and traps you.
  - Dirt and mud look very similar, and mud looks identical to humus
 
 Known bugs:
+ - Clickboxes r3equire the mouse to move before they notice it
  - Collision detection misses one when falling into a two-wide gap at just the
 right angle
  - When the window is bigger than the map, crossing x = 0 causes an assertion

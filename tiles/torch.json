@@ -28,7 +28,7 @@
         "maxWounds": 0,
         "type": 2
     },
-    "isAnimated": false,
+    "isAnimated": true,
     "emitted": {
         "r": 0,
         "g": 0,

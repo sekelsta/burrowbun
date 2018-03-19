@@ -1,7 +1,7 @@
 #include <fstream>
 #include <vector>
 #include "Item.hh"
-#include "json.hpp"
+#include "json.hh"
 #include "filepaths.hh"
 #include "AllTheItems.hh"
 #include "Game.hh"

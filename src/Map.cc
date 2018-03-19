@@ -58,12 +58,13 @@ void Map::chooseSprite(int x, int y) {
     place.x = x;
     place.y = y;
     place.layer = MapLayer::FOREGROUND;
-    uint8_t spritePlace = getTile(place) -> getSpritePlace(*this, place);
-    findPointer(x, y) -> foregroundSprite = spritePlace;
-    assert(findPointer(x, y) -> foregroundSprite == spritePlace);
+    Location spritePlace = getTile(place) -> getSpritePlace(*this, place);
+    findPointer(x, y) -> foregroundSprite 
+        = SpaceInfo::toSpritePlace(spritePlace);
     place.layer = MapLayer::BACKGROUND;
     spritePlace = getTile(place) -> getSpritePlace(*this, place);
-    findPointer(x, y) -> backgroundSprite = spritePlace;
+    findPointer(x, y) -> backgroundSprite 
+        = SpaceInfo::toSpritePlace(spritePlace);
 }
 
 bool Map::isBesideTile(int x, int y, MapLayer layer) {
@@ -532,7 +533,7 @@ bool Map::placeTile(Location place, TileType type) {
 
     setTile(place, type);
     chooseSprite(place.x, place.y);
-    // TODO: change this when I add furniture
+    // TODO: change this if I add furniture
 
     return true;
 }
@@ -682,7 +683,7 @@ void Map::moveTile(const Location &place, int x, int y,
 
     kill(newX, place.y + y, place.layer, items);
     TileType val = getTileType(place, 0, 0);
-    uint8_t spritePlace = getSprite(place);
+    Location spritePlace = getSprite(place);
     setSprite(newX, place.y + y, place.layer, spritePlace);
     setTile(newX, place.y + y, place.layer, val);
     setTile(place, TileType::EMPTY);
@@ -697,7 +698,7 @@ void Map::displaceTile(const Location &place, int x, int y) {
     }
 
     TileType destination = getTileType(place, x, y);
-    uint8_t spritePlace = getSprite(newX, place.y + y, place.layer);
+    Location spritePlace = getSprite(newX, place.y + y, place.layer);
     setSprite(newX, place.y + y, place.layer, getSprite(place));
     setSprite(place, spritePlace);
     setTile(newX, place.y + y, place.layer, getTile(place) -> type);

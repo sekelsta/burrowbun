@@ -1,7 +1,7 @@
 #include <fstream>
 #include <SDL2/SDL_image.h>
 #include "Sprite.hh"
-#include "json.hpp"
+#include "json.hh"
 
 /* For convinence. */
 using json = nlohmann::json;

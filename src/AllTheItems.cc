@@ -6,7 +6,7 @@
 #include "Player.hh"
 #include "Map.hh"
 #include "World.hh"
-#include "json.hpp"
+#include "json.hh"
 
 #define TILE_WIDTH 16
 #define TILE_HEIGHT 16
@@ -153,20 +153,26 @@ Pickaxe::Pickaxe(ActionType type, string path) : Block(type, path) {
     json j = json::parse(infile);
 
     blockDamage = j["blockDamage"];
-    pickaxeTier = j["pickaxeTier"];
+    tier = j["tier"];
 }
 
 /* Pickaxe use. */
 bool Pickaxe::use_internal(InputType type, int x, int y, World &world) {
     // Only do anything if the tile is within range
-    if (canPlace(x, y, world.player, world.map)) {
-        /* Which layer to damage. */
-        MapLayer layer = getLayer(type);
-        bool success = world.map.damage(world.map.getMapCoords(x, y, layer),
-                 blockDamage, world.droppedItems);
-        return success;
+    if (!canPlace(x, y, world.player, world.map)) {
+        return false;
     }
-    return false;
+
+    /* Which layer to damage. */
+    MapLayer layer = getLayer(type);
+    Location place = world.map.getMapCoords(x, y, layer);
+    /* Only mine blocks this pickaxe is capable of mining. */
+    if (world.map.getTile(place) -> getTier() > tier) {
+        return false;
+    }
+
+    bool success = world.map.damage(place, blockDamage, world.droppedItems);
+    return success;
 }
 
 /* Turn an ActionType into the corresponding TileType. Requires that the 

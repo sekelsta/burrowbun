@@ -5,7 +5,7 @@
 #include "Rect.hh"
 #include <vector>
 #include <string>
-#include "json.hpp"
+#include "json.hh"
 
 /* A class to hold the information for an animation. */
 class Animation: public SpriteBase {

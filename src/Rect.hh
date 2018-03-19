@@ -3,7 +3,7 @@
 
 #include <cassert>
 #include <algorithm>
-#include "json.hpp"
+#include "json.hh"
 #include <SDL2/SDL.h>
 
 /* Rectangle, capable of seeing if another intersects it taking into account

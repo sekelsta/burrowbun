@@ -9,7 +9,7 @@
         "name": "pickaxe01.png"
     },
 	"blockDamage": 6,
-	"pickaxeTier": 1,
+	"tier": 0,
 	"bonusReach": 0,
     "isItem": true,
 	"maxStack": 1,

@@ -10,6 +10,8 @@
 #include <SDL2/SDL.h>
 #include "DroppedItem.hh"
 
+#define TILE_ANIMATION_DELAY 4
+
 // For convenience
 using json = nlohmann::json;
 
@@ -154,36 +156,44 @@ void Tile::dealOverlapDamage(movable::Movable &movable) const {
     movable.takeDamage(overlapDamage);
 }
 
-uint8_t Tile::getSpritePlace(Map &map, const Location &place) const {
-    int x;
-    int y;
+Location Tile::getSpritePlace(Map &map, const Location &place) const {
+    Location answer;
     /* Some (empty) tiles have no sprite. */
     if (!sprite.hasTexture()) {
-        x = 0;
-        y = 0;
-        return SpaceInfo::toSpritePlace(x, y);
+        answer.x = 0;
+        answer.y = 0;
+        return answer;
     }
-    y = map.bordering(place);
-    x = rand() % numSprites();
+    answer.y = map.bordering(place);
+    answer.x = rand() % numSprites();
     /* On the sprite, the equivalent background tile is moved over by
     sprite.cols / 2. */
     if (place.layer == MapLayer::BACKGROUND) {
         assert(canBackground);
-        x += sprite.getCols() / 2;
+        answer.x += sprite.getCols() / 2;
     }
 
-    return SpaceInfo::toSpritePlace(x, y);
+    return answer;
 }
 
-uint8_t Tile::updateSprite(Map &map, const Location &place) const {
-    int y = map.bordering(place);
-    int x = SpaceInfo::getX(map.getSprite(place));
-    return SpaceInfo::toSpritePlace(x, y);
+Location Tile::updateSprite(Map &map, const Location &place) const {
+    Location answer;
+    answer.y = map.bordering(place);
+    answer.x = map.getSprite(place).x;
+    return answer;
 }
 
 /* Change the map in whatever way needs doing. */
 bool Tile::update(Map &map, Location place,
         std::vector<DroppedItem*> &items, int tick) {
+    if (isAnimated) {
+        if (tick % TILE_ANIMATION_DELAY == 0) {
+            Location spritePlace = map.getSprite(place);
+            spritePlace.x = (spritePlace.x + 1) % numSprites();
+            map.setSprite(place, spritePlace);
+        }
+        return true;
+    }
     return false;
 }
 
@@ -223,7 +233,7 @@ Tile::~Tile() {}
 
 /* Whether the tile will ever need to call its update function. */
 bool Tile::canUpdate(const Map &map, const Location &place) {
-    return false;
+    return isAnimated;
 }
 
 void Tile::render(uint8_t spritePlace, const Light &light, 

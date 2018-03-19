@@ -2,7 +2,7 @@
 #define DAMAGE_HH
 
 #include <random>
-#include "json.hpp"
+#include "json.hh"
 
 /* What type of damage is being dealt. */
 enum class DamageType {

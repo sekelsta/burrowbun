@@ -150,8 +150,12 @@ public:
         return canBackground;
     }
 
+    inline bool getTier() const {
+        return tier;
+    }
+
     /* The number of foreground and background columns in the spritesheet. */
-    inline bool numSprites() const {
+    inline int numSprites() const {
         return sprite.getCols() / (2 - !canBackground);
     }
 
@@ -164,11 +168,11 @@ public:
     int getMaxHealth() const;
 
     /* Which sprite on the spritesheet to use. */
-    virtual uint8_t getSpritePlace(Map &map, const Location &place)
+    virtual Location getSpritePlace(Map &map, const Location &place)
              const;
 
     /* What sprite to change to. */
-    virtual uint8_t updateSprite(Map &map, const Location &place)
+    virtual Location updateSprite(Map &map, const Location &place)
             const;
 
     /* Change the map in whatever way needs doing. */
