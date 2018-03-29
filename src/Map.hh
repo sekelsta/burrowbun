@@ -79,7 +79,11 @@ private:
 
     /* Find a Tile object of type val. If it does not exist, create it. If
     multiple exist, return the first one. */
-    Tile *getTile(TileType val) const;
+    inline Tile *getTile(TileType val) const {
+        /* Return the tile if it exists. */
+        assert(pointers[(unsigned int)val] != nullptr);
+        return pointers[(unsigned int)val];
+    }
 
     /* Call chooseSprite on every tile on the map. */
     void randomizeSprites();
@@ -315,10 +319,14 @@ public:
 
     inline void setSprite(const Location &place, Location newSprite) {
         setSprite(place.x, place.y, place.layer, newSprite);
-    }
+    }  
 
-    /* Return the light at a square, setting it if necessary. */
-    Light getLight(int x, int y);
+    /* Return the lighting of a tile. */
+    inline Light getLight(int x, int y) {
+        /* Combine the value from blocks with the value from the sky, taking into
+        account that the color of light the sky makes. */
+        return findPointer(x, y) -> light.useSky(getSkyLight());
+    }
 
     /* Return the color the sun / moon is shining. */
     inline Light getSkyLight() const {
@@ -354,13 +362,25 @@ public:
     /* Get the type of the tile at x, y, layer. If it isn't on the map,
     return TileType::EMPTY. */
     TileType getTileType(int x, int y, MapLayer layer) const;
+
     /* Sets the tiletype very fast (does not update the sprites of the tiles
     around it). */
-    void setTileType(int x, int y, MapLayer layer, TileType type);
+    inline void setTileType(int x, int y, MapLayer layer, TileType type) {
+        if (layer == MapLayer::FOREGROUND) {
+            findPointer(x, y) -> foreground = type;
+        }
+        else {
+            assert(layer == MapLayer::BACKGROUND);
+            findPointer(x, y) -> background = type;
+        }
+    }
 
     /* Get the type of the tile at place.x + x, place.y + y, place.layer. 
     If the tile isn't on the map, return TileType::EMPTY. */
-    TileType getTileType(const Location &place, int x, int y) const;
+    inline TileType getTileType(const Location &place, int x, int y) const {
+        int newX = wrapX(place.x + x);
+        return getTileType(newX, place.y + y, place.layer);
+    }
 
     /* Set the tile at x, y, layer equal to val. */
     inline void setTile(const Location &place, TileType val) {
@@ -372,9 +392,6 @@ public:
     /* Place a tile in the correct layer. Return whether it was successful. */
     bool placeTile(Location place, TileType type);
 
-    /* Gets the map's list of the tile pointers it uses. */
-    std::vector<Tile *> getPointers() const;
-
     /* Update the map. */
     void update(std::vector<DroppedItem*> &items);
 
@@ -384,11 +401,20 @@ public:
 
     /* Destroy a tile if it has no health. Return true if it was destroyed, or
     false if it still had health and lived. */
-    bool destroy(const TileHealth &health, std::vector<DroppedItem*> &items);
+    inline bool destroy(const TileHealth &health, 
+            std::vector<DroppedItem*> &items) {
+        if (health.health <= 0) {
+            kill(health.place, items);
+        }
+
+        return health.health <= 0;
+    }
 
     /* Destroy a tile. */
     void kill(int x, int y, MapLayer layer, std::vector<DroppedItem*> &items);
-    void kill(const Location &place, std::vector<DroppedItem*> &items);
+    inline void kill(const Location &place, std::vector<DroppedItem*> &items) {
+        kill(place.x, place.y, place.layer, items);
+    }
 
     /* Take an invalid x location and add or subtract width until
     0 <= x < width. */

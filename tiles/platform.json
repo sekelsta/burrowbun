@@ -36,13 +36,13 @@
         "a": 0
     },
     "absorbed": {
-        "r": 1.96798967127,
+        "r": 8,
         "g": 1.96798967127,
         "b": 1.96798967127,
         "a": 0.3
     },
     "maxHealth": 6,
     "tier": 0,
-    "isSky": false,
+    "isSky": true,
     "edgeType": 2
 }

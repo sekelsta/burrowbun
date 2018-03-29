@@ -228,16 +228,12 @@ Tile::Tile(TileType tileType, string path)
     sprite.loadTexture(path + TILE_SPRITE_PATH);
 
     double sqrt2 = sqrt(2);
-    assert(absorbed.r > 1.0);
-    assert(absorbed.g > 1.0);
-    assert(absorbed.b > 1.0);
+    assert(absorbed.r >= 1.0);
+    assert(absorbed.g >= 1.0);
+    assert(absorbed.b >= 1.0);
     /* Not technically required but I can imagine mistakenly making it so much
     more easily than I can imagine actually wanting it to be the case. */
     assert(absorbed.a < 1.0);
-    corner.r = pow(absorbed.r, sqrt2);
-    corner.g = pow(absorbed.g, sqrt2);
-    corner.b = pow(absorbed.b, sqrt2);
-    corner.a = pow(absorbed.a, sqrt2);
 }
 
 /* Virtual destructor. */

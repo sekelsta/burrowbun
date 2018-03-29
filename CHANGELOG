@@ -1,5 +1,5 @@
 Changes since last push:
- - Lighting now also looks at blocks, and different blocks can have different opacities
+ - Changed opacities of tiles
 
 Known "features":
  - The strenth of gravity is independent of the world.
@@ -7,6 +7,8 @@ Known "features":
  - If carried by a boulder with another boulder right behind you, the top
 boulder updates first and traps you.
  - Dirt and mud look very similar, and mud looks identical to humus
+ - I can't spread light as far as I would like without slowing down the 
+framerate
 
 Known bugs:
  - Clickboxes r3equire the mouse to move before they notice it

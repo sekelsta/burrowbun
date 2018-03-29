@@ -62,15 +62,6 @@ enum class EdgeType {
     SOLITARY
 };
 
-/* A struct with four doubles. Useful for calculating what portion of the light
-passes through a block. */
-struct Absorb {
-    double r;
-    double b;
-    double g;
-    double a;
-};
-
 /* A class to make tiles based on their type, and store their infos. */
 // Maybe since maps are filled with pointers to the same tile, everything
 // should be constant?
@@ -100,9 +91,6 @@ class Tile {
     /* How much light it blocks for each color, aside from the amount lost by
     distance, for edges. */
     DLight absorbed;
-
-    /* absorbed but with each number to the sqrt(2), for corners. */
-    DLight corner;
 
     /* Whether it is a source of natural light. For instance, an empty tile
     or one that is mostly transparent. */
@@ -164,10 +152,6 @@ public:
 
     inline DLight getAbsorbed() const {
         return absorbed;
-    }
-
-    inline DLight getCorner() const {
-        return corner;
     }
 
     /* The number of foreground and background columns in the spritesheet. */

@@ -12,7 +12,7 @@
 #include "AllTheItems.hh"
 #include <queue>
 
-#define MAX_LIGHT_DEPTH 8
+#define MAX_LIGHT_DEPTH 5
 
 using namespace std;
 
@@ -40,12 +40,6 @@ Tile *Map::newTile(TileType val) {
     pointers[(unsigned int)val] = tile;
 
     return tile;
-}
-
-Tile *Map::getTile(TileType val) const {
-    /* Return the tile if it exists. */
-    assert(pointers[(unsigned int)val] != nullptr);
-    return pointers[(unsigned int)val];
 }
 
 void Map::randomizeSprites() {
@@ -196,9 +190,11 @@ void Map::setLight(int xstart, int ystart, int xstop, int ystop) {
     int xlookstop = wrapX(xstop + MAX_LIGHT_DEPTH);
     int ylookstart = min(max(0, ystart - MAX_LIGHT_DEPTH), height - 1);
     int ylookstop = min(max(0, ystop + MAX_LIGHT_DEPTH), height - 1);
+    set<Location> toCheck;
     /* Loop through and make sure none need to be updated. */
     for (int i = xlookstart; i < xlookstop; i++) {
         for (int j = ylookstart; j < ylookstop; j++) {
+            bool change = false;
             if (findPointer(i, j) -> lightRemoved) {
                 done = false;
                 findPointer(i, j) -> lightRemoved = false;
@@ -210,15 +206,39 @@ void Map::setLight(int xstart, int ystart, int xstop, int ystop) {
                         findPointer(x, y) -> light = Light(0, 0, 0, 0);
                     }
                 }
+
+                /* Add anything that could affect those to the list of lights to
+                calculate. */
+                for (int x = i - 2 * mld; x <= i + 2 * mld; x++) {
+                    for (int y = j - 2 * mld; y <= j + 2 * mld; y++) {
+                        if (isOnMap(x, y)) {
+                            toCheck.insert({x, y, (MapLayer)0});
+                        }
+                    }
+                }
+                
             }
             if (findPointer(i, j) -> lightAdded) {
-                done = false;
+                change = true;
                 findPointer(i, j) -> lightAdded = false;
             }
             if (i >= xstart && i < xstop && j >= ystart && j < ystop
                     && !findPointer(i, j) -> isLightUpdated) {
-                done = false;
+                change = true;
                 findPointer(i, j) -> isLightUpdated = true;
+            }
+
+            if (change) {
+                done = false;
+                /* Add anything that could affect those to the list of lights to
+                calculate. */
+                for (int x = i - mld; x <= i + mld; x++) {
+                    for (int y = j - mld; y <= j + mld; y++) {
+                        if (isOnMap(x, y)) {
+                            toCheck.insert({x, y, (MapLayer)0});
+                        }
+                    }
+                }
             }
         }
     }
@@ -236,38 +256,39 @@ void Map::setLight(int xstart, int ystart, int xstop, int ystop) {
     // so far.
 
     /* Loop over the map looking for light sources. */
-    for (int x = xlookstart; x < xlookstop; x++) {
-        for (int y = ylookstart; y < ylookstop; y++) {
-            assert(isOnMap(x, y));
-            if (isSky(x, y)) {
-                findPointer(x, y) -> light = getSkyLight();
-                bool used = false;
-                /* If there's a non-sky tile next to it, this sky is a light
-                source. */
-                for (int i = -1; i < 2; i++) {
-                    for (int j = -1; j < 2; j++) {
-                        if (isOnMap(x + i, y + j) && !isSky(x + i, y + j)
-                                /* Avoid recaclutating. */
-                                && !used) {
-                            used = true;
-                            effectLight(x, y, Light(0, 0, 0, 255), current);
-                            addLight(x, y, current, Light(0, 0, 0, 255));
-                        }
+    set<Location>::iterator it;
+    for (it = toCheck.begin(); it != toCheck.end(); it++) {
+        int x = it -> x;
+        int y = it -> y;
+        assert(isOnMap(x, y));
+        if (isSky(x, y)) {
+            findPointer(x, y) -> light = getSkyLight();
+            bool used = false;
+            /* If there's a non-sky tile next to it, this sky is a light
+            source. */
+            for (int i = -1; i < 2; i++) {
+                for (int j = -1; j < 2; j++) {
+                    if (isOnMap(x + i, y + j) && !isSky(x + i, y + j)
+                            /* Avoid recaclutating. */
+                            && !used) {
+                        used = true;
+                        effectLight(x, y, Light(0, 0, 0, 255), current);
+                        addLight(x, y, current, Light(0, 0, 0, 255));
                     }
                 }
             }
-
-            /* If this tile is a light source */
-            Light emitted = getTile(x, y, MapLayer::FOREGROUND) -> getEmitted();
-            if (emitted.r != 0 || emitted.g != 0 || emitted.b != 0) {
-                effectLight(x, y, emitted, current);
-                addLight(x, y, current, emitted);
-            }
-
-            // possible TODO: light sources in the background (maybe just no)
-            // TODO: darksources
-            // TODO: movable lights
         }
+
+        /* If this tile is a light source */
+        Light emitted = getTile(x, y, MapLayer::FOREGROUND) -> getEmitted();
+        if (emitted.r != 0 || emitted.g != 0 || emitted.b != 0) {
+            effectLight(x, y, emitted, current);
+            addLight(x, y, current, emitted);
+        }
+
+        // possible TODO: light sources in the background (maybe just no)
+        // TODO: darksources
+        // TODO: movable lights
     }
 
 }
@@ -578,13 +599,6 @@ void Map::savePPM(MapLayer layer, std::string filename) {
     } 
 }
 
-/* Return the lighting of a tile. */
-Light Map::getLight(int x, int y) {
-    /* Combine the value from blocks with the value from the sky, taking into
-    account that the color of light the sky makes. */
-    return findPointer(x, y) -> light.useSky(getSkyLight());
-}
-
 TileType Map::getTileType(int x, int y, MapLayer layer) const {
     if (!isOnMap(x, y)) {
         return TileType::EMPTY;
@@ -596,21 +610,6 @@ TileType Map::getTileType(int x, int y, MapLayer layer) const {
         assert(layer == MapLayer::BACKGROUND);
         return findPointer(x, y) -> background;
     }
-} 
-
-void Map::setTileType(int x, int y, MapLayer layer, TileType type) {
-    if (layer == MapLayer::FOREGROUND) {
-        findPointer(x, y) -> foreground = type;
-    }
-    else {
-        assert(layer == MapLayer::BACKGROUND);
-        findPointer(x, y) -> background = type;
-    }
-}
-
-TileType Map::getTileType(const Location &place, int x, int y) const {
-    int newX = wrapX(place.x + x);
-    return getTileType(newX, place.y + y, place.layer);
 }
 
 void Map::setTile(int x, int y, MapLayer layer, TileType val) {
@@ -669,10 +668,6 @@ bool Map::placeTile(Location place, TileType type) {
     // TODO: change this if I add furniture
 
     return true;
-}
-
-vector<Tile *> Map::getPointers() const {
-    return pointers;
 }
 
 void Map::update(vector<DroppedItem*> &items) {
@@ -750,14 +745,6 @@ bool Map::damage(Location place, int amount, vector<DroppedItem*> &items) {
     return true;
 }
 
-bool Map::destroy(const TileHealth &health, vector<DroppedItem*> &items) {
-    if (health.health <= 0) {
-        kill(health.place, items);
-    }
-
-    return health.health <= 0;
-}
-
 void Map::kill(int x, int y, MapLayer layer, vector<DroppedItem*> &items) {
     // Drop itself as an item
     TileType type = getTileType(wrapX(x), y, layer);
@@ -770,9 +757,6 @@ void Map::kill(int x, int y, MapLayer layer, vector<DroppedItem*> &items) {
 
     // Set the place it used to be to empty
     setTile(x, y, layer, TileType::EMPTY);
-}
-void Map::kill(const Location &place, vector<DroppedItem*> &items) {
-    kill(place.x, place.y, place.layer, items);
 }
 
 Location Map::getMapCoords(int x, int y, MapLayer layer) {
