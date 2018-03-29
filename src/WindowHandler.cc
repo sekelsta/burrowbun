@@ -213,6 +213,10 @@ void WindowHandler::renderMap(Map &m, const Rect &camera) {
     int height = ceil((float)camera.h / (float)TILE_HEIGHT) + 1;
     int xMapStart = ((camera.x / TILE_WIDTH) + m.getWidth()) % m.getWidth();
     int yMapStart = (camera.y + camera.h) / TILE_HEIGHT;
+
+    /* Make sure the lights are updated. */
+    m.setLight(xMapStart, yMapStart - height, xMapStart + width, yMapStart);
+
     assert(width != 0);
     assert(height != 0);
     for (int i = 0; i < width; i++) {
@@ -269,7 +273,9 @@ void WindowHandler::update(World &world) {
 
     // Put a black rectangle in the background
     SDL_Rect fillRect = { 0, 0, screenWidth, screenHeight };
-    SDL_SetRenderDrawColor(Renderer::renderer, 0x00, 0x99, 0xFF, 0xFF);
+    Light skyColor = world.map.getSkyColor();
+    SDL_SetRenderDrawColor(Renderer::renderer, skyColor.r, skyColor.g, 
+        skyColor.b, 0xFF);
     SDL_RenderFillRect(Renderer::renderer, &fillRect);
 
     // Only draw stuff if it isn't minimized

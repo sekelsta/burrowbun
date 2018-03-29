@@ -2,7 +2,7 @@
 #include <SDL2/SDL.h>
 
 using json = nlohmann::json;
-
+using namespace std;
 
 Light::operator SDL_Color() const {
     return {r, g, b, a};

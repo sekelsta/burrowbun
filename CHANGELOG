@@ -1,10 +1,5 @@
 Changes since last push:
- - Tiles now can't be placed in the background and don't expect to have background sprites if canBackground is false
- - Pickaxe and block tiers now matter
- - Map now mostly works with sprite places as locations rather than uint8s
- - Tiles can now have an animation
- - Ignore compiler warnings from json.hpp, since I didn't write it
-
+ - Lighting now also looks at blocks, and different blocks can have different opacities
 
 Known "features":
  - The strenth of gravity is independent of the world.

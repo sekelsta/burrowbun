@@ -10,6 +10,9 @@
 #include "version.hh"
 #include "DroppedItem.hh"
 #include "AllTheItems.hh"
+#include <queue>
+
+#define MAX_LIGHT_DEPTH 8
 
 using namespace std;
 
@@ -92,43 +95,185 @@ bool Map::isBesideTile(int x, int y, MapLayer layer) {
 }
 
 inline bool Map::isSky(int x, int y) {
+    assert(y >= 0);
+    assert(y < height);
     x = wrapX(x);
     return (getForeground(x, y) -> getIsSky()
         && getBackground(x, y) -> getIsSky());
 }
 
-int Map::skyDistance(int x, int y, int maxDist) {
-    if (isSky(x, y)) {
-        return 0;
-    }
-    int smallest = distance(0, 0, 0, maxDist);
-    /* It's okay if i is negative. */
-    for (int i = x + 1 - maxDist; i < maxDist + x; i++) {
-        for (int j = max(0, y + 1 - maxDist);
-                j < maxDist + y && j < height; j++) {
-            if (isSky(i, j)) {
-                smallest = min(smallest, distance(i, j, x, y));
+void Map::effectLight(int x, int y, const Light &l, 
+        vector<vector<int>> &current) {
+    int mld = MAX_LIGHT_DEPTH;
+    assert(current.size() == 2 * MAX_LIGHT_DEPTH + 1);
+    assert(current[0][0] == -1);
+    assert(current[mld][mld] == -1);
+
+    /* Do pattern like breadth-first search. */
+    queue<Location> unvisited;
+    unvisited.push({0, 0, MapLayer::FOREGROUND});
+    DLight lback = getBackground(x, y) -> getAbsorbed();
+    current[MAX_LIGHT_DEPTH][MAX_LIGHT_DEPTH] = max(
+        getForeground(x, y) -> getAbsorbed().r, lback.r * lback.a);
+
+    while (!unvisited.empty()) {
+        Location loc = unvisited.front();
+        unvisited.pop();
+        /* Stop if we've gotten to the edge of where the light should reach. */
+        if (loc.x >= mld || loc.y >= mld || loc.x <= -1 * mld 
+                || loc.y <= -1 * mld) {
+            continue;
+        }
+
+        int next = current[MAX_LIGHT_DEPTH + loc.x][MAX_LIGHT_DEPTH + loc.y];
+        /* Stop if we've gotten to the edge of where the light reaches. */
+        if (next >= 64) {
+            continue;
+        }
+
+        assert(next != -1);
+
+        Tile *fore = getTile(x + loc.x, y + loc.y, MapLayer::FOREGROUND);
+        Tile *back = getTile(x + loc.x, y + loc.y, MapLayer::BACKGROUND);
+        
+        int opacity = max(fore -> getAbsorbed().r, 
+            back -> getAbsorbed().r * back -> getAbsorbed().a);
+        int edge = next + opacity;
+
+        vector<Location> edges = {{-1, 0, (MapLayer)0}, {0, -1, (MapLayer)0}, 
+            {1, 0, (MapLayer)0}, {0, 1, (MapLayer)0}};
+        vector<Location> corners = {{-1, -1, (MapLayer)0}, {1, -1, (MapLayer)0},
+            {-1, 1, (MapLayer)0}, {1, 1, (MapLayer)0}};
+        for (int i = 0; i < 4; i++) {
+            int ix = mld + loc.x + edges[i].x;
+            int iy = mld + loc.y + edges[i].y;
+            if (current[ix][iy] == -1) {
+                current[ix][iy] = edge;
+                unvisited.push({ix - mld, iy - mld, (MapLayer)0});
+            }
+            else {
+                current[ix][iy] = min(current[ix][iy], edge);
+            }
+            int cx = mld + loc.x + corners[i].x;
+            int cy = mld + loc.y + corners[i].y;
+            Tile *cfore = getForeground(x + cx - mld, y + cy - mld);
+            Tile *cback = getBackground(x + cx - mld, y + cy - mld);
+        
+            int copacity = max(cfore -> getAbsorbed().r, 
+                cback -> getAbsorbed().r * cback -> getAbsorbed().a);
+            int ccorner = next + 1.41 * (copacity + opacity) / 2.0;
+            if (current[cx][cy] == -1) {
+                current[cx][cy] = ccorner;
+                unvisited.push({cx - mld, cy - mld, (MapLayer)0});
+            }
+            else {
+                current[cx][cy] = min(current[cx][cy], ccorner);
             }
         }
     }
-    return smallest;
 }
 
-void Map::setLight(int x, int y) {
-    // TODO: actually make this depend on the light source
-    SpaceInfo *place = findPointer(x, y);
-    place -> light.r = 0;
-    place -> light.g = 0;
-    place -> light.b = 0;
-    int dist = skyDistance(x, y, 25);
-    /* Make sure a is between 0 and 255. */
-    double lightIntensity = min(1.0, exp((1 - dist) / 8.0));
-    place -> light.a = 255 * max(0.0, lightIntensity);
 
-    place -> isLightUpdated = true;
+void Map::addLight(int x, int y, vector<vector<int>> &current, 
+        const Light &l) {
+    for (unsigned int i = 0; i < current.size(); i++) {
+        for (unsigned int j = 0; j < current[i].size(); j++) {
+            int xi = x + i - current.size() / 2;
+            int yi = y + j - current[i].size() / 2;
+            if (current[i][j] != -1) {
+                findPointer(xi, yi) -> light.setmax(
+                    l.times(getExpLight(current[i][j])));
+                current[i][j] = -1;
+            }
+        }
+    }
+}
+
+void Map::setLight(int xstart, int ystart, int xstop, int ystop) {
+    int mld = MAX_LIGHT_DEPTH;
+    bool done = true;
+    int xlookstart = wrapX(xstart - MAX_LIGHT_DEPTH);
+    int xlookstop = wrapX(xstop + MAX_LIGHT_DEPTH);
+    int ylookstart = min(max(0, ystart - MAX_LIGHT_DEPTH), height - 1);
+    int ylookstop = min(max(0, ystop + MAX_LIGHT_DEPTH), height - 1);
+    /* Loop through and make sure none need to be updated. */
+    for (int i = xlookstart; i < xlookstop; i++) {
+        for (int j = ylookstart; j < ylookstop; j++) {
+            if (findPointer(i, j) -> lightRemoved) {
+                done = false;
+                findPointer(i, j) -> lightRemoved = false;
+
+                /* The map itself will be used to keep track of the summation 
+                of lights we have calculated so far. */
+                for (int x = i - 1 * mld; x <= i + mld; x++) {
+                    for (int y = j - 1 * mld; y <= j + mld; y++) {
+                        findPointer(x, y) -> light = Light(0, 0, 0, 0);
+                    }
+                }
+            }
+            if (findPointer(i, j) -> lightAdded) {
+                done = false;
+                findPointer(i, j) -> lightAdded = false;
+            }
+            if (i >= xstart && i < xstop && j >= ystart && j < ystop
+                    && !findPointer(i, j) -> isLightUpdated) {
+                done = false;
+                findPointer(i, j) -> isLightUpdated = true;
+            }
+        }
+    }
+    if (done) {
+        return;
+    }
+
+    vector<vector<int>> current;
+    current.resize(2 * MAX_LIGHT_DEPTH + 1);
+    for (unsigned int i = 0; i < current.size(); i++) {
+        current[i].resize(2 * MAX_LIGHT_DEPTH + 1, -1);
+    }
+
+    // TODO: Make an array to keep track of the summation of darkness we have
+    // so far.
+
+    /* Loop over the map looking for light sources. */
+    for (int x = xlookstart; x < xlookstop; x++) {
+        for (int y = ylookstart; y < ylookstop; y++) {
+            assert(isOnMap(x, y));
+            if (isSky(x, y)) {
+                findPointer(x, y) -> light = getSkyLight();
+                bool used = false;
+                /* If there's a non-sky tile next to it, this sky is a light
+                source. */
+                for (int i = -1; i < 2; i++) {
+                    for (int j = -1; j < 2; j++) {
+                        if (isOnMap(x + i, y + j) && !isSky(x + i, y + j)
+                                /* Avoid recaclutating. */
+                                && !used) {
+                            used = true;
+                            effectLight(x, y, Light(0, 0, 0, 255), current);
+                            addLight(x, y, current, Light(0, 0, 0, 255));
+                        }
+                    }
+                }
+            }
+
+            /* If this tile is a light source */
+            Light emitted = getTile(x, y, MapLayer::FOREGROUND) -> getEmitted();
+            if (emitted.r != 0 || emitted.g != 0 || emitted.b != 0) {
+                effectLight(x, y, emitted, current);
+                addLight(x, y, current, emitted);
+            }
+
+            // possible TODO: light sources in the background (maybe just no)
+            // TODO: darksources
+            // TODO: movable lights
+        }
+    }
+
 }
 
 void Map::updateNear(int x, int y) {
+    findPointer(wrapX(x), y) -> isLightUpdated = false;
     /* Value that takes into account x-wrapping of the map. */
     Location fore;
     Location back;
@@ -139,6 +284,7 @@ void Map::updateNear(int x, int y) {
         back.x = wrapX(x + i);
         for (int j = -1; j < 2; j++) {
             if (isOnMap(wrapX(x + i), y + j)) {
+
                 fore.y = y + j;
                 back.y = y + j;
                 /* Update the tiles. */
@@ -147,17 +293,6 @@ void Map::updateNear(int x, int y) {
                 /* Update the sprites. */
                 setSprite(fore, getTile(fore) -> updateSprite(*this, fore));
                 setSprite(back, getTile(back) -> updateSprite(*this, back));
-            }
-        }
-    }
-
-    /* Update the lighting. */
-    int range = 8;
-    for (int i = -1 * range; i < range + 1; i++) {
-        int newx = wrapX(x + i);
-        for (int j = -1 * range; j < range + 1; j++) {
-            if (isOnMap(newx, y + j)) {
-                findPointer(newx, y + j) -> isLightUpdated = false;
             }
         }
     }
@@ -316,6 +451,8 @@ Map::Map(string filename, int tileWidth, int tileHeight, string p) :
     ifstream infile(filename);
     path = p;
 
+    exps.resize(MAX_OPACITY, 0);
+
     /* Create a tile object for each type. */
     for (int i = 0; i <= (int)TileType::LAST_TILE; i++) {
         newTile((TileType)i);
@@ -443,26 +580,9 @@ void Map::savePPM(MapLayer layer, std::string filename) {
 
 /* Return the lighting of a tile. */
 Light Map::getLight(int x, int y) {
-    /* Set the light to the correct value, if necessary. */
-    if (!findPointer(x, y) -> isLightUpdated) {
-        setLight(x, y);
-    }
-
-    Light light;
     /* Combine the value from blocks with the value from the sky, taking into
     account that the color of light the sky makes. */
-    light.useSky(findPointer(x, y) -> light, getSkyColor(x, y));
-    return light;
-}
-
-/* Returns the color the sun or moon is shining. */
-Light Map::getSkyColor(int x, int y) const {
-    Light light;
-    light.r = 255;
-    light.g = 255;
-    light.b = 255;
-    light.a = 255;
-    return light;
+    return findPointer(x, y) -> light.useSky(getSkyLight());
 }
 
 TileType Map::getTileType(int x, int y, MapLayer layer) const {
@@ -494,6 +614,11 @@ TileType Map::getTileType(const Location &place, int x, int y) const {
 }
 
 void Map::setTile(int x, int y, MapLayer layer, TileType val) {
+    assert(layer == MapLayer::FOREGROUND || layer == MapLayer::BACKGROUND
+            || layer == MapLayer::NONE);
+
+    bool wasSky = isSky(x, y);
+
     if (layer == MapLayer::FOREGROUND) {
         findPointer(x, y) -> foreground = val;
     }
@@ -508,6 +633,14 @@ void Map::setTile(int x, int y, MapLayer layer, TileType val) {
     /* If we made it this far we changed something, so the amount of light
     reaching nearby tiles may have changed. */
     updateNear(x, y);
+    if ((wasSky && !getTile(val) -> getIsSky())
+            || getForeground(x, y) -> getEmitted() != Light(0, 0, 0, 0)) {
+        findPointer(x, y) -> lightRemoved = true;
+    }
+    if ((isSky(x, y) && !wasSky)
+            || getTile(val) -> getEmitted() != Light(0, 0, 0, 0)) {
+        findPointer(x, y) -> lightAdded = true;
+    }
 }
 
 bool Map::placeTile(Location place, TileType type) {
@@ -643,6 +776,9 @@ void Map::kill(const Location &place, vector<DroppedItem*> &items) {
 }
 
 Location Map::getMapCoords(int x, int y, MapLayer layer) {
+    assert(layer == MapLayer::FOREGROUND || layer == MapLayer::BACKGROUND
+            || layer == MapLayer::NONE);
+    
     /* Make sure x isn't negative. */
     x += getWidth() * getTileWidth();
     assert(x >= 0);

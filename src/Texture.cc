@@ -184,7 +184,7 @@ Texture::Texture(Uint32 pixelFormat, int access, int width, int height) {
     SetRenderTarget();
     m.lock();
     /* Set render draw color to alpha. */
-    Renderer::setColor({0x00, 0x00, 0x00, 0x00});
+    Renderer::setColor(Light(0x00, 0x00, 0x00, 0x00));
     Renderer::renderClear();
     /* Set render color back to white. */
     Renderer::setColorWhite();

@@ -102,9 +102,12 @@ struct SpaceInfo {
 
     // How well-lit this tile is, and from where
     Light light;
+    Light sunlight;
 
     // Whether the light is actually set to the correct value
     bool isLightUpdated;
+    bool lightRemoved;
+    bool lightAdded;
 
     // Which rectangle of the spritesheet to draw
     uint8_t foregroundSprite;
@@ -115,6 +118,8 @@ struct SpaceInfo {
         foreground = TileType::EMPTY;
         background = TileType::EMPTY;
         isLightUpdated = false;
+        lightRemoved = false;
+        lightAdded = false;
         foregroundSprite = 0;
         backgroundSprite = 0;
     }

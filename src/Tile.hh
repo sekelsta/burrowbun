@@ -96,9 +96,13 @@ class Tile {
 
     /* Nonzero if the block creates light. */
     Light emitted;
+
     /* How much light it blocks for each color, aside from the amount lost by
-    distance. */
-    Absorb absorbed;
+    distance, for edges. */
+    DLight absorbed;
+
+    /* absorbed but with each number to the sqrt(2), for corners. */
+    DLight corner;
 
     /* Whether it is a source of natural light. For instance, an empty tile
     or one that is mostly transparent. */
@@ -152,6 +156,18 @@ public:
 
     inline bool getTier() const {
         return tier;
+    }
+
+    inline Light getEmitted() const {
+        return emitted;
+    }
+
+    inline DLight getAbsorbed() const {
+        return absorbed;
+    }
+
+    inline DLight getCorner() const {
+        return corner;
     }
 
     /* The number of foreground and background columns in the spritesheet. */

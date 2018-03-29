@@ -4,8 +4,11 @@
 #include <vector>
 #include <set>
 #include <string>
+#include <algorithm>
 #include "Tile.hh"
 #include "MapHelpers.hh"
+
+#define MAX_OPACITY 64
 
 class DroppedItem;
 
@@ -59,10 +62,12 @@ private:
     /* Tiles that have been damaged. */
     std::vector<TileHealth> damaged;
 
+    /* Table of pre-calculated exponentials. */
+    std::vector<double> exps;
+
     /* Return a pointer to the SpaceInfo* at x, y. */
     inline SpaceInfo *findPointer(int x, int y) const {
-        assert (0 <= x);
-        assert (x < width);
+        x = wrapX(x);
         assert (0 <= y);
         assert (y < height);
         return tiles + (y * width + x);
@@ -90,19 +95,20 @@ private:
     Accept oput-of-bounds x coordinates and loop them so they are in bounds. */
     bool isSky(int x, int y);
 
-    /* Return the square of the distance between i, j and x, y. */
-    inline int distance(int i, int j, int x, int y) const {
-        return (((i - x) * (i - x)) + ((j - y) * (j - y)));
-    }
+    /* Spread out the light from a source at x, y. */
+    void effectLight(int x, int y, const Light &light, 
+        std::vector<std::vector<int>> &current);
 
-    /* Compute the square of the taxicab distance to the nearest sky block 
-    that is a source of light (doesn't have and opaque foreground or 
-    background). If more than maxDist, return maxDist. */
-    int skyDistance(int x, int y, int maxDist);
+    /* Add an array for a light to the whole map. */
+    void addLight(int x, int y, std::vector<std::vector<int>> &current,
+        const Light &l);
 
-    /* Calculate how well-lit a tile is and set its light level. */
-    void setLight(int x, int y);
+public:
+    /* Calculate how well-lit the tiles on screen are and set their light 
+    levels. */
+    void setLight(int xstart, int ystart, int xstop, int ystop);
 
+private:
     /* Set the tiles around a place to show the right sprite and have the
     right amount of light, and recheck if they need to run their own update
     functions. */
@@ -179,6 +185,18 @@ private:
 
     inline bool updateContains(const Location &place) const {
         return toUpdate.count(place);
+    }
+
+    /* Calculates the coefficent for light when the opacity is n. */
+    inline double getExpLight(int n) {
+        if (n >= MAX_OPACITY) {
+            return 0;
+        }
+        if (exps[n] == 0) {
+            double coef = exp(-1 * n * n / (MAX_OPACITY * MAX_OPACITY / 4.0));
+            exps[n] = std::min(1.0, std::max(coef, 0.0));
+        }
+        return exps[n];
     }
 
     /* Return a number from 0-15 depending on which tiles border this one. 
@@ -303,7 +321,14 @@ public:
     Light getLight(int x, int y);
 
     /* Return the color the sun / moon is shining. */
-    Light getSkyColor(int x, int y) const;
+    inline Light getSkyLight() const {
+        return {255, 255, 255, 255};
+    }
+
+    /* Return the color the sky tiles should be rendered. */
+    inline Light getSkyColor() const {
+        return {0x00, 0x99, 0xFF, 0xFF};
+    }
 
     /* Return the pointer the the tile at this location. */
     inline Tile *getTile(int x, int y, MapLayer layer) {
