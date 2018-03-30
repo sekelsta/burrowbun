@@ -24,7 +24,7 @@ void Mapgen::setSize(int x, int y) {
 
 void Mapgen::generateEarth(CreateState *state, mutex *m) {
     /* Set height and width, and use them to make a tile array. */
-    setSize(4096, 2048);
+    setSize(2048 * 3, 2048);
 
     /* Inform on status. */
     m -> lock();
@@ -100,8 +100,19 @@ void Mapgen::generateEarth(CreateState *state, mutex *m) {
     module::ScalePoint finalCaves;
     finalCaves.SetSourceModule(0, turbulentCaves);
     finalCaves.SetScale(0.005);
+    finalCaves.SetYScale(2 * finalCaves.GetYScale());
     double caveBoundary = getPercentile(0.75, finalCaves, 10000);
 
+    /* Add a system of tunnels to hopefully connect the caves. */
+    module::RidgedMulti baseTunnels;
+    baseTunnels.SetSeed(rand());
+    module::Turbulence turbulentTunnels;
+    turbulentTunnels.SetSourceModule(0, baseTunnels);
+    module::ScalePoint finalTunnels;
+    finalTunnels.SetSourceModule(0, baseTunnels);
+    finalTunnels.SetScale(0.0011);
+    finalTunnels.SetYScale(3 * finalTunnels.GetYScale());
+    double tunnelBoundary = getPercentile(0.85, finalTunnels, 10000);
     /* A perlin noise to use for getting the surface. */
     module::Perlin baseSurface;
     baseSurface.SetSeed(rand());
@@ -112,9 +123,15 @@ void Mapgen::generateEarth(CreateState *state, mutex *m) {
     const double hillScale = 0.001;
     const double steepness = 50000.0 * hillScale;
     finalSurface.SetScale(hillScale);
-    int baseHeight = map.height * 4.0 / 5.0;
+
+    const int baseHeight = map.height * 0.8;
+    const int seaLevel = map.height * 0.75;
+    const int seafloorLevel = map.height * 0.5;
+    const int cavernHeight = map.height * 0.5;
     double caveLimit = getPercentile(0.125, finalSurface, 10000);
     caveLimit -= getPercentile(0.875, finalCaves, 10000);
+    double cavernLimit = getPercentile(0.05, finalSurface, 10000);
+    cavernLimit -= getPercentile(0.95, finalCaves, 10000);
 
     /* Wetness as in whether there is actually water there right now. */
     module::Perlin baseWetness;
@@ -167,15 +184,46 @@ void Mapgen::generateEarth(CreateState *state, mutex *m) {
             double surface = getCylinderValue(i, j, finalSurface);
             surface += (j - baseHeight) / steepness;
             /* Experimental: try making something like an ocean. */
-            surface += 20 * float((i - map.width / 2) * (i - map.width / 2)) / (map.width * map.width);
+            int shoreline = map.width * 0.25;
+            int abyss = map.width * 0.35;
+            double quadratic = 20 * ((i - map.width / 2.0) 
+                    * (i - map.width / 2.0)) / (map.width * map.width);
+            double linear = 5 * abs(map.width / 2.0 - i) / map.width;
+            int depth = (baseHeight - seafloorLevel) / steepness;
+            if (abs(map.width / 2.0 - i) > abyss) {
+                surface += depth + linear;
+            }
+            else if (abs(map.width / 2.0 - i) > shoreline) {
+                double dist = (abs(map.width / 2.0 - i) - shoreline) 
+                                / (abyss - shoreline);
+                double interp = dist < 0.5? pow(0.5 - dist, 1 / 3.0) 
+                    : -1 * pow(dist - 0.5, 1 / 3.0);
+                interp /= 2 * 0.7937; //cube root of 0.5
+                interp += 0.5;
+                surface += (1 - interp) * (depth + linear);
+                surface += interp * quadratic;
+            }
+            else {
+                surface += quadratic;
+            }
+
             if (surface > 0) {
                 tileType = TileType::EMPTY;
             }
  
-            /* Set the caves to be empty. */
+            /* Set the caves to be empty. */ 
             double cave = getCylinderValue(i, j, finalCaves);
             if (cave > caveBoundary 
                     && surface - cave < caveLimit) {
+                tileType = TileType::EMPTY;
+            }
+
+            /* Set the tunnels to be empty. */
+            double tunnel = getCylinderValue(i, j, finalTunnels);
+            double tunnelHeight = (j - cavernHeight) / steepness / 2.0;
+            if (tunnel > tunnelBoundary
+                    && max(surface, tunnelHeight + surface / 2.0) 
+                     - tunnel < cavernLimit) {
                 tileType = TileType::EMPTY;
             }
 
@@ -203,8 +251,22 @@ void Mapgen::generateEarth(CreateState *state, mutex *m) {
     m -> unlock();
 
     settleWater();
-    removeWater(10);
+    removeWater(20);
     settleWater();
+
+    /* Fill the ocean. */
+    for (int i = 0; i < map.width; i++) {
+        /* magic number 30 is bigger than random surface variations but small
+        enough to still be below any floating islands. */
+        for (int j = baseHeight + 30; j >= 0; j--) {
+            if (map.getTileType(i, j, MapLayer::FOREGROUND) != TileType::EMPTY) {
+                break;
+            }
+            if (j < seaLevel) {
+                map.setTileType(i, j, MapLayer::FOREGROUND, TileType::WATER);
+            }
+        }
+    }
 
     /* When done setting non-boulders and before setting boulders, have
     all the tiles use a random sprite. */

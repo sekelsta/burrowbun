@@ -1,5 +1,6 @@
 Changes since last push:
- - Changed opacities of tiles
+ - Added giant caverns
+ - Made the ocean a shape
 
 Known "features":
  - The strenth of gravity is independent of the world.
