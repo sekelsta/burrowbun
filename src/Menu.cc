@@ -52,6 +52,7 @@ std::vector<Spriterect> Menu::getSprites() {
                 break;
             case CreateState::STUFF:
                 message = "Doing stuff...";
+                break;
             case CreateState::GENERATING_BIOMES:
                 message = "Setting biomes...";
                 break;

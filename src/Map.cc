@@ -583,7 +583,7 @@ Map::Map(string filename, int tileWidth, int tileHeight, string p) :
 }
 
 void Map::savePPM(MapLayer layer, std::string filename) {
-    ofstream outfile(filename);
+    ofstream outfile(filename + ".ppm");
     /* Header saying we'll use ASCII, along with the height, width,
     and maximum value. */
     outfile << "P3\n" << width << " " << height << "\n255\n";
@@ -594,6 +594,58 @@ void Map::savePPM(MapLayer layer, std::string filename) {
             outfile << (int)(tile -> getColor().r) << " ";
             outfile << (int)(tile -> getColor().g) << " ";
             outfile << (int)(tile -> getColor().b) << " ";
+        }
+        outfile << "\n";
+    } 
+}
+
+
+Light Map::getBiomeColor(BiomeInfo biome) const {
+    Light color;
+    switch(biome.biome) {
+        case BiomeType::TUNDRA:
+            color = Light(255, 255, 255, 0);
+            break;
+        case BiomeType::TAIGA:
+            color = Light(128, 0xCC, 255, 0);
+            break;
+        case BiomeType::GRASSLAND:
+            color = Light(58, 198, 88, 0);
+            break;
+        case BiomeType::WOODLAND:
+            color = Light(87, 64, 36, 0);
+            break;
+        case BiomeType::JUNGLE:
+            color = Light(25, 135, 23, 0);
+            break;
+        case BiomeType::SAVANNAH:
+            color = Light(181, 51, 0, 0);
+            break;
+        case BiomeType::SCRUB:
+            color = Light(246, 130, 53, 0);
+            break;
+        case BiomeType::DESERT:
+            color = Light(215, 195, 115, 0);
+            break;
+        default:
+            color = Light(0, 0, 0, 0);
+            break;
+    }
+    return color;
+}
+
+void Map::saveBiomePPM(std::string filename) {
+    ofstream outfile(filename + "_biomes.ppm");
+    /* Header saying we'll use ASCII, along with the height, width,
+    and maximum value. */
+    outfile << "P3\n" << width << " " << height << "\n255\n";
+    for (int j = height - 1; j >= 0; j--) {
+        for (int i = 0; i < width; i++) {
+            BiomeInfo *biome = getBiome(i, j);
+            /* Output red, green, and blue values for each tile. */
+            outfile << (int)(getBiomeColor(*biome).r) << " ";
+            outfile << (int)(getBiomeColor(*biome).g) << " ";
+            outfile << (int)(getBiomeColor(*biome).b) << " ";
         }
         outfile << "\n";
     } 

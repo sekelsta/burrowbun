@@ -1,6 +1,6 @@
 Changes since last push:
- - Added giant caverns
- - Made the ocean a shape
+ - Made a proper way to save biomes as an image
+ - Fixed a bug in the menu world creation progress display
 
 Known "features":
  - The strenth of gravity is independent of the world.

@@ -96,7 +96,7 @@ private:
     bool isBesideTile(int x, int y, MapLayer layer);
 
     /* Return true if neither the foreground nor background are opaque. 
-    Accept oput-of-bounds x coordinates and loop them so they are in bounds. */
+    Accept out-of-bounds x coordinates and loop them so they are in bounds. */
     bool isSky(int x, int y);
 
     /* Spread out the light from a source at x, y. */
@@ -228,6 +228,11 @@ private:
     /* Save the specified layer to a PPM file. */
     void savePPM(MapLayer layer, std::string filename);
 
+    /* Return a color representing that biome. */
+    Light getBiomeColor(BiomeInfo biome) const;
+
+    /* Save a picture showing where all the biomes are. */
+    void saveBiomePPM(std::string filename);
 private:
     // Constructor. Resulting map cannot be played but can be saved.
     inline Map(std::string p) : TILE_WIDTH(1), TILE_HEIGHT(1) {

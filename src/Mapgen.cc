@@ -243,7 +243,7 @@ void Mapgen::generateEarth(CreateState *state, mutex *m) {
     m -> unlock();
 
     /* Put water on the surface. */
-    map.savePPM(MapLayer::FOREGROUND, "wunsettled.world.ppm");
+    map.savePPM(MapLayer::FOREGROUND, "wunsettled");
 
     /* Inform on status. */
     m -> lock();
@@ -503,7 +503,8 @@ void Mapgen::generate(std::string filename, WorldType worldType,
     *state = CreateState::SAVING;
     map.save(filename);
     /* TODO: remove when done testing. */
-    map.savePPM(MapLayer::FOREGROUND, filename + ".ppm");
+    map.savePPM(MapLayer::FOREGROUND, filename);
+    map.saveBiomePPM(filename);
     m -> lock();
     *state = CreateState::DONE;
     m -> unlock();
