@@ -59,6 +59,9 @@ std::vector<Spriterect> Menu::getSprites() {
             case CreateState::GENERATING_TERRAIN:
                 message = "Placing blocks...";
                 break;
+            case CreateState::FELSIC:
+                message = "Baking the continental crust...";
+                break;
             case CreateState::SETTLING_WATER:
                 message = "Settling water...";
                 break;
@@ -70,6 +73,9 @@ std::vector<Spriterect> Menu::getSprites() {
                 break;
             case CreateState::NONE:
                 message = "Error?";
+                break;
+            default:
+                message = "Unsupported state.";
                 break;
         }
         m.unlock();

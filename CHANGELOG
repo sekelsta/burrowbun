@@ -1,6 +1,7 @@
 Changes since last push:
- - Made a proper way to save biomes as an image
- - Fixed a bug in the menu world creation progress display
+ - World now generates with mostly granite in the continental crust and mostly
+basalt in the oceanic
+ - Have fewer biomes to make it easier for all the biomes to be found
 
 Known "features":
  - The strenth of gravity is independent of the world.

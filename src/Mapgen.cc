@@ -26,6 +26,10 @@ void Mapgen::generateEarth(CreateState *state, mutex *m) {
     /* Set height and width, and use them to make a tile array. */
     setSize(2048 * 3, 2048);
 
+    baseHeight = map.height * 0.8;
+    seaLevel = map.height * 0.72;
+    seafloorLevel = map.height * 0.5;
+
     /* Inform on status. */
     m -> lock();
     *state = CreateState::GENERATING_BIOMES;
@@ -124,14 +128,13 @@ void Mapgen::generateEarth(CreateState *state, mutex *m) {
     const double steepness = 50000.0 * hillScale;
     finalSurface.SetScale(hillScale);
 
-    const int baseHeight = map.height * 0.8;
-    const int seaLevel = map.height * 0.75;
-    const int seafloorLevel = map.height * 0.5;
     const int cavernHeight = map.height * 0.5;
     double caveLimit = getPercentile(0.125, finalSurface, 10000);
     caveLimit -= getPercentile(0.875, finalCaves, 10000);
     double cavernLimit = getPercentile(0.05, finalSurface, 10000);
     cavernLimit -= getPercentile(0.95, finalCaves, 10000);
+    const int shoreline = map.width * 0.25;
+    const int abyss = map.width * 0.35;
 
     /* Wetness as in whether there is actually water there right now. */
     module::Perlin baseWetness;
@@ -153,59 +156,12 @@ void Mapgen::generateEarth(CreateState *state, mutex *m) {
     /* Just for testing, base the foreground tile on biome. */
     for (int i = 0; i < map.width; i++) {
         for (int j = 0; j < map.height; j++) {
-            TileType tileType = TileType::EMPTY;
-            BiomeType biome = map.getBiome(i, j) -> biome;
-            if (biome == BiomeType::DESERT) {
-                tileType = TileType::SANDSTONE;
-            }
-            else if (biome == BiomeType::SCRUB) {
-                tileType = TileType::GRANITE;
-            }
-            else if (biome == BiomeType::SAVANNAH) {
-                tileType = TileType::RED_SANDSTONE;
-            }
-            else if (biome == BiomeType::JUNGLE) {
-                tileType = TileType::BASALT;
-            }
-            else if (biome == BiomeType::WOODLAND) {
-                tileType = TileType::PLATFORM;
-            }
-            else if (biome == BiomeType::GRASSLAND) {
-                tileType = TileType::PERIDOTITE;
-            }
-            else if (biome == BiomeType::TAIGA) {
-                tileType = TileType::ICE;
-            }
-            else if (biome == BiomeType::TUNDRA) {
-                tileType = TileType::SNOW;
-            }
+            TileType tileType = TileType::STONE;
 
             /* Find the sky and make it empty. */
             double surface = getCylinderValue(i, j, finalSurface);
-            surface += (j - baseHeight) / steepness;
-            /* Experimental: try making something like an ocean. */
-            int shoreline = map.width * 0.25;
-            int abyss = map.width * 0.35;
-            double quadratic = 20 * ((i - map.width / 2.0) 
-                    * (i - map.width / 2.0)) / (map.width * map.width);
-            double linear = 5 * abs(map.width / 2.0 - i) / map.width;
-            int depth = (baseHeight - seafloorLevel) / steepness;
-            if (abs(map.width / 2.0 - i) > abyss) {
-                surface += depth + linear;
-            }
-            else if (abs(map.width / 2.0 - i) > shoreline) {
-                double dist = (abs(map.width / 2.0 - i) - shoreline) 
-                                / (abyss - shoreline);
-                double interp = dist < 0.5? pow(0.5 - dist, 1 / 3.0) 
-                    : -1 * pow(dist - 0.5, 1 / 3.0);
-                interp /= 2 * 0.7937; //cube root of 0.5
-                interp += 0.5;
-                surface += (1 - interp) * (depth + linear);
-                surface += interp * quadratic;
-            }
-            else {
-                surface += quadratic;
-            }
+            /* Add the ocean. */
+            surface += ocean(i, j, steepness, shoreline, abyss);
 
             if (surface > 0) {
                 tileType = TileType::EMPTY;
@@ -222,13 +178,13 @@ void Mapgen::generateEarth(CreateState *state, mutex *m) {
             double tunnel = getCylinderValue(i, j, finalTunnels);
             double tunnelHeight = (j - cavernHeight) / steepness / 2.0;
             if (tunnel > tunnelBoundary
-                    && max(surface, tunnelHeight + surface / 2.0) 
+                        && max(surface, tunnelHeight + surface / 2.0) 
                      - tunnel < cavernLimit) {
                 tileType = TileType::EMPTY;
             }
 
-            /* Add water instead of air to moist areas. */
-            if (tileType == TileType::EMPTY 
+            /* Add water instead of air to moist underground areas. */
+            if (tileType == TileType::EMPTY && surface <= 0
                     && getCylinderValue(i, j, finalWetness) > waterLimit) {
                 tileType = TileType::WATER;
             }
@@ -236,6 +192,11 @@ void Mapgen::generateEarth(CreateState *state, mutex *m) {
             map.setTileType(i, j, MapLayer::FOREGROUND, tileType);
         }
     }
+
+    m -> lock();
+    *state = CreateState::FELSIC;
+    m -> unlock();
+    setFelsic();
 
     /* Inform on status. */
     m -> lock();
@@ -337,6 +298,96 @@ BiomeType Mapgen::getBaseBiome(double temperature, double humidity,
     }
 
     return (BiomeType)biomeData[t][h];
+}
+
+
+double Mapgen::ocean(int x, int y, double steepness, int shoreline, 
+        int abyss) {
+    double surface = (y - baseHeight) / steepness;
+    double quadratic = 20 * ((x - map.width / 2.0) 
+            * (x - map.width / 2.0)) / (map.width * map.width);
+    double linear = 5 * abs(map.width / 2.0 - x) / map.width;
+    int depth = (baseHeight - seafloorLevel) / steepness;
+    if (abs(map.width / 2.0 - x) > abyss) {
+        surface += depth + linear;
+    }
+    else if (abs(map.width / 2.0 - x) > shoreline) {
+        double dist = (abs(map.width / 2.0 - x) - shoreline) 
+                        / (abyss - shoreline);
+        double interp = dist < 0.5? pow(0.5 - dist, 1 / 3.0) 
+            : -1 * pow(dist - 0.5, 1 / 3.0);
+        interp /= 2 * 0.7937; //cube root of 0.5
+        interp += 0.5;
+        surface += (1 - interp) * (depth + linear);
+        surface += interp * quadratic;
+    }
+    else {
+        surface += quadratic;
+    }
+    return surface;
+}
+
+void Mapgen::setFelsic() {
+    /* Perlin noise for felsic / mafic gradient. */
+    module::Perlin baseFelsic;
+    baseFelsic.SetSeed(rand());
+    module::Turbulence turbulentFelsic;
+    turbulentFelsic.SetSourceModule(0, baseFelsic);
+    module::ScalePoint finalFelsic;
+    finalFelsic.SetScale(0.001);
+    finalFelsic.SetSourceModule(0, turbulentFelsic);
+    double basaltLimit = getPercentile(0.25, finalFelsic, 10000);
+    double graniteLimit = getPercentile(0.75, finalFelsic, 10000);
+    double peridotLimit = getPercentile(0.05, finalFelsic, 10000);
+
+    for (int i = 0; i < map.width; i++) {
+        int surface = map.height;
+        for (int j = map.height - 1; j >= 0; j--) {
+            /* Figure out the felsic - mafic value of the rock. */
+            TileType tileType = map.getTileType(i, j, MapLayer::FOREGROUND);
+            if (tileType == TileType::STONE) {
+            // Alternately:
+            // if (tileType != TileType::EMPTY) {
+                if (surface == map.height) {
+                    // NOTE: floating islands could disrupt this
+                    surface = j;
+                }
+
+                double felsic = getCylinderValue(i, j, finalFelsic);
+                double interp = 0;
+                /* Adjust so that continental plates tend to be made of 
+                granite, while oceanic plates tend to be made of basalt, 
+                and the upper mantle is peridotite. */
+
+                if (seafloorLevel - j > surface - seafloorLevel) {
+                    double dist = surface > seafloorLevel? 
+                        2 * seafloorLevel - surface : surface;
+                    interp = abs((dist - j) / dist);
+                    felsic -= abs(peridotLimit + basaltLimit) / 2.0 + interp;
+                }
+                else if (seafloorLevel - j == surface - seafloorLevel) {
+                    // pass
+                }
+                else {
+                    double dist = 2 * (surface - seafloorLevel);
+                    interp = abs((dist - (surface - j)) / dist);
+                    felsic += abs(graniteLimit) / 2.0 + 0.2 * interp;
+                }
+
+                if (felsic < peridotLimit && interp - 0.7 > 0.25 * felsic) {
+                    tileType = TileType::PERIDOTITE;
+                }
+                else if (felsic < basaltLimit) {
+                    tileType = TileType::BASALT;
+                }
+                else if (felsic > graniteLimit) {
+                    tileType = TileType::GRANITE;
+                }
+
+                map.setTileType(i, j, MapLayer::FOREGROUND, tileType);
+            }
+        }
+    }
 }
 
 void Mapgen::moveTileFast(int x1, int y1, int x2, int y2, MapLayer layer) {

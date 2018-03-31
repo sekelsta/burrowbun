@@ -8,6 +8,7 @@
 enum class MapLayer {
     FOREGROUND,
     BACKGROUND,
+    LIQUID,
     NONE
 };
 
@@ -60,11 +61,11 @@ enum class BiomeType {
     SAVANNAH,
     SCRUB,
     DESERT,
+    TALLGRASS,
 
     /* Wishlist: */
     ALPINE_TUNDRA,
     ALPINE_FOREST,
-    SKY,
 
     SWAMP,
     MARSH,

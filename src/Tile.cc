@@ -227,7 +227,6 @@ Tile::Tile(TileType tileType, string path)
     edgeType = (EdgeType)edgeInt;
     sprite.loadTexture(path + TILE_SPRITE_PATH);
 
-    double sqrt2 = sqrt(2);
     assert(absorbed.r >= 1.0);
     assert(absorbed.g >= 1.0);
     assert(absorbed.b >= 1.0);

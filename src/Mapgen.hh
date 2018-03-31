@@ -17,6 +17,7 @@ enum class CreateState {
     NOT_STARTED,
     GENERATING_BIOMES,
     GENERATING_TERRAIN,
+    FELSIC,
     SETTLING_WATER,
     SAVING,
     DONE
@@ -41,6 +42,11 @@ class Mapgen {
 
     /* A 2D vector saying which percentiles map to which biomes. */
     std::vector<std::vector<int>> biomeData;
+
+    /* Some values for map generation. */
+    int baseHeight;
+    int seaLevel;
+    int seafloorLevel;
 
     /* Set the map size to x, y. */
     void setSize(int x, int y);
@@ -71,6 +77,12 @@ class Mapgen {
     BiomeType getBaseBiome(double temperature, double humidity, 
         std::vector<double> tempPercentiles, 
         std::vector<double> humidityPercentiles);
+
+    /* Get a value for determining the ground level changes needed for an
+    ocean. */
+    double ocean(int x, int y, double steepness, int shoreline, int abyss);
+
+    void setFelsic();
 
     /* Move a tile on a map from x1, y1 to x2, y2 without updating the tiles 
     around it. */

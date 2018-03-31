@@ -627,6 +627,9 @@ Light Map::getBiomeColor(BiomeInfo biome) const {
         case BiomeType::DESERT:
             color = Light(215, 195, 115, 0);
             break;
+        case BiomeType::TALLGRASS:
+            color = Light(20, 126, 68, 0);
+            break;
         default:
             color = Light(0, 0, 0, 0);
             break;
@@ -641,11 +644,14 @@ void Map::saveBiomePPM(std::string filename) {
     outfile << "P3\n" << width << " " << height << "\n255\n";
     for (int j = height - 1; j >= 0; j--) {
         for (int i = 0; i < width; i++) {
-            BiomeInfo *biome = getBiome(i, j);
+            Light biomeColor = getBiomeColor(*getBiome(i, j));
+            if (getTileType(i, j, MapLayer::FOREGROUND) == TileType::EMPTY) {
+                biomeColor = biomeColor.times(0.5);
+            }
             /* Output red, green, and blue values for each tile. */
-            outfile << (int)(getBiomeColor(*biome).r) << " ";
-            outfile << (int)(getBiomeColor(*biome).g) << " ";
-            outfile << (int)(getBiomeColor(*biome).b) << " ";
+            outfile << (int)(biomeColor.r) << " ";
+            outfile << (int)(biomeColor.g) << " ";
+            outfile << (int)(biomeColor.b) << " ";
         }
         outfile << "\n";
     } 
