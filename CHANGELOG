@@ -1,7 +1,8 @@
 Changes since last push:
- - World now generates with mostly granite in the continental crust and mostly
-basalt in the oceanic
- - Have fewer biomes to make it easier for all the biomes to be found
+ - World generation now puts glowstone on the ceiling of caverns
+ - Glowstone now actually emits light
+ - A few blocks were removed from the player starting inventory, which at this
+point exists mainly for debugging purposes anyway
 
 Known "features":
  - The strenth of gravity is independent of the world.

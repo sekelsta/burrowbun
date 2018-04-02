@@ -80,22 +80,20 @@ Player::Player(string path) : Entity(path + "entities/bunny.json", path),
     pickup(ItemMaker::makeItem(ActionType::PICKAXE, path));
     for (int i = 0; i < 20; i++) {
         pickup(ItemMaker::makeItem(ActionType::HEALTH_POTION, path));
+        pickup(ItemMaker::makeItem(ActionType::GLOWSTONE, path));
+        pickup(ItemMaker::makeItem(ActionType::GLASS, path));
     }
     pickup(ItemMaker::makeItem(ActionType::DIRT, path));
     pickup(ItemMaker::makeItem(ActionType::TOPSOIL, path));
     pickup(ItemMaker::makeItem(ActionType::SAND, path));
     pickup(ItemMaker::makeItem(ActionType::CLAY, path));
-    pickup(ItemMaker::makeItem(ActionType::CALCAREOUS_OOZE, path));
     pickup(ItemMaker::makeItem(ActionType::SNOW, path));
     pickup(ItemMaker::makeItem(ActionType::ICE, path));
     pickup(ItemMaker::makeItem(ActionType::STONE, path));
     pickup(ItemMaker::makeItem(ActionType::GRANITE, path));
     pickup(ItemMaker::makeItem(ActionType::BASALT, path));
-    pickup(ItemMaker::makeItem(ActionType::LIMESTONE, path));
-    pickup(ItemMaker::makeItem(ActionType::MUDSTONE, path));
     pickup(ItemMaker::makeItem(ActionType::PERIDOTITE, path));
     pickup(ItemMaker::makeItem(ActionType::SANDSTONE, path));
-    pickup(ItemMaker::makeItem(ActionType::RED_SANDSTONE, path));
     pickup(ItemMaker::makeItem(ActionType::PLATFORM, path));
     pickup(ItemMaker::makeItem(ActionType::LUMBER, path));
     pickup(ItemMaker::makeItem(ActionType::RED_BRICK, path));

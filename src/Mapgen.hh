@@ -9,6 +9,7 @@
 #include "MapHelpers.hh"
 #include "Map.hh"
 #include <mutex>
+#include <algorithm> // For max and min
 
 /* How far along world creation is. */
 enum class CreateState {
@@ -47,6 +48,7 @@ class Mapgen {
     int baseHeight;
     int seaLevel;
     int seafloorLevel;
+    int cavernHeight;
 
     /* Set the map size to x, y. */
     void setSize(int x, int y);
@@ -80,9 +82,23 @@ class Mapgen {
 
     /* Get a value for determining the ground level changes needed for an
     ocean. */
-    double ocean(int x, int y, double steepness, int shoreline, int abyss);
+    double ocean(int x, int y, int shoreline, int abyss);
 
+    /* Choose how felsic or mafic all the rock should be. */
     void setFelsic();
+
+    /* Get a value for determining where the level of the surface should be. */
+   double getSurface(int x, int y, const noise::module::Module &surface,
+            WorldType type);
+
+    /* Get whether this spot should be a large tunnel. */
+    inline bool isTunnel(int x, int y, const noise::module::Module &tunnels, 
+            double surface, double tunnelLimit, double cavernLimit) {
+        double tunnel = getCylinderValue(x, y, tunnels);
+        double tunnelHeight = (y - cavernHeight) / 50.0 / 2.0;
+        return tunnel > tunnelLimit
+            && std::max(surface, tunnelHeight + surface / 2.0) - tunnel < cavernLimit;
+    }
 
     /* Move a tile on a map from x1, y1 to x2, y2 without updating the tiles 
     around it. */

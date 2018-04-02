@@ -4,7 +4,6 @@
 #include <ctime> // To seed the random number generator
 #include <cstdlib> // For randomness
 #include <cmath> // Because pi and exponentiation
-#include <algorithm> // For max and min
 #include "Mapgen.hh"
 #include "version.hh"
 
@@ -125,16 +124,13 @@ void Mapgen::generateEarth(CreateState *state, mutex *m) {
     module::ScalePoint finalSurface;
     finalSurface.SetSourceModule(0, turbulentSurface);
     const double hillScale = 0.001;
-    const double steepness = 50000.0 * hillScale;
     finalSurface.SetScale(hillScale);
 
-    const int cavernHeight = map.height * 0.5;
+    cavernHeight = map.height * 0.5;
     double caveLimit = getPercentile(0.125, finalSurface, 10000);
     caveLimit -= getPercentile(0.875, finalCaves, 10000);
     double cavernLimit = getPercentile(0.05, finalSurface, 10000);
     cavernLimit -= getPercentile(0.95, finalCaves, 10000);
-    const int shoreline = map.width * 0.25;
-    const int abyss = map.width * 0.35;
 
     /* Wetness as in whether there is actually water there right now. */
     module::Perlin baseWetness;
@@ -153,16 +149,13 @@ void Mapgen::generateEarth(CreateState *state, mutex *m) {
 
     double waterLimit = getPercentile(0.85, finalWetness, 10000);
 
-    /* Just for testing, base the foreground tile on biome. */
+    /* Make terrain and caves. */
     for (int i = 0; i < map.width; i++) {
         for (int j = 0; j < map.height; j++) {
             TileType tileType = TileType::STONE;
 
             /* Find the sky and make it empty. */
-            double surface = getCylinderValue(i, j, finalSurface);
-            /* Add the ocean. */
-            surface += ocean(i, j, steepness, shoreline, abyss);
-
+            double surface = getSurface(i, j, finalSurface, WorldType::EARTH);
             if (surface > 0) {
                 tileType = TileType::EMPTY;
             }
@@ -174,12 +167,9 @@ void Mapgen::generateEarth(CreateState *state, mutex *m) {
                 tileType = TileType::EMPTY;
             }
 
-            /* Set the tunnels to be empty. */
-            double tunnel = getCylinderValue(i, j, finalTunnels);
-            double tunnelHeight = (j - cavernHeight) / steepness / 2.0;
-            if (tunnel > tunnelBoundary
-                        && max(surface, tunnelHeight + surface / 2.0) 
-                     - tunnel < cavernLimit) {
+            /* Set the tunnels to be empty. */            
+            if (isTunnel(i, j, finalTunnels, surface, tunnelBoundary, 
+                    cavernLimit)) {
                 tileType = TileType::EMPTY;
             }
 
@@ -190,6 +180,22 @@ void Mapgen::generateEarth(CreateState *state, mutex *m) {
             }
 
             map.setTileType(i, j, MapLayer::FOREGROUND, tileType);
+        }
+    }
+
+    /* Put glowstone on tunnel ceilings. */
+    for (int i = 0; i < map.width; i++) {
+        for (int j = 0; j < map.height; j++) {
+            /* Find the sky and make it empty. */
+            double surface = getSurface(i, j, finalSurface, WorldType::EARTH);
+
+            if(isTunnel(i, j, finalTunnels, surface, tunnelBoundary, 
+                    cavernLimit)
+                    && map.isOnMap(i, j+1) 
+                    && map.getTileType(i, j+1, MapLayer::FOREGROUND) 
+                        == TileType::STONE) { 
+                map.setTile(i, j+1, MapLayer::FOREGROUND, TileType::GLOWSTONE);
+            }
         }
     }
 
@@ -301,8 +307,8 @@ BiomeType Mapgen::getBaseBiome(double temperature, double humidity,
 }
 
 
-double Mapgen::ocean(int x, int y, double steepness, int shoreline, 
-        int abyss) {
+double Mapgen::ocean(int x, int y, int shoreline, int abyss) {
+    double steepness = 50;
     double surface = (y - baseHeight) / steepness;
     double quadratic = 20 * ((x - map.width / 2.0) 
             * (x - map.width / 2.0)) / (map.width * map.width);
@@ -387,6 +393,24 @@ void Mapgen::setFelsic() {
                 map.setTileType(i, j, MapLayer::FOREGROUND, tileType);
             }
         }
+    }
+}
+
+double Mapgen::getSurface(int x, int y, const noise::module::Module &surface,
+        WorldType type) {
+    if (type == WorldType::EARTH) {
+        const int shoreline = map.width * 0.25;
+        const int abyss = map.width * 0.35; 
+        /* Base value */
+        double s = getCylinderValue(x, y, surface);
+        /* Modifiers: */
+        /* Add the ocean. */
+        s += ocean(x, y, shoreline, abyss);
+        return s;
+    }
+    else {
+        std::cerr << "Unsupported worldtype!\n";
+        return 0;
     }
 }
 

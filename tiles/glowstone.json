@@ -9,9 +9,9 @@
         "name": "glowstone.png"
     },
     "color": {
-        "r": 82,
-        "g": 74,
-        "b": 64,
+        "r": 175,
+        "g": 255,
+        "b": 219,
         "a": 0
     },
     "isSolid": true,
@@ -30,9 +30,9 @@
     },
     "isAnimated": false,
     "emitted": {
-        "r": 0,
-        "g": 0,
-        "b": 0,
+        "r": 175,
+        "g": 255,
+        "b": 219,
         "a": 0
     },
     "absorbed": {
