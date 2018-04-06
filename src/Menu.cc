@@ -57,13 +57,22 @@ std::vector<Spriterect> Menu::getSprites() {
                 message = "Setting biomes...";
                 break;
             case CreateState::GENERATING_TERRAIN:
-                message = "Placing blocks...";
+                message = "Generating terrain...";
+                break;
+            case CreateState::ADDING_GLOWSTONE:
+                message = "Installing ceiling glowstone...";
                 break;
             case CreateState::FELSIC:
                 message = "Baking the continental crust...";
                 break;
             case CreateState::SETTLING_WATER:
                 message = "Settling water...";
+                break;
+            case CreateState::GENERATING_OCEAN:
+                message = "Putting water in the ocean...";
+                break;
+            case CreateState::ADDING_DIRT:
+                message = "Making the world dirty...";
                 break;
             case CreateState::SAVING:
                 message = "Saving generated map...";

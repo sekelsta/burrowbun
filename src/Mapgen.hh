@@ -18,7 +18,10 @@ enum class CreateState {
     NOT_STARTED,
     GENERATING_BIOMES,
     GENERATING_TERRAIN,
+    ADDING_GLOWSTONE,
     FELSIC,
+    GENERATING_OCEAN,
+    ADDING_DIRT,
     SETTLING_WATER,
     SAVING,
     DONE
@@ -49,6 +52,12 @@ class Mapgen {
     int seaLevel;
     int seafloorLevel;
     int cavernHeight;
+    int shoreline;
+    int abyss;
+
+    /* A vector of the highest solid block for each x value, not counting any
+    sort of floating island. */
+    std::vector<int> surfaces;
 
     /* Set the map size to x, y. */
     void setSize(int x, int y);
@@ -82,10 +91,20 @@ class Mapgen {
 
     /* Get a value for determining the ground level changes needed for an
     ocean. */
-    double ocean(int x, int y, int shoreline, int abyss);
+    double ocean(int x, int y);
+
+    inline void fillVertical(int x, int low, int high, MapLayer layer, 
+            TileType type) {
+        for (int y = low; y < high; y++) {
+            map.setTileType(x, y, layer, type);
+        }
+    }
 
     /* Choose how felsic or mafic all the rock should be. */
     void setFelsic();
+
+    /* Put dirt, clay, and sand on the surface. */
+    void putDirt();
 
     /* Get a value for determining where the level of the surface should be. */
    double getSurface(int x, int y, const noise::module::Module &surface,

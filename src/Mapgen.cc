@@ -11,6 +11,9 @@ using namespace std;
 using namespace noise;
 using json = nlohmann::json;
 
+#define LAND_SLOPE 20
+#define SHORE_SIZE 40
+
 void Mapgen::setSize(int x, int y) {
     map.setHeight(y);
     map.setWidth(x);
@@ -19,6 +22,7 @@ void Mapgen::setSize(int x, int y) {
     map.tiles = new SpaceInfo[map.width * map.height];
     cylinderScale.SetXScale((map.width / 2.0) / M_PI);
     cylinderScale.SetZScale(cylinderScale.GetXScale());
+    surfaces.resize(x, 0);
 }
 
 void Mapgen::generateEarth(CreateState *state, mutex *m) {
@@ -28,6 +32,8 @@ void Mapgen::generateEarth(CreateState *state, mutex *m) {
     baseHeight = map.height * 0.8;
     seaLevel = map.height * 0.72;
     seafloorLevel = map.height * 0.5;
+    shoreline = map.width * 0.25;
+    abyss = map.width * 0.35; 
 
     /* Inform on status. */
     m -> lock();
@@ -173,6 +179,11 @@ void Mapgen::generateEarth(CreateState *state, mutex *m) {
                 tileType = TileType::EMPTY;
             }
 
+            /* Figure out where the top of the ground is. */
+            if (tileType != TileType::EMPTY) {
+                surfaces[i] = max(j, surfaces[i]);
+            }
+
             /* Add water instead of air to moist underground areas. */
             if (tileType == TileType::EMPTY && surface <= 0
                     && getCylinderValue(i, j, finalWetness) > waterLimit) {
@@ -183,6 +194,10 @@ void Mapgen::generateEarth(CreateState *state, mutex *m) {
         }
     }
 
+    /* Inform on status. */
+    m -> lock();
+    *state = CreateState::ADDING_GLOWSTONE;
+    m -> unlock();
     /* Put glowstone on tunnel ceilings. */
     for (int i = 0; i < map.width; i++) {
         for (int j = 0; j < map.height; j++) {
@@ -199,6 +214,7 @@ void Mapgen::generateEarth(CreateState *state, mutex *m) {
         }
     }
 
+    /* Inform on status. */
     m -> lock();
     *state = CreateState::FELSIC;
     m -> unlock();
@@ -206,11 +222,9 @@ void Mapgen::generateEarth(CreateState *state, mutex *m) {
 
     /* Inform on status. */
     m -> lock();
-    *state = CreateState::STUFF;
+    *state = CreateState::ADDING_DIRT;
     m -> unlock();
-
-    /* Put water on the surface. */
-    map.savePPM(MapLayer::FOREGROUND, "wunsettled");
+    putDirt();
 
     /* Inform on status. */
     m -> lock();
@@ -221,6 +235,9 @@ void Mapgen::generateEarth(CreateState *state, mutex *m) {
     removeWater(20);
     settleWater();
 
+    m -> lock();
+    *state = CreateState::GENERATING_OCEAN;
+    m -> unlock();
     /* Fill the ocean. */
     for (int i = 0; i < map.width; i++) {
         /* magic number 30 is bigger than random surface variations but small
@@ -307,10 +324,10 @@ BiomeType Mapgen::getBaseBiome(double temperature, double humidity,
 }
 
 
-double Mapgen::ocean(int x, int y, int shoreline, int abyss) {
+double Mapgen::ocean(int x, int y) {
     double steepness = 50;
     double surface = (y - baseHeight) / steepness;
-    double quadratic = 20 * ((x - map.width / 2.0) 
+    double quadratic = LAND_SLOPE * ((x - map.width / 2.0) 
             * (x - map.width / 2.0)) / (map.width * map.width);
     double linear = 5 * abs(map.width / 2.0 - x) / map.width;
     int depth = (baseHeight - seafloorLevel) / steepness;
@@ -396,16 +413,134 @@ void Mapgen::setFelsic() {
     }
 }
 
+void Mapgen::putDirt() {
+    module::Perlin baseDirt;
+    baseDirt.SetSeed(rand());
+    module::Turbulence turbulentDirt;
+    turbulentDirt.SetSourceModule(0, baseDirt);
+    module::ScalePoint finalDirt;
+    finalDirt.SetScale(0.04);
+    finalDirt.SetSourceModule(0, turbulentDirt);
+    double minDirt = getPercentile(0.01, finalDirt, 10000);
+
+    module::ScalePoint bigDirt;
+    bigDirt.SetScale(0.001);
+    bigDirt.SetSourceModule(0, turbulentDirt);
+
+    /* Find the lowest part of the surface, and the locations of the 
+    ocean edges. */
+    int oceanEdgeLeft = map.width / 2 - abyss;
+    int shoreLeft = map.width;
+    int shoreRight = 0;
+    int oceanEdgeRight = map.width / 2 + abyss;
+    int lowest = seafloorLevel;
+    int midocean = 0;
+    for (int i = 0; i < map.width; i++) {
+        if (surfaces[i] > seaLevel) {
+            if (i < map.width / 2) {
+                shoreLeft = min(shoreLeft, i);
+            }
+            else {
+                shoreRight = max(shoreRight, i);
+            }
+        }
+        for (int j = seafloorLevel; j > 0; j--) {
+            if (map.getTileType(i, j, MapLayer::FOREGROUND) != TileType::EMPTY && map.getTileType(i, j, MapLayer::FOREGROUND) != TileType::WATER) {
+                if (j + 1 < lowest) {
+                    lowest = j + 1;
+                    midocean = i;
+                }
+                break;
+            }
+        }
+    }   
+
+    midocean = midocean < map.width / 2? midocean + map.width : midocean;
+
+    /* Adjust shore locations so the beaches are a reasonable size. */
+    shoreLeft += SHORE_SIZE;
+    shoreRight -= SHORE_SIZE;
+    shoreLeft += (rand() % SHORE_SIZE / 2) + (rand() % SHORE_SIZE / 2);
+    shoreRight -= (rand() % SHORE_SIZE / 2) + (rand() % SHORE_SIZE / 2);
+    shoreLeft = (shoreLeft + map.width / 2 - shoreline) / 2;
+    shoreRight = (shoreRight + map.width / 2 + shoreline) / 2;
+
+    assert(oceanEdgeLeft < shoreLeft);
+    assert(shoreLeft < shoreRight);
+    assert(shoreRight < oceanEdgeRight);
+
+    for (int i = 0; i < map.width; i++) {
+        double clayDepth = 0;
+        double sandDepth = 0;
+        double sandDist = 0;
+        /* If it's shore, add sand. */
+        if ((i > oceanEdgeLeft && i < shoreLeft)
+                || (i > shoreRight && i < oceanEdgeRight)) {
+            double x1 = min(abs(shoreLeft - i), abs(i - shoreRight));
+            double x2 = min(abs(i - oceanEdgeLeft), abs(oceanEdgeRight - i));
+            double length = x1 + x2;
+            sandDepth = 200.0 * x1 * x2 / (length * length);
+            sandDepth *= 1 + abs(getCylinderValue(i, seafloorLevel, bigDirt));
+            sandDist = x1 / length;
+        }
+
+        /* Figure out whether we're closer to land or the sea floor. */
+        int oceanAvgRight = (oceanEdgeRight + shoreRight) / 2;
+        int oceanAvgLeft = (oceanEdgeLeft + shoreLeft) / 2;
+        if (i >  oceanAvgRight || i < oceanAvgLeft) {
+
+            int x = i < map.width / 2? i + map.width : i;
+            double dist = abs(x - midocean);
+            int length = x < midocean? midocean - (oceanAvgLeft + map.width)
+                    : oceanAvgRight - midocean;
+            double shoredist = (length - dist) / length;
+            clayDepth = 20.0 * (1.0 - dist / length) * pow(shoredist, 0.5);
+            clayDepth *= 1.0 + abs(getCylinderValue(i, seaLevel, bigDirt));
+            fillVertical(i, surfaces[i] - clayDepth / 2, 
+                surfaces[i] + clayDepth / 2,
+                MapLayer::FOREGROUND, TileType::CLAY);
+        }
+        else {
+            // TODO: after adding mountains, adjust this to not put dirt
+            // all the way up them
+            int length = min(baseHeight - cavernHeight, 
+                    surfaces[i] - (seafloorLevel + seaLevel) / 2);
+            for (int j = -1 * length; j <= 0; j++) {
+                if (length == 0) {
+                    continue;
+                }
+                int y = j + surfaces[i] - sandDepth * sandDist;
+                double dirt = getCylinderValue(i, y, finalDirt) - abs(minDirt);
+                double val = (j + length) / (double)length;
+                dirt += 2 * abs(minDirt) * val;
+                TileType block = map.getTileType(i, y, MapLayer::FOREGROUND);
+                if (dirt > 0
+                        && (block == TileType::STONE 
+                        || block == TileType::GRANITE
+                        || block == TileType::BASALT 
+                        || block == TileType::PERIDOTITE)) {
+                    map.setTileType(i, y, MapLayer::FOREGROUND, TileType::DIRT);
+                }
+            }
+        }
+
+        if (sandDepth != 0) {
+            int down = surfaces[i] - sandDist * sandDepth;
+            int up =  surfaces[i] + sandDist * sandDepth;
+            fillVertical(i, down, up, MapLayer::FOREGROUND, TileType::SAND);
+        }
+
+    }
+}
+
 double Mapgen::getSurface(int x, int y, const noise::module::Module &surface,
         WorldType type) {
     if (type == WorldType::EARTH) {
-        const int shoreline = map.width * 0.25;
-        const int abyss = map.width * 0.35; 
         /* Base value */
         double s = getCylinderValue(x, y, surface);
         /* Modifiers: */
         /* Add the ocean. */
-        s += ocean(x, y, shoreline, abyss);
+        s += ocean(x, y);
         return s;
     }
     else {
