@@ -433,7 +433,7 @@ void Mapgen::putDirt() {
     int shoreLeft = map.width;
     int shoreRight = 0;
     int oceanEdgeRight = map.width / 2 + abyss;
-    int lowest = seafloorLevel;
+    int lowest = map.height;
     int midocean = 0;
     for (int i = 0; i < map.width; i++) {
         if (surfaces[i] > seaLevel) {
@@ -444,14 +444,10 @@ void Mapgen::putDirt() {
                 shoreRight = max(shoreRight, i);
             }
         }
-        for (int j = seafloorLevel; j > 0; j--) {
-            if (map.getTileType(i, j, MapLayer::FOREGROUND) != TileType::EMPTY && map.getTileType(i, j, MapLayer::FOREGROUND) != TileType::WATER) {
-                if (j + 1 < lowest) {
-                    lowest = j + 1;
-                    midocean = i;
-                }
-                break;
-            }
+        
+        if (surfaces[i] < lowest) {
+            lowest = surfaces[i];
+            midocean = i;
         }
     }   
 
@@ -469,6 +465,11 @@ void Mapgen::putDirt() {
     assert(shoreLeft < shoreRight);
     assert(shoreRight < oceanEdgeRight);
 
+    /* Calculate some constants. */
+    int oceanAvgRight = (oceanEdgeRight + shoreRight) / 2;
+    int oceanAvgLeft = (oceanEdgeLeft + shoreLeft) / 2;
+    int clayRight = oceanAvgRight;
+    int clayLeft = oceanAvgLeft;
     for (int i = 0; i < map.width; i++) {
         double clayDepth = 0;
         double sandDepth = 0;
@@ -479,28 +480,31 @@ void Mapgen::putDirt() {
             double x1 = min(abs(shoreLeft - i), abs(i - shoreRight));
             double x2 = min(abs(i - oceanEdgeLeft), abs(oceanEdgeRight - i));
             double length = x1 + x2;
-            sandDepth = 200.0 * x1 * x2 / (length * length);
-            sandDepth *= 1 + abs(getCylinderValue(i, seafloorLevel, bigDirt));
+            sandDepth = 300.0 * x1 * x2 / (length * length);
+            sandDepth *= abs(1 + getCylinderValue(i, seafloorLevel, bigDirt));
             sandDist = x1 / length;
+            sandDepth *= sandDist;
         }
-
-        /* Figure out whether we're closer to land or the sea floor. */
-        int oceanAvgRight = (oceanEdgeRight + shoreRight) / 2;
-        int oceanAvgLeft = (oceanEdgeLeft + shoreLeft) / 2;
-        if (i >  oceanAvgRight || i < oceanAvgLeft) {
-
+        
+        if (i >  clayRight || i < clayLeft) {
             int x = i < map.width / 2? i + map.width : i;
             double dist = abs(x - midocean);
-            int length = x < midocean? midocean - (oceanAvgLeft + map.width)
-                    : oceanAvgRight - midocean;
+            int length = x < midocean? midocean - clayRight
+                    : clayLeft + map.width - midocean;
             double shoredist = (length - dist) / length;
-            clayDepth = 20.0 * (1.0 - dist / length) * pow(shoredist, 0.5);
-            clayDepth *= 1.0 + abs(getCylinderValue(i, seaLevel, bigDirt));
-            fillVertical(i, surfaces[i] - clayDepth / 2, 
-                surfaces[i] + clayDepth / 2,
-                MapLayer::FOREGROUND, TileType::CLAY);
+            assert(dist <= length);
+            assert(0 <= dist);
+            clayDepth = 80.0 * (dist / length) * pow(shoredist, 0.4);
+            /* Y value here is arbitrary. */
+            clayDepth *= max(0.0, 0.5 + getCylinderValue(i, 0, bigDirt));
+            int level = surfaces[i] + 1;
+            if ((int)clayDepth >= 1) {
+                fillVertical(i, level, level + clayDepth,
+                    MapLayer::FOREGROUND, TileType::CLAY);
+                surfaces[i] = level + clayDepth;
+            }
         }
-        else {
+        if (i > oceanAvgLeft && i < oceanAvgRight) {
             // TODO: after adding mountains, adjust this to not put dirt
             // all the way up them
             int length = min(baseHeight - cavernHeight, 
@@ -525,9 +529,12 @@ void Mapgen::putDirt() {
         }
 
         if (sandDepth != 0) {
-            int down = surfaces[i] - sandDist * sandDepth;
-            int up =  surfaces[i] + sandDist * sandDepth;
+            int level = surfaces[i] + 1;
+            double coef = pow(sandDist, 0.5);
+            int down = level - (1 - coef) * sandDepth;
+            int up = level + coef * sandDepth;
             fillVertical(i, down, up, MapLayer::FOREGROUND, TileType::SAND);
+            surfaces[i] = up;
         }
 
     }
