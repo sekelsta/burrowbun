@@ -49,5 +49,13 @@ Leaf and potions and pickax: Open Game Art user Johann C (https://opengameart.or
 Trash - Open Game Art user qubodup (https://opengameart.org/content/forum-
 controls), public domain, edited (changed color and format)
 
+Crystal / ice horse - Open Game Art user lancelot_gao (https://opengameart.org/content/2d-platformer-art-assets-from-horse-of-spring)
+
+hellhound (edited to have orange eyes instead of blue):
+    Artwork created by Luis Zuno (@ansimuz)
+    License for Everyone. This piece is under a CC-BY-3.0 License http://creativecommons.org/licenses/by/3.0/
+    You can copy, modify, distribute and perform the work, even for commercial purposes, as long as you give appropiate credit. Don't redistribute as is as Game Art.
+    Get more Assets like this at: https://www.patreon.com/ansimuz
+
 I edited most of the art, mostly just to get it into the right format.
 All other art was drawn by me.

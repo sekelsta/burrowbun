@@ -1,5 +1,5 @@
 Changes since last push:
- - Modified the way sand and clay are added
+ - Added a couple images for when I add other critters
 
 Known "features":
  - The strenth of gravity is independent of the world.
@@ -12,7 +12,7 @@ framerate
  - Clay and sand copy the ups and downs of the ground beneath them. I might add some sort of smoothing later.
 
 Known bugs:
- - Clickboxes r3equire the mouse to move before they notice it
+ - Clickboxes require the mouse to move before they notice it
  - Collision detection misses one when falling into a two-wide gap at just the
 right angle
  - When the window is bigger than the map, crossing x = 0 causes an assertion
@@ -22,7 +22,6 @@ error.
 To do:
  - save and load the player
  - Make all public Map functions accept any x value (might be done?)
- - remove Map.getForeground() and Map.getBackground()
  - Make spawning destroy solid tiles at the spawn
  - make it impossible to place solid blocks on top of creatures
  - make light work properly with background walls and water
