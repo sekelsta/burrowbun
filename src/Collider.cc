@@ -239,20 +239,6 @@ bool Collider::listCollisions(vector<CollisionInfo> &collisions, Map &map,
 // it's best to call it again with the results assuming the y position is 
 // correct but the x may have farther to move.
 void Collider::collide(Map &map, movable::Movable &movable) {
-    /* First try to move the movable straight sideways by boulderSpeed.
-    (The boulder that gave it that speed isn't necessarily still under it. )*/
-    if (movable.boulderSpeed != 0) {
-        movable::Point storedVelocity = movable.getVelocity();
-        movable::Point boulderVelocity;
-        boulderVelocity.y = 0;
-        boulderVelocity.x = min(movable.boulderSpeed, TILE_WIDTH);
-        boulderVelocity.x = max(boulderVelocity.x, -1.0 * TILE_WIDTH);
-        movable.boulderSpeed = 0;
-        movable.setVelocity(boulderVelocity);
-        collide(map, movable);
-        movable.setVelocity(storedVelocity);
-    }
-
     // Calculate the world width and height
     int worldWidth = map.getWidth() * TILE_WIDTH;
     int worldHeight = map.getHeight() * TILE_HEIGHT;

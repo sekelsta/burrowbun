@@ -36,7 +36,6 @@ Movable::Movable() {
 
     pixelsFallen = 0;
     maxHeight = 0;
-    boulderSpeed = 0;
 
     // These should be changed by the child class's init.
     drag.x = 0;
@@ -88,7 +87,6 @@ Movable &Movable::operator=(const Movable &movable) {
     pixelsFallen = movable.pixelsFallen;
     maxHeight = movable.maxHeight;
     minVelocity = movable.minVelocity;
-    boulderSpeed = movable.boulderSpeed;
     return *this;
 }
 
@@ -261,7 +259,6 @@ void from_json(const json &j, Movable &movable) {
     movable.minVelocity = j["minVelocity"];
     movable.rect.x = j["x"];
     movable.rect.y = j["y"];
-    movable.boulderSpeed = 0;
 }
 
 } // End namespace movable

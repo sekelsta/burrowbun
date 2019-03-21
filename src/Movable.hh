@@ -79,9 +79,6 @@ public:
     speed.) */
     double minVelocity;
 
-    /* How fast are all the boulders trying to move it this update. */
-    int boulderSpeed;
-
     // Constructor
     Movable();
 
