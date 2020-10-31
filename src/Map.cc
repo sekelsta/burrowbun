@@ -8,8 +8,6 @@
 #include "Map.hh"
 #include "Boulder.hh"
 #include "version.hh"
-#include "DroppedItem.hh"
-#include "AllTheItems.hh"
 #include <queue>
 
 #define MAX_LIGHT_DEPTH 5
@@ -40,28 +38,6 @@ Tile *Map::newTile(TileType val) {
     pointers[(unsigned int)val] = tile;
 
     return tile;
-}
-
-void Map::randomizeSprites() {
-    for (int i = 0; i < width; i++) {
-        for (int j = 0; j < height; j++) {
-            chooseSprite(i, j);
-        }
-    }
-}
-
-void Map::chooseSprite(int x, int y) {
-    Location place;
-    place.x = x;
-    place.y = y;
-    place.layer = MapLayer::FOREGROUND;
-    Location spritePlace = getTile(place) -> getSpritePlace(*this, place);
-    findPointer(x, y) -> foregroundSprite 
-        = SpaceInfo::toSpritePlace(spritePlace);
-    place.layer = MapLayer::BACKGROUND;
-    spritePlace = getTile(place) -> getSpritePlace(*this, place);
-    findPointer(x, y) -> backgroundSprite 
-        = SpaceInfo::toSpritePlace(spritePlace);
 }
 
 bool Map::isBesideTile(int x, int y, MapLayer layer) {
@@ -293,32 +269,6 @@ void Map::setLight(int xstart, int ystart, int xstop, int ystop) {
 
 }
 
-void Map::updateNear(int x, int y) {
-    findPointer(wrapX(x), y) -> isLightUpdated = false;
-    /* Value that takes into account x-wrapping of the map. */
-    Location fore;
-    Location back;
-    fore.layer = MapLayer::FOREGROUND;
-    back.layer = MapLayer::BACKGROUND;
-    for (int i = -1; i < 2; i++) {
-        fore.x = wrapX(x + i);
-        back.x = wrapX(x + i);
-        for (int j = -1; j < 2; j++) {
-            if (isOnMap(wrapX(x + i), y + j)) {
-
-                fore.y = y + j;
-                back.y = y + j;
-                /* Update the tiles. */
-                addToUpdate(fore);
-                addToUpdate(back);
-                /* Update the sprites. */
-                setSprite(fore, getTile(fore) -> updateSprite(*this, fore));
-                setSprite(back, getTile(back) -> updateSprite(*this, back));
-            }
-        }
-    }
-}
-
 
 int Map::bordering(const Location &place) {
     EdgeType thisEdge = getTile(place) -> getEdge();
@@ -387,7 +337,6 @@ void Map::saveLayer(MapLayer layer, ofstream &outfile) const {
 }
 
 void Map::save(std::string filename) const {
-    // Saves in .bmp file format in black and white
     std::ofstream outfile;
     outfile.open(filename);
 
@@ -556,30 +505,6 @@ Map::Map(string filename, int tileWidth, int tileHeight, string p) :
         cerr << "May have improperly loaded biomes. \n";
     }
 
-    for (int i = 0; i < width * height; i++) {
-        int spritePlace;
-        infile >> spritePlace;
-        tiles[i].foregroundSprite = (uint8_t)spritePlace;
-        infile >> spritePlace;
-        tiles[i].backgroundSprite = (uint8_t)spritePlace;
-    }
-
-    /* Iterate over the entire map. */
-    Location fore;
-    Location back;
-    fore.layer = MapLayer::FOREGROUND;
-    back.layer = MapLayer::BACKGROUND;
-    for (int i = 0; i < width; i++) {
-        fore.x = i;
-        back.x = i;
-        for (int j = 0; j < height; j++) {
-            fore.y = j;
-            back.y = j;
-            /* Add the appropriate tiles to our list of tiles to update. */
-            addToUpdate(fore);
-            addToUpdate(back);
-        }
-    }
 }
 
 void Map::savePPM(MapLayer layer, std::string filename) {
@@ -674,8 +599,6 @@ void Map::setTile(int x, int y, MapLayer layer, TileType val) {
     assert(layer == MapLayer::FOREGROUND || layer == MapLayer::BACKGROUND
             || layer == MapLayer::NONE);
 
-    bool wasSky = isSky(x, y);
-
     if (layer == MapLayer::FOREGROUND) {
         findPointer(x, y) -> foreground = val;
     }
@@ -685,18 +608,6 @@ void Map::setTile(int x, int y, MapLayer layer, TileType val) {
     else {
         /* We didn't change anything. */
         return;
-    }
-
-    /* If we made it this far we changed something, so the amount of light
-    reaching nearby tiles may have changed. */
-    updateNear(x, y);
-    if ((wasSky && !getTile(val) -> getIsSky())
-            || getForeground(x, y) -> getEmitted() != Light(0, 0, 0, 0)) {
-        findPointer(x, y) -> lightRemoved = true;
-    }
-    if ((isSky(x, y) && !wasSky)
-            || getTile(val) -> getEmitted() != Light(0, 0, 0, 0)) {
-        findPointer(x, y) -> lightAdded = true;
     }
 }
 
@@ -722,49 +633,8 @@ bool Map::placeTile(Location place, TileType type) {
     }
 
     setTile(place, type);
-    chooseSprite(place.x, place.y);
-    // TODO: change this if I add furniture
 
     return true;
-}
-
-void Map::update(vector<DroppedItem*> &items) {
-    /* Make sure we're updating tiles that need to be updated. */
-    set<Location>::iterator removeIter = toUpdate.begin();
-    while (removeIter != toUpdate.end()) {
-        if (!(getTile(*removeIter) -> canUpdate(*this, *removeIter))) {
-            removeIter = toUpdate.erase(removeIter);
-        }
-        else {
-            ++removeIter;
-        }
-    }
-
-    /* Iterate over a copy of the list. */
-    set<Location> newUpdate = toUpdate;
-    set<Location>::iterator iter = newUpdate.begin();
-    while (iter != newUpdate.end()) {
-        Tile *tile = getTile(*iter);
-        tile -> update(*this, *iter, items, tick);
-        iter++;
-    }
-
-    /* Heal tiles that have been damaged for a while. */
-    /* Tiles stay damaged for this many ticks, with about 20-40 ticks/sec. */
-    const int healTime = 3000;
-    /* Iterate while removing. */
-    vector<TileHealth>::iterator healIter = damaged.begin();
-    while (healIter != damaged.end()) {
-        if (tick - healIter -> lastUpdated > healTime) {
-            healIter = damaged.erase(healIter);
-        }
-        else {
-            ++healIter;
-        }
-    }
-
-    /* It's a new tick. */
-    tick++;
 }
 
 bool Map::damage(Location place, int amount, vector<DroppedItem*> &items) {
@@ -804,14 +674,7 @@ bool Map::damage(Location place, int amount, vector<DroppedItem*> &items) {
 }
 
 void Map::kill(int x, int y, MapLayer layer, vector<DroppedItem*> &items) {
-    // Drop itself as an item
-    TileType type = getTileType(wrapX(x), y, layer);
-    assert(type != TileType::WATER);
-    if (type != TileType::EMPTY) {
-        items.push_back(new DroppedItem ((ItemMaker::makeItem(
-            ItemMaker::tileToItem(type), path)), 
-            x * TILE_WIDTH, y * TILE_HEIGHT, width * TILE_WIDTH));
-    }
+    // Not very useful without items
 
     // Set the place it used to be to empty
     setTile(x, y, layer, TileType::EMPTY);
@@ -843,43 +706,5 @@ Location Map::getMapCoords(int x, int y, MapLayer layer) {
     assert(place.y < getHeight());
 
     return place;
-}
-
-void Map::moveTile(const Location &place, int x, int y, 
-        vector<DroppedItem*> &items) {
-    assert(place.x >= 0);
-    assert(place.x < width);
-    assert(place.y >=0);
-    assert(place.y < height);
-    assert(x != 0 || y != 0);
-    int newX = wrapX(place.x + x);
-    /* If it's just above the bottom, it vanishes. */
-    if (!isOnMap(newX, place.y + y)) {
-        setTile(place, TileType::EMPTY);
-        return;
-    }
-
-    kill(newX, place.y + y, place.layer, items);
-    TileType val = getTileType(place, 0, 0);
-    Location spritePlace = getSprite(place);
-    setSprite(newX, place.y + y, place.layer, spritePlace);
-    setTile(newX, place.y + y, place.layer, val);
-    setTile(place, TileType::EMPTY);
-}
-
-void Map::displaceTile(const Location &place, int x, int y) {
-    assert(x != 0 || y != 0);
-    int newX = wrapX(place.x + x);
-    /* Check if the place below is actually on the map. */
-    if (!isOnMap(newX, place.y + y)) {
-        return;
-    }
-
-    TileType destination = getTileType(place, x, y);
-    Location spritePlace = getSprite(newX, place.y + y, place.layer);
-    setSprite(newX, place.y + y, place.layer, getSprite(place));
-    setSprite(place, spritePlace);
-    setTile(newX, place.y + y, place.layer, getTile(place) -> type);
-    setTile(place, destination);
 }
 

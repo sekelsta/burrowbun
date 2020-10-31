@@ -3,16 +3,12 @@
 
 #include <vector>
 #include <string>
-#include "Sprite.hh"
-#include "Movable.hh"
 #include "Light.hh"
-#include "Damage.hh"
 
 /* Forward declare! */
 class Map;
 struct Location;
 struct SDL_Rect;
-class DroppedItem;
 
 // A class for keeping track of which tiles there are
 enum class TileType : short {
@@ -79,9 +75,6 @@ class Tile {
     /* Whether it drops itself as an item when water touches it. */
     bool waterBreaks;
 
-    /* How much damage the player takes from sharing space with this tile. */
-    Damage overlapDamage;
-
     // Display-related variables
     bool isAnimated;
 
@@ -112,11 +105,6 @@ class Tile {
     EdgeType edgeType;
 
 protected:
-    // Information about the sprite
-    // Tile spritesheets use rows for the different versions that depend on
-    // whether each side is next to air, and the cols are the different 
-    // variations.
-    Sprite sprite;
 
     /* Return the filename of the json file for that tiletype. */
     static std::string getFilename(TileType tileType);
@@ -154,30 +142,15 @@ public:
         return absorbed;
     }
 
-    /* The number of foreground and background columns in the spritesheet. */
-    inline int numSprites() const {
-        return sprite.getCols() / (2 - !canBackground);
-    }
-
     // Variables for how it interacts with the players
     bool getIsPlatform() const;
     bool getIsSolid() const;
-    void dealOverlapDamage(movable::Movable &movable) const;
 
     /* Basically the number of hits with a pickaxe to break it. */
     int getMaxHealth() const;
 
-    /* Which sprite on the spritesheet to use. */
-    virtual Location getSpritePlace(Map &map, const Location &place)
-             const;
-
-    /* What sprite to change to. */
-    virtual Location updateSprite(Map &map, const Location &place)
-            const;
-
     /* Change the map in whatever way needs doing. */
-    virtual bool update(Map &map, Location place,
-        std::vector<DroppedItem*> &items, int tick);
+    virtual bool update(Map &map, Location place, int tick);
 
     // Constructor, based on the tile type
     Tile(TileType tileType, std::string path);
@@ -187,9 +160,6 @@ public:
 
     /* Whether the tile will ever need to call its update function. */
     virtual bool canUpdate(const Map &map, const Location &place);
-
-    virtual void render(uint8_t spritePlace, const Light &light, 
-        const SDL_Rect &rectTo);
 };
 
 #endif

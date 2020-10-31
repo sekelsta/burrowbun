@@ -8,7 +8,7 @@ $ sudo apt-get install make git libsdl2-2.0.0 libsdl2-dev libsld2-image-2.0.0
 $ sudo apt-get install libsdl2-image-dev libsdl2-ttf-2.0.0 libsdl2-ttf-dev
 (The SDL ttf library isn't needed yet, but will probably be at some point.)
 $ sudo apt-get install libnoise libnoise-dev g++
-$ git clone https://github.com/felinoidthekeratincoated/burrowbun
+$ git clone https://github.com/sekelsta/burrowbun
 $ cd burrowbun
 $ make
 It will probably take a while to compile. Once it finishes successfullly, run
@@ -16,3 +16,5 @@ it with:
 $ ./burrowbun
 To be able to run it as just burrowbun from any working directory, add it to
 your PATH environment variable.
+
+For GPU optimizations, NVIDIA's CUDA library must also be installed.

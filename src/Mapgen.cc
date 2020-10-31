@@ -6,6 +6,10 @@
 #include <cmath> // Because pi and exponentiation
 #include "Mapgen.hh"
 #include "version.hh"
+#include "mapgen.cuh"
+#include <cuda_runtime.h>
+
+#define ENABLE_GPU
 
 using namespace std;
 using namespace noise;
@@ -13,6 +17,17 @@ using json = nlohmann::json;
 
 #define LAND_SLOPE 20
 #define SHORE_SIZE 40
+
+void Mapgen::set_status(CreateState *state_ptr, mutex *m, CreateState state) {
+    if (m == nullptr) {
+        std::cout << get_message(state) << "\n";
+    }
+    else {
+        m -> lock();
+        *state_ptr = state;
+        m -> unlock();
+    }
+}
 
 void Mapgen::setSize(int x, int y) {
     map.setHeight(y);
@@ -26,19 +41,22 @@ void Mapgen::setSize(int x, int y) {
 }
 
 void Mapgen::generateEarth(CreateState *state, mutex *m) {
+    int width = 2048 * 3;
+    int height = 2048;
+
     /* Set height and width, and use them to make a tile array. */
     setSize(2048 * 3, 2048);
 
-    baseHeight = map.height * 0.8;
-    seaLevel = map.height * 0.72;
-    seafloorLevel = map.height * 0.5;
-    shoreline = map.width * 0.25;
-    abyss = map.width * 0.35; 
+    baseHeight = height * 0.8;
+    seaLevel = height * 0.72;
+    seafloorLevel = height * 0.5;
+    shoreline = width * 0.25;
+    abyss = width * 0.35; 
+    seed = rand();
+    cavernHeight = map.height * 0.5;
 
     /* Inform on status. */
-    m -> lock();
-    *state = CreateState::GENERATING_BIOMES;
-    m -> unlock();
+    set_status(state, m, CreateState::GENERATING_BIOMES);
 
     /* Some constants to use in the perlin moise. */
     const int octaves = 2;
@@ -50,7 +68,7 @@ void Mapgen::generateEarth(CreateState *state, mutex *m) {
     module::Perlin baseTemperature;
     baseTemperature.SetOctaveCount(octaves);
     baseTemperature.SetPersistence(persistence);
-    baseTemperature.SetSeed(rand());
+    baseTemperature.SetSeed(seed - 20);
     module::ScalePoint scaledTemperature;
     scaledTemperature.SetScale(scale);
     scaledTemperature.SetSourceModule(0, baseTemperature);
@@ -63,7 +81,7 @@ void Mapgen::generateEarth(CreateState *state, mutex *m) {
     module::Perlin baseHumidity;
     baseHumidity.SetOctaveCount(octaves);
     baseHumidity.SetPersistence(persistence);
-    baseTemperature.SetSeed(rand());
+    baseTemperature.SetSeed(seed - 10);
     module::ScalePoint scaledHumidity;
     scaledHumidity.SetScale(scale);
     scaledHumidity.SetSourceModule(0, baseHumidity);
@@ -97,13 +115,24 @@ void Mapgen::generateEarth(CreateState *state, mutex *m) {
     }
 
     /* Inform on status. */
-    m -> lock();
-    *state = CreateState::GENERATING_TERRAIN;
-    m -> unlock();
+#ifdef ENABLE_GPU
+    set_status(state, m, CreateState::GENERATING_TERRAIN);
+    char *terrain_map = generate_terrain(seed, width, height, &surfaces[0]);
+    for (int i = 0; i < map.width; i++) {
+        for (int j = 0; j < map.height; j++) {
+            map.setTile(i, j, MapLayer::FOREGROUND, 
+                        (TileType)terrain_map[j * map.width + i]);
+        }
+    }
+
+    cudaDeviceSynchronize();
+
+#else
+    set_status(state, m, CreateState::PREPARE_GENERATE_TERRAIN);
 
     /* Now that biomes are set, make a cave system. */
     module::RidgedMulti baseCaves;
-    baseCaves.SetSeed(rand());
+    baseCaves.SetSeed(seed);
     module::Turbulence turbulentCaves;
     turbulentCaves.SetSourceModule(0, baseCaves);
     module::ScalePoint finalCaves;
@@ -114,7 +143,7 @@ void Mapgen::generateEarth(CreateState *state, mutex *m) {
 
     /* Add a system of tunnels to hopefully connect the caves. */
     module::RidgedMulti baseTunnels;
-    baseTunnels.SetSeed(rand());
+    baseTunnels.SetSeed(seed + 30);
     module::Turbulence turbulentTunnels;
     turbulentTunnels.SetSourceModule(0, baseTunnels);
     module::ScalePoint finalTunnels;
@@ -124,7 +153,7 @@ void Mapgen::generateEarth(CreateState *state, mutex *m) {
     double tunnelBoundary = getPercentile(0.85, finalTunnels, 10000);
     /* A perlin noise to use for getting the surface. */
     module::Perlin baseSurface;
-    baseSurface.SetSeed(rand());
+    baseSurface.SetSeed(seed + 40);
     module::Turbulence turbulentSurface;
     turbulentSurface.SetSourceModule(0, baseSurface);
     module::ScalePoint finalSurface;
@@ -132,7 +161,6 @@ void Mapgen::generateEarth(CreateState *state, mutex *m) {
     const double hillScale = 0.001;
     finalSurface.SetScale(hillScale);
 
-    cavernHeight = map.height * 0.5;
     double caveLimit = getPercentile(0.125, finalSurface, 10000);
     caveLimit -= getPercentile(0.875, finalCaves, 10000);
     double cavernLimit = getPercentile(0.05, finalSurface, 10000);
@@ -140,7 +168,7 @@ void Mapgen::generateEarth(CreateState *state, mutex *m) {
 
     /* Wetness as in whether there is actually water there right now. */
     module::Perlin baseWetness;
-    baseWetness.SetSeed(rand());
+    baseWetness.SetSeed(seed + 50);
     module::Turbulence turbulentWetness;
     turbulentWetness.SetSourceModule(0, baseWetness);
     module::ScalePoint scaledWetness;
@@ -155,6 +183,7 @@ void Mapgen::generateEarth(CreateState *state, mutex *m) {
 
     double waterLimit = getPercentile(0.85, finalWetness, 10000);
 
+    set_status(state, m, CreateState::GENERATING_TERRAIN);
     /* Make terrain and caves. */
     for (int i = 0; i < map.width; i++) {
         for (int j = 0; j < map.height; j++) {
@@ -195,9 +224,8 @@ void Mapgen::generateEarth(CreateState *state, mutex *m) {
     }
 
     /* Inform on status. */
-    m -> lock();
-    *state = CreateState::ADDING_GLOWSTONE;
-    m -> unlock();
+    set_status(state, m, CreateState::ADDING_GLOWSTONE);
+
     /* Put glowstone on tunnel ceilings. */
     for (int i = 0; i < map.width; i++) {
         for (int j = 0; j < map.height; j++) {
@@ -215,29 +243,23 @@ void Mapgen::generateEarth(CreateState *state, mutex *m) {
     }
 
     /* Inform on status. */
-    m -> lock();
-    *state = CreateState::FELSIC;
-    m -> unlock();
+    set_status(state, m, CreateState::FELSIC);
     setFelsic();
 
+#endif
+
     /* Inform on status. */
-    m -> lock();
-    *state = CreateState::ADDING_DIRT;
-    m -> unlock();
+    set_status(state, m, CreateState::ADDING_DIRT);
     putDirt();
 
     /* Inform on status. */
-    m -> lock();
-    *state = CreateState::SETTLING_WATER;
-    m -> unlock();
+    set_status(state, m, CreateState::SETTLING_WATER);
 
     settleWater();
     removeWater(20);
     settleWater();
 
-    m -> lock();
-    *state = CreateState::GENERATING_OCEAN;
-    m -> unlock();
+    set_status(state, m, CreateState::GENERATING_OCEAN);
     /* Fill the ocean. */
     for (int i = 0; i < map.width; i++) {
         /* magic number 30 is bigger than random surface variations but small
@@ -251,10 +273,6 @@ void Mapgen::generateEarth(CreateState *state, mutex *m) {
             }
         }
     }
-
-    /* When done setting non-boulders and before setting boulders, have
-    all the tiles use a random sprite. */
-    map.randomizeSprites();
 }
 
 void Mapgen::generateTest() {
@@ -264,8 +282,6 @@ void Mapgen::generateTest() {
             map.setTile(i, j, MapLayer::FOREGROUND, TileType::SANDSTONE);
         }
     }
-
-    map.randomizeSprites();
 }
 
 double Mapgen::getCylinderValue(int x, int y, const module::Module &values) {
@@ -324,7 +340,7 @@ BiomeType Mapgen::getBaseBiome(double temperature, double humidity,
 }
 
 
-double Mapgen::ocean(int x, int y) {
+double Mapgen::surfaceModifier(int x, int y) {
     double steepness = 50;
     double surface = (y - baseHeight) / steepness;
     double quadratic = LAND_SLOPE * ((x - map.width / 2.0) 
@@ -353,7 +369,7 @@ double Mapgen::ocean(int x, int y) {
 void Mapgen::setFelsic() {
     /* Perlin noise for felsic / mafic gradient. */
     module::Perlin baseFelsic;
-    baseFelsic.SetSeed(rand());
+    baseFelsic.SetSeed(seed + 60);
     module::Turbulence turbulentFelsic;
     turbulentFelsic.SetSourceModule(0, baseFelsic);
     module::ScalePoint finalFelsic;
@@ -415,7 +431,7 @@ void Mapgen::setFelsic() {
 
 void Mapgen::putDirt() {
     module::Perlin baseDirt;
-    baseDirt.SetSeed(rand());
+    baseDirt.SetSeed(seed + 70);
     module::Turbulence turbulentDirt;
     turbulentDirt.SetSourceModule(0, baseDirt);
     module::ScalePoint finalDirt;
@@ -436,6 +452,8 @@ void Mapgen::putDirt() {
     int lowest = map.height;
     int midocean = 0;
     for (int i = 0; i < map.width; i++) {
+        if (i > 3000 && i < 3400) {
+        }
         if (surfaces[i] > seaLevel) {
             if (i < map.width / 2) {
                 shoreLeft = min(shoreLeft, i);
@@ -504,6 +522,7 @@ void Mapgen::putDirt() {
                 surfaces[i] = level + clayDepth;
             }
         }
+        //printf("%d, %d\n", oceanAvgLeft, oceanAvgRight);
         if (i > oceanAvgLeft && i < oceanAvgRight) {
             // TODO: after adding mountains, adjust this to not put dirt
             // all the way up them
@@ -547,7 +566,7 @@ double Mapgen::getSurface(int x, int y, const noise::module::Module &surface,
         double s = getCylinderValue(x, y, surface);
         /* Modifiers: */
         /* Add the ocean. */
-        s += ocean(x, y);
+        s += surfaceModifier(x, y);
         return s;
     }
     else {
@@ -717,14 +736,12 @@ void Mapgen::generate(std::string filename, WorldType worldType,
     floating islands or whatever directly above the spawn point, so the
     player doesn't die of fall damage every time they respawn. */
     map.spawn.y = map.height * 0.9;
-    *state = CreateState::SAVING;
+    set_status(state, m, CreateState::SAVING);
     map.save(filename);
     /* TODO: remove when done testing. */
     map.savePPM(MapLayer::FOREGROUND, filename);
     map.saveBiomePPM(filename);
-    m -> lock();
-    *state = CreateState::DONE;
-    m -> unlock();
+    set_status(state, m, CreateState::DONE);
 }
 
 

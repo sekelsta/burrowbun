@@ -3,6 +3,8 @@
 #include <string>
 #include <libgen.h> // For dirname
 #include <unistd.h> // For readlink
+#include "Mapgen.hh"
+
 
 using namespace std;
 
@@ -21,11 +23,15 @@ int main(int argc, char **argv) {
         exit(1);
     }
     path = path + "/";
-
     Game game(path);
-    game.run();
-    // Clean up fonts
-    Texture::closeFonts();
+
+    if (argc == 3 && strcmp(argv[1], "-c") == 0) {
+        game.create_new_world(argv[2]);
+    }
+    else {
+        cout << "Usage:\n    " << argv[0] << "\n    to run the game (disabled due to lack of SDL), or\n    "
+        << argv[0] << " -c worldname\n    to create a world with the given file name.\n";
+    }
     return 0;
 }
 

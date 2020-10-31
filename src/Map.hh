@@ -85,12 +85,6 @@ private:
         return pointers[(unsigned int)val];
     }
 
-    /* Call chooseSprite on every tile on the map. */
-    void randomizeSprites();
-
-    /* Pick the sprite to use for a tile based on the ones next to it. */
-    void chooseSprite(int x, int y);
-
     /* Return true if there's a non-empty tile of the same maplayer here or 
     next to here. */
     bool isBesideTile(int x, int y, MapLayer layer);
@@ -113,10 +107,6 @@ public:
     void setLight(int xstart, int ystart, int xstop, int ystop);
 
 private:
-    /* Set the tiles around a place to show the right sprite and have the
-    right amount of light, and recheck if they need to run their own update
-    functions. */
-    void updateNear(int x, int y);
 
     /* Private setter function since only friend class Mapgen should be using
     it. */
@@ -154,42 +144,6 @@ private:
     }
 
     public:
-    /* Add a place to the list of places to be updated, if the tile there
-    will need to be updated. */
-    inline void addToUpdate(const Location &place) {
-        assert(0 <= place.x);
-        assert(place.x < width);
-        assert(0 <= place.y);
-        assert(place.y < height);
-        /* Ignore it if it won't need to be updated. */
-        if (getTile(place) -> canUpdate(*this, place)) {
-            toUpdate.insert(place);
-        }
-    }
-
-    inline void addToUpdate(int x, int y, MapLayer layer) {
-        Location place;
-        place.x = x;
-        place.y = y;
-        place.layer = layer;
-        addToUpdate(place);
-    }
-
-    inline void removeFromUpdate(const Location &place) {
-        toUpdate.erase(place);
-    }
-
-    inline void removeFromUpdate(int x, int y, MapLayer layer) {
-        Location place;
-        place.x = x;
-        place.y = y;
-        place.layer = layer;
-        removeFromUpdate(place);
-    }
-
-    inline bool updateContains(const Location &place) const {
-        return toUpdate.count(place);
-    }
 
     /* Calculates the coefficent for light when the opacity is n. */
     inline double getExpLight(int n) {
@@ -282,50 +236,6 @@ public:
         return spawn;
     }
 
-    /* Return which part of the spritesheet should be used. */
-    inline uint8_t getForegroundSprite(int x, int y) const {
-        return findPointer(x, y) -> foregroundSprite;
-    }
-
-    inline uint8_t getBackgroundSprite(int x, int y) const {
-        return findPointer(x, y) -> backgroundSprite;
-    }
-
-    inline Location getSprite(int x, int y, MapLayer layer) const {
-        uint8_t sprite;
-        if (layer == MapLayer::FOREGROUND) {
-            sprite = getForegroundSprite(x, y);
-        }
-        else {
-            assert(layer == MapLayer::BACKGROUND);
-            sprite = getBackgroundSprite(x, y);
-        }
-
-        Location answer;
-        SpaceInfo::fromSpritePlace(answer, sprite);
-        return answer;
-    }
-
-    inline Location getSprite(const Location &place) const {
-        return getSprite(place.x, place.y, place.layer);
-    }
-
-    /* Set which part of the spritesheet should be used. */
-    inline void setSprite(int x, int y, MapLayer layer, Location newSprite) {
-        uint8_t toset = SpaceInfo::toSpritePlace(newSprite);
-        if (layer == MapLayer::FOREGROUND) {
-            findPointer(x, y) -> foregroundSprite = toset;
-        }
-        else {
-            assert(layer == MapLayer::BACKGROUND);
-            findPointer(x, y) -> backgroundSprite = toset;
-        }
-    }
-
-    inline void setSprite(const Location &place, Location newSprite) {
-        setSprite(place.x, place.y, place.layer, newSprite);
-    }  
-
     /* Return the lighting of a tile. */
     inline Light getLight(int x, int y) {
         /* Combine the value from blocks with the value from the sky, taking into
@@ -397,9 +307,6 @@ public:
     /* Place a tile in the correct layer. Return whether it was successful. */
     bool placeTile(Location place, TileType type);
 
-    /* Update the map. */
-    void update(std::vector<DroppedItem*> &items);
-
     /* Damage a tile (with a pickax or something). Return false if there
     was no tile to damage. */
     bool damage(Location place, int amount, std::vector<DroppedItem*> &items);
@@ -438,15 +345,6 @@ public:
     /* Take in world coordinates and a layer and convert to a location in 
     map coordinates. */
     Location getMapCoords(int x, int y, MapLayer layer);
-
-    /* Move a tile x in the +x direction and y in the +y directoin. If there's 
-    a tile at the destination, it will be destroyed. */
-    void moveTile(const Location &place, int x, int y,
-        std::vector<DroppedItem*> &items);
-
-    /* Move a tile x in the +x direction and y in the +y direction. If there's 
-    a tile there, they switch places. */
-    void displaceTile(const Location &place, int x, int y);
 };
 
 #endif

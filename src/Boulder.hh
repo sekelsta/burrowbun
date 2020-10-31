@@ -8,7 +8,6 @@
 
 /* Forward declare. */
 struct Rect;
-class DroppedItem;
 
 /* A Tile that moves. */
 class Boulder: public Tile {
@@ -46,12 +45,7 @@ class Boulder: public Tile {
     static std::set<TileType> vectorConvert(const std::vector<int> &input);
 
     /* Try to fall one tile. Return true on success. */
-    bool fall(Map &map, const Location &place, 
-        std::vector<DroppedItem*> &items) const;
-
-    /* Try to move one tile. Return true on success. */
-    bool move(Map &map, const Location &place, int direction, 
-            std::vector<DroppedItem*> &items);
+    bool fall(Map &map, const Location &place) const;
 
     bool canUpdate(const Map &map, const Location &place, 
             int direction) const;
@@ -60,15 +54,10 @@ public:
     /* Constructor. */
     Boulder(TileType type, std::string path);
 
-    /* Set the direction the boulder moves, if it does move. Note that
-    this will change its sprite. */
-    void setDirection(Map &map, const Location &place, int direction) const;
-
     /* Look at the map and move, bringing movables along if required. 
     Return false if it didn't move and should therefore be removed from any
     lists of boulders to try to move. */
-    virtual bool update(Map &map, Location place,  
-            std::vector<DroppedItem*> &items, 
+    virtual bool update(Map &map, Location place, 
             int tick);
 
     /* Look at the map and see if it can move, but don't do anything. */

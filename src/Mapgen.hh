@@ -17,6 +17,7 @@ enum class CreateState {
     STUFF,
     NOT_STARTED,
     GENERATING_BIOMES,
+    PREPARE_GENERATE_TERRAIN,
     GENERATING_TERRAIN,
     ADDING_GLOWSTONE,
     FELSIC,
@@ -26,6 +27,57 @@ enum class CreateState {
     SAVING,
     DONE
 };
+
+
+
+inline std::string get_message(CreateState state) {
+    std::string message;
+    switch (state) {
+        case CreateState::NOT_STARTED:
+            message = "Starting...";
+            break;
+        case CreateState::STUFF:
+            message = "Doing stuff...";
+            break;
+        case CreateState::GENERATING_BIOMES:
+            message = "Setting biomes...";
+            break;
+        case CreateState::PREPARE_GENERATE_TERRAIN:
+            message = "Preparing to generate terrain...";
+            break;
+        case CreateState::GENERATING_TERRAIN:
+            message = "Generating terrain...";
+            break;
+        case CreateState::ADDING_GLOWSTONE:
+            message = "Installing ceiling glowstone...";
+            break;
+        case CreateState::FELSIC:
+            message = "Picking varieties of rock...";
+            break;
+        case CreateState::SETTLING_WATER:
+            message = "Settling water...";
+            break;
+        case CreateState::GENERATING_OCEAN:
+            message = "Putting water in the ocean...";
+            break;
+        case CreateState::ADDING_DIRT:
+            message = "Making the world dirty...";
+            break;
+        case CreateState::SAVING:
+            message = "Saving generated map...";
+            break;
+        case CreateState::DONE:
+            message = "Finished!";
+            break;
+        case CreateState::NONE:
+            message = "Error?";
+            break;
+        default:
+            message = "Unsupported state.";
+            break;
+    }
+    return message;
+}
 
 /* A class for generating a map. */
 class Mapgen {
@@ -59,6 +111,9 @@ class Mapgen {
     sort of floating island. */
     std::vector<int> surfaces;
 
+
+    void set_status(CreateState *state_ptr, std::mutex *m, CreateState state);
+
     /* Set the map size to x, y. */
     void setSize(int x, int y);
 
@@ -91,7 +146,7 @@ class Mapgen {
 
     /* Get a value for determining the ground level changes needed for an
     ocean. */
-    double ocean(int x, int y);
+    double surfaceModifier(int x, int y);
 
     inline void fillVertical(int x, int low, int high, MapLayer layer, 
             TileType type) {
