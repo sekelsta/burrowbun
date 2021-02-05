@@ -717,7 +717,9 @@ void Mapgen::generate(std::string filename, WorldType worldType,
     floating islands or whatever directly above the spawn point, so the
     player doesn't die of fall damage every time they respawn. */
     map.spawn.y = map.height * 0.9;
+    m -> lock();
     *state = CreateState::SAVING;
+    m -> unlock();
     map.save(filename);
     /* TODO: remove when done testing. */
     map.savePPM(MapLayer::FOREGROUND, filename);

@@ -10,11 +10,9 @@
 #include "Hotbar.hh"
 #include "Menu.hh"
 #include "World.hh"
+#include "tile_size.hh"
 
 using namespace std;
-
-#define TILE_WIDTH 16
-#define TILE_HEIGHT 16
 
 string Game::path;
 

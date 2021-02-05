@@ -8,9 +8,6 @@
 #include "World.hh"
 #include "json.hh"
 
-#define TILE_WIDTH 16
-#define TILE_HEIGHT 16
-
 using json = nlohmann::json;
 using namespace std;
 

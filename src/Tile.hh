@@ -67,7 +67,7 @@ enum class EdgeType {
 // should be constant?
 class Tile {
     // Collision-related varables
-    /* Whether the tile is a platform. Palyers only colide with the tops side
+    /* Whether the tile is a platform. Players only collide with the top side
     of platforms. */
     bool isPlatform;
     /* Whether players can pass through the tile. */
