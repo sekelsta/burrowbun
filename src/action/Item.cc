@@ -2,7 +2,7 @@
 #include "../json.hh"
 #include "../filepaths.hh"
 #include "ItemMaker.hh"
-#include "../Game.hh"
+#include "../util/PathToExecutable.hh"
 #include "../world/World.hh"
 #include <fstream>
 #include <vector>
@@ -75,7 +75,7 @@ Item *Item::merge(Item *other, int n) {
         return nullptr;
     }
     if (!other) {
-        other = ItemMaker::makeItem(getType(), Game::getPath());
+        other = ItemMaker::makeItem(getType(), PATH_TO_EXECUTABLE);
         other->setStack(0);
     }
     /* If they're different types, no merging can be done. */

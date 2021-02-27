@@ -9,17 +9,17 @@
 #include "entity/Entity.hh"
 #include "ui/Hotbar.hh"
 #include "ui/Menu.hh"
+#include "util/PathToExecutable.hh"
 #include "world/World.hh"
 #include "world/tile_size.hh"
 
 using namespace std;
 
-string Game::path;
-
 bool Game::play(string mapname) {
     isPlaying = true;
     /* Load a world. */
-    world = new World(path + mapname, TILE_WIDTH, TILE_HEIGHT, path);
+    world = new World(PATH_TO_EXECUTABLE + mapname, TILE_WIDTH, TILE_HEIGHT, 
+        PATH_TO_EXECUTABLE);
 
     window.setMapSize(world -> map.getWidth(), world -> map.getHeight());
 
@@ -56,7 +56,7 @@ bool Game::play(string mapname) {
             SDL_Delay(TICKS_PER_FRAME - frameTicks);
         }
     }
-    world -> map.save(path + mapname);
+    world -> map.save(PATH_TO_EXECUTABLE + mapname);
 
     isPlaying = false;
     delete world;
@@ -104,10 +104,9 @@ bool Game::update() {
     return quit;
 }
 
-Game::Game(string p) : SCREEN_FPS(60), TICKS_PER_FRAME(1000 / SCREEN_FPS),
+Game::Game() : SCREEN_FPS(60), TICKS_PER_FRAME(1000 / SCREEN_FPS),
         // 800 x 600 window, resizable
         window(800, 600, TILE_WIDTH, TILE_HEIGHT) {
-    path = p;
     isFocused = true;
     isPlaying = false;
     menu = nullptr;

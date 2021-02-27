@@ -1,6 +1,6 @@
 #include "Texture.hh"
 #include "../filepaths.hh"
-#include "../Game.hh"
+#include "../util/PathToExecutable.hh"
 #include <SDL2/SDL_image.h>
 
 #define DEFAULT_OUTLINE_COLOR {0x00, 0x00, 0x00, 0xFF}
@@ -233,7 +233,7 @@ Texture::~Texture() {
 }
 
 string Texture::getPath() {
-    return Game::getPath();
+    return PATH_TO_EXECUTABLE;
 }
 
 

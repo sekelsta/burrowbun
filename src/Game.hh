@@ -13,9 +13,6 @@ class Game {
     const uint32_t SCREEN_FPS;
     const uint32_t TICKS_PER_FRAME;
 
-    /* The path to the folder containing the executable. */
-    static std::string path;
-
     EventHandler eventHandler;
     WindowHandler window;
 
@@ -36,13 +33,8 @@ class Game {
     user requested quit. */
     bool update();
 public:
-    /* Constructor. Takes the path to the folder containing the executable. */
-    Game(std::string p);
-
-    /* Get the path. */
-    static inline std::string getPath() {
-        return path;
-    }
+    /* Constructor. */
+    Game();
 
     /* Do everything. */
     void run();
