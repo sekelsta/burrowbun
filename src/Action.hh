@@ -1,7 +1,7 @@
 #ifndef ACTION_HH
 #define ACTION_HH
 
-#include "Sprite.hh"
+#include "render/Sprite.hh"
 
 struct SDL_Rect;
 

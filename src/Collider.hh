@@ -4,12 +4,12 @@
 #include <iostream>
 #include <cassert>
 #include <vector>
-#include "Tile.hh"
-#include "Map.hh"
-#include "Movable.hh"
+#include "world/Tile.hh"
+#include "world/Map.hh"
+#include "entity/Movable.hh"
 #include "Rect.hh"
-#include "DroppedItem.hh"
-#include "Entity.hh"
+#include "entity/DroppedItem.hh"
+#include "entity/Entity.hh"
 
 /* To be able to describe collisions better. */
 enum class CollisionType {

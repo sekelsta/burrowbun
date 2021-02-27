@@ -3,8 +3,8 @@
 
 #include <vector>
 #include "Item.hh"
-#include "Tile.hh"
-#include "MapHelpers.hh"
+#include "world/Tile.hh"
+#include "world/MapHelpers.hh"
 
 class Player;
 class Map;

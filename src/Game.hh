@@ -2,9 +2,9 @@
 #define GAME_HH
 
 #include <string>
-#include "WindowHandler.hh"
+#include "render/WindowHandler.hh"
 #include "EventHandler.hh"
-#include "MapHelpers.hh"
+#include "world/MapHelpers.hh"
 
 class Menu;
 

@@ -3,9 +3,9 @@
 #include <fstream>
 #include <iostream>
 #include "AllTheItems.hh"
-#include "Player.hh"
-#include "Map.hh"
-#include "World.hh"
+#include "entity/Player.hh"
+#include "world/Map.hh"
+#include "world/World.hh"
 #include "json.hh"
 
 using json = nlohmann::json;

@@ -3,13 +3,13 @@
 #include "EventHandler.hh"
 
 // Include things that were forward declared in the header
-#include "WindowHandler.hh"
-#include "Player.hh"
-#include "World.hh"
-#include "Hotbar.hh"
-#include "Button.hh"
-#include "Menu.hh"
-#include "DroppedItem.hh"
+#include "render/WindowHandler.hh"
+#include "entity/Player.hh"
+#include "world/World.hh"
+#include "ui/Hotbar.hh"
+#include "ui/Button.hh"
+#include "ui/Menu.hh"
+#include "entity/DroppedItem.hh"
 
 using namespace std;
 

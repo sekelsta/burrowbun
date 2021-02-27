@@ -5,7 +5,7 @@
 #include "filepaths.hh"
 #include "AllTheItems.hh"
 #include "Game.hh"
-#include "World.hh"
+#include "world/World.hh"
 #include <SDL2/SDL.h>
 #include <algorithm>
 

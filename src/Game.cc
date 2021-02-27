@@ -2,15 +2,15 @@
 
 #include <iostream>
 #include <cassert>
-#include "Tile.hh"
-#include "Mapgen.hh"
+#include "world/Tile.hh"
+#include "world/Mapgen.hh"
 #include "EventHandler.hh"
-#include "Movable.hh"
-#include "Entity.hh"
-#include "Hotbar.hh"
-#include "Menu.hh"
-#include "World.hh"
-#include "tile_size.hh"
+#include "entity/Movable.hh"
+#include "entity/Entity.hh"
+#include "ui/Hotbar.hh"
+#include "ui/Menu.hh"
+#include "world/World.hh"
+#include "world/tile_size.hh"
 
 using namespace std;
 
