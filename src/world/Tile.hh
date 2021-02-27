@@ -59,7 +59,8 @@ enum class EdgeType {
     LIQUID,
     SOLID,
     PLATFORM,
-    SOLITARY
+    SOLITARY,
+    TORCH
 };
 
 /* A class to make tiles based on their type, and store their infos. */

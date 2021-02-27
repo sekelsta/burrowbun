@@ -44,5 +44,5 @@
     "maxHealth": 16,
     "tier": 0,
     "isSky": true,
-    "edgeType": 0
+    "edgeType": 4
 }

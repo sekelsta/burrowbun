@@ -327,6 +327,11 @@ int Map::bordering(const Location &place) {
     if (thisEdge == EdgeType::LIQUID) {
         return 0;
     }
+    /* Special case for torches. They want to act like they are next to dirt, 
+    but they do not want dirt to act like it is next to them. */
+    if (thisEdge == EdgeType::TORCH) {
+        thisEdge = EdgeType::SOLID;
+    }
 
     int col = 0;
     if (place.y != height - 1 
