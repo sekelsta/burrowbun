@@ -71,6 +71,7 @@ Item *ItemMaker::makeItem(ActionType type, string path) {
     // A list of all the item types that should be potions
     std::vector<ActionType> potions;
     potions.push_back(ActionType::HEALTH_POTION);
+    potions.push_back(ActionType::DANDELION);
 
     // If it's a potion, make a potion
     if (isIn(potions, type)) {

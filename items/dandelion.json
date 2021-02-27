@@ -1,0 +1,21 @@
+{
+    "sprite": {
+        "rect": {
+            "x": 0,
+            "y": 0,
+            "w": 16,
+            "h": 16
+        },
+        "name": "dandelion.png"
+    },
+	"healthGained": 0,
+	"fullnessGained": 10,
+	"manaGained": 0,
+	"woundsCured": 0,
+	"hungerCured": 10,
+	"manaCured": 0,
+    "isItem": true,
+	"maxStack": 30,
+	"useTime": 32,
+    "consumable": true
+}

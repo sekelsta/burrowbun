@@ -44,14 +44,15 @@ enum class ActionType {
 
     /* Other things. */
     MAPLE_LEAF,
-    HEALTH_POTION,   
+    HEALTH_POTION,
+    DANDELION,
 
     FIRST_BLOCK = DIRT,
     LAST_BLOCK = PICKAXE,
     LAST_PURE_BLOCK = GLACIER,
 
     FIRST_ITEM = DIRT,
-    LAST_ITEM = HEALTH_POTION
+    LAST_ITEM = DANDELION
 };
 
 // Forward declare

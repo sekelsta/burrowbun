@@ -202,6 +202,9 @@ std::string Item::getJsonFilename(ActionType type) {
         case ActionType::PICKAXE:
             filename = "pickaxe";
             break;
+        case ActionType::DANDELION:
+            filename = "dandelion";
+            break;
         default:
             assert(false);
             break;

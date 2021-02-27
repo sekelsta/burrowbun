@@ -82,6 +82,7 @@ Player::Player(string path) : Entity(path + "entities/bunny.json", path),
         pickup(ItemMaker::makeItem(ActionType::HEALTH_POTION, path));
         pickup(ItemMaker::makeItem(ActionType::GLOWSTONE, path));
         pickup(ItemMaker::makeItem(ActionType::GLASS, path));
+        pickup(ItemMaker::makeItem(ActionType::DANDELION, path));
     }
     pickup(ItemMaker::makeItem(ActionType::DIRT, path));
     pickup(ItemMaker::makeItem(ActionType::TOPSOIL, path));
