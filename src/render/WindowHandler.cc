@@ -11,7 +11,7 @@
 #include "../world/Map.hh"
 #include "../entity/Player.hh"
 #include "Sprite.hh"
-#include "../Action.hh"
+#include "../action/Action.hh"
 #include "../Rect.hh"
 #include "../world/World.hh"
 

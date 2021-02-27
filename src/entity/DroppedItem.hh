@@ -2,7 +2,7 @@
 #define DROPPED_ITEM_HH
 
 #include "Movable.hh"
-#include "../Item.hh"
+#include "../action/Item.hh"
 
 #define ITEM_MERGE_DISTANCE 64
 #define ITEM_ATTRACT_SPEED 8.0

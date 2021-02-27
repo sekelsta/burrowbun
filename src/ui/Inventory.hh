@@ -4,7 +4,7 @@
 #include "../render/Sprite.hh"
 #include "Button.hh"
 #include "../Light.hh"
-#include "../Item.hh"
+#include "../action/Item.hh"
 #include <vector>
 #include <string>
 

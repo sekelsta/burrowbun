@@ -1,11 +1,11 @@
+#include "Item.hh"
+#include "../json.hh"
+#include "../filepaths.hh"
+#include "ItemMaker.hh"
+#include "../Game.hh"
+#include "../world/World.hh"
 #include <fstream>
 #include <vector>
-#include "Item.hh"
-#include "json.hh"
-#include "filepaths.hh"
-#include "AllTheItems.hh"
-#include "Game.hh"
-#include "world/World.hh"
 #include <SDL2/SDL.h>
 #include <algorithm>
 

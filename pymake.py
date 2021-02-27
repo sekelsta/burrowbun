@@ -75,7 +75,7 @@ def needs_build(src_name, obj_name, dep_name):
         deps = parse_dependencies(f)
         f.close()
         for dep in deps:
-            if os.path.getmtime(dep) >= obj_time:
+            if (not os.path.isfile(dep)) or os.path.getmtime(dep) >= obj_time:
                 return True
     return False
 

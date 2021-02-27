@@ -3,7 +3,7 @@
 
 #include "../render/Sprite.hh"
 #include "Button.hh"
-#include "../Action.hh"
+#include "../action/Action.hh"
 #include "Inventory.hh"
 #include <vector>
 #include <string>

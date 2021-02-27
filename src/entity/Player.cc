@@ -1,9 +1,9 @@
 #include <SDL2/SDL.h>
 #include <vector>
 #include "Player.hh"
-#include "../Item.hh"
-#include "../AllTheItems.hh"
-#include "../Action.hh"
+#include "../action/Item.hh"
+#include "../action/ItemMaker.hh"
+#include "../action/Action.hh"
 #include <iostream>
 #include "../json.hh"
 #include "../filepaths.hh"

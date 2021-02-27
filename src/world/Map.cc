@@ -9,7 +9,7 @@
 #include "Boulder.hh"
 #include "../version.hh"
 #include "../entity/DroppedItem.hh"
-#include "../AllTheItems.hh"
+#include "../action/ItemMaker.hh"
 #include <queue>
 
 #define MAX_LIGHT_DEPTH 5
