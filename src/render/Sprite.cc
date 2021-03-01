@@ -7,19 +7,6 @@
 using json = nlohmann::json;
 using namespace std;
 
-/* Assignment operator. */
-Sprite &Sprite::operator=(const Sprite &sprite) {
-    /* Check for self-assignment. */
-    if (this == &sprite) {
-        return *this;
-    }
-    name = sprite.name;
-    texture = sprite.texture;
-    rect = sprite.rect;
-
-    return *this;
-}
-
 void Sprite::render(const SDL_Rect &rectTo) {
     SpriteBase::render(rect, rectTo);
 }

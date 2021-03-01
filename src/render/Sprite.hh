@@ -60,9 +60,6 @@ public:
         rect.h = texture->getHeight();
     }
 
-    /* Assignment operator. */
-    Sprite &operator=(const Sprite &sprite);
-
     /* Render itself. */
     virtual void render(const SDL_Rect &rectTo);
 
