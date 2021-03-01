@@ -1,13 +1,14 @@
 #ifndef MOVABLE_HH
 #define MOVABLE_HH
 
+#include "../Damage.hh"
+#include "../render/Sprite.hh"
+#include "../Rect.hh"
+
+#include <nlohmann/json.hpp>
+#include <algorithm>
 #include <string>
 #include <set>
-#include "../render/Sprite.hh"
-#include "../json.hh"
-#include "../Damage.hh"
-#include "../Rect.hh"
-#include <algorithm>
 
 namespace movable {
 

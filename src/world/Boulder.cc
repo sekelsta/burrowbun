@@ -1,12 +1,13 @@
-#include <fstream>
-#include <string>
 #include "Boulder.hh"
 #include "Tile.hh"
 #include "Map.hh"
 #include "MapHelpers.hh"
 #include "../Rect.hh"
-#include "../json.hh"
 #include "../entity/DroppedItem.hh"
+
+#include <nlohmann/json.hpp>
+#include <fstream>
+#include <string>
 
 #define BOULDER_CARRY_HEIGHT 1.5
 

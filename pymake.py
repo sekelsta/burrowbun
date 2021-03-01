@@ -19,10 +19,10 @@ import shlex
 
 CXX = 'g++'
 # Debug version
-CXX_FLAGS = '-std=c++14 -Wall -D_GLIBCXX_DEBUG -D_LIBCXX_DEBUG_PEDANTIC -Og -g'
+CXX_FLAGS = '-std=c++17 -Wall -D_GLIBCXX_DEBUG -D_LIBCXX_DEBUG_PEDANTIC -Og -g'
 # Optimized version (disabled)
 # CXX_FLAGS = '-std=c++14 -Wall -O3'
-INCLUDE_FLAGS = '-I/usr/include/libnoise -L/usr/lib'
+INCLUDE_FLAGS = '-I/usr/include/libnoise -L/usr/lib -I include'
 LINKER_FLAGS = '-lSDL2 -lSDL2_image -lSDL2_ttf -lnoise -lpthread'
 
 # Helper functions

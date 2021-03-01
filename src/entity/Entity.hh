@@ -1,13 +1,14 @@
 #ifndef ENTITY_HH
 #define ENTITY_HH
 
-#include <string>
-#include <fstream>
 #include "Movable.hh"
 #include "../Stat.hh"
-#include "../json.hh"
 #include "../Damage.hh"
 #include "../render/Animation.hh"
+
+#include <nlohmann/json.hpp>
+#include <string>
+#include <fstream>
 #include <vector>
 
 class DroppedItem;

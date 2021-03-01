@@ -1,8 +1,8 @@
 #ifndef DAMAGE_HH
 #define DAMAGE_HH
 
+#include <nlohmann/json.hpp>
 #include <random>
-#include "json.hh"
 
 /* What type of damage is being dealt. */
 enum class DamageType {

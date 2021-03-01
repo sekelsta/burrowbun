@@ -1,9 +1,10 @@
 #include "Item.hh"
-#include "../json.hh"
 #include "../filepaths.hh"
 #include "ItemMaker.hh"
 #include "../util/PathToExecutable.hh"
 #include "../world/World.hh"
+
+#include <nlohmann/json.hpp>
 #include <fstream>
 #include <vector>
 #include <SDL2/SDL.h>

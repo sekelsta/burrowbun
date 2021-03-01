@@ -1,5 +1,5 @@
 #include "Potion.hh"
-#include "../json.hh"
+#include <nlohmann/json.hpp>
 
 using json = nlohmann::json;
 using namespace std;

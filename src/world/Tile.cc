@@ -1,14 +1,15 @@
-#include <cassert>
-#include <iostream>
-#include <fstream>
-#include <string>
 #include "Tile.hh"
 #include "Map.hh"
 #include "../entity/DroppedItem.hh"
 #include "../entity/Movable.hh"
-#include "../json.hh"
 #include "../filepaths.hh"
 #include "../util/PathToExecutable.hh"
+
+#include <nlohmann/json.hpp>
+#include <cassert>
+#include <iostream>
+#include <fstream>
+#include <string>
 #include <SDL2/SDL.h>
 
 #define TILE_ANIMATION_DELAY 4

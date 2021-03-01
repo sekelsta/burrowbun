@@ -1,8 +1,8 @@
 #ifndef LIGHT_HH
 #define LIGHT_HH
 
+#include <nlohmann/json.hpp>
 #include <algorithm>
-#include "json.hh"
 
 struct SDL_Color;
 struct DLight;

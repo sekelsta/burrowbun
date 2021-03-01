@@ -1,12 +1,13 @@
 #ifndef SPRITE_HH
 #define SPRITE_HH
 
+#include "Texture.hh"
+#include "SpriteBase.hh"
+
+#include <nlohmann/json.hpp>
 #include <SDL2/SDL.h>
 #include <string>
 #include <memory>
-#include "Texture.hh"
-#include "SpriteBase.hh"
-#include "../json.hh"
 
 // Forward declare
 struct SDL_Texture;

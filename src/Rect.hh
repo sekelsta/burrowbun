@@ -1,9 +1,9 @@
 #ifndef RECT_HH
 #define RECT_HH
 
-#include <cassert>
+#include <nlohmann/json.hpp>
 #include <algorithm>
-#include "json.hh"
+#include <cassert>
 #include <SDL2/SDL.h>
 
 /* Rectangle, capable of seeing if another intersects it taking into account

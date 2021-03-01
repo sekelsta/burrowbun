@@ -1,13 +1,14 @@
-#include <SDL2/SDL.h>
-#include <vector>
 #include "Player.hh"
 #include "../action/Item.hh"
 #include "../action/ItemMaker.hh"
 #include "../action/Action.hh"
-#include <iostream>
-#include "../json.hh"
 #include "../filepaths.hh"
 #include "DroppedItem.hh"
+
+#include <nlohmann/json.hpp>
+#include <iostream>
+#include <SDL2/SDL.h>
+#include <vector>
 
 using namespace std;
 using json = nlohmann::json;

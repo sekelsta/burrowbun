@@ -3,9 +3,10 @@
 
 #include "SpriteBase.hh"
 #include "../Rect.hh"
+
+#include <nlohmann/json.hpp>
 #include <vector>
 #include <string>
-#include "../json.hh"
 
 /* A class to hold the information for an animation. */
 class Animation: public SpriteBase {

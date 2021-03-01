@@ -1,8 +1,8 @@
 #ifndef STAT_HH
 #define STAT_HH
 
+#include <nlohmann/json.hpp>
 #include <iostream>
-#include "json.hh"
 
 /* A struct for having a stat, such as health or mana. */
 struct Stat {

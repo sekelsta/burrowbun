@@ -1,13 +1,15 @@
 #ifndef TEXTURE_HH
 #define TEXTURE_HH
 
+#include "../Light.hh"
+#include "Renderer.hh"
+
+#include <iostream>
+#include <mutex>
 #include <SDL2/SDL.h>
 #include <SDL2/SDL_ttf.h>
 #include <string>
 #include <vector>
-#include "../Light.hh"
-#include "Renderer.hh"
-#include <mutex>
 
 #define FONT_NAME "FreeMonoBold.ttf"
 #define DEFAULT_OUTLINE_SIZE 1
