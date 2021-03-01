@@ -18,16 +18,94 @@ using namespace std;
 
 Tile *Map::newTile(TileType val) {
     Tile *tile = nullptr;
-    /* If it's a boulder, make a boulder. */
-    if ((unsigned int)TileType::FIRST_BOULDER <= (unsigned int)val
-            && (unsigned int)val <= (unsigned int)TileType::LAST_BOULDER) {
-        tile = new Boulder(val, path);
-    }
-    /* Otherwise it's just a plain tile. */
-    else {
-        tile = new Tile(val, path);
-        assert((unsigned int)TileType::FIRST_TILE <= (unsigned int)val);
-        assert((unsigned int)val <= (unsigned int)TileType::LAST_PURE_TILE);
+        switch(val) {
+        case TileType::EMPTY :
+            tile = new Tile(TileType::EMPTY, "empty");
+            break;
+        case TileType::WATER :
+            tile = new Tile(TileType::WATER, "water");
+            break;
+        case TileType::DIRT :
+            tile = new Tile(TileType::DIRT, "dirt");
+            break;
+        case TileType::TOPSOIL :
+            tile = new Tile(TileType::TOPSOIL, "topsoil");
+            break;
+        case TileType::CLAY :
+            tile = new Tile(TileType::CLAY, "clay");
+            break;
+        case TileType::CALCAREOUS_OOZE :
+            tile = new Tile(TileType::CALCAREOUS_OOZE, "calcareous_ooze");
+            break;
+        case TileType::SNOW :
+            tile = new Tile(TileType::SNOW, "snow");
+            break;
+        case TileType::ICE :
+            tile = new Tile(TileType::ICE, "ice");
+            break;
+        case TileType::STONE :
+            tile = new Tile(TileType::STONE, "stone");
+            break;
+        case TileType::GRANITE :
+            tile = new Tile(TileType::GRANITE, "granite");
+            break;
+        case TileType::BASALT :
+            tile = new Tile(TileType::BASALT, "basalt");
+            break;
+        case TileType::LIMESTONE :
+            tile = new Tile(TileType::LIMESTONE, "limestone");
+            break;
+        case TileType::MUDSTONE :
+            tile = new Tile(TileType::MUDSTONE, "mudstone");
+            break;
+        case TileType::PERIDOTITE :
+            tile = new Tile(TileType::PERIDOTITE, "peridotite");
+            break;
+        case TileType::SANDSTONE :
+            tile = new Tile(TileType::SANDSTONE, "sandstone");
+            break;
+        case TileType::RED_SANDSTONE :
+            tile = new Tile(TileType::RED_SANDSTONE, "red_sandstone");
+            break;
+        case TileType::PLATFORM :
+            tile = new Tile(TileType::PLATFORM, "platform");
+            break;
+        case TileType::LUMBER :
+            tile = new Tile(TileType::LUMBER, "lumber");
+            break;
+        case TileType::RED_BRICK :
+            tile = new Tile(TileType::RED_BRICK, "red_brick");
+            break;
+        case TileType::GRAY_BRICK :
+            tile = new Tile(TileType::GRAY_BRICK, "gray_brick");
+            break;
+        case TileType::DARK_BRICK :
+            tile = new Tile(TileType::DARK_BRICK, "dark_brick");
+            break;
+        case TileType::GLASS :
+            tile = new Tile(TileType::GLASS, "glass");
+            break;
+        case TileType::GLOWSTONE :
+            tile = new Tile(TileType::GLOWSTONE, "glowstone");
+            break;
+        case TileType::TORCH :
+            tile = new Tile(TileType::TORCH, "torch");
+            break;
+        case TileType::SAND :
+            tile = new Boulder(TileType::SAND, "sand");
+            break;
+        case TileType::MUD :
+            tile = new Boulder(TileType::MUD, "mud");
+            break;
+        case TileType::CLOUD :
+            tile = new Boulder(TileType::CLOUD, "cloud");
+            break;
+        case TileType::BOULDER :
+            tile = new Boulder(TileType::BOULDER, "boulder");
+            break;
+        case TileType::GLACIER :
+            tile = new Boulder(TileType::GLACIER, "glacier");
+            break;
     }
 
     assert(tile != nullptr);

@@ -95,9 +95,9 @@ bool Boulder::canUpdate(const Map &map, const Location &place,
 }
 
 /* Constructor. */
-Boulder::Boulder(TileType type, string path) : Tile(type, path) {
+Boulder::Boulder(TileType type, string name_in) : Tile(type, name_in) {
     /* The name of the file where the initial values are stored. */
-    std::string filename = path + getFilename(type);
+    std::string filename = getFilename();
 
     /* Put data in a json. */
     std::ifstream infile(filename);

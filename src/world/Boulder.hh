@@ -58,7 +58,7 @@ class Boulder: public Tile {
 
 public:
     /* Constructor. */
-    Boulder(TileType type, std::string path);
+    Boulder(TileType type, std::string name_in);
 
     /* Set the direction the boulder moves, if it does move. Note that
     this will change its sprite. */

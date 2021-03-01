@@ -119,12 +119,16 @@ protected:
     // variations.
     Sprite sprite;
 
-    /* Return the filename of the json file for that tiletype. */
-    static std::string getFilename(TileType tileType);
+    /* Return the filename of the json file. */
+    std::string getFilename();
 
 public:
-    // The name of this type of tile
+    // The enum identifying this type of tile
     const TileType type;
+
+    // A name for this tile, used to find the json file to read data from
+    // Can also be used as an identifier
+    const std::string name;
 
     /* Access functions. */
     inline bool getIsSky() const {
@@ -178,16 +182,16 @@ public:
 
     /* Change the map in whatever way needs doing. */
     virtual bool update(Map &map, Location place,
-        std::vector<DroppedItem*> &items, int tick);
+        std::vector<DroppedItem*> &items, int tick) const;
 
     // Constructor, based on the tile type
-    Tile(TileType tileType, std::string path);
+    Tile(TileType tileType, std::string name_in);
 
     /* Virtual destructor. */
     virtual ~Tile();
 
     /* Whether the tile will ever need to call its update function. */
-    virtual bool canUpdate(const Map &map, const Location &place);
+    virtual bool canUpdate(const Map &map, const Location &place) const;
 
     virtual void render(uint8_t spritePlace, const Light &light, 
         const SDL_Rect &rectTo);
