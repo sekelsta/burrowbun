@@ -74,7 +74,7 @@ bool Collider::collidesTiles(const Rect &rect, Map &map) const {
             /* If the player starts off overlapping this tile */
             if (stays.intersects(rect) && enableCollisions) {
                 /* Deal damage based on tile type. */
-                Tile *tile = map.getForeground(l, j);
+                const Tile *tile = map.getForeground(l, j);
                 /* If the tile is solid, then there is a collision with a 
                 solid tile. */
                 if (tile -> getIsSolid()) {
@@ -199,7 +199,7 @@ bool Collider::listCollisions(vector<CollisionInfo> &collisions, Map &map,
             if (j < 0 || j >= map.getHeight()) {
                 continue;
             }
-            Tile *tile = map.getForeground(l, j);
+            const Tile *tile = map.getForeground(l, j);
             // Skip non-collidable tiles
             if (!(tile -> getIsSolid() || tile -> getIsPlatform())) {
                 continue;
@@ -298,7 +298,7 @@ void Collider::collide(Map &map, movable::Movable &movable) {
             /* If the player starts off overlapping this tile */
             if (stays.intersects(from) && enableCollisions) {
                 /* Deal damage based on tile type. */
-                Tile *tile = map.getForeground(l, j);
+                const Tile *tile = map.getForeground(l, j);
                 tile -> dealOverlapDamage(movable);
                 /* If the tile is solid, set velocity to 0. */
                 if (tile -> getIsSolid()) {
