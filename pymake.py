@@ -16,6 +16,7 @@ Features:
 import os
 import subprocess
 import shlex
+import sys
 
 CXX = 'g++'
 # Debug version
@@ -116,7 +117,7 @@ def build(exec_name, src_dir='src', obj_dir='obj', dep_dir='.d', bin_dir='.'):
     def is_cpp(name):
         return name.endswith('.cc') or name.endswith('.cpp') \
             or name.endswith('.c')
-    l = filter(is_cpp, list_files_recursive('src'))
+    l = filter(is_cpp, list_files_recursive(src_dir))
     # Build object files if needed
     success = True
     for s in l:
@@ -133,11 +134,23 @@ def build(exec_name, src_dir='src', obj_dir='obj', dep_dir='.d', bin_dir='.'):
     print(command)
     subprocess.run(shlex.split(command))
 
+def lint(clang, src_dir='src'):
+    l = list_files_recursive(src_dir)
+    for f in l:
+        command = f'{clang} {f} -- {INCLUDE_FLAGS}'
+        print(command)
+        subprocess.run(shlex.split(command))
+
 # Compilation script
 
 
 # Name of final executable
 EXEC = 'burrowbun'
 
+CLANG = 'clang-tidy-8'
+
 if __name__ == '__main__':
-    build(EXEC)
+    if len(sys.argv) >= 2 and sys.argv[1] == 'lint':
+        lint(CLANG)
+    else:
+        build(EXEC)

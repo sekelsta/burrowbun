@@ -84,7 +84,8 @@ public:
     Item *stack(Item *item);
 
     // Call this after changing x or y, puts clickboxes in the right place
-    virtual void updateClickBoxes();
+    // Do not make this virtual. It is called from the constructor.
+    void updateClickBoxes();
 
     /* Set wasClicked to false for all clickboxes. */
     void resetClicks();
