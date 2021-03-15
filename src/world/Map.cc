@@ -548,12 +548,11 @@ void Map::loadLayer(MapLayer layer, ifstream &infile) {
 }
 
 // Constructor
-Map::Map(string filename, int tileWidth, int tileHeight, string p) : 
+Map::Map(string filename, int tileWidth, int tileHeight) : 
         TILE_WIDTH(tileWidth), TILE_HEIGHT(tileHeight) {
     /* It's the 0th tick. */
     tick = 0;
     ifstream infile(filename);
-    path = p;
 
     exps.resize(MAX_OPACITY, 0);
 
@@ -892,7 +891,7 @@ void Map::kill(int x, int y, MapLayer layer, vector<DroppedItem*> &items) {
     assert(type != TileType::WATER);
     if (type != TileType::EMPTY) {
         items.push_back(new DroppedItem ((ItemMaker::makeItem(
-            ItemMaker::tileToItem(type), path)), 
+            ItemMaker::tileToItem(type))), 
             x * TILE_WIDTH, y * TILE_HEIGHT, width * TILE_WIDTH));
     }
 

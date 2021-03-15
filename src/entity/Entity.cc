@@ -1,12 +1,13 @@
 #include "Entity.hh"
 #include "../filepaths.hh"
+#include "../util/PathToExecutable.hh"
 #include "DroppedItem.hh"
 
 using json = nlohmann::json;
 using namespace std;
 
 // Constructor
-Entity::Entity(std::string filename, std::string path) 
+Entity::Entity(std::string filename) 
         : movable::Movable(filename) {
     /* Open the json file. */
     std::ifstream infile(filename);
@@ -23,12 +24,13 @@ Entity::Entity(std::string filename, std::string path)
     sprites = j["sprites"].get<std::vector<Sprite>>();
     /* The rect starts as size of the correct sprite. */
     rect = sprites[isFacingRight].getRect();
+    string sprite_path = PATH_TO_EXECUTABLE + MOVABLE_SPRITE_PATH;
     nextRect = rect;
     for (unsigned int i = 0; i < sprites.size(); i++) {
-        sprites[i].loadTexture(path + MOVABLE_SPRITE_PATH);
+        sprites[i].loadTexture(sprite_path);
     }
-    run.emplace_back(j["run_left"], path + MOVABLE_SPRITE_PATH);
-    run.emplace_back(j["run_right"], path + MOVABLE_SPRITE_PATH);
+    run.emplace_back(j["run_left"], sprite_path);
+    run.emplace_back(j["run_right"], sprite_path);
 }
 
 Entity::Entity() {};

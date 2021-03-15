@@ -38,16 +38,15 @@ private:
 
     // Create a texture and render all the textures to it, using the spacing 
     // variables from hotbar. row is expected to be 0 or 1.
-    Texture *renderHotbarPart(int row, std::string path, 
-        Texture *texture, int left, int up);
+    Texture *renderHotbarPart(int row, Texture *texture, int left, int up);
 
     // Draw the entire hotbar sprite to a texture. This only needs to be called
     // when the hotbar is first made, or when anything about it changes.
-    void updateSprite(std::string path);
+    void updateSprite();
 
 public:
     // Constructor
-    Hotbar(std::string path);
+    Hotbar();
 
     // Access functions
     inline int getX() {
@@ -76,7 +75,7 @@ public:
     Action *getSelected();
 
     // Draw to the screen
-    void render(std::string path);
+    void render();
 };
 
 #endif

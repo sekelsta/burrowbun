@@ -1,4 +1,6 @@
 #include "Menu.hh"
+#include "../world/Mapgen.hh"
+#include "../util/PathToExecutable.hh"
 #include <iostream>
 
 #define MENU_BUTTON_SIZE 48
@@ -8,9 +10,8 @@ using namespace std;
 
 
 void Menu::createWorld(string filename, WorldType type) {
-    string path = Texture::getPath();
-    Mapgen mapgen(path);
-    mapgen.generate(path + filename, type, path, &create, &m);
+    Mapgen mapgen;
+    mapgen.generate(PATH_TO_EXECUTABLE + filename, type, &create, &m);
 }
 
 vector<Buttonfun> Menu::getButtons(Screen s) {

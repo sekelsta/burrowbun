@@ -1,17 +1,18 @@
 #include "Block.hh"
 #include "ItemMaker.hh"
+#include "../util/PathToExecutable.hh"
 
 using json = nlohmann::json;
 using namespace std;
 
 // Block constructor
-Block::Block(ActionType type, string path) : Item(type, path) {
+Block::Block(ActionType type) : Item(type) {
     /* Make sure we should actually be a block. */
     assert(ActionType::FIRST_BLOCK <= type);
     assert(type <= ActionType::LAST_BLOCK);
 
     /* Read in the json. */
-    std::string filename = path + Item::getJsonFilename(type);
+    std::string filename = PATH_TO_EXECUTABLE + Item::getJsonFilename(type);
     std::ifstream infile(filename);
     /* Check that the file could be opened. */
     if (!infile) {

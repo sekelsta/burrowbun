@@ -18,8 +18,7 @@ using namespace std;
 bool Game::play(string mapname) {
     isPlaying = true;
     /* Load a world. */
-    world = new World(PATH_TO_EXECUTABLE + mapname, TILE_WIDTH, TILE_HEIGHT, 
-        PATH_TO_EXECUTABLE);
+    world = new World(PATH_TO_EXECUTABLE + mapname, TILE_WIDTH, TILE_HEIGHT);
 
     window.setMapSize(world -> map.getWidth(), world -> map.getHeight());
 

@@ -1,13 +1,14 @@
 #include "Pickaxe.hh"
+#include "../util/PathToExecutable.hh"
 
 
 using json = nlohmann::json;
 using namespace std;
 
 /* Pickaxe constructor. */
-Pickaxe::Pickaxe(ActionType type, string path) : Block(type, path) {
+Pickaxe::Pickaxe(ActionType type) : Block(type) {
     /* Load the right json based on the type. */
-    std::string filename = path + Item::getJsonFilename(type);
+    std::string filename = PATH_TO_EXECUTABLE + Item::getJsonFilename(type);
     std::ifstream infile(filename);
     /* Check that the file could be opened. */
     if (!infile) {

@@ -16,7 +16,7 @@ class Potion : public Item {
 
 public:
     // Constructor
-    Potion(ActionType type, std::string path);
+    Potion(ActionType type);
 
     // What to do when used
     virtual bool use_internal(InputType type, int x, int y, World &world);

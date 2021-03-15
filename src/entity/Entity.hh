@@ -43,7 +43,7 @@ public:
     std::vector<Animation> run;
 
     // Constructor
-    Entity(std::string filename, std::string path); 
+    Entity(std::string filename); 
     Entity();
 
     // Virtual destructor

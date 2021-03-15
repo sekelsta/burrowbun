@@ -6,6 +6,7 @@
 #include <cmath> // Because pi and exponentiation
 #include "Mapgen.hh"
 #include "../version.hh"
+#include "../util/PathToExecutable.hh"
 
 using namespace std;
 using namespace noise;
@@ -677,10 +678,10 @@ void Mapgen::removeWater(int removeDepth) {
     }
 }
 
-Mapgen::Mapgen(std::string path) : map(path) { }
+Mapgen::Mapgen() : map() { }
 
 void Mapgen::generate(std::string filename, WorldType worldType, 
-        std::string path, CreateState *state, mutex *m) {
+        CreateState *state, mutex *m) {
     /* Seed the random number generators. */
     map.seed = time(NULL);
     srand(map.seed);
@@ -691,9 +692,9 @@ void Mapgen::generate(std::string filename, WorldType worldType,
     cylinder.SetModule(cylinderScale);
 
     /* Set the biome data vector. TODO: not hardcode filename? */
-    std::ifstream infile(path + "content/biomes.json");
+    std::ifstream infile(PATH_TO_EXECUTABLE + "content/biomes.json");
     if (!infile) {
-        std::cout << "Can't open " << path + "content/biomes.json" << "\n";
+        std::cout << "Can't open " << PATH_TO_EXECUTABLE + "content/biomes.json" << "\n";
     }
     json j = json::parse(infile);
     biomeData = j["biomes"].get<std::vector<std::vector<int>>>();

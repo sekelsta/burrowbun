@@ -9,7 +9,7 @@ class Pickaxe: public Block {
     int tier;
 public:
     /* Constructor. */
-    Pickaxe(ActionType type, std::string path);
+    Pickaxe(ActionType type);
 
     /* What to do when used. */
     virtual bool use_internal(InputType type, int x, int y, World &world);

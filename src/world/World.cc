@@ -4,8 +4,8 @@
 
 using namespace std;
 
-World::World(string filename, int tileWidth, int tileHeight, string path) 
-        : map(filename, tileWidth, tileHeight, path), player(path),
+World::World(string filename, int tileWidth, int tileHeight) 
+        : map(filename, tileWidth, tileHeight), player(),
         collider(tileWidth, tileHeight) {
     
     entities.push_back(&player);

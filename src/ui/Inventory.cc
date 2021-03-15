@@ -2,10 +2,11 @@
 #include <iostream>
 #include "Inventory.hh"
 #include "../filepaths.hh"
+#include "../util/PathToExecutable.hh"
 
 using namespace std;
 
-void Inventory::updateSprite(string path) {
+void Inventory::updateSprite() {
     // Tell the renderer to draw to the texture
     sprite.texture -> SetRenderTarget();
 
@@ -31,7 +32,7 @@ void Inventory::updateSprite(string path) {
             // exists
             Item *item = getItem(row, col);
             if (item != NULL) {
-                item -> render(refRect, path);
+                item -> render(refRect);
             }
             else if (isTrash) {
                 int w = trashSprite.getWidth();
@@ -118,10 +119,10 @@ void Inventory::update_internal(Action *&mouse) {
 }
 
 // Constructors
-Inventory::Inventory(int cols, int rows, string path) : 
-    Inventory(cols, rows, path, false) {}
+Inventory::Inventory(int cols, int rows) : 
+    Inventory(cols, rows, false) {}
 
-Inventory::Inventory(int cols, int rows, string path, bool trash) {
+Inventory::Inventory(int cols, int rows, bool trash) {
     // Initialize the location
     x = 0;
     y = 0;
@@ -152,9 +153,10 @@ Inventory::Inventory(int cols, int rows, string path, bool trash) {
     trashSprite = Sprite(0, 0, 16, 16, "trash.png");
 
     // And actually load it
-    squareSprite.loadTexture(path + UI_SPRITE_PATH);
-    frameSprite.loadTexture(path + UI_SPRITE_PATH);
-    trashSprite.loadTexture(path + UI_SPRITE_PATH);
+    string sprite_path = PATH_TO_EXECUTABLE + UI_SPRITE_PATH;
+    squareSprite.loadTexture(sprite_path);
+    frameSprite.loadTexture(sprite_path);
+    trashSprite.loadTexture(sprite_path);
 
     /* Assign the squareSprite a different color. */
     squareSprite.setColorMod(squareColor);
@@ -340,9 +342,9 @@ void Inventory::update() {
     }
 }
 
-void Inventory::render(string path) {
+void Inventory::render() {
     if (!isSpriteUpdated) {
-        updateSprite(path);
+        updateSprite();
     }
 
     /* Set the rect to draw to. */

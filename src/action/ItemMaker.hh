@@ -21,7 +21,7 @@ namespace ItemMaker {
     bool isIn(std::vector<ActionType> items, ActionType type);
 
     // Take an item type and make the correct child class based on that
-    Item *makeItem(ActionType type, std::string path);
+    Item *makeItem(ActionType type);
 }
 
 

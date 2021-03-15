@@ -1,13 +1,14 @@
 #include "Potion.hh"
+#include "../util/PathToExecutable.hh"
 #include <nlohmann/json.hpp>
 
 using json = nlohmann::json;
 using namespace std;
 
 // Potion constructor
-Potion::Potion(ActionType type, string path) : Item(type, path) {
+Potion::Potion(ActionType type) : Item(type) {
     /* Figure out which json file to use. */
-    std::string filename = path + Item::getJsonFilename(type);
+    std::string filename = PATH_TO_EXECUTABLE + Item::getJsonFilename(type);
 
     /* Put the data into the json. */
     std::ifstream infile(filename);

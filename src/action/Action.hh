@@ -103,7 +103,7 @@ public:
         return item;
     }
 
-    virtual void render(SDL_Rect &rect, std::string path) = 0;
+    virtual void render(SDL_Rect &rect) = 0;
 };
 
 

@@ -23,7 +23,7 @@ protected:
 
 public:
     // Constructor
-    Item(ActionType type, std::string path);
+    Item(ActionType type);
 
     /* Use function. Decreases number if consumable, and calls use_internal(). */
     void use(InputType type, int x, int y, World &world);
@@ -45,7 +45,7 @@ public:
     }
 
     /* Render itself. */
-    virtual void render(SDL_Rect &rect, std::string path);
+    virtual void render(SDL_Rect &rect);
 
     /* Move n of the stack from other to this. n can be negative. 
     If n is 0, merge as many as possible. Return the item for the other stack,

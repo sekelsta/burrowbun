@@ -3,6 +3,7 @@
 #include "../action/ItemMaker.hh"
 #include "../action/Action.hh"
 #include "../filepaths.hh"
+#include "../util/PathToExecutable.hh"
 #include "DroppedItem.hh"
 
 #include <nlohmann/json.hpp>
@@ -16,14 +17,14 @@ using json = nlohmann::json;
 #define PLAYER_PICKUP_DISTANCE 128
 
 // Constructor
-Player::Player(string path) : Entity(path + "entities/bunny.json", path), 
-        inventory(12, 5, path), trash(1, 1, path, true), hotbar(path) {
+Player::Player() : Entity(PATH_TO_EXECUTABLE + "entities/bunny.json"), 
+        inventory(12, 5), trash(1, 1, true), hotbar() {
     hasInventory = true;
 
     /* Open json file that contains info about the stat bars. */
-    ifstream bar_infile(path + "UI/stat_bars.json");
+    ifstream bar_infile(PATH_TO_EXECUTABLE + "UI/stat_bars.json");
     if (!bar_infile) {
-        cerr << "Can't open " << path + "UI/stat_bars.json" << "\n";
+        cerr << "Can't open " << PATH_TO_EXECUTABLE + "UI/stat_bars.json" << "\n";
     }
     json jstats = json::parse(bar_infile);
 
@@ -37,13 +38,13 @@ Player::Player(string path) : Entity(path + "entities/bunny.json", path),
     manaBar.update(mana);
 
     /* Load spritebar textures. */
-    healthBar.overlay.loadTexture(path + UI_SPRITE_PATH);
-    fullnessBar.overlay.loadTexture(path + UI_SPRITE_PATH);
-    manaBar.overlay.loadTexture(path + UI_SPRITE_PATH);
+    healthBar.overlay.loadTexture(PATH_TO_EXECUTABLE + UI_SPRITE_PATH);
+    fullnessBar.overlay.loadTexture(PATH_TO_EXECUTABLE + UI_SPRITE_PATH);
+    manaBar.overlay.loadTexture(PATH_TO_EXECUTABLE + UI_SPRITE_PATH);
 
-    ifstream infile(path + "entities/bunny.json");
+    ifstream infile(PATH_TO_EXECUTABLE + "entities/bunny.json");
     if (!infile) {
-        cerr << "Can't open " << path + "entities/bunny.json" << "!\n";
+        cerr << "Can't open " << PATH_TO_EXECUTABLE + "entities/bunny.json" << "!\n";
     }
     json j = json::parse(infile);
 
@@ -78,32 +79,32 @@ Player::Player(string path) : Entity(path + "entities/bunny.json", path),
     mouseSlot = NULL;
 
     // Have starting items
-    pickup(ItemMaker::makeItem(ActionType::PICKAXE, path));
+    pickup(ItemMaker::makeItem(ActionType::PICKAXE));
     for (int i = 0; i < 20; i++) {
-        pickup(ItemMaker::makeItem(ActionType::HEALTH_POTION, path));
-        pickup(ItemMaker::makeItem(ActionType::GLOWSTONE, path));
-        pickup(ItemMaker::makeItem(ActionType::GLASS, path));
-        pickup(ItemMaker::makeItem(ActionType::DANDELION, path));
+        pickup(ItemMaker::makeItem(ActionType::HEALTH_POTION));
+        pickup(ItemMaker::makeItem(ActionType::GLOWSTONE));
+        pickup(ItemMaker::makeItem(ActionType::GLASS));
+        pickup(ItemMaker::makeItem(ActionType::DANDELION));
     }
-    pickup(ItemMaker::makeItem(ActionType::DIRT, path));
-    pickup(ItemMaker::makeItem(ActionType::TOPSOIL, path));
-    pickup(ItemMaker::makeItem(ActionType::SAND, path));
-    pickup(ItemMaker::makeItem(ActionType::CLAY, path));
-    pickup(ItemMaker::makeItem(ActionType::SNOW, path));
-    pickup(ItemMaker::makeItem(ActionType::ICE, path));
-    pickup(ItemMaker::makeItem(ActionType::STONE, path));
-    pickup(ItemMaker::makeItem(ActionType::GRANITE, path));
-    pickup(ItemMaker::makeItem(ActionType::BASALT, path));
-    pickup(ItemMaker::makeItem(ActionType::PERIDOTITE, path));
-    pickup(ItemMaker::makeItem(ActionType::SANDSTONE, path));
-    pickup(ItemMaker::makeItem(ActionType::PLATFORM, path));
-    pickup(ItemMaker::makeItem(ActionType::LUMBER, path));
-    pickup(ItemMaker::makeItem(ActionType::RED_BRICK, path));
-    pickup(ItemMaker::makeItem(ActionType::GRAY_BRICK, path));
-    pickup(ItemMaker::makeItem(ActionType::DARK_BRICK, path));
-    pickup(ItemMaker::makeItem(ActionType::GLOWSTONE, path));
-    pickup(ItemMaker::makeItem(ActionType::GLASS, path));
-    pickup(ItemMaker::makeItem(ActionType::TORCH, path));
+    pickup(ItemMaker::makeItem(ActionType::DIRT));
+    pickup(ItemMaker::makeItem(ActionType::TOPSOIL));
+    pickup(ItemMaker::makeItem(ActionType::SAND));
+    pickup(ItemMaker::makeItem(ActionType::CLAY));
+    pickup(ItemMaker::makeItem(ActionType::SNOW));
+    pickup(ItemMaker::makeItem(ActionType::ICE));
+    pickup(ItemMaker::makeItem(ActionType::STONE));
+    pickup(ItemMaker::makeItem(ActionType::GRANITE));
+    pickup(ItemMaker::makeItem(ActionType::BASALT));
+    pickup(ItemMaker::makeItem(ActionType::PERIDOTITE));
+    pickup(ItemMaker::makeItem(ActionType::SANDSTONE));
+    pickup(ItemMaker::makeItem(ActionType::PLATFORM));
+    pickup(ItemMaker::makeItem(ActionType::LUMBER));
+    pickup(ItemMaker::makeItem(ActionType::RED_BRICK));
+    pickup(ItemMaker::makeItem(ActionType::GRAY_BRICK));
+    pickup(ItemMaker::makeItem(ActionType::DARK_BRICK));
+    pickup(ItemMaker::makeItem(ActionType::GLOWSTONE));
+    pickup(ItemMaker::makeItem(ActionType::GLASS));
+    pickup(ItemMaker::makeItem(ActionType::TORCH));
 
     isInventoryOpen = false;
 }

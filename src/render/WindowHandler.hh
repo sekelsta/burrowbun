@@ -63,7 +63,7 @@ class WindowHandler {
     Rect findCamera(int x, int y, int w, int h);
 
     // Render everything UI
-    void renderUI(Player &player, std::string path);
+    void renderUI(Player &player);
 
     // Clean up and close SDL
     void close();

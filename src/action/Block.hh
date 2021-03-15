@@ -25,7 +25,7 @@ protected:
 
 public:
     // Constructor
-    Block(ActionType type, std::string path);
+    Block(ActionType type);
 
     /* Destructor must be virtual. */
     virtual ~Block();

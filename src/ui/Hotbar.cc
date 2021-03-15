@@ -1,6 +1,7 @@
 #include <iostream>
 #include "Hotbar.hh"
 #include "../filepaths.hh"
+#include "../util/PathToExecutable.hh"
 #include "../render/Texture.hh"
 
 // The number of slots in the hotbar
@@ -10,8 +11,7 @@ using namespace std;
 // Render each texture from textures onto to, using the spacing variables
 // from hotbar. The texture to is expected to have the correct width and
 // height, and the vector is expected to have length 12. 
-Texture *Hotbar::renderHotbarPart(int row, string path, 
-        Texture *texture, int left, int up) {
+Texture *Hotbar::renderHotbarPart(int row, Texture *texture, int left, int up) {
     assert(row == 0 || row == 1);
 
     // Set render settings
@@ -47,7 +47,7 @@ Texture *Hotbar::renderHotbarPart(int row, string path,
                 squareSprite.setColorMod(unselectColor);
             }
             squareSprite.render(refRect);
-            items[row][i] -> render(refRect, path);
+            items[row][i] -> render(refRect);
         }
 
         /* Render the frame. */
@@ -63,7 +63,7 @@ Texture *Hotbar::renderHotbarPart(int row, string path,
 
 // Draw the entire hotbar sprite to a texture. This only needs to be called 
 // when the hotbar is first made, or when anything about it changes.
-void Hotbar::updateSprite(string path) {
+void Hotbar::updateSprite() {
     /* Sprite will soon be updated. */
     isSpriteUpdated = true;
 
@@ -103,8 +103,8 @@ void Hotbar::updateSprite(string path) {
     Renderer::renderClear();
 
     /* Render */
-    renderHotbarPart(1, path, all, up, up);
-    renderHotbarPart(0, path, all, up, up);
+    renderHotbarPart(1, all, up, up);
+    renderHotbarPart(0, all, up, up);
 
     /* Render the key / number labels. */
     for (unsigned int i = 0; i < clickBoxes.size(); i++) {
@@ -119,7 +119,7 @@ void Hotbar::updateSprite(string path) {
 }
 
 // Constructor, which fills it with default values
-Hotbar::Hotbar(string path) : Inventory(12, 2, path) {
+Hotbar::Hotbar() : Inventory(12, 2) {
     // If you want to change these default settings, this is the place in the 
     // code to do it.
     smallGap = 8;
@@ -163,17 +163,8 @@ Hotbar::Hotbar(string path) : Inventory(12, 2, path) {
         x += largeGap;
     }
 
-    // Set every action * to NULL
-    // TODO
-    /*
-    actions.resize(24);
-    for (unsigned int i = 0; i < actions.size(); i++) {
-        actions[i] = {NULL, false};
-    }
-    */
-
     /* Load the frame's texture. */
-    frame.loadTexture(path + UI_SPRITE_PATH);
+    frame.loadTexture(PATH_TO_EXECUTABLE + UI_SPRITE_PATH);
 }
 
 // Select a slot
@@ -228,10 +219,10 @@ Action *Hotbar::getSelected() {
     return items[selected / 12][selected % 12];
 }
 
-void Hotbar::render(string path) {
+void Hotbar::render() {
     // Re-render the sprite if necessary
     if (!isSpriteUpdated) {
-        updateSprite(path);
+        updateSprite();
     }
 
     // Make sure the renderer isn't rendering to a texture

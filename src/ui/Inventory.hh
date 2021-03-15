@@ -20,7 +20,7 @@ protected:
     std::vector<std::vector<Item*>> items;
 
     /* Have an up-to-date sprite. */
-    void updateSprite(std::string path);
+    void updateSprite();
 
 public:
     // Where the top left corner of the inventory is
@@ -51,8 +51,8 @@ protected:
 
 public:
     // Constructors
-    Inventory(int cols, int rows, std::string path);
-    Inventory(int cols, int rows, std::string path, bool trash);
+    Inventory(int cols, int rows);
+    Inventory(int cols, int rows, bool trash);
 
     /* Copy constructor. Don't use; all it does it assert false. If I ever
     think of any good reason why anyone would use a copy constructor of an
@@ -97,7 +97,7 @@ public:
     void update();
 
     /* Render itself. */
-    virtual void render(std::string path);
+    virtual void render();
 
     /* Set isSpriteUpdated to false. */
     inline void touch() {

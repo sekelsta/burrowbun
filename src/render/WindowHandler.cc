@@ -45,9 +45,9 @@ Rect WindowHandler::findCamera(int x, int y, int w, int h) {
     return camera;
 }
 
-void WindowHandler::renderUI(Player &player, string path) {
+void WindowHandler::renderUI(Player &player) {
     // Render the hotbar
-    player.hotbar.render(path);
+    player.hotbar.render();
 
     // Render the stat bars
     player.healthBar.y = screenHeight - player.healthBar.distFromBottom;
@@ -61,8 +61,8 @@ void WindowHandler::renderUI(Player &player, string path) {
 
     // Render the inventory, if necessary
     if (player.isInventoryOpen) {
-        player.inventory.render(path);
-        player.trash.render(path);
+        player.inventory.render();
+        player.trash.render();
     }
 
     /* TODO: Note to self: when adding chests, make sure to not have infinite
@@ -82,7 +82,7 @@ void WindowHandler::renderUI(Player &player, string path) {
         rect.x = x - (rect.w / 2);
         rect.y = y - (rect.h / 2);
         // Render
-        player.mouseSlot -> render(rect, path);
+        player.mouseSlot -> render(rect);
     }
 }
 
@@ -291,7 +291,7 @@ void WindowHandler::update(World &world) {
         }
 
         // Draw the UI
-        renderUI(world.player, world.map.path);
+        renderUI(world.player);
 
         // Update the screen
         SDL_RenderPresent(Renderer::renderer);

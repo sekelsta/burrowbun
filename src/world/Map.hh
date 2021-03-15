@@ -51,11 +51,6 @@ class Map {
     spawn points later. */
     Location spawn;
 
-public:
-    /* Path to the folder containing the executable. */
-    std::string path;
-
-private:
     /* The tiles whose update function should be called. */
     std::set<Location> toUpdate;
 
@@ -223,7 +218,7 @@ private:
     void loadLayer(MapLayer layer, std::ifstream &infile);
 
     /* Constructor, from a savefile. */
-    Map(std::string filename, int tileWidth, int tileHeight, std::string p);
+    Map(std::string filename, int tileWidth, int tileHeight);
 
     /* Save the specified layer to a PPM file. */
     void savePPM(MapLayer layer, std::string filename);
@@ -235,9 +230,8 @@ private:
     void saveBiomePPM(std::string filename);
 private:
     // Constructor. Resulting map cannot be played but can be saved.
-    inline Map(std::string p) : TILE_WIDTH(1), TILE_HEIGHT(1) {
+    inline Map() : TILE_WIDTH(1), TILE_HEIGHT(1) {
         tiles = nullptr;
-        path = p;
 
         /* Create a tile object for each type. */
         for (int i = 0; i <= (int)TileType::LAST_TILE; i++) {

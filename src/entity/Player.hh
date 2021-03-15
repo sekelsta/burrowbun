@@ -49,7 +49,7 @@ public:
     Hotbar hotbar;
 
     // Constructor
-    Player(std::string path);
+    Player();
 
     // Switch the open / closed state of the inventory.
     void toggleInventory();

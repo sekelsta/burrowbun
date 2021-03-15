@@ -24,7 +24,7 @@ private:
     unsigned int tick;
 
 public:
-    World(std::string filename, int tileWidth, int tileHeight, std::string path);
+    World(std::string filename, int tileWidth, int tileHeight);
     ~World();
 
     void update();

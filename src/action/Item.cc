@@ -20,12 +20,12 @@ bool Item::use_internal(InputType type, int x, int y, World &world) {
 }
 
 // Constructor
-Item::Item(ActionType t, string path) {
+Item::Item(ActionType t) {
     type = t;
     item = true;
 
     /* Figure out which json file to use. */
-    string filename = path + getJsonFilename(type);
+    string filename = PATH_TO_EXECUTABLE + getJsonFilename(type);
 
     /* Put the data in the json. */
     ifstream infile(filename);
@@ -41,7 +41,7 @@ Item::Item(ActionType t, string path) {
     useTime = j["useTime"];
     consumable = j["consumable"];
     stack = 1;
-    sprite.loadTexture(path + ICON_SPRITE_PATH);
+    sprite.loadTexture(PATH_TO_EXECUTABLE + ICON_SPRITE_PATH);
 }
 
 void Item::use(InputType type, int x, int y, World &world) {
@@ -54,7 +54,7 @@ void Item::use(InputType type, int x, int y, World &world) {
 
 Item::~Item() {}
 
-void Item::render(SDL_Rect &rect, std::string path) {
+void Item::render(SDL_Rect &rect) {
     int w = sprite.getWidth();
     int h = sprite.getHeight();
     /* Center inside given rect. */
@@ -76,7 +76,7 @@ Item *Item::merge(Item *other, int n) {
         return nullptr;
     }
     if (!other) {
-        other = ItemMaker::makeItem(getType(), PATH_TO_EXECUTABLE);
+        other = ItemMaker::makeItem(getType());
         other->setStack(0);
     }
     /* If they're different types, no merging can be done. */
