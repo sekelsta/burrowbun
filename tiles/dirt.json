@@ -8,6 +8,7 @@
         },
         "name": "dirt.png"
     },
+    "numVariants": 4,
     "color": {
         "r": 70,
         "g": 39,

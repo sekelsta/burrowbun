@@ -242,10 +242,12 @@ void WindowHandler::renderMap(Map &m, const Rect &camera) {
             /* Modulate the color due to lighting. */
             Light light = m.getLight(xTile, yTile);
             light.a = 255;
-            uint8_t background = m.getBackgroundSprite(xTile, yTile);
-            uint8_t foreground = m.getForegroundSprite(xTile, yTile);
-            m.getBackground(xTile, yTile) -> render(background, light, rectTo);
-            m.getForeground(xTile, yTile) -> render(foreground, light, rectTo);
+            Location place(xTile, yTile, MapLayer::BACKGROUND);
+            uint8_t background = m.getBackgroundVariant(xTile, yTile);
+            uint8_t foreground = m.getForegroundVariant(xTile, yTile);
+            m.getBackground(xTile, yTile) -> render(background, m.bordering(place), light, rectTo);
+            place.layer = MapLayer::FOREGROUND;
+            m.getForeground(xTile, yTile) -> render(foreground, m.bordering(place), light, rectTo);
         }
     }
 }

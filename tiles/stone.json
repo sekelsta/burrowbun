@@ -8,6 +8,7 @@
         },
         "name": "stone.png"
     },
+    "numVariants": 4,
     "color": {
         "r": 82,
         "g": 74,

@@ -8,6 +8,7 @@
         },
         "name": "sand.png"
     },
+    "numVariants": 4,
     "color": {
         "r": 227,
         "g": 169,

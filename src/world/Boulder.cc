@@ -126,11 +126,11 @@ void Boulder::setDirection(Map &map, const Location &place, int direction)
     assert(direction == 1 || direction == -1);
     /* Convert direction to 0 or 1. */
     direction = (direction + 1) / 2;
-    Location spritePlace = map.getSprite(place);
-    /* If direction = 1, spritePlace.y should be at least sprite.cols / 4. */
-    spritePlace.x %= sprite.getCols() / 4;
-    spritePlace.x += direction * (sprite.getCols() / 4);
-    map.setSprite(place, spritePlace); 
+    // Set the variant according to the direction.
+    uint8_t variant = map.getVariant(place.x, place.y, place.layer);
+    variant %= getNumVariants() / 2;
+    variant += direction * (getNumVariants() / 2);
+    map.setVariant(place.x, place.y, place.layer, variant); 
 }
 
 /* Look at the map and move.
@@ -160,12 +160,11 @@ bool Boulder::canUpdate(const Map &map, const Location &place) {
     return canUpdate(map, place, direction);
 }
 
-/* Figure out the direction to go from the tile sprite. */
 int Boulder::getDirection(const Map &map, const Location &place) const {
     if (!isMoving) {
         return 0; 
     }
-    Location spritePlace = map.getSprite(place);
-    return (spritePlace.x < sprite.getCols() / 4) ? -1 : 1;
+    uint8_t variant = map.getVariant(place.x, place.y, place.layer);
+    return (variant < getNumVariants() / 2) ? -1 : 1;
 }
 

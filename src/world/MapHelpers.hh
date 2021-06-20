@@ -26,6 +26,11 @@ struct Location {
 
     /* Return true if the first is less than the second. */
     bool operator<(const Location &location) const;
+
+    inline Location() {}
+
+    inline Location(int x_in, int y_in, MapLayer layer_in) :
+        x(x_in), y(y_in), layer(layer_in) {}
 };
 
 struct TileHealth {
@@ -111,8 +116,8 @@ struct SpaceInfo {
     bool lightAdded;
 
     // Which rectangle of the spritesheet to draw
-    uint8_t foregroundSprite;
-    uint8_t backgroundSprite;
+    uint8_t foregroundVariant;
+    uint8_t backgroundVariant;
 
     // Constructor
     SpaceInfo() {
@@ -121,29 +126,8 @@ struct SpaceInfo {
         isLightUpdated = false;
         lightRemoved = false;
         lightAdded = false;
-        foregroundSprite = 0;
-        backgroundSprite = 0;
-    }
-
-    static inline void fromSpritePlace(Location &place, uint8_t spritePlace) {
-        place.x = spritePlace / 16;
-        place.y = spritePlace % 16;
-    }
-
-    static inline uint8_t toSpritePlace(const Location &place) {
-        return toSpritePlace(place.x, place.y);
-    }
-
-    static inline uint8_t toSpritePlace(int x, int y) {
-        return 16 * x + y;
-    } 
-
-    static inline int getX(uint8_t spritePlace) {
-        return spritePlace / 16;
-    }
-
-    static inline int getY(uint8_t spritePlace) {
-        return spritePlace % 16;
+        foregroundVariant = 0;
+        backgroundVariant = 0;
     }
 };
 

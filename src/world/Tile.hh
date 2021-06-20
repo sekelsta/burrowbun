@@ -1,12 +1,12 @@
 #ifndef TILE_HH
 #define TILE_HH
 
-#include <vector>
-#include <string>
 #include "../render/Sprite.hh"
 #include "../entity/Movable.hh"
 #include "../Light.hh"
 #include "../Damage.hh"
+#include <vector>
+#include <string>
 
 /* Forward declare! */
 class Map;
@@ -83,7 +83,7 @@ class Tile {
     /* How much damage the player takes from sharing space with this tile. */
     Damage overlapDamage;
 
-    // Display-related variables
+    // If it's animated, the variant is used as the animation frame
     bool isAnimated;
 
     /* Nonzero if the block creates light. */
@@ -92,6 +92,9 @@ class Tile {
     /* How much light it blocks for each color, aside from the amount lost by
     distance, for edges. */
     DLight absorbed;
+
+    /* Number of variants the tile can have. */
+    int numVariants;
 
     /* Whether it is a source of natural light. For instance, an empty tile
     or one that is mostly transparent. */
@@ -159,9 +162,8 @@ public:
         return absorbed;
     }
 
-    /* The number of foreground and background columns in the spritesheet. */
-    inline int numSprites() const {
-        return sprite.getCols() / (2 - !canBackground);
+    inline int getNumVariants() const {
+        return numVariants;
     }
 
     // Variables for how it interacts with the players
@@ -172,13 +174,8 @@ public:
     /* Basically the number of hits with a pickaxe to break it. */
     int getMaxHealth() const;
 
-    /* Which sprite on the spritesheet to use. */
-    virtual Location getSpritePlace(Map &map, const Location &place)
-             const;
-
-    /* What sprite to change to. */
-    virtual Location updateSprite(Map &map, const Location &place)
-            const;
+    /* Get a variant suitable for initializing a newly created tile. */
+    virtual uint8_t getInitialVariant() const;
 
     /* Change the map in whatever way needs doing. */
     virtual bool update(Map &map, Location place,
@@ -193,7 +190,7 @@ public:
     /* Whether the tile will ever need to call its update function. */
     virtual bool canUpdate(const Map &map, const Location &place) const;
 
-    virtual void render(uint8_t spritePlace, const Light &light, 
+    virtual void render(uint8_t variant, uint8_t bordering, const Light &light, 
         const SDL_Rect &rectTo);
 };
 

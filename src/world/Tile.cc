@@ -39,37 +39,14 @@ int Tile::getMaxHealth() const {
     return maxHealth;
 }
 
+uint8_t Tile::getInitialVariant() const {
+    return uint8_t(rand() % getNumVariants());
+}
+
 /* Deal damage to whatever is overlapping this, and stop it if this tile is 
 solid. */
 void Tile::dealOverlapDamage(movable::Movable &movable) const {
     movable.takeDamage(overlapDamage);
-}
-
-Location Tile::getSpritePlace(Map &map, const Location &place) const {
-    Location answer;
-    /* Some (empty) tiles have no sprite. */
-    if (!sprite.hasTexture()) {
-        answer.x = 0;
-        answer.y = 0;
-        return answer;
-    }
-    answer.y = map.bordering(place);
-    answer.x = rand() % numSprites();
-    /* On the sprite, the equivalent background tile is moved over by
-    sprite.cols / 2. */
-    if (place.layer == MapLayer::BACKGROUND) {
-        assert(canBackground);
-        answer.x += sprite.getCols() / 2;
-    }
-
-    return answer;
-}
-
-Location Tile::updateSprite(Map &map, const Location &place) const {
-    Location answer;
-    answer.y = map.bordering(place);
-    answer.x = map.getSprite(place).x;
-    return answer;
 }
 
 /* Change the map in whatever way needs doing. */
@@ -77,9 +54,8 @@ bool Tile::update(Map &map, Location place,
         std::vector<DroppedItem*> &items, int tick) const {
     if (isAnimated) {
         if (tick % TILE_ANIMATION_DELAY == 0) {
-            Location spritePlace = map.getSprite(place);
-            spritePlace.x = (spritePlace.x + 1) % numSprites();
-            map.setSprite(place, spritePlace);
+            uint8_t variant = map.getVariant(place.x, place.y, place.layer);
+            map.setVariant(place.x, place.y, place.layer, (variant + 1) % numVariants);
         }
         return true;
     }
@@ -99,6 +75,7 @@ Tile::Tile(TileType tileType, string name_in)
     json j = json::parse(infile);
     /* Set each of this tile's non-const values equal to the json's values. */
     sprite = j["sprite"].get<Sprite>();
+    numVariants = j["numVariants"];
     color = j["color"].get<Light>();
     isSolid = j["isSolid"];
     isPlatform = j["isPlatform"];
@@ -132,7 +109,7 @@ bool Tile::canUpdate(const Map &map, const Location &place) const {
     return isAnimated;
 }
 
-void Tile::render(uint8_t spritePlace, const Light &light, 
+void Tile::render(uint8_t variant, uint8_t bordering, const Light &light, 
         const SDL_Rect &rectTo) {
     if (!sprite.hasTexture()) {
         return;
@@ -140,13 +117,8 @@ void Tile::render(uint8_t spritePlace, const Light &light,
 
     /* Use darkness. */
     sprite.setColorMod(light);
-    Location spriteLocation;
-    SpaceInfo::fromSpritePlace(spriteLocation, spritePlace);
-    assert(spriteLocation.x >= 0);
-    assert(spriteLocation.y >= 0);
     assert(sprite.getWidth() > 0);
     assert(sprite.getHeight() > 0);
-    sprite.move(spriteLocation.x * sprite.getWidth(), 
-            spriteLocation.y * sprite.getHeight());
+    sprite.move(variant * sprite.getWidth(), bordering * sprite.getHeight());
     sprite.render(rectTo);
 }

@@ -8,6 +8,7 @@
         },
         "name": "water.png"
     },
+    "numVariants": 1,
     "color": {
         "r": 0,
         "g": 128,

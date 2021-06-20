@@ -254,8 +254,8 @@ void Mapgen::generateEarth(CreateState *state, mutex *m) {
     }
 
     /* When done setting non-boulders and before setting boulders, have
-    all the tiles use a random sprite. */
-    map.randomizeSprites();
+    all the tiles choose a random variant. */
+    map.initializeVariants();
 }
 
 void Mapgen::generateTest() {
@@ -266,7 +266,7 @@ void Mapgen::generateTest() {
         }
     }
 
-    map.randomizeSprites();
+    map.initializeVariants();
 }
 
 double Mapgen::getCylinderValue(int x, int y, const module::Module &values) {

@@ -8,6 +8,7 @@
         },
         "name": "glowstone.png"
     },
+    "numVariants": 4,
     "color": {
         "r": 175,
         "g": 255,

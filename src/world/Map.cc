@@ -120,26 +120,15 @@ Tile *Map::newTile(TileType val) {
     return tile;
 }
 
-void Map::randomizeSprites() {
-    for (int i = 0; i < width; i++) {
-        for (int j = 0; j < height; j++) {
-            chooseSprite(i, j);
+void Map::initializeVariants() {
+    for (int x = 0; x < width; ++x) {
+        for (int y = 0; y < height; ++y) {
+            setForegroundVariant(x, y, 
+                getForeground(x, y) -> getInitialVariant());
+            setBackgroundVariant(x, y, 
+                getBackground(x, y) -> getInitialVariant());
         }
     }
-}
-
-void Map::chooseSprite(int x, int y) {
-    Location place;
-    place.x = x;
-    place.y = y;
-    place.layer = MapLayer::FOREGROUND;
-    Location spritePlace = getTile(place) -> getSpritePlace(*this, place);
-    findPointer(x, y) -> foregroundSprite 
-        = SpaceInfo::toSpritePlace(spritePlace);
-    place.layer = MapLayer::BACKGROUND;
-    spritePlace = getTile(place) -> getSpritePlace(*this, place);
-    findPointer(x, y) -> backgroundSprite 
-        = SpaceInfo::toSpritePlace(spritePlace);
 }
 
 bool Map::isBesideTile(int x, int y, MapLayer layer) {
@@ -383,22 +372,18 @@ void Map::updateNear(int x, int y) {
         back.x = wrapX(x + i);
         for (int j = -1; j < 2; j++) {
             if (isOnMap(wrapX(x + i), y + j)) {
-
                 fore.y = y + j;
                 back.y = y + j;
                 /* Update the tiles. */
                 addToUpdate(fore);
                 addToUpdate(back);
-                /* Update the sprites. */
-                setSprite(fore, getTile(fore) -> updateSprite(*this, fore));
-                setSprite(back, getTile(back) -> updateSprite(*this, back));
             }
         }
     }
 }
 
 
-int Map::bordering(const Location &place) {
+uint8_t Map::bordering(const Location &place) const {
     EdgeType thisEdge = getTile(place) -> getEdge();
     /* TODO: when rendering of liquids is added, see if this is actually what
     I want to happen. */
@@ -518,8 +503,8 @@ void Map::save(std::string filename) const {
     /* All the other data. */
     outfile << "\n#Other\n";
     for (int i = 0; i < width * height; i++) {
-        outfile << (int)tiles[i].foregroundSprite << " ";
-        outfile << (int)tiles[i].backgroundSprite << " ";
+        outfile << (int)tiles[i].foregroundVariant << " ";
+        outfile << (int)tiles[i].backgroundVariant << " ";
     }
 
     outfile.close();
@@ -639,11 +624,11 @@ Map::Map(string filename, int tileWidth, int tileHeight) :
     }
 
     for (int i = 0; i < width * height; i++) {
-        int spritePlace;
-        infile >> spritePlace;
-        tiles[i].foregroundSprite = (uint8_t)spritePlace;
-        infile >> spritePlace;
-        tiles[i].backgroundSprite = (uint8_t)spritePlace;
+        int variant;
+        infile >> variant;
+        tiles[i].foregroundVariant = (uint8_t)variant;
+        infile >> variant;
+        tiles[i].backgroundVariant = (uint8_t)variant;
     }
 
     /* Iterate over the entire map. */
@@ -804,8 +789,8 @@ bool Map::placeTile(Location place, TileType type) {
     }
 
     setTile(place, type);
-    chooseSprite(place.x, place.y);
-    // TODO: change this if I add furniture
+    setVariant(place.x, place.y, place.layer, 
+        getTile(place) -> getInitialVariant());
 
     return true;
 }
@@ -943,8 +928,8 @@ void Map::moveTile(const Location &place, int x, int y,
 
     kill(newX, place.y + y, place.layer, items);
     TileType val = getTileType(place, 0, 0);
-    Location spritePlace = getSprite(place);
-    setSprite(newX, place.y + y, place.layer, spritePlace);
+    uint8_t variant = getVariant(place.x, place.y, place.layer);
+    setVariant(newX, place.y + y, place.layer, variant);
     setTile(newX, place.y + y, place.layer, val);
     setTile(place, TileType::EMPTY);
 }
@@ -958,9 +943,10 @@ void Map::displaceTile(const Location &place, int x, int y) {
     }
 
     TileType destination = getTileType(place, x, y);
-    Location spritePlace = getSprite(newX, place.y + y, place.layer);
-    setSprite(newX, place.y + y, place.layer, getSprite(place));
-    setSprite(place, spritePlace);
+    uint8_t oldVariant = getVariant(place.x, place.y, place.layer);
+    uint8_t newVariant = getVariant(newX, place.y + y, place.layer);
+    setVariant(place.x, place.y, place.layer, newVariant);
+    setVariant(newX, place.y + y, place.layer, oldVariant);
     setTile(newX, place.y + y, place.layer, getTile(place) -> type);
     setTile(place, destination);
 }

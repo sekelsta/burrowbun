@@ -8,6 +8,7 @@
         },
         "name": "red_brick.png"
     },
+    "numVariants": 1,
     "color": {
         "r": 170,
         "g": 42,

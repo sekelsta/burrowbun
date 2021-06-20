@@ -80,11 +80,8 @@ class Map {
         return pointers[(unsigned int)val];
     }
 
-    /* Call chooseSprite on every tile on the map. */
-    void randomizeSprites();
-
-    /* Pick the sprite to use for a tile based on the ones next to it. */
-    void chooseSprite(int x, int y);
+    /* Choose a variant for every tile on the map. */
+    void initializeVariants();
 
     /* Return true if there's a non-empty tile of the same maplayer here or 
     next to here. */
@@ -201,7 +198,7 @@ private:
     /* Return a number from 0-15 depending on which tiles border this one. 
     (In fact, in binary it returns the number you get if you start at the left
     side and go counterclockwise around, reading an empty tile as a 0. )*/
-    int bordering(const Location &place);
+    uint8_t bordering(const Location &place) const;
 
     /* Return true if this is a place that exists on the map. */
     inline bool isOnMap(int x, int y) const {
@@ -276,52 +273,46 @@ public:
         return spawn;
     }
 
-    /* Return which part of the spritesheet should be used. */
-    inline uint8_t getForegroundSprite(int x, int y) const {
-        return findPointer(x, y) -> foregroundSprite;
-    }
-
-    inline uint8_t getBackgroundSprite(int x, int y) const {
-        return findPointer(x, y) -> backgroundSprite;
-    }
-
-    inline Location getSprite(int x, int y, MapLayer layer) const {
-        uint8_t sprite;
+    /* Get the tile variant. */
+    inline uint8_t getVariant(int x, int y, MapLayer layer) const {
         if (layer == MapLayer::FOREGROUND) {
-            sprite = getForegroundSprite(x, y);
+            return getForegroundVariant(x, y);
         }
         else {
             assert(layer == MapLayer::BACKGROUND);
-            sprite = getBackgroundSprite(x, y);
+            return getBackgroundVariant(x, y);
         }
-
-        Location answer;
-        SpaceInfo::fromSpritePlace(answer, sprite);
-        return answer;
     }
 
-    inline Location getSprite(const Location &place) const {
-        return getSprite(place.x, place.y, place.layer);
+    inline uint8_t getForegroundVariant(int x, int y) const {
+        return findPointer(x, y) -> foregroundVariant;
     }
 
-    /* Set which part of the spritesheet should be used. */
-    inline void setSprite(int x, int y, MapLayer layer, Location newSprite) {
-        uint8_t toset = SpaceInfo::toSpritePlace(newSprite);
+    inline uint8_t getBackgroundVariant(int x, int y) const {
+        return findPointer(x, y) -> backgroundVariant;
+    }
+
+    /* Set the tile variant. */
+    inline void setVariant(int x, int y, MapLayer layer, uint8_t val) {
         if (layer == MapLayer::FOREGROUND) {
-            findPointer(x, y) -> foregroundSprite = toset;
+            setForegroundVariant(x, y, val);
         }
         else {
             assert(layer == MapLayer::BACKGROUND);
-            findPointer(x, y) -> backgroundSprite = toset;
+            setBackgroundVariant(x, y, val);
         }
     }
 
-    inline void setSprite(const Location &place, Location newSprite) {
-        setSprite(place.x, place.y, place.layer, newSprite);
-    }  
+    inline void setForegroundVariant(int x, int y, uint8_t val) {
+        findPointer(x, y) -> foregroundVariant = val;
+    }
+
+    inline void setBackgroundVariant(int x, int y, uint8_t val) {
+        findPointer(x, y) -> backgroundVariant = val;
+    }
 
     /* Return the lighting of a tile. */
-    inline Light getLight(int x, int y) {
+    inline Light getLight(int x, int y) const {
         /* Combine the value from blocks with the value from the sky, taking into
         account that the color of light the sky makes. */
         return findPointer(x, y) -> light.useSky(getSkyLight());
@@ -337,12 +328,12 @@ public:
         return {0x00, 0x99, 0xFF, 0xFF};
     }
 
-    /* Return the pointer the the tile at this location. */
-    inline Tile *getTile(int x, int y, MapLayer layer) {
+    /* Return the pointer to the tile at this location. */
+    inline Tile *getTile(int x, int y, MapLayer layer) const {
         return getTile(getTileType(wrapX(x), y, layer));
     }
 
-    inline Tile *getTile(Location place) {
+    inline Tile *getTile(Location place) const {
         return getTile(place.x, place.y, place.layer);
     }
 
